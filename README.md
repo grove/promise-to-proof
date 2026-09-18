@@ -60,28 +60,26 @@ Invoke the skill directly in your agent:
 ```
 *(or tell the agent: "Let's interrogate your proposal before writing any code.")*
 
-### 2. The Agent Takes the Stand
-The agent immediately exposes its posture in a compact opening statement:
-- **Goal & Stance**: What it proposes doing to achieve your objective.
-- **Key Assumptions**: What must hold true for this to work.
-- **Uncertainty & Alternatives**: Key unknowns and why alternative options were discarded.
-- **Falsifiability**: What evidence or constraint would change its mind.
-- *1 sharp, concrete tradeoff question to kick off the interrogation.*
+### 2. Presenting the Proposal
+The agent exposes its plan transparently in a clean opening statement:
+- **Proposed Approach**: What it proposes building to achieve your objective, grounded in actual code.
+- **Key Assumptions**: What must hold true for this to work without regressions.
+- **Tradeoffs & Risks**: Known compromises, edge cases, and alternative options considered.
+- *At most 1 sharp, concrete technical question or recommendation.*
 
-### 3. The Cross-Examination
-You attack the proposal. The agent adheres to strict rules of engagement:
-- **Hard brevity budget**: Every response is under 150 words or 3–4 bullet points with zero conversational filler.
-- **Direct answers first**: Answers the question in the very first sentence without evading.
-- **Lean format**: Breaks down responses into *Stance*, *Evidence* (observed code vs inference), and *Risk/Consequence*.
+### 3. The Stress-Test
+You probe and challenge the design. The agent adheres to clear principles:
+- **Concise and direct**: Crisp, scannable responses with zero conversational fluff.
+- **Answers first**: Addresses your feedback immediately in the very first sentence.
+- **Collaborative, not combative**: Synthesizes practical compromises rather than grilling you with binary ultimatums.
 - **Autonomous fact-finding**: Inspects the codebase, tools, and git history itself—never asking you to look up facts it can check.
-- **Zero defensive pride**: Concedes invalid assumptions immediately and pivots without excuses.
-- **Targeted technical follow-ups**: Max 1 concrete tradeoff question (e.g., *"Can this pipeline tolerate 2s read lag, or is read-after-write consistency required?"*).
+- **Zero ego**: Adapts smoothly when assumptions are challenged, without defensiveness or flattery.
+- **Focused technical follow-ups**: Max 1 concrete design decision when steering is genuinely needed.
 
 ### 4. Direct Handoff to Action
 When you are satisfied or say wrap up, the session concludes with an immediate transition to work:
-1. **Settled Plan**: The design that survived scrutiny.
-2. **Discarded / Revised**: Assumptions and options dropped during the session.
-3. **Next Step**: An immediate, actionable implementation step or diff ready to run.
+1. **Settled Plan**: The design that survived scrutiny (2–3 bullet points).
+2. **Next Step**: An immediate, actionable implementation step, code diff, or command ready to run.
 
 ---
 
