@@ -39,13 +39,13 @@ The agent autonomously checks the codebase, forms a concrete technical proposal,
 | **Who evaluates?** | The agent probes your requirements | **You** stress-test the agent's proposal |
 | **Fact-checking** | Agent asks you for context | Agent autonomously inspects code, git & docs |
 | **Tone** | Requirements questionnaire | Collegial, high-signal RFC / design review |
-| **Outcome** | Long specification list | **Agreed architecture & immediate code execution** |
+| **Outcome** | Long specification list | **Agreed architecture, verified code & closed loop** |
 
 ---
 
 ## ✨ See It in Action
 
-A quick 2-minute design review that cuts through ambiguity and starts building:
+A quick 2-minute design review that cuts through ambiguity, verifies in code, and closes the loop:
 
 ```text
 User:   /interrogate How should we make the Rockstream storage layer scale to multi-terabyte state?
@@ -64,7 +64,7 @@ Agent:  Inspecting crates/rockstream-storage/src...
         Support both memory-first and tiered storage via per-view configuration:
         `WITH (residency = 'memory_only' | 'tiered')`.
 
-User:   Makes sense. Let's make tiered the default, but memory_only for real-time views.
+User:   Makes sense. Let's make tiered the default, but memory_only for real-time views. Go ahead and build it.
 
 Agent:  Perfect. That keeps the hot path sub-millisecond while protecting overall RAM limits.
 
@@ -73,7 +73,12 @@ Agent:  Perfect. That keeps the hot path sub-millisecond while protecting overal
         2. Route memory_only views directly to in-memory spine bypass in shard_db.rs.
         3. Verify with `cargo test -p rockstream-storage`.
 
-        Moving to implementation now. Here is the first diff...
+        [Applies changes to crates/rockstream-storage/src/shard_db.rs]
+        [Runs `cargo test -p rockstream-storage`]
+
+        Verification complete: 14 passed, 0 failed.
+        • Added ResidencyPolicy with Tiered and MemoryOnly variants.
+        • Verified bypass path. All unit tests green. Ready to review.
 ```
 
 ---
@@ -101,12 +106,12 @@ Before letting an agent write large multi-file changes:
 
 ```text
   ┌────────────────────────────────────────────────────────┐
-  │ 1. Trigger: `/interrogate <your goal or proposal>`    │
+  │ 1. Trigger: `/interrogate <goal or proposal>`          │
   └───────────────────────────┬────────────────────────────┘
                               ▼
   ┌────────────────────────────────────────────────────────┐
   │ 2. Agent inspects code & presents concrete proposal    │
-  │    (Approach • Assumptions • Tradeoffs • Choice)       │
+  │    (Approach • Assumptions • Tradeoffs • Blocking Qs)  │
   └───────────────────────────┬────────────────────────────┘
                               ▼
   ┌────────────────────────────────────────────────────────┐
@@ -115,8 +120,13 @@ Before letting an agent write large multi-file changes:
   └───────────────────────────┬────────────────────────────┘
                               ▼
   ┌────────────────────────────────────────────────────────┐
-  │ 4. Fast convergence into code (within 3–5 turns)       │
-  │    (Final summary bullet points + immediate diffs)     │
+  │ 4. Bounded Convergence (by Turn 5)                     │
+  │    (Stops branching • Summarizes plan & tradeoffs)     │
+  └───────────────────────────┬────────────────────────────┘
+                              ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ 5. Authorized Implementation & Verification            │
+  │    (Apply changes • Run tests/checks • Close loop)     │
   └────────────────────────────────────────────────────────┘
 ```
 
