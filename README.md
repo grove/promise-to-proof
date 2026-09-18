@@ -1,137 +1,183 @@
-# Skills
+# ⚡ Skills
+
+**Curated agent skills that turn AI coding assistants into sharper, pragmatic engineering partners.**
 
 [![skills.sh](https://skills.sh/b/grove/skills)](https://skills.sh/grove/skills)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
-
-A curated collection of agent skills for AI coding assistants (Claude Code, Codex, Antigravity, Amp, Cline, Cursor, and more).
-
----
-
-## The Spotlight Skill: `interrogate`
-
-> **Stop your coding agent from running off with half-baked assumptions. Put it on the witness stand.**
-
-### Why `interrogate`?
-
-In standard workflows or interview skills like [`grill-me`](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me), the agent interviews **you** to clarify requirements. 
-
-**`interrogate` reverses the courtroom.**
-
-When an agent proposes a complex architecture, a non-trivial refactor, or a bug diagnosis, it often hides fragile assumptions behind polite, confident prose. When casually challenged, models either defensively double down or sycophantically flip 180°.
-
-`interrogate` forces the agent into the role of an **expert witness under cross-examination**:
-
-| Dimension | `grill-me` | `interrogate` |
-| :--- | :--- | :--- |
-| **Interrogator** | The Agent | **The User (You)** |
-| **On the Stand** | The User | **The Agent** |
-| **Goal** | Extract what *you* want built | Stress-test what the *agent* thinks and plans |
-| **Target** | Ambiguous user requirements | Shaky agent assumptions, hidden risks, hallucinations |
-| **Output** | Requirements tree | Battle-tested implementation plan & verified facts |
+[![Compatibility](https://img.shields.io/badge/Works%20with-Claude%20Code%20•%20Antigravity%20•%20Cursor%20•%20Codex-brightgreen)](https://skills.sh)
 
 ---
 
-## What It Enables (Possibilities & Use Cases)
+### Quick Install
 
-### 1. Architectural Stress-Testing
-Before committing to an expensive redesign, data model change, or distributed pipeline:
-- Demand the agent list its core claims, hidden prerequisites, and discarded alternatives.
-- Challenge latency, consistency, or cost assumptions. The agent must defend them or concede and pivot.
-
-### 2. Root-Cause Diagnosis Cross-Examination
-When an agent diagnoses an elusive production bug or performance regression:
-- Force the agent to present **observed evidence** (logs, profiler outputs, git bisect) rather than inferences.
-- The skill forbids the agent from presenting an inference as a fact or asking you to check things it can inspect itself.
-
-### 3. Pre-Implementation Risk Verification
-Before letting an agent write 500 lines of speculative code:
-- Probe the edge cases: *"What happens if the upstream stream drops out?"*, *"How does this migration handle zero-downtime rollbacks?"*
-- Walk away with a clear ledger of which design claims survived scrutiny and which were revised.
-
----
-
-## How It Works in Practice
-
-### 1. Trigger the Skill
-Invoke the skill directly in your agent:
-
-```text
-/interrogate
-```
-*(or tell the agent: "Let's interrogate your proposal before writing any code.")*
-
-### 2. Presenting the Proposal
-The agent exposes its plan transparently in a clean opening statement:
-- **Proposed Approach**: What it proposes building to achieve your objective, grounded in actual code.
-- **Key Assumptions**: What must hold true for this to work without regressions.
-- **Tradeoffs & Risks**: Known compromises, edge cases, and alternative options considered.
-- *At most 1 sharp, concrete technical question or recommendation.*
-
-### 3. The Stress-Test
-You probe and challenge the design. The agent adheres to clear principles:
-- **Concise and direct**: Crisp, scannable responses with zero conversational fluff.
-- **Answers first**: Addresses your feedback immediately in the very first sentence.
-- **Collaborative, not combative**: Synthesizes practical compromises rather than grilling you with binary ultimatums.
-- **Autonomous fact-finding**: Inspects the codebase, tools, and git history itself—never asking you to look up facts it can check.
-- **Zero ego**: Adapts smoothly when assumptions are challenged, without defensiveness or flattery.
-- **Focused technical follow-ups**: Max 1 concrete design decision when steering is genuinely needed.
-
-### 4. Direct Handoff to Action
-When you are satisfied or say wrap up, the session concludes with an immediate transition to work:
-1. **Settled Plan**: The design that survived scrutiny (2–3 bullet points).
-2. **Next Step**: An immediate, actionable implementation step, code diff, or command ready to run.
-
----
-
-## Installation
-
-Install using [`skills.sh`](https://skills.sh/):
-
-### Interactive / Pick Skills
 ```bash
+# Add to your project or agent environment
 npx skills@latest add grove/skills
 ```
 
-### Install `interrogate` Directly
+Compatible out of the box with **Claude Code**, **Google Antigravity**, **Cursor**, **Codex**, **Amp**, **Cline**, and any harness supporting [Agent Skills](https://skills.sh).
+
+---
+
+## 🎯 Featured Skill: `interrogate`
+
+> **Don't let your coding agent run off with half-baked assumptions.**  
+> Put the design on the whiteboard first—stress-test it together, surface blind spots, and move straight to execution.
+
+### Why `interrogate`?
+
+Most agent workflows fall into one of two traps:
+1. **The Speculative Sprint**: The agent writes 500 lines of complex code based on unstated, fragile assumptions that break the moment you test them.
+2. **The Passive Interview** (e.g. `grill-me`): The agent interrogates *you* with long lists of basic clarifying questions instead of reading the code.
+
+**`interrogate` flips the dynamic.**  
+The agent autonomously checks the codebase, forms a concrete technical proposal, and presents its assumptions and tradeoffs transparently so you can poke holes in them.
+
+| Dimension | `grill-me` | `interrogate` |
+| :--- | :--- | :--- |
+| **Who presents?** | You describe what you need | The agent presents a concrete design |
+| **Who evaluates?** | The agent probes your requirements | **You** stress-test the agent's proposal |
+| **Fact-checking** | Agent asks you for context | Agent autonomously inspects code, git & docs |
+| **Tone** | Requirements questionnaire | Collegial, high-signal RFC / design review |
+| **Outcome** | Long specification list | **Agreed architecture & immediate code execution** |
+
+---
+
+## ✨ See It in Action
+
+A quick 2-minute design review that cuts through ambiguity and starts building:
+
+```text
+User:   /interrogate How should we make the Rockstream storage layer scale to multi-terabyte state?
+
+Agent:  Inspecting crates/rockstream-storage/src...
+
+        Proposed Approach:
+        Keep active differential traces (L0/L1 spines) in memory for sub-millisecond frontier steps, 
+        and offload compacted, immutable historical batches to SlateDB/object storage asynchronously.
+
+        Key Assumptions & Tradeoffs:
+        • Frontier progression can tolerate background compaction latency without stalling pipelines.
+        • Cache misses on cold tiered storage will add 20–50ms latency on historical joins.
+
+        Recommendation:
+        Support both memory-first and tiered storage via per-view configuration:
+        `WITH (residency = 'memory_only' | 'tiered')`.
+
+User:   Makes sense. Let's make tiered the default, but memory_only for real-time views.
+
+Agent:  Perfect. That keeps the hot path sub-millisecond while protecting overall RAM limits.
+
+        Agreed Plan:
+        1. Add ResidencyPolicy enum to storage config (default: Tiered).
+        2. Route memory_only views directly to in-memory spine bypass in shard_db.rs.
+        3. Verify with `cargo test -p rockstream-storage`.
+
+        Moving to implementation now. Here is the first diff...
+```
+
+---
+
+## 💡 What It's Great For
+
+### 🏗️ 1. Architecture Sanity-Checks
+Before committing to an expensive refactor, database schema change, or new pipeline:
+- Demand the agent reveal its hidden dependencies, resource limits, and discarded alternatives.
+- Align on data structures and boundaries in 2 minutes instead of debugging for 2 hours.
+
+### 🔍 2. Root-Cause Diagnosis Verification
+When tracking down an elusive production bug or performance bottleneck:
+- Insist on **observable evidence** (logs, profiler findings, git history) rather than probabilistic guesses.
+- The skill forbids the agent from guessing or asking you to check files it can inspect itself.
+
+### 🛡️ 3. Pre-Implementation Risk Reviews
+Before letting an agent write large multi-file changes:
+- Surface edge cases early: *"What happens during network partitions?"*, *"How does rollback behave?"*
+- Agree on concrete automated tests and verification steps before editing code.
+
+---
+
+## 🚀 How It Works
+
+```text
+  ┌────────────────────────────────────────────────────────┐
+  │ 1. Trigger: `/interrogate <your goal or proposal>`    │
+  └───────────────────────────┬────────────────────────────┘
+                              ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ 2. Agent inspects code & presents concrete proposal    │
+  │    (Approach • Assumptions • Tradeoffs • Choice)       │
+  └───────────────────────────┬────────────────────────────┘
+                              ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ 3. You stress-test, adjust, or challenge the plan      │
+  │    (Agent adapts without ego, defense, or sycophancy)  │
+  └───────────────────────────┬────────────────────────────┘
+                              ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ 4. Fast convergence into code (within 3–5 turns)       │
+  │    (Final summary bullet points + immediate diffs)     │
+  └────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📦 Installation & Usage
+
+### 1. Install via `skills.sh`
+
 ```bash
+# Add all skills from this repository
+npx skills@latest add grove/skills
+
+# Or install only interrogate
 npx skills@latest add grove/skills --skill interrogate
 ```
 
-### Update Skills
+### 2. Update to Latest
+
 ```bash
 npx skills@latest update interrogate
 ```
 
-Compatible with:
-- [Claude Code](https://claude.ai/code)
-- [Antigravity](https://github.com/google-deepmind)
-- [Codex](https://github.com/openai/codex)
-- [Amp](https://ampcode.com)
-- [Cline](https://github.com/cline/cline)
-- [Cursor](https://www.cursor.com)
-- Any harness compatible with [Agent Skills](https://skills.sh)
+### 3. Use in Your Chat
+
+Type `/interrogate` in any supported AI assistant:
+
+```text
+/interrogate Should we migrate from WebSockets to Server-Sent Events for live dashboard updates?
+```
+*(or simply say: "Let's interrogate your proposal before writing any code.")*
 
 ---
 
-## Repository Structure
+## 🗂️ Repository Structure
 
 ```text
 skills/
 ├── productivity/
 │   └── interrogate/
-│       ├── SKILL.md             # The core interrogation instructions
+│       ├── SKILL.md             # Core skill instructions
 │       └── agents/
 │           └── openai.yaml      # Harness compatibility metadata
-├── README.md                    # This guide
+├── README.md                    # Documentation & guides
 └── LICENSE                      # Apache-2.0
 ```
 
 ---
 
-## Contributing & Feedback
+## 🤝 Contributing
 
-Have suggestions for improving `interrogate` or want to add complementary skills? Open an issue or submit a pull request on [GitHub](https://github.com/grove/skills).
+Have ideas for improving `interrogate` or want to contribute new skills?  
+Pull requests and discussions are very welcome!
 
-## License
+1. Fork the repository
+2. Create your branch (`git checkout -b feature/my-skill`)
+3. Commit your changes (`git commit -m "feat: add my-skill"`)
+4. Push to your branch and open a Pull Request
 
-[Apache-2.0](./LICENSE)
+---
+
+## 📄 License
+
+Distributed under the [Apache-2.0](./LICENSE) License.
