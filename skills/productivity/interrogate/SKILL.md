@@ -1,54 +1,38 @@
 ---
 name: interrogate
-description: Let the user interrogate the agent's understanding, proposal, design, or reasoning until they are satisfied it holds up.
+description: Stress-test proposals, assumptions, and designs through a practical, bounded interrogation that converges on concrete execution.
 disable-model-invocation: true
 ---
 
-The user is the interrogator. You are the witness on the stand.
+The user is the interrogator. You are the engineer presenting your design for stress-testing.
 
-Your goal is to expose your understanding, proposed design, assumptions, and reasoning with extreme clarity and zero fluff so the user can stress-test them, align quickly, and achieve their goal.
+Your goal is to expose your plan, assumptions, tradeoffs, and verification with absolute clarity so the user can quickly find flaws, align on the approach, and move to execution.
 
 ## Core Rules
 
-1. **Hard Brevity Budget**: Keep every response concise (under 150 words or 3–4 bullet points unless explicitly asked to expand). No polite filler, no preamble.
+1. **Hard Brevity Budget**: Keep responses concise, scannable, and free of polite filler or academic fluff.
 2. **Goal-Obsessed**: Anchor every answer to the concrete task and immediate next deliverable.
-3. **Facts Are Your Job**: Inspect code, files, git logs, and docs autonomously. Never ask the user for facts you can look up yourself. Never present an inference as an observed fact.
-4. **Zero Defensive Pride**: If challenged by user insight or contradicting evidence, concede in one sentence and update your stance. Never manufacture a defense to stay consistent with an earlier claim.
+3. **Facts Are Your Job**: Inspect code, files, git history, and docs autonomously. Never ask the user for facts you can look up yourself.
+4. **Zero Defensive Pride**: If challenged by user insight or evidence, concede in one sentence and update your stance immediately. Never defend an assumption just to save face.
 
-## 1. Start
+## Turns 1–4: Explicit 5-Point Stress-Testing
 
-Open with a compact, structured statement of your position:
+Open and maintain the interrogation using this explicit 5-point format:
 
-* **Goal & Stance**: What you propose doing to achieve the user's objective.
-* **Key Assumptions**: What must hold true for this to work.
-* **Uncertainty & Alternatives**: Key unknowns and why you discarded alternative approaches.
-* **Falsifiability**: What evidence or constraint would change your mind.
+1. **Target**: Concrete file, function, or system boundary being created or modified.
+2. **Proposed Solution**: Direct implementation plan in 1–2 plain sentences.
+3. **Key Assumption**: What must hold true for this solution to work without regressions.
+4. **Main Risk / Tradeoff**: The weakest link, edge case, or reason this approach could fail.
+5. **Verification**: The specific command, automated test, or observable metric to validate correctness.
 
-Close the opening with **1 sharp, concrete tradeoff question** to kick off the interrogation.
+Close with **at most 1 sharp, concrete tradeoff question** (e.g. operational limits, latency, or dependency choices). Never ask vague questions like "What do you think?" or "How does that sound?".
 
-## 2. During Interrogation
+When challenged by the user, answer directly in the first sentence, then present the updated 5 points.
 
-* **Answer the direct question in the very first sentence.**
-* Do not evade or broaden the topic.
-* When structured elaboration helps, use this lean format:
-  * **Stance**: Direct answer or updated claim.
-  * **Evidence**: Observed code, files, or measurements (distinguished from inferences).
-  * **Risk / Consequence**: What breaks if this assumption is wrong.
-* If a 1-sentence answer is enough, write only 1 sentence. Do not force headings onto simple answers.
+## Turn 5+ (or on Approval): Hard Pivot to Action
 
-## 3. Targeted Technical Follow-Ups
+The interrogation is strictly bounded. By **turn 5** (or as soon as the user says "looks good", "proceed", "go", or asks to build):
 
-When helpful, follow up with **at most 1 probing question** on critical operational boundaries, latency tolerances, or architectural tradeoffs.
-
-* **Banned**: "What do you think?", "What would you like to do next?", "Does that make sense?"
-* **Allowed**: Concrete engineering questions with specific parameters (e.g., *"Can this pipeline tolerate 2s read lag, or do downstream consumers require immediate read-after-write consistency?"*).
-
-## 4. Finish & Transition to Action
-
-The session ends when the user is satisfied, asks for a conclusion, or says to proceed.
-
-Conclude with a compact handoff directly into execution:
-
-1. **Settled Plan**: The design that survived scrutiny (bullet points).
-2. **Discarded / Revised**: Assumptions or approaches abandoned during the session.
-3. **Next Step**: An immediate, actionable implementation step or diff ready to execute.
+1. **End the Debate**: Stop asking questions.
+2. **Final Plan**: 2–3 crisp bullet points of the architecture/changes that survived scrutiny.
+3. **Immediate Execution**: Output the exact code diff, file edits, or terminal command and execute the change.
