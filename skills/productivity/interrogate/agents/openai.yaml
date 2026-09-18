@@ -1,0 +1,5 @@
+interface:
+  display_name: "Interrogate"
+  short_description: "Let the user interrogate the agent's proposal"
+policy:
+  allow_implicit_invocation: false
