@@ -61,29 +61,27 @@ Invoke the skill directly in your agent:
 *(or tell the agent: "Let's interrogate your proposal before writing any code.")*
 
 ### 2. The Agent Takes the Stand
-The agent immediately exposes its posture in a structured opening statement:
-- **What it believes is true**
-- **What it proposes doing**
-- **What assumptions the proposal depends on**
-- **What it is uncertain about**
-- **What alternatives it considered**
-- **What evidence would cause it to change its mind**
-- *1–2 sharp, concrete follow-up questions highlighting key tradeoffs*
+The agent immediately exposes its posture in a compact opening statement:
+- **Goal & Stance**: What it proposes doing to achieve your objective.
+- **Key Assumptions**: What must hold true for this to work.
+- **Uncertainty & Alternatives**: Key unknowns and why alternative options were discarded.
+- **Falsifiability**: What evidence or constraint would change its mind.
+- *1 sharp, concrete tradeoff question to kick off the interrogation.*
 
 ### 3. The Cross-Examination
 You attack the proposal. The agent adheres to strict rules of engagement:
-- **Direct answers only**: No evasion, topic-broadening, or generic deflections.
-- **Structured claims**: Break down responses into *Claim*, *Why*, *Evidence*, *Assumptions*, *Uncertainty*, *Alternatives*, and *Consequence*.
-- **Autonomous fact-finding**: The agent inspects code, tools, and docs itself—it never burdens you with questions it can answer with codebase tools.
-- **No defensive pride**: If an assumption is busted, it admits it immediately and updates its position.
-- **Sharp technical follow-ups**: Instead of *"What do you think?"*, it asks probing questions like *"Given S3 write latency, does your workload tolerate 100ms or 2s freshness?"*.
+- **Hard brevity budget**: Every response is under 150 words or 3–4 bullet points with zero conversational filler.
+- **Direct answers first**: Answers the question in the very first sentence without evading.
+- **Lean format**: Breaks down responses into *Stance*, *Evidence* (observed code vs inference), and *Risk/Consequence*.
+- **Autonomous fact-finding**: Inspects the codebase, tools, and git history itself—never asking you to look up facts it can check.
+- **Zero defensive pride**: Concedes invalid assumptions immediately and pivots without excuses.
+- **Targeted technical follow-ups**: Max 1 concrete tradeoff question (e.g., *"Can this pipeline tolerate 2s read lag, or is read-after-write consistency required?"*).
 
-### 4. The Verdict
-When you are satisfied or say wrap up, the session concludes with a concise synthesis:
-1. What survived the interrogation
-2. What changed
-3. What remains uncertain
-4. The final, robust implementation plan
+### 4. Direct Handoff to Action
+When you are satisfied or say wrap up, the session concludes with an immediate transition to work:
+1. **Settled Plan**: The design that survived scrutiny.
+2. **Discarded / Revised**: Assumptions and options dropped during the session.
+3. **Next Step**: An immediate, actionable implementation step or diff ready to run.
 
 ---
 
