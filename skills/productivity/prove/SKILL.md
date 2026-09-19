@@ -127,7 +127,7 @@ When cheap, safe, and materially confidence-improving (such as for critical bug 
 Ensure proof fixes did not introduce regressions:
 1. Run focused tests for the issue.
 2. Run static type checking and relevant linters.
-3. Run the full test suite.
+3. Run the full test suite where practical; otherwise run the strongest relevant project-wide verification available and state the limitation.
 4. Inspect `git diff` to ensure no temporary test scaffolding remains.
 5. Rebuild the final Acceptance Matrix.
 
@@ -162,11 +162,11 @@ Whenever files are changed during `/prove`, the final output MUST conclude with 
 - Typecheck: passed
 - Full suite: <count> passed
 
-### Changes Made During Proof
+### Changes Made During Proof (if any)
 - Added regression test for <case> (`<file>`)
 - Fixed <defect found> in `<file>`
 
-> ⚠️ **Diff modified during proof**: Rerun `/code-review main` to ensure changes conform to repository standards.
+> ⚠️ **Diff modified during proof** (if changes were made): Rerun `/code-review main` to ensure changes conform to repository standards.
 ```
 
 ##### If NOT PROVEN:
