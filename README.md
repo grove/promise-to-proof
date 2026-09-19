@@ -17,6 +17,12 @@ npx skills@latest add grove/skills
 
 Compatible out of the box with **Claude Code**, **Google Antigravity**, **Cursor**, **Codex**, **Amp**, **Cline**, and any harness supporting [Agent Skills](https://skills.sh).
 
+The productivity workflow is:
+
+```text
+/to-spec → /to-tickets → /acceptance-matrix → /implement → /prove → /code-review
+```
+
 ---
 
 ## 🎯 Featured Skill: `interrogate`
@@ -239,6 +245,12 @@ npx skills@latest update interrogate
 npx skills@latest update prove
 ```
 
+For the requirement-to-evidence step:
+
+```bash
+npx skills@latest add grove/skills --skill acceptance-matrix
+```
+
 ### 3. Use in Your Chat
 
 Type `/interrogate` or `/prove` in any supported AI assistant:
@@ -259,6 +271,10 @@ Type `/interrogate` or `/prove` in any supported AI assistant:
 skills/
 ├── productivity/
 │   ├── interrogate/
+│   │   ├── SKILL.md             # Core skill instructions
+│   │   └── agents/
+│   │       └── openai.yaml      # Harness compatibility metadata
+│   ├── acceptance-matrix/
 │   │   ├── SKILL.md             # Core skill instructions
 │   │   └── agents/
 │   │       └── openai.yaml      # Harness compatibility metadata
