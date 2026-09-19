@@ -1,0 +1,5 @@
+interface:
+  display_name: "Fix PR"
+  short_description: "Repair failed PR workflows without weakening checks"
+policy:
+  allow_implicit_invocation: false

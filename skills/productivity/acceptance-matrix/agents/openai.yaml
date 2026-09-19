@@ -1,0 +1,5 @@
+interface:
+  display_name: "Acceptance Matrix"
+  short_description: "Turn ticket promises into testable acceptance requirements"
+policy:
+  allow_implicit_invocation: false
