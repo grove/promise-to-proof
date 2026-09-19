@@ -17,6 +17,43 @@ npx skills@latest add grove/skills
 
 Compatible out of the box with **Claude Code**, **Google Antigravity**, **Cursor**, **Codex**, **Amp**, **Cline**, and any harness supporting [Agent Skills](https://skills.sh).
 
+The skills share one agreement: preserve the ticket's promises, identify what
+success looks like, and carry evidence and unresolved gaps into the next step.
+
+| Skill | Use it to | Result |
+|---|---|---|
+| [`interrogate`](./skills/productivity/interrogate/SKILL.md) | Stress-test a proposal and agree on changes | An agreed approach, explicit decisions, and checks for success |
+| [`acceptance-matrix`](./skills/productivity/acceptance-matrix/SKILL.md) | Make a ticket's promises testable before implementation | Stable requirement IDs, observable results, evidence plans, and gaps |
+| [`prove`](./skills/productivity/prove/SKILL.md) | Verify the implementation against the agreement | Every requirement reconciled with evidence and an overall `PROVEN` or `NOT PROVEN` verdict |
+| [`fix-pr`](./skills/productivity/fix-pr/SKILL.md) | Repair failed PR workflows without weakening the agreement | `FIXED` or `NOT FIXED` for the workflow on the repaired commit |
+
+A typical workflow is:
+
+```text
+Ticket or spec → /acceptance-matrix → implementation → /prove → code review
+```
+
+Use `/interrogate` when the design needs discussion and `/fix-pr` when CI fails.
+Each skill also works independently. `/to-spec`, `/to-tickets`, `/implement`, and
+`/code-review` are optional integrations from other skill collections, not skills
+shipped here.
+
+Keep the outcome and matrix with the ticket or implementation plan. Later steps
+account for every requirement ID, preserve required results, and report authorized
+scope changes. Evidence may be replaced when it still establishes the same promise.
+Unresolved requirements prevent declaring the ticket complete.
+
+Matrix rows use `planned`, `proven`, `not proven`, or `disproven`. Only `/prove`
+accepts a row as `proven`; its overall verdict is `PROVEN` or `NOT PROVEN`.
+`FIXED` means CI was repaired, not that the whole ticket is proven. Proof records
+the implementation state and environment; changes to requirements, code, or evidence
+require reassessing affected verdicts. Code review still checks code quality.
+
+These handoffs do not automatically invoke other skills or authorize publishing.
+`/acceptance-matrix` produces a planning artifact. `/interrogate` implements only
+when authorized, and `/prove` can make issue-scoped repairs. Invoking `/fix-pr`
+also authorizes scoped commit, push, and workflow reruns for its target.
+
 ---
 
 ## 🎯 Featured Skill: `interrogate`
@@ -145,12 +182,16 @@ Traditional code reviews and test suites leave dangerous blind spots:
 - Regressions hide in state transitions, idempotency gaps, or concurrency check-then-write boundaries.
 
 **`prove` works from requirements to evidence, not from diff to opinions.**  
-It extracts every material behavioral claim from the originating GitHub issue, audits test quality against independent oracles, attacks the claims with concrete domain counterexamples, and repairs discovered gaps.
+It reads the originating ticket, spec, or agreed conversation, reconciles any
+existing acceptance matrix, audits evidence, and repairs issue-scoped gaps.
+Missing requirements are added; existing promises cannot quietly disappear.
 
 | Skill | Phase | Question |
 | :--- | :--- | :--- |
-| **`/interrogate`** | Pre-Implementation | *Does the proposed solution survive scrutiny before building?* |
-| **`/prove`** | Post-Implementation | *Can we demonstrate that the issue is actually resolved?* |
+| **`/interrogate`** | Design discussion | *Does the approach deliver the agreed outcome?* |
+| **`/acceptance-matrix`** | Acceptance planning | *What must the PR deliver, and how will we check it?* |
+| **`/prove`** | Acceptance verification | *Does the implementation fulfill every promise?* |
+| **`/fix-pr`** | CI repair | *Is the workflow repaired without weakening its checks or the ticket's promises?* |
 
 ---
 
@@ -186,6 +227,7 @@ Agent:  Contract: Issue #482 — Retry failed payment capture
         Requirements: 4/4 demonstrated
         Counterexamples tested: 3 (1 defect fixed, 1 test strengthened)
         ============================================================
+        Diff modified during proof. Repeat code review against the PR's target base.
 ```
 
 ---
@@ -194,7 +236,7 @@ Agent:  Contract: Issue #482 — Retry failed payment capture
 
 ```text
   ┌────────────────────────────────────────────────────────┐
-  │ 1. Contract Discovery (Issue → Acceptance Matrix)      │
+  │ 1. Read Contract & Reconcile Acceptance Matrix        │
   └───────────────────────────┬────────────────────────────┘
                               ▼
   ┌────────────────────────────────────────────────────────┐
@@ -229,26 +271,38 @@ npx skills@latest add grove/skills
 
 # Or install individual skills
 npx skills@latest add grove/skills --skill interrogate
+npx skills@latest add grove/skills --skill acceptance-matrix
 npx skills@latest add grove/skills --skill prove
+npx skills@latest add grove/skills --skill fix-pr
 ```
 
 ### 2. Update to Latest
 
 ```bash
 npx skills@latest update interrogate
+npx skills@latest update acceptance-matrix
 npx skills@latest update prove
+npx skills@latest update fix-pr
 ```
 
 ### 3. Use in Your Chat
 
-Type `/interrogate` or `/prove` in any supported AI assistant:
+Invoke the skill for the work you need:
 
 ```text
 /interrogate Should we migrate from WebSockets to Server-Sent Events for live dashboard updates?
 ```
 
 ```text
+/acceptance-matrix #482
+```
+
+```text
 /prove #482
+```
+
+```text
+/fix-pr #123
 ```
 
 ---
@@ -256,20 +310,17 @@ Type `/interrogate` or `/prove` in any supported AI assistant:
 ## 🗂️ Repository Structure
 
 ```text
-skills/
-├── productivity/
-│   ├── interrogate/
-│   │   ├── SKILL.md             # Core skill instructions
-│   │   └── agents/
-│   │       └── openai.yaml      # Harness compatibility metadata
-│   └── prove/
-│       ├── SKILL.md             # Core skill instructions
-│       ├── agents/
-│       │   └── openai.yaml      # Harness compatibility metadata
-│       └── references/          # Deep patterns & heuristics
-├── README.md                    # Documentation & guides
-└── LICENSE                      # Apache-2.0
+skills/productivity/
+├── acceptance-matrix/
+├── fix-pr/
+├── interrogate/
+├── prove/
+│   └── references/              # Testing and counterexample guidance
+└── README.md
 ```
+
+Each skill directory contains `SKILL.md` and `agents/openai.yaml`. List the
+installed source files with `rg --files skills/productivity`.
 
 ---
 

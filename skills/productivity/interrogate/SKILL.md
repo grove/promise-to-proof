@@ -29,6 +29,14 @@ Present your thinking clearly and naturally. Avoid rigid, robotic checklists or 
 * **Key Assumptions & Tradeoffs**: What must hold true, what risks or edge cases exist, and what compromises we are making.
 * **Open Decisions / Recommendation**: If a design choice needs user input, lay out the options with your recommendation. If the direction is clear, state the next concrete step.
 
+When the task has a ticket or acceptance matrix, read it before proposing changes.
+Carry its requirement IDs, promised results, boundaries, and open decisions into
+the proposal. Explain how the proposed workflow reaches the intended outcome and
+what evidence would demonstrate it. Record user-authorized changes against the
+affected requirements; an implementation shortcut does not change the agreement.
+For an informal design question, state the outcome and checks in prose. A matrix
+is useful when requirements need tracking, not a prerequisite for discussion.
+
 ### During the Discussion
 
 * **Answer directly**: Address the user's feedback in the very first sentence.
@@ -49,7 +57,7 @@ Steps may be compressed or skipped when they do not add meaningful value.
 After several rounds of active discussion—roughly 4–5 turns, or earlier if the design has stabilized—stop expanding the decision space.
 
 1. **Stop branching**: Cease exploring new speculative alternatives unless new evidence invalidates the current direction.
-2. **Summarize status**: Give 2–3 crisp bullet points covering the surviving plan, any material unresolved issue, and your recommended path.
+2. **Summarize status**: Give 2–3 crisp bullet points covering the surviving plan, any material unresolved issue, and your recommended path. Include agreed requirement changes and the evidence needed to judge success.
 3. **Identify the next step**: State the concrete implementation action. If implementation has not already been authorized, ask for confirmation to proceed.
 
 Elapsed conversation does not equal write permission.
@@ -60,6 +68,6 @@ Execute once authorized—either because the user approves ("looks good", "proce
 
 1. **Implement**: Apply the agreed changes, file edits, or commands cleanly.
 2. **Verify Technically**: Run appropriate tests, linters, builds, runtime checks, or other observable validation.
-3. **Verify the Outcome**: Confirm that the result actually satisfies the user's stated goal, not merely that the implementation is internally correct.
+3. **Verify the Outcome**: Check the promised results and complete workflow. When a matrix exists, account for each requirement ID, evidence, and remaining gap. A passing suite alone does not establish an unchecked promise.
 4. **Use the strongest available evidence**: If normal automated verification is unavailable, perform the best practical check available and state any limitation explicitly.
-5. **Close the loop**: State what changed, what was verified, whether the user's goal was achieved, and any remaining operational risks.
+5. **Close the loop**: State what changed, what was verified, whether the user's goal was achieved, and any remaining operational risks. Carry the agreement, authorized amendments, and evidence into implementation or review. Keep unavailable or inconclusive checks visible; reserve matrix status `proven` for independent acceptance by `/prove`.
