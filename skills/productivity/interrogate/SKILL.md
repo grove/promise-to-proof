@@ -64,7 +64,7 @@ Elapsed conversation does not equal write permission.
 
 ### Execution & Outcome Verification
 
-Execute once authorized—either because the user approves ("looks good", "proceed", "go", "build it") or because the original request already explicitly authorized implementation.
+Execute when the current or an earlier request authorizes implementation. Treat "looks good" as authorization only when the context clearly approves implementation, rather than agreement with an explanation or design. Preserve authorization already granted and proceed without redundant confirmation.
 
 1. **Implement**: Apply the agreed changes, file edits, or commands cleanly.
 2. **Verify Technically**: Run appropriate tests, linters, builds, runtime checks, or other observable validation.
