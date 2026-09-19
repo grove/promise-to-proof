@@ -160,7 +160,7 @@ Whenever files are changed during `/prove`, the final output MUST conclude with 
 ### Verification
 - Focused tests: <count> passed
 - Typecheck: passed
-- Full suite: <count> passed
+- Project-wide verification: <result>
 
 ### Changes Made During Proof (if any)
 - Added regression test for <case> (`<file>`)
@@ -188,7 +188,7 @@ Whenever files are changed during `/prove`, the final output MUST conclude with 
 
 ### Verification Status
 - Focused tests: <result>
-- Full suite: <result>
+- Project-wide verification: <result>
 
 ### Changes Made During Proof (if any)
 - Added regression test for <case> (`<file>`)
