@@ -112,9 +112,8 @@ Attack claims with failure scenarios grounded in the domain and codebase:
 ### Phase 5: Strengthen the Proof & Repair Gaps
 When evidence is missing or a counterexample exposes a gap:
 1. Write or strengthen the smallest useful behavioral test at the highest meaningful seam.
-2. Run the focused test to observe failure.
-3. Fix the implementation defect within the issue's scope.
-4. Rerun the test until green.
+2. Run the focused test. If it fails, fix the issue-scoped defect and rerun. If it passes but sensitivity is uncertain, consider a Phase 6 sensitivity check.
+3. Keep changes tightly focused on the issue contract.
 
 ### Phase 6: Sensitivity Checks (Selective)
 When cheap, safe, and materially confidence-improving (such as for critical bug fixes, deduplication guards, or idempotency checks), confirm the test is sensitive to regressions:
@@ -190,6 +189,12 @@ Whenever files are changed during `/prove`, the final output MUST conclude with 
 ### Verification Status
 - Focused tests: <result>
 - Full suite: <result>
+
+### Changes Made During Proof (if any)
+- Added regression test for <case> (`<file>`)
+- Fixed <defect found> in `<file>`
+
+> ⚠️ **Diff modified during proof** (if changes were made): Rerun `/code-review main` to ensure changes conform to repository standards.
 ```
 
 ---
