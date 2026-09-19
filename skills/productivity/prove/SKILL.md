@@ -4,7 +4,11 @@ description: Prove that an implemented issue is actually resolved by mapping eve
 disable-model-invocation: true
 ---
 
-`/prove` is a post-implementation verification skill. It determines whether a GitHub issue has actually been resolved by treating the originating issue as a set of behavioral claims and proving each claim with independent, observable evidence.
+`/prove` is a post-implementation verification skill. It determines whether a
+ticket, spec, or agreed conversation has been implemented by checking its promises
+against independent, observable evidence. Treat that source and its authorized
+amendments as the contract; an acceptance matrix records the contract but does not
+replace it.
 
 Unlike a conventional code review, `/prove` does not primarily ask whether the diff looks clean or follows style guidelines. It starts from the desired outcome:
 
@@ -40,23 +44,33 @@ The output is never "looks good" or "seems complete." It is strictly **PROVEN** 
 * **Not speculative paranoia**: Counterexamples must be rooted in real domain states, actual control flow, public APIs, storage semantics, and concrete caller contracts.
 * **Scope boundaries**: Only make issue-local repairs and tests. Do not redesign surrounding architecture or expand feature scope. Report larger defects in the final assessment.
 
+For a report-only or read-only request, inspect and run safe diagnostics within
+that scope. Report needed repairs instead of editing files or injecting faults.
+
 ---
 
 ## The Proof Model
 
-Every issue is converted into an **Acceptance Matrix**:
+Use the issue's existing **Acceptance Matrix** when available, or create one
+from the issue contract:
 
 | Requirement | Evidence | Status |
 |---|---|---|
-| R1: Failed upload can be retried | `retry-upload.test.ts` (retries after failure) | Proven |
-| R2: Retry does not create duplicates | DB uniqueness constraint + integration test | Proven |
-| R3: Metadata survives retry | No direct assertion | Not Proven |
-| R4: Retry works after page refresh | Session rehydration integration test | Proven |
+| R1: Retrying a failed upload makes the original file retrievable | `retry-upload.test.ts :: retrieves file after retry`; retrieved bytes equal the original fixture | proven |
+| R2: Retry does not create duplicates | DB uniqueness constraint + integration test asserting one upload for the operation | proven |
+| R3: Metadata survives retry | No direct assertion | not proven |
+| R4: Retry works after page refresh | Session rehydration integration test asserting file retrieval after retry | proven |
 
 Each material requirement must resolve to:
-* **Proven**: Direct, credible evidence confirms the required behavior holds under verification.
-* **Not Proven**: Requirement may be implemented, but available evidence is weak, absent, or inconclusive.
-* **Disproven**: A concrete counterexample or test demonstrates the requirement is violated.
+* `proven`: Direct, credible evidence confirms the required behavior holds under verification.
+* `not proven`: Requirement may be implemented, but available evidence is weak, absent, unrun, or inconclusive.
+* `disproven`: A concrete counterexample or test demonstrates the requirement is violated.
+
+Convert incoming `planned` rows to one of these verdicts after verification.
+An unavailable tool or environment leaves a row `not proven`, not `disproven`.
+Record the verified commit or worktree state and relevant environment with the
+results. Reassess affected verdicts when requirements, evidence, or implementation
+change. Use uppercase `PROVEN` or `NOT PROVEN` only for the overall conclusion.
 
 ---
 
@@ -80,8 +94,8 @@ Each material requirement must resolve to:
 ```
 
 ### Phase 1: Establish the Contract & Inherit Parent Spec
-Read the originating issue before deeply inspecting the implementation diff.
-1. **Locate the issue**: From user input (`#123`, URL), branch/commit metadata, PR description, or issue tracker. If no requirement source can be established, stop and ask.
+Read the source contract before deeply inspecting the implementation diff.
+1. **Locate the contract**: Use the supplied ticket, spec, or agreed conversation. For an issue, inspect user input (`#123`, URL), branch/commit metadata, PR description, or issue tracker. If no requirement source can be established, stop and ask.
 2. **Follow parent/spec links**:
    - Check the issue for parent references (e.g. `Parent: #100`, `Part of #100`, links to a spec, or epic).
    - If a parent exists, read the parent issue/spec to understand the overarching system guarantees.
@@ -90,12 +104,29 @@ Read the originating issue before deeply inspecting the implementation diff.
    - Explicit acceptance criteria, requested user-visible behaviors, and inherited parent constraints.
    - Required state transitions and negative requirements ("must NOT duplicate").
    - Data preservation, error handling, and domain invariants implied by the outcome.
-4. **Draft the initial Acceptance Matrix** (`R1, R2, ...`).
+4. **Reconcile the acceptance matrix**: Read any matrix embedded in or linked
+   from the issue, or supplied with the task. Preserve its requirement IDs,
+   promised results, boundaries, and open questions. If none exists, draft one
+   (`R1, R2, ...`). Independently compare the matrix with the issue and applicable
+   parent constraints; add omitted material requirements with unused IDs.
+   - Record changed or dropped promises with their original IDs, source, and
+     explicit authorization for any scope change. A PR's implementation or
+     weaker tests do not authorize narrowing the contract. Keep unsupported
+     changes visible as unresolved gaps and return **NOT PROVEN** while they
+     remain unresolved.
+   - Resolve conflicts against the source contract and authorized amendments.
+     Report ambiguous product decisions instead of choosing the easiest reading.
+     Evidence mappings are proposals to evaluate; earlier statuses are not
+     evidence for the current implementation.
 
 ### Phase 2: Map Existing Evidence
 Map existing code and tests to each requirement:
 * Inspect tests, runtime validations, database schemas, and type constraints.
 * Read the actual assertions and invariants—confirm they establish the specific behavioral claim rather than merely executing the code path.
+* For each row, identify the required observable result and the assertion or
+  enforced condition that establishes it. Record replacement evidence and why it
+  still establishes the same promise. A passing suite does not establish a row
+  whose required result is never checked.
 
 ### Phase 3: Audit Test Quality
 Ensure tests serving as evidence are credible:
@@ -107,12 +138,16 @@ Ensure tests serving as evidence are credible:
 ### Phase 4: Hunt Concrete Counterexamples
 Attack claims with failure scenarios grounded in the domain and codebase:
 * Explore adjacent lifecycle states, semantic boundaries (`0 / 1 / N`, tenant/auth boundaries), persistence/restart transitions, retries & idempotency, check-then-write race windows, and caller contracts.
+* Trace the requested workflow from trigger through completion. Could every row
+  pass while the intended user or operational outcome still fails? Check how the
+  steps connect and what the user can observe at completion. Strengthen evidence
+  or add a missing obligation where the contract supports it.
 * *Reference*: See [Counterexample Hunting Patterns](./references/counterexample-patterns.md) for domain-specific attack vectors.
 
 ### Phase 5: Strengthen the Proof & Repair Gaps
 When evidence is missing or a counterexample exposes a gap:
-1. Write or strengthen the smallest useful behavioral test at the highest meaningful seam.
-2. Run the focused test. If it fails, fix the issue-scoped defect and rerun. If it passes but sensitivity is uncertain, consider a Phase 6 sensitivity check.
+1. Strengthen the smallest appropriate evidence. Use a behavioral test at the highest meaningful seam for behavioral gaps, or an enforced invariant or verification command for claims those checks establish.
+2. Run the focused check. If it demonstrates a violation, fix the issue-scoped defect and rerun. If it passes but sensitivity is uncertain, consider a Phase 6 sensitivity check. Report unavailable verification as an evidence gap.
 3. Keep changes tightly focused on the issue contract.
 
 ### Phase 6: Sensitivity Checks (Selective)
@@ -128,21 +163,31 @@ Ensure proof fixes did not introduce regressions:
 1. Check the PR status for the exact commit under review. If all required checks are green and the working tree is clean, treat those checks as project-wide verification. Do not rerun tests, typechecks, or linters locally just to duplicate green CI.
 2. Run focused tests, static checks, or the full suite only when the PR checks are missing, stale, incomplete for the affected paths, or no longer cover the final diff because `/prove` changed files.
 3. Inspect `git diff` to ensure no temporary test scaffolding remains.
-4. Rebuild the final Acceptance Matrix.
+4. Update the reconciled Acceptance Matrix with current evidence and verdicts.
+   Account for every original ID and added requirement. Retain the disposition
+   of changed or dropped promises, including their source and authorization;
+   unresolved requirements and product decisions prevent **PROVEN**.
 
 ### Phase 8: Declare the Result & Close the Review Loop
 Report the conclusion with complete objectivity.
+Include the intended outcome, evidence of workflow completion, and reconciliation
+with the ticket's matrix. Report added, changed, or dropped requirements and
+replaced evidence by ID, or state that none changed. Keep unmet requirements and
+missing evidence visible in the final matrix and unresolved gaps.
 
 #### Closing the Review / Prove Loop
 If `/prove` added tests, changed code, or fixed defects, **it modified the diff and may have invalidated a prior code review**.
 Whenever files are changed during `/prove`, the final output MUST conclude with an explicit directive:
-> **Diff modified during proof.** Rerun `/code-review main` to re-verify code quality, naming, and architectural alignment against the updated diff.
+> **Diff modified during proof.** Repeat the repository's code review against the actual target base. Use `/code-review <base>` if installed, or the repository's equivalent review process.
+
+This handoff does not invoke another skill, publish a result, or merge the PR.
+An acceptance verdict and a code review assess different parts of PR quality.
 
 #### Reporting Format
 
 ##### If PROVEN:
 ```markdown
-# PROVEN — Issue #<number>
+# PROVEN — <ticket, spec, or agreed source>
 
 > PROVEN: Every material requirement in the issue contract is supported by credible evidence under the available verification environment.
 
@@ -150,11 +195,15 @@ Whenever files are changed during `/prove`, the final output MUST conclude with 
 **Counterexamples tested:** <count> (<fixed_count> resolved)
 **Requirements relying on inspection alone:** 0
 
+**Outcome:** <intended result and evidence of workflow completion>
+**Contract reconciliation:** <added requirements, authorized scope changes, and replaced evidence by ID, or "None">
+**Verification context:** <commit or worktree state, relevant environment>
+
 ### Acceptance Matrix
 | Requirement | Evidence | Status |
 |---|---|---|
-| R1: <claim> | <test or invariant> | Proven |
-| R2: <inherited from Parent #X> | <test or invariant> | Proven |
+| R1: <claim> | <test or invariant and observed result> | proven |
+| R2: <inherited from Parent #X> | <test or invariant and observed result> | proven |
 
 ### Verification
 - Focused tests: <count> passed
@@ -165,14 +214,18 @@ Whenever files are changed during `/prove`, the final output MUST conclude with 
 - Added regression test for <case> (`<file>`)
 - Fixed <defect found> in `<file>`
 
-> ⚠️ **Diff modified during proof** (if changes were made): Rerun `/code-review main` to ensure changes conform to repository standards.
+> **Diff modified during proof** (if changes were made): Repeat code review against the actual target base using `/code-review <base>` if installed, or the repository's equivalent review process.
 ```
 
 ##### If NOT PROVEN:
 ```markdown
-# NOT PROVEN — Issue #<number>
+# NOT PROVEN — <ticket, spec, or agreed source>
 
 **Requirements:** <proven_count>/<total_count> demonstrated
+
+**Outcome:** <intended result and what prevents establishing it>
+**Contract reconciliation:** <added, changed, or dropped requirements and replaced evidence by ID, with sources and authorization where applicable, or "None">
+**Verification context:** <commit or worktree state, relevant environment>
 
 ### Unresolved Gaps
 - **Requirement R<X>**: <description of what is unproven or failing>
@@ -182,8 +235,8 @@ Whenever files are changed during `/prove`, the final output MUST conclude with 
 ### Acceptance Matrix
 | Requirement | Evidence | Status |
 |---|---|---|
-| R1: <claim> | <test or invariant> | Proven |
-| R2: <claim> | Insufficient concurrency protection | Not Proven |
+| R1: <claim> | <test or invariant and observed result> | proven |
+| R2: <claim> | Insufficient concurrency evidence | not proven |
 
 ### Verification Status
 - Focused tests: <result>
@@ -193,7 +246,7 @@ Whenever files are changed during `/prove`, the final output MUST conclude with 
 - Added regression test for <case> (`<file>`)
 - Fixed <defect found> in `<file>`
 
-> ⚠️ **Diff modified during proof** (if changes were made): Rerun `/code-review main` to ensure changes conform to repository standards.
+> **Diff modified during proof** (if changes were made): Repeat code review against the actual target base using `/code-review <base>` if installed, or the repository's equivalent review process.
 ```
 
 ---

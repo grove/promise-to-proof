@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Implemented in [fix-pr](../skills/productivity/fix-pr/SKILL.md).
 
 ## Summary
 
@@ -78,7 +78,7 @@ Before changing code, classify the primary cause:
 * **Workflow:** GitHub Actions configuration, permissions, or job wiring is wrong.
 * **External:** a dependency, runner, credential, or service is unavailable.
 
-Flakiness is a confidence modifier, not a separate cause: a rerun without a relevant change is `WORKFLOW GREEN — FLAKE NOT RESOLVED` until nondeterminism is understood.
+Flakiness is a confidence modifier, not a separate cause: a rerun without a relevant change is `NOT FIXED — WORKFLOW GREEN — FLAKE NOT RESOLVED` until nondeterminism is understood.
 
 ---
 
@@ -93,7 +93,9 @@ Validate branch before merge
 Run required checks for commit abc123
 ```
 
-The intended operation defines success.
+The intended operation defines success. Read the ticket and acceptance matrix
+when they define the behavior under repair. Preserve their requirement IDs and
+promises; report missing or ambiguous requirements without guessing them.
 
 ## 2. Diagnose the Failure
 
@@ -113,6 +115,12 @@ Run the cheapest high-signal verification first, and run broader or duplicate ch
 
 * `FIXED`: the cause is understood, a durable repair is applied, focused verification passes, required quality signals are preserved or strengthened, the repaired commit is pushed, and all required PR checks are green.
 * `NOT FIXED`: the failure remains unresolved, required capability is unavailable, the worktree is unsafe, the repair would weaken quality, or only an unexplained rerun passed.
+
+`FIXED` establishes workflow repair on the reported commit, not acceptance of
+every ticket requirement. Report affected requirement IDs, replacement evidence,
+and remaining acceptance gaps. Reassess prior proof and review after changes to
+implementation or evidence; use `/prove` for full acceptance verification when
+requested or required.
 
 ---
 
