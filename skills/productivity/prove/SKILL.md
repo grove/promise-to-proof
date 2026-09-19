@@ -125,11 +125,10 @@ When cheap, safe, and materially confidence-improving (such as for critical bug 
 
 ### Phase 7: Verify the Whole Change
 Ensure proof fixes did not introduce regressions:
-1. Run focused tests for the issue.
-2. Run static type checking and relevant linters.
-3. Run the full test suite where practical; otherwise run the strongest relevant project-wide verification available and state the limitation.
-4. Inspect `git diff` to ensure no temporary test scaffolding remains.
-5. Rebuild the final Acceptance Matrix.
+1. Check the PR status for the exact commit under review. If all required checks are green and the working tree is clean, treat those checks as project-wide verification. Do not rerun tests, typechecks, or linters locally just to duplicate green CI.
+2. Run focused tests, static checks, or the full suite only when the PR checks are missing, stale, incomplete for the affected paths, or no longer cover the final diff because `/prove` changed files.
+3. Inspect `git diff` to ensure no temporary test scaffolding remains.
+4. Rebuild the final Acceptance Matrix.
 
 ### Phase 8: Declare the Result & Close the Review Loop
 Report the conclusion with complete objectivity.
