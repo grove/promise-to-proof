@@ -9,7 +9,7 @@ When evaluating test evidence during `/prove`, do not equate "tests pass" with "
 ### Mock Illusion
 * **The Flaw**: Mocks configure the mock return value to match the exact requirement, so the test merely verifies that the mock returned what it was told to return.
 * **Red Flag**: A test with 15 lines of mock setup and a single assertion verifying that the mock was invoked with arguments configured in line 2.
-* **Remedy**: Test across real boundaries or against real in-memory adapters (e.g. SQLite, fake repositories, real serialization).
+* **Remedy**: Test across real boundaries or use substitutes that preserve the semantics relevant to the claim. SQLite or a fake repository does not automatically establish production-database concurrency behavior. Use the production engine when its locking or isolation semantics determine the result.
 
 ### Tautological Expectations
 * **The Flaw**: The test calculates the expected outcome using the exact same helper, regex, or logic used by the production code.

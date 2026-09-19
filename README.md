@@ -82,7 +82,7 @@ The agent autonomously checks the codebase, forms a concrete technical proposal,
 
 ## ✨ See It in Action
 
-A quick 2-minute design review that cuts through ambiguity, verifies in code, and closes the loop:
+An illustrative design review that separates implementation checks from outstanding scale and latency evidence:
 
 ```text
 User:   /interrogate How should we make the Rockstream storage layer scale to multi-terabyte state?
@@ -90,12 +90,12 @@ User:   /interrogate How should we make the Rockstream storage layer scale to mu
 Agent:  Inspecting crates/rockstream-storage/src...
 
         Proposed Approach:
-        Keep active differential traces (L0/L1 spines) in memory for sub-millisecond frontier steps, 
+        Keep active differential traces (L0/L1 spines) in memory, targeting sub-millisecond frontier steps,
         and offload compacted, immutable historical batches to SlateDB/object storage asynchronously.
 
         Key Assumptions & Tradeoffs:
         • Frontier progression can tolerate background compaction latency without stalling pipelines.
-        • Cache misses on cold tiered storage will add 20–50ms latency on historical joins.
+        • Historical join latency on cache misses needs measurement against the agreed latency budget.
 
         Recommendation:
         Support both memory-first and tiered storage via per-view configuration:
@@ -103,19 +103,22 @@ Agent:  Inspecting crates/rockstream-storage/src...
 
 User:   Makes sense. Let's make tiered the default, but memory_only for real-time views. Go ahead and build it.
 
-Agent:  Perfect. That keeps the hot path sub-millisecond while protecting overall RAM limits.
+Agent:  I'll implement that policy. Hot-path latency and RAM use at multi-terabyte scale still need measurement.
 
         Agreed Plan:
         1. Add ResidencyPolicy enum to storage config (default: Tiered).
         2. Route memory_only views directly to in-memory spine bypass in shard_db.rs.
         3. Verify with `cargo test -p rockstream-storage`.
+        4. Measure RAM use and latency under a representative multi-terabyte workload before claiming the scale goal is met.
 
         [Applies changes to crates/rockstream-storage/src/shard_db.rs]
         [Runs `cargo test -p rockstream-storage`]
 
-        Verification complete: 14 passed, 0 failed.
+        Unit tests: 14 passed, 0 failed.
         • Added ResidencyPolicy with Tiered and MemoryOnly variants.
-        • Verified bypass path. All unit tests green. Ready to review.
+        • Verified bypass path. Implementation ready to review.
+        • Outstanding: multi-terabyte workload evidence for RAM use, frontier latency, and historical join latency.
+          The scale goal and sub-millisecond hot-path target remain unverified.
 ```
 
 ---
