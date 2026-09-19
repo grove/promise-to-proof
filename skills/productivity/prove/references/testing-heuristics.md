@@ -47,7 +47,7 @@ When evaluating test evidence during `/prove`, do not equate "tests pass" with "
 A sensitivity check verifies that a regression test is capable of detecting when the requirement is broken.
 
 ### When to use:
-Apply to 1–3 central regression claims of the issue (especially bug fixes or idempotency guards).
+Apply selectively when cheap, safe, and materially confidence-improving (for example, verifying that a bug-fix test or deduplication guard fails when the fix is omitted). Omit when fault injection is costly, unsafe, or provides little additional confidence.
 
 ### Protocol:
 1. **Identify the core guard or fix**:
