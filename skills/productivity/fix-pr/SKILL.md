@@ -21,10 +21,23 @@ target makes that possible.
 
 ## Guardrails
 
-Before editing, inspect the branch and worktree. Continue only when changes
-are either clean or clearly part of the target branch; stop with `NOT FIXED`
-when unrelated edits, missing credentials, unavailable permissions, or an
-unsafe branch state make the repair ambiguous.
+Before editing, inspect the branch and worktree. Continue only when the
+current branch and commit identify the target PR head or workflow commit, and
+the worktree has no unrelated changes. Stop with `NOT FIXED` when the target
+cannot be established, credentials or permissions are unavailable, or the
+branch state makes the repair ambiguous.
+
+Commit only the scoped repair, push only the target PR head branch, and never
+force-push.
+
+Bind diagnosis and verification to the exact target commit SHA. If the PR
+changes during the repair, stop and re-establish the target rather than
+silently chasing the newer commit.
+
+For fork or otherwise untrusted PRs, do not expose secrets, approve privileged
+workflow execution, broaden permissions, or weaken isolation. Stop with
+`NOT FIXED` when the required verification depends on an unavailable safe
+execution path.
 
 Preserve the verification boundary that exposed the failure:
 
@@ -48,14 +61,16 @@ Define success from that guarantee.
 ### 2. Diagnose before editing
 
 Inspect the workflow run, failed jobs and steps, logs, workflow YAML, relevant
-changes, and required PR checks. Start at the earliest causal failure, then
-look for independent failures in parallel jobs. Record the workflow, job,
-step, command, and observed error.
+changes, and the target PR's branch-protection or ruleset-required checks.
+Start at the earliest causal failure, then look for independent failures in
+parallel jobs. Record the workflow, job, step, command, and observed error.
 
-Reproduce a failing command locally or remotely only when it is the cheapest
-useful way to distinguish plausible causes or validate a risky repair. Prefer
-existing artifacts and focused static inspection; avoid equivalent duplicate
-runs.
+Choose local reproduction, a pushed GitHub Actions run, or both by expected
+evidence per unit of clock time, context cost, and compute cost. Use local
+checks when they isolate the cause quickly; prefer the authoritative remote
+workflow when it is environment-specific or expensive to reproduce locally.
+Use existing artifacts and focused static inspection when they answer the
+question; avoid equivalent duplicate runs.
 
 Classify the primary cause before changing anything:
 
@@ -63,6 +78,10 @@ Classify the primary cause before changing anything:
 - `WORKFLOW`: GitHub Actions configuration, permissions, or job wiring is
   wrong.
 - `EXTERNAL`: dependency, runner, credential, or service is unavailable.
+
+For `EXTERNAL`, do not change product or workflow code to compensate for the
+unavailable capability. Resolve the external condition only when it is
+authorized and independently verifiable; otherwise return `NOT FIXED`.
 
 Treat flakiness as a confidence modifier. A rerun without a relevant change
 ends as `WORKFLOW GREEN — FLAKE NOT RESOLVED` until nondeterminism is
@@ -75,16 +94,29 @@ required checks and their failure semantics unchanged. For product and test
 defects, add or strengthen the focused regression evidence before declaring
 success.
 
-Run the cheapest high-signal verification first. Then run broader local checks
-or the authoritative GitHub workflow when their evidence justifies the cost.
-Verify all required checks for the target PR or commit, not only the original
-failed job. For a workflow-run target, use its associated PR when available;
-otherwise verify the run's required checks. Confirm that the repaired commit
-is pushed, no verification was weakened, and no unrelated quality regression
-was introduced.
+Run the cheapest high-signal verification first, whether local or remote. Use
+the authoritative GitHub workflow as the primary verification when it is the
+more efficient evidence source; run broader local checks only when their
+additional evidence justifies the cost.
+Verify every required check reported by the target PR's branch protection or
+ruleset, not only the original failed job. For a workflow-run target, use its
+associated PR when available; otherwise verify every check represented by the
+run and state that branch-protection requirements could not be established.
+Count a required check only when it succeeds for the exact repaired SHA.
+Pending, queued, cancelled, timed-out, skipped, missing, or stale results are
+not successful verification. When waiting is authorized, poll adaptively:
+use the workflow's observed duration when available, otherwise start at 30
+seconds, double the interval up to 5 minutes, and stop at a bounded wait
+budget: use the workflow's recent p95 duration when available, otherwise 15
+minutes, capped at 30 minutes. Stop immediately on a terminal result; do not
+spend calls checking an unchanged run at a fixed short interval. If the budget
+expires, return `NOT FIXED — VERIFICATION PENDING` with the run URLs. Confirm
+that the repaired commit is pushed, no verification was weakened, and no
+unrelated quality regression was introduced.
 
-Cap repair attempts. If the cause remains uncertain, a required capability is
-unavailable, a verification fails, or the repair would weaken quality, stop.
+Allow at most two repair attempts. If the cause remains uncertain, a required
+capability is unavailable, a verification fails, or the repair would weaken
+quality, stop.
 Also stop when the repair introduces an unexplained quality regression, removes
 required verification, or makes an existing quality signal unmeasurable.
 
@@ -115,4 +147,6 @@ earliest causal error, files changed, verification performed, required-check
 status, and the remaining reason when `NOT FIXED`.
 
 Invoking `/fix-pr` authorizes scoped inspection, edits, commit, push, and
-workflow reruns for the target PR or workflow run.
+workflow reruns for the target PR or workflow run. It does not authorize
+force-pushes, changes outside the target branch, or workarounds that weaken
+verification.
