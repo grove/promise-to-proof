@@ -1,0 +1,5 @@
+interface:
+  display_name: "Prove"
+  short_description: "Prove that an issue is resolved with independent evidence"
+policy:
+  allow_implicit_invocation: false

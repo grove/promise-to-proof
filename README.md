@@ -132,6 +132,93 @@ Before letting an agent write large multi-file changes:
 
 ---
 
+## 🎯 Featured Skill: `prove`
+
+> **"Looks good to me" is not evidence.**  
+> Map every material requirement in an issue to observable evidence, hunt concrete counterexamples, repair gaps, and refuse to declare success until proven.
+
+### Why `prove`?
+
+Traditional code reviews and test suites leave dangerous blind spots:
+- Diffs look clean and faithful to the spec, but a core negative requirement was never tested.
+- Tests pass, but they mock the world so thoroughly that the system under test cannot realistically fail.
+- Regressions hide in state transitions, idempotency gaps, or concurrency check-then-write boundaries.
+
+**`prove` works from requirements to evidence, not from diff to opinions.**  
+It extracts every material behavioral claim from the originating GitHub issue, audits test quality against independent oracles, attacks the claims with concrete domain counterexamples, and repairs discovered gaps.
+
+| Skill | Phase | Question |
+| :--- | :--- | :--- |
+| **`/interrogate`** | Pre-Implementation | *Does the proposed solution survive scrutiny before building?* |
+| **`/prove`** | Post-Implementation | *Can we demonstrate that the issue is actually resolved?* |
+
+---
+
+### ✨ See It in Action
+
+Verifying an issue resolution with independent falsification:
+
+```text
+User:   /prove #482
+
+Agent:  Contract: Issue #482 — Retry failed payment capture
+        R1. Failed captures can be retried.
+        R2. Retry cannot result in a duplicate charge.
+        R3. Original invoice association must survive retry.
+        R4. Successful retry clears failure state.
+
+        Auditing Evidence & Hunting Counterexamples...
+        • R1: Verified by payment_retry_test.go.
+        • R2: Found weak mock. Replacing with integration idempotency check.
+              Running sensitivity check (temporarily removing idempotency key)...
+              [Sensitivity check RED: duplicate charge detected]
+              Restored implementation. [Sensitivity check GREEN].
+        • R3: No existing assertion found. Added test:
+              [Test RED: retry path creates replacement record without invoice_id]
+              Fixing retry logic in payments/service.go to preserve invoice_id...
+              [Test GREEN: invoice_id preserved].
+        • R4: Verified by clear_failure_test.go.
+
+        Running full verification suite (412 tests passed, 0 failed)...
+
+        ============================================================
+        PROVEN — Issue #482
+        Requirements: 4/4 demonstrated
+        Counterexamples tested: 3 (1 defect fixed, 1 test strengthened)
+        ============================================================
+```
+
+---
+
+### 🛡️ The 8-Phase Proof Loop
+
+```text
+  ┌────────────────────────────────────────────────────────┐
+  │ 1. Contract Discovery (Issue → Acceptance Matrix)      │
+  └───────────────────────────┬────────────────────────────┘
+                              ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ 2. Map Evidence & 3. Audit Test Quality                │
+  │    (Public seams • Independent oracles • Sensitivity)  │
+  └───────────────────────────┬────────────────────────────┘
+                              ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ 4. Hunt Counterexamples & 5. Strengthen / Repair Gaps  │
+  │    (Domain boundaries • TOCTOU • Retries • Fix local)  │
+  └───────────────────────────┬────────────────────────────┘
+                              ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ 6. Sensitivity Checks & 7. Whole-Change Verification   │
+  │    (Verify tests turn RED • Clean diff • Full suite)   │
+  └───────────────────────────┬────────────────────────────┘
+                              ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ 8. Strict Outcome: PROVEN or NOT PROVEN                │
+  └────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## 📦 Installation & Usage
 
 ### 1. Install via `skills.sh`
@@ -140,24 +227,29 @@ Before letting an agent write large multi-file changes:
 # Add all skills from this repository
 npx skills@latest add grove/skills
 
-# Or install only interrogate
+# Or install individual skills
 npx skills@latest add grove/skills --skill interrogate
+npx skills@latest add grove/skills --skill prove
 ```
 
 ### 2. Update to Latest
 
 ```bash
 npx skills@latest update interrogate
+npx skills@latest update prove
 ```
 
 ### 3. Use in Your Chat
 
-Type `/interrogate` in any supported AI assistant:
+Type `/interrogate` or `/prove` in any supported AI assistant:
 
 ```text
 /interrogate Should we migrate from WebSockets to Server-Sent Events for live dashboard updates?
 ```
-*(or simply say: "Let's interrogate your proposal before writing any code.")*
+
+```text
+/prove #482
+```
 
 ---
 
@@ -166,10 +258,15 @@ Type `/interrogate` in any supported AI assistant:
 ```text
 skills/
 ├── productivity/
-│   └── interrogate/
+│   ├── interrogate/
+│   │   ├── SKILL.md             # Core skill instructions
+│   │   └── agents/
+│   │       └── openai.yaml      # Harness compatibility metadata
+│   └── prove/
 │       ├── SKILL.md             # Core skill instructions
-│       └── agents/
-│           └── openai.yaml      # Harness compatibility metadata
+│       ├── agents/
+│       │   └── openai.yaml      # Harness compatibility metadata
+│       └── references/          # Deep patterns & heuristics
 ├── README.md                    # Documentation & guides
 └── LICENSE                      # Apache-2.0
 ```
