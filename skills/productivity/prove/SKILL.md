@@ -185,62 +185,34 @@ An acceptance verdict and a code review assess different parts of PR quality.
 
 #### Reporting Format
 
-##### If PROVEN:
 ```markdown
-# PROVEN — <ticket, spec, or agreed source>
+# <PROVEN | NOT PROVEN> — <ticket, spec, or agreed source>
 
-> PROVEN: Every material requirement in the issue contract is supported by credible evidence under the available verification environment.
+> <PROVEN means every material requirement has credible evidence. NOT PROVEN means at least one requirement lacks direct evidence or has a failing counterexample.>
 
-**Requirements:** <N>/<N> demonstrated (including inherited parent constraints)
+**Requirements:** <proven_count>/<total_count> demonstrated (including inherited parent constraints)
 **Counterexamples tested:** <count> (<fixed_count> resolved)
-**Requirements relying on inspection alone:** 0
+**Requirements relying on inspection alone:** <count>
 
-**Outcome:** <intended result and evidence of workflow completion>
-**Contract reconciliation:** <added requirements, authorized scope changes, and replaced evidence by ID, or "None">
-**Verification context:** <commit or worktree state, relevant environment>
-
-### Acceptance Matrix
-| Requirement | Evidence | Status |
-|---|---|---|
-| R1: <claim> | <test or invariant and observed result> | proven |
-| R2: <inherited from Parent #X> | <test or invariant and observed result> | proven |
-
-### Verification
-- Focused tests: <count> passed
-- Typecheck: passed
-- Project-wide verification: <result>
-
-### Changes Made During Proof (if any)
-- Added regression test for <case> (`<file>`)
-- Fixed <defect found> in `<file>`
-
-> **Diff modified during proof** (if changes were made): Repeat code review against the actual target base using `/code-review <base>` if installed, or the repository's equivalent review process.
-```
-
-##### If NOT PROVEN:
-```markdown
-# NOT PROVEN — <ticket, spec, or agreed source>
-
-**Requirements:** <proven_count>/<total_count> demonstrated
-
-**Outcome:** <intended result and what prevents establishing it>
+**Outcome:** <intended result and evidence of workflow completion, or what prevents establishing it>
 **Contract reconciliation:** <added, changed, or dropped requirements and replaced evidence by ID, with sources and authorization where applicable, or "None">
 **Verification context:** <commit or worktree state, relevant environment>
 
-### Unresolved Gaps
-- **Requirement R<X>**: <description of what is unproven or failing>
-  - *Evidence / Counterexample*: <concrete scenario or race condition>
-  - *Why unresolved*: <architectural limitation outside issue scope, external dependency, etc.>
-
 ### Acceptance Matrix
 | Requirement | Evidence | Status |
 |---|---|---|
 | R1: <claim> | <test or invariant and observed result> | proven |
-| R2: <claim> | Insufficient concurrency evidence | not proven |
+| R2: <claim> | <test or invariant and observed result> | not proven |
 
-### Verification Status
+### Verification
 - Focused tests: <result>
+- Typecheck: <result>
 - Project-wide verification: <result>
+
+### Unresolved Gaps (when NOT PROVEN)
+- **Requirement R<X>**: <description>
+  - *Evidence / Counterexample*: <scenario or failing check>
+  - *Why unresolved*: <limitation or unavailable capability>
 
 ### Changes Made During Proof (if any)
 - Added regression test for <case> (`<file>`)

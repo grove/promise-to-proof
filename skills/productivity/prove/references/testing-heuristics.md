@@ -42,28 +42,8 @@ When evaluating test evidence during `/prove`, do not equate "tests pass" with "
 
 ---
 
-## 2. Executing Sensitivity Checks
+## 2. Executing sensitivity checks
 
-A sensitivity check verifies that a regression test is capable of detecting when the requirement is broken.
-
-### When to use:
-Apply selectively when cheap, safe, and materially confidence-improving (for example, verifying that a bug-fix test or deduplication guard fails when the fix is omitted). Omit when fault injection is costly, unsafe, or provides little additional confidence.
-
-### Protocol:
-1. **Identify the core guard or fix**:
-   Find the specific lines in the implementation that resolve the issue (e.g., the deduplication query, transaction wrapper, or error fallback).
-2. **Introduce a temporary fault**:
-   Comment out the guard or invert the condition:
-   ```ts
-   // TEMPORARY PROVE SENSITIVITY CHECK
-   // if (existingRecord) return existingRecord;
-   ```
-3. **Execute the regression test**:
-   The test MUST fail (**turn RED**).
-   - If the test still passes, the test is insensitive or tautological. Strengthen the test until it reliably catches the fault.
-4. **Restore the implementation**:
-   Revert the temporary fault.
-5. **Verify GREEN**:
-   Confirm the test passes again.
-6. **Clean Diff Check**:
-   Always verify with `git diff` that no commented code or temporary changes remain before finishing the proof.
+Use [Phase 6 of the prove skill](../SKILL.md#phase-6-sensitivity-checks-selective)
+when a cheap, safe check would materially improve confidence. It defines fault
+injection, the required RED/GREEN results, restoration, and the clean-diff check.

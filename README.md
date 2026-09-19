@@ -141,31 +141,9 @@ Before letting an agent write large multi-file changes:
 
 ## 🚀 How It Works
 
-```text
-  ┌────────────────────────────────────────────────────────┐
-  │ 1. Trigger: `/interrogate <goal or proposal>`          │
-  └───────────────────────────┬────────────────────────────┘
-                              ▼
-  ┌────────────────────────────────────────────────────────┐
-  │ 2. Agent inspects code & presents concrete proposal    │
-  │    (Approach • Assumptions • Tradeoffs • Blocking Qs)  │
-  └───────────────────────────┬────────────────────────────┘
-                              ▼
-  ┌────────────────────────────────────────────────────────┐
-  │ 3. You stress-test, adjust, or challenge the plan      │
-  │    (Agent adapts without ego, defense, or sycophancy)  │
-  └───────────────────────────┬────────────────────────────┘
-                              ▼
-  ┌────────────────────────────────────────────────────────┐
-  │ 4. Bounded Convergence (by Turn 5)                     │
-  │    (Stops branching • Summarizes plan & tradeoffs)     │
-  └───────────────────────────┬────────────────────────────┘
-                              ▼
-  ┌────────────────────────────────────────────────────────┐
-  │ 5. Authorized Implementation & Verification            │
-  │    (Apply changes • Run tests/checks • Close loop)     │
-  └────────────────────────────────────────────────────────┘
-```
+`/interrogate` inspects the code, presents a proposal, incorporates feedback,
+converges on a plan, then implements and verifies it when authorized. See the
+[`interrogate` skill](./skills/productivity/interrogate/SKILL.md).
 
 ---
 
@@ -234,30 +212,9 @@ Agent:  Contract: Issue #482 — Retry failed payment capture
 
 ### 🛡️ The 8-Phase Proof Loop
 
-```text
-  ┌────────────────────────────────────────────────────────┐
-  │ 1. Read Contract & Reconcile Acceptance Matrix        │
-  └───────────────────────────┬────────────────────────────┘
-                              ▼
-  ┌────────────────────────────────────────────────────────┐
-  │ 2. Map Evidence & 3. Audit Test Quality                │
-  │    (Public seams • Independent oracles • Sensitivity)  │
-  └───────────────────────────┬────────────────────────────┘
-                              ▼
-  ┌────────────────────────────────────────────────────────┐
-  │ 4. Hunt Counterexamples & 5. Strengthen / Repair Gaps  │
-  │    (Domain boundaries • TOCTOU • Retries • Fix local)  │
-  └───────────────────────────┬────────────────────────────┘
-                              ▼
-  ┌────────────────────────────────────────────────────────┐
-  │ 6. Sensitivity Checks & 7. Whole-Change Verification   │
-  │    (Verify tests turn RED • Clean diff • Full suite)   │
-  └───────────────────────────┬────────────────────────────┘
-                              ▼
-  ┌────────────────────────────────────────────────────────┐
-  │ 8. Strict Outcome: PROVEN or NOT PROVEN                │
-  └────────────────────────────────────────────────────────┘
-```
+`/prove` reads the contract, maps and audits evidence, hunts counterexamples,
+repairs issue-local gaps, verifies the whole change, and reports `PROVEN` or
+`NOT PROVEN`. See the [`prove` skill](./skills/productivity/prove/SKILL.md).
 
 ---
 
