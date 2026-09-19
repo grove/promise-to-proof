@@ -42,7 +42,8 @@ execution path.
 Preserve the verification boundary that exposed the failure:
 
 - Keep every required job, test, assertion, lint/type check, coverage
-  threshold, matrix entry, and failure condition.
+  threshold, CI matrix entry, and failure condition. Replace an incorrect or
+  obsolete check only under the evidence rule in `Forbidden repairs`.
 - For a workflow-only repair, require the same quality checks to run with the
   same failure semantics.
 - Add or strengthen a focused regression test for a product or test defect
@@ -57,6 +58,12 @@ Preserve the verification boundary that exposed the failure:
 Determine what the failed workflow was meant to guarantee, such as validating
 the PR branch before merge or running required checks for a specific commit.
 Define success from that guarantee.
+
+Read the linked ticket and any supplied acceptance matrix when they define the
+behavior under repair. Preserve requirement IDs, promised results, and relevant
+boundaries. If that contract is unavailable or ambiguous, continue only with
+repairs whose correctness does not depend on guessing the missing requirement.
+Report the gap; a CI failure does not authorize changing the ticket's promises.
 
 ### 2. Diagnose before editing
 
@@ -84,15 +91,21 @@ unavailable capability. Resolve the external condition only when it is
 authorized and independently verifiable; otherwise return `NOT FIXED`.
 
 Treat flakiness as a confidence modifier. A rerun without a relevant change
-ends as `WORKFLOW GREEN — FLAKE NOT RESOLVED` until nondeterminism is
-understood.
+ends as `NOT FIXED — WORKFLOW GREEN — FLAKE NOT RESOLVED` until nondeterminism
+is understood.
 
 ### 3. Repair and verify
 
 Apply the smallest correct repair at the layer that owns the failure. Keep
-required checks and their failure semantics unchanged. For product and test
+required checks and their failure semantics, subject to the evidence rule in
+`Forbidden repairs`. For product and test
 defects, add or strengthen the focused regression evidence before declaring
 success.
+
+Map product or test repairs to the affected requirements and their observable
+results. Record replacement evidence and why it still checks the same promise.
+Keep unrelated acceptance gaps visible without expanding this CI repair into a
+full implementation or proof run.
 
 Run the cheapest high-signal verification first, whether local or remote. Use
 the authoritative GitHub workflow as the primary verification when it is the
@@ -114,9 +127,10 @@ expires, return `NOT FIXED — VERIFICATION PENDING` with the run URLs. Confirm
 that the repaired commit is pushed, no verification was weakened, and no
 unrelated quality regression was introduced.
 
-Allow at most two repair attempts. If the cause remains uncertain, a required
-capability is unavailable, a verification fails, or the repair would weaken
-quality, stop.
+Allow at most two repair attempts. After a failed verification, use the second
+attempt only when the failure identifies a concrete, scoped correction. Stop
+after the second unsuccessful attempt. Stop immediately if the cause remains
+uncertain, a required capability is unavailable, or the repair would weaken quality.
 Also stop when the repair introduces an unexplained quality regression, removes
 required verification, or makes an existing quality signal unmeasurable.
 
@@ -125,8 +139,10 @@ required verification, or makes an existing quality signal unmeasurable.
 Keep the required quality signal measurable. Do not delete or skip tests,
 disable lint rules, lower coverage, make checks optional, swallow failures,
 add unconditional `continue-on-error`, add arbitrary retries, or comment out
-workflow steps. A check may change only when evidence proves it incorrect or
-obsolete, and the replacement must provide stronger valid evidence.
+workflow steps. A check may change only when the source contract and evidence
+prove it incorrect or obsolete. The replacement must provide stronger valid
+evidence for the same promised behavior. Record the reason and affected
+requirement IDs; changing a check does not authorize changing the promise.
 
 Do not redesign workflows, clean up unrelated code, or use a green rerun to
 mask an unresolved failure.
@@ -142,9 +158,17 @@ Return one of these outcomes:
   unavailable, the worktree is unsafe, the repair would weaken quality, or
   only an unexplained rerun passed.
 
+`FIXED` means the workflow is repaired. It does not mean every ticket requirement
+is `proven`.
+
 For either outcome, report the intended operation, failure classification,
 earliest causal error, files changed, verification performed, required-check
 status, and the remaining reason when `NOT FIXED`.
+Include the repaired SHA, affected requirement IDs, replaced evidence, and any
+acceptance gaps. Changes to implementation or evidence require reassessing prior
+proof and review. Identify which results need refreshing on the repaired commit;
+use `/prove` for full acceptance verification and the repository's review process
+for code quality when those steps are requested or required.
 
 Invoking `/fix-pr` authorizes scoped inspection, edits, commit, push, and
 workflow reruns for the target PR or workflow run. It does not authorize

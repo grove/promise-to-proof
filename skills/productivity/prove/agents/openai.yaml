@@ -1,5 +1,5 @@
 interface:
   display_name: "Prove"
-  short_description: "Prove that an issue is resolved with independent evidence"
+  short_description: "Verify every promised outcome with independent evidence"
 policy:
   allow_implicit_invocation: false
