@@ -3,24 +3,37 @@
 A convincing implementation is not the same as a finished ticket. The code can
 look right while one sentence from the issue never reaches a test. A test suite
 can pass while its assertions miss the promised result. A green pull request can
-hide a weakened check. Use the skills in this repository to keep the original
-agreement visible from the first design discussion through the final GitHub
-Actions run.
+hide a weakened check.
 
-This guide follows the workflow shape of [A High-Confidence Engineering
-Workflow with Matt Pocock's
-Skills](https://gist.github.com/grove/926f8c119884efea24f7a6260bb288ef),
-but it uses only the skills that this repository ships. The sequence is not a
-ceremony. Each skill answers a different question, and you can omit a step when
-that question has a clear, low-risk answer.
+Use [Matt Pocock's skills](https://github.com/mattpocock/skills) to understand
+the problem, write the specification, divide the work, implement it, and review
+the result. Add the skills from this repository where the workflow needs a clear
+acceptance contract or independent evidence. Together, the collections carry
+the original agreement from the first design discussion through the final
+GitHub Actions run.
+
+The sequence is not a ceremony. Each skill answers a different question, and
+you can omit a step when that question has a clear, low-risk answer.
 
 ## Install the skills
 
-Install the collection before you start:
+Install both collections before you start:
 
 ```bash
+npx skills@latest add mattpocock/skills
 npx skills@latest add grove/skills
 ```
+
+When the first command asks which skills to install, include
+`setup-matt-pocock-skills`. Run the setup once in each repository:
+
+```text
+/setup-matt-pocock-skills
+```
+
+Choose the issue tracker, triage labels, and documentation locations that the
+project already uses. The setup gives Matt's planning and implementation skills
+the same sources that `acceptance-matrix` and `/prove` will read later.
 
 The repository provides the five skills used below. To confirm the current set
 from a clone, run:
@@ -32,18 +45,29 @@ find skills -name SKILL.md -print | sort
 The complete path looks like this:
 
 ```text
-ticket or specification
-        |
-        v
+idea or problem
+      |
+      v
+/grill-with-docs
+      |
+      +---- /wayfinder when one session cannot resolve the work
+      |
+      v
+/to-spec -> /to-tickets
+      |
+      v
+for each ticket
+      |
+      v
 /acceptance-matrix
-        |
-        v
+      |
+      v
 /interrogate       optional when the design is already settled
-        |
-        v
-implementation
-        |
-        v
+      |
+      v
+/implement         uses /tdd and closes with /code-review
+      |
+      v
 /prove
    |         |
    |         +---- PROVEN --------------------+
@@ -53,7 +77,7 @@ implementation
              v                                 |
        /repair-proof                           |
              |                                 |
-             +----> fresh /prove --------------+
+             +----> fresh /prove, then review -+
                                                  |
                                                  v
                                            pull request
@@ -66,6 +90,34 @@ implementation
                                          v
                               refresh stale proof or review
 ```
+
+## Shape the work with Matt's planning skills
+
+For a feature that begins as an idea, start with a focused conversation:
+
+```text
+/grill-with-docs Add retry support for failed uploads
+```
+
+The skill presses on unclear requirements while it keeps the project's domain
+language and architectural decisions up to date. Once the important choices are
+settled, turn the conversation into a durable specification:
+
+```text
+/to-spec
+```
+
+If the specification is too large for one ticket, divide it into complete
+slices that can each deliver and verify useful behavior:
+
+```text
+/to-tickets #123
+```
+
+Use `/wayfinder` before `/to-spec` when the work is too large or uncertain for
+one agent session. It records the decisions that block a reliable plan and
+resolves them one at a time. When the issue already states a complete, agreed
+outcome, skip these planning steps and begin with `acceptance-matrix`.
 
 ## Turn the ticket into an acceptance contract
 
@@ -133,17 +185,30 @@ choice is low. A one-line correction with an existing regression seam rarely
 needs a separate design session. The acceptance contract still helps because
 small diffs can omit behavior too.
 
-## Implement against the requirement IDs
+## Implement with Matt's feedback loops
 
-Build the change with the repository's normal implementation process. Keep the
-matrix beside the work and map each meaningful code path or check back to its
-requirement ID. The repository does not ship a general implementation skill,
-so use the coding and review tools that already fit the project.
+Pass the ticket and its acceptance matrix into Matt's implementation workflow:
 
-Run focused checks while you work, then run the repository's required checks.
-Commit the finished candidate before proof when the project permits it. A clean
-commit gives every later observation one exact identity and avoids the awkward
-question of whether a file changed halfway through verification.
+```text
+/implement #124
+```
+
+Keep the matrix beside the work and map each meaningful code path or check back
+to its requirement ID. `/implement` uses `/tdd` at the agreed seams, so each
+vertical slice moves through a failing test, the smallest working change, and a
+cleanup pass. The matrix and TDD answer different questions. TDD drives the next
+piece of code, while the matrix keeps every ticket promise in view.
+
+For a difficult defect or performance regression, use `/diagnosing-bugs` to
+build a reproduction, test hypotheses, and leave a regression check. Once the
+cause is known, return to the same requirement IDs so the fix does not solve one
+symptom while leaving the promised outcome unverified.
+
+Matt's `/implement` closes with `/code-review`, which checks both repository
+standards and fidelity to the source specification. Finish the review and
+commit the candidate before proof. A clean commit gives every later observation
+one exact identity and avoids the awkward question of whether a file changed
+halfway through verification.
 
 Record that identity before you invoke proof:
 
@@ -227,6 +292,17 @@ Stop when the missing input is a product decision, unavailable credential, or
 external capability. `repair-proof` must not guess its way through a stale or
 ambiguous contract.
 
+If the repair changes a diff that `/code-review` already checked, run the review
+again after fresh proof succeeds:
+
+```text
+/code-review main
+```
+
+Proof checks whether the ticket's promises hold. Code review checks whether the
+new diff follows project standards and still matches the specification. Keep
+both results tied to the repaired candidate.
+
 ## Repair failed GitHub Actions without weakening the check
 
 Open the pull request after the candidate is proven and reviewed according to
@@ -263,24 +339,38 @@ the previous review stale.
 
 ## Choose the shortest workflow that covers the risk
 
-For a straightforward change with a settled design, use the compact path:
+For a straightforward ticket with a settled design, use the compact path:
 
 ```text
 /acceptance-matrix #124
-implement and commit
+/implement #124
 /prove #124
 open the pull request
 ```
 
-For a change whose architecture or failure modes deserve scrutiny, add the
-design challenge before implementation:
+For a feature that starts as an idea, use the full planning and delivery path:
+
+```text
+/grill-with-docs <idea>
+/to-spec
+/to-tickets #123
+
+# For each ticket:
+/acceptance-matrix #124
+/interrogate #124
+/implement #124
+/prove #124
+open the pull request
+```
+
+For a difficult bug, replace the broad planning phase with a disciplined
+diagnosis while keeping the acceptance and proof steps:
 
 ```text
 /acceptance-matrix #124
-/interrogate #124
-implement and commit
+/diagnosing-bugs
+/implement #124
 /prove #124
-open the pull request
 ```
 
 When proof finds a gap, insert the repair loop without blurring its roles:
@@ -289,6 +379,7 @@ When proof finds a gap, insert the repair loop without blurring its roles:
 /prove #124
 /repair-proof #124
 /prove #124
+/code-review main  if the repair changed the reviewed diff
 ```
 
 When GitHub Actions fails, repair that workflow and refresh any result that the
@@ -301,7 +392,9 @@ review again      if the reviewed diff changed materially
 ```
 
 Use every step that closes a real uncertainty and omit the rest. The workflow
-works because its handoffs stay honest: `acceptance-matrix` defines the checks,
-`interrogate` tests the proposed design, `/prove` verifies a fixed candidate,
-`repair-proof` changes only named gaps, and `fix-pr` restores the pull request's
-required automation. None of those results is a substitute for another.
+works because Matt's skills move the work from an idea to reviewed code, while
+the skills in this repository keep the acceptance contract and evidence intact.
+`acceptance-matrix` defines the checks, `interrogate` tests the proposed design,
+`/prove` verifies a fixed candidate, `repair-proof` changes only named gaps, and
+`fix-pr` restores the pull request's required automation. None of those results
+is a substitute for another.
