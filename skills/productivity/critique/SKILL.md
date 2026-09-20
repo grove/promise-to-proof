@@ -34,8 +34,11 @@ Use these prompts to guide investigation, not as mandatory report sections:
 
 Independently inspect claims that could change the recommendation. Cite code,
 history, authoritative sources, or observations from a cheap experiment as useful.
-The proposal's assertion alone is not corroboration. Trace the path to completion,
-including gaps between individually plausible steps.
+Use concrete supplied facts about existing controls and observations as evidence,
+attributed to their source. Distinguish them from predictions that the proposal
+will succeed. Inspect available corroboration and resolve material contradictions;
+absent independent verification alone does not make a supplied fact a blocker.
+Trace the path to completion, including gaps between individually plausible steps.
 
 Stop when further investigation is unlikely to change the recommendation.
 When evidence is unavailable, state the limit and smallest useful next check.
@@ -61,6 +64,23 @@ fact and explain which decision about success or a material constraint cannot
 be made without it. A fact that could conceivably matter is not enough. Use the
 uncertainty branch below unless a separate, evidenced material defect justifies
 a change.
+
+Judge the decision being proposed. A bounded experiment can be ready to run
+while the outcome it is designed to measure remains unknown. Missing exact
+thresholds, sample sizes, or implementation details stay advisory unless they
+prevent judging success or compliance with a material constraint at this stage.
+
+For example:
+
+- A staged service change uses existing health limits, monitoring, and supported
+  rollback. These stated controls can support `proceed` without reproducing their
+  numeric settings or implementation. A documented gap in rollback coverage can
+  still justify `adjust` if it exposes the stated availability goal to failure.
+- A reversible product experiment limits exposure and duration, compares a
+  relevant outcome with the current experience, and defines a stop condition.
+  These bounds can support `proceed` for learning whether the change helps.
+  An omitted sample-size calculation stays advisory unless the decision requires
+  a specified level of precision that cannot be assessed without it.
 
 ## Return a recommendation
 
