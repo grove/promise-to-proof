@@ -39,6 +39,9 @@ including gaps between individually plausible steps.
 
 Stop when further investigation is unlikely to change the recommendation.
 When evidence is unavailable, state the limit and smallest useful next check.
+A missing fact is load-bearing when its value could change whether the stated
+goal is achieved or a material constraint is respected. Treat missing optional
+detail as an unknown or advisory follow-up, not a defect or required correction.
 Refer material specialist concerns to a focused review without invoking it
 automatically or expanding this review into an expert checklist.
 
@@ -48,17 +51,22 @@ Give a brief goal statement, material findings, decision-relevant unknowns and
 checks, and a recommendation with a reason. Omit empty sections and filler praise.
 Order findings by consequence; there is no minimum finding count.
 
-Each finding names the problem, evidence or explicit assumption with its source,
-consequence for the outcome, and smallest effective adjustment. Distinguish
-observed defects, conditional risks, unknowns, and preferences in plain language.
-Unsupported possibilities and style preferences are not established defects.
+Classify each material finding in plain language as an observed defect,
+conditional risk, unknown, or preference. Name its evidence and source or an
+explicit evidence limit, consequence for the outcome, and smallest effective
+adjustment. For conditional risks, state the triggering condition and whether
+evidence shows it holds. Unsupported possibilities and preferences are not
+established defects.
 
-Recommend `proceed` when the approach needs no material change; `adjust` when it
-remains viable after a bounded correction; `rethink` when its core should be
-replaced or abandoned; and `insufficient evidence` when a load-bearing unknown
-prevents judgment. A minor uncertainty need not block a sound proposal. Explain
-what survived scrutiny only when it helps the decision; a sound proposal can get
-a short result.
+Recommend `proceed` when the stated goal and material constraints are satisfied
+and remaining gaps are optional. Use `adjust` for a bounded, evidence-backed
+correction that preserves the viable approach. Reserve `rethink` for a core path
+that targets the wrong problem, violates a material constraint, or is clearly
+displaced by a simpler evidenced path. Use `insufficient evidence` only when a
+load-bearing unknown prevents choosing among the other recommendations. Missing
+evidence does not erase an established reason to change direction. Explain what
+survived scrutiny only when it helps the decision; a sound proposal can get a
+short result.
 
 ## Keep the review advisory
 
