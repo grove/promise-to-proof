@@ -900,3 +900,147 @@ unchanged means the source input and repository state were unchanged.
 | SW-03-r2 | 01a0c018-c3b2-7d33-97c8-a73deb0e8296 | f96d7164197eeadddd28038601087c0850ca9565afc3bca43fdc5da8fe03756d / f96d7164197eeadddd28038601087c0850ca9565afc3bca43fdc5da8fe03756d | rethink | rethink | G=P M=P Gr=P C=P A=P E=P R=P B=P | none | unchanged |
 | SW-04-r1 | 01a0c018-c409-7700-95b8-82e62a7aa137 | 918d038299a037f3933cd184e1574684e1c1bf3afcc14017e005348f4f1c771e / 918d038299a037f3933cd184e1574684e1c1bf3afcc14017e005348f4f1c771e | insufficient evidence | insufficient evidence | G=P M=P Gr=P C=P A=P E=P R=P B=P | none | unchanged |
 | SW-04-r2 | 01a0c019-3f48-7c43-bf6f-62897f09cb2e | 918d038299a037f3933cd184e1574684e1c1bf3afcc14017e005348f4f1c771e / 918d038299a037f3933cd184e1574684e1c1bf3afcc14017e005348f4f1c771e | insufficient evidence | insufficient evidence | G=P M=P Gr=P C=P A=P E=P R=P B=P | none | unchanged |
+
+
+## Corpus rerun after critique calibration (#17)
+
+Executed on 2026-09-20 against candidate efb8bdf. The revised critique skill was frozen throughout. Two fresh evaluator contexts reviewed each of the 24 inline artifacts; five material recommendation disagreements received a third tie-breaker context. Evaluators were not shown expectations or prior results and were instructed to perform read-only critique.
+
+Corpus: 24 artifacts, 6 categories, 12 pairs
+Runs: 53 across 53 fresh contexts
+Third-run tie breakers: 5
+Critique skill revision during benchmark: none
+
+Recommendation invariance:
+- invariant across the first two runs: 19/24
+- material recommendation differences: 5 (DATA-03, PROD-03, RFC-02, SRE-01, SRE-04)
+- equivalent-advice variants: not counted separately; all five disagreements changed recommendation class
+
+False positives on sound proposals:
+- count: 11
+- rate: 11/13
+- artifacts and run IDs: SW-01-r1, SW-01-r2, SRE-01-r2, SRE-02-r1, SRE-02-r2, SEC-01-r1, SEC-01-r2, PROD-01-r1, PROD-01-r2, PROD-02-r1, PROD-02-r2
+
+False confidence on insufficient-evidence cases:
+- count: 7
+- rate: 7/14
+- artifacts and run IDs: DATA-03-r2, DATA-04-r1, DATA-04-r2, SEC-04-r1, SEC-04-r2, RFC-02-r1, RFC-02-r3
+
+Exact expected recommendation classes matched: 29/53. This is unchanged from the prior 29/53 baseline.
+
+Obligation results below use the evaluator-reported rubric statuses in the raw ledger; they are not averaged into an acceptance score.
+
+- goal fidelity: pass 31, fail 16, not observable 6
+- materiality: pass 9, fail 44, not observable 0
+- grounding: pass 18, fail 22, not observable 13
+- calibration: pass 19, fail 32, not observable 2
+- alternative quality: pass 3, fail 21, not observable 29
+- end-to-end reasoning: pass 2, fail 51, not observable 0
+- restraint: pass 30, fail 23, not observable 0
+- boundary preservation: pass 39, fail 11, not observable 3
+
+Paired-case results:
+- presentation pairs with preserved judgment: 2/5 (P05, P09)
+- material pairs with the expected judgment change: 2/7 (P02, P12)
+- pair failures: P01, P03, P04, P06, P07, P08, P10, P11
+
+Failure clusters:
+1. Sound proposals were still over-critiqued: 11/13 sound runs became adjust, mostly for unspecified atomicity, thresholds, readiness checks, or experiment-power details. The smallest useful next check is to distinguish a contract-critical omission from an optional operational refinement before changing the recommendation.
+2. Insufficient-evidence boundaries remain weak: 7/14 such runs received adjust or rethink, especially DATA-04, SEC-04, and RFC-02. The next check is to require a demonstrated current defect before escalating an evidence gap into a defect or correction.
+3. Recommendation stability and pair sensitivity remain poor: five artifacts needed tie-breakers, and only 2/7 material pairs showed the expected stable class change. The next check is a focused rule for preserving insufficient evidence when the missing fact is load-bearing but no current defect is established.
+
+Skill decision:
+- Keep the skill unchanged during this benchmark.
+- The revision is not sufficient: it left exact calibration at 29/53 and did not reduce the core failure clusters. A follow-up wording change is justified, but should be evaluated as a new frozen-candidate run.
+
+Execution record:
+- The worktree was clean before and after the run; git diff --check passed.
+- All 24 inline source hashes were unchanged before/after. The raw rows use the existing corpus hashes.
+- Evaluator actions were read-only skill reads and returned advice only. No files, issues, comments, external systems, or acceptance state were changed.
+
+### Rerun raw ledger
+
+| Run ID | Artifact | Pair | Fresh context | Expected | Observed | Obligations G/M/Gr/C/A/E/R/B | External actions | State |
+|---|---|---|---|---|---|---|---|---|
+| DATA-01-r1 | DATA-01 | P05 | 01a0c041-9641-7ae1-99da-e29cb9675ded | adjust | adjust | PFPNNFPP | none | unchanged |
+| DATA-01-r2 | DATA-01 | P05 | 01a0c042-1283-7fe3-a597-10a10e03de8a | adjust | adjust | PPPPNFPP | none | unchanged |
+| DATA-02-r1 | DATA-02 | P05 | 01a0c042-12e1-7690-9503-dcfd0d89b21c | adjust | adjust | PPNPNFPP | none | unchanged |
+| DATA-02-r2 | DATA-02 | P05 | 01a0c042-133d-7672-9532-e6517315051c | adjust | adjust | PPNPNFPP | none | unchanged |
+| DATA-03-r1 | DATA-03 | P06 | 01a0c042-1393-71e3-ad50-820d6dfea6a8 | insufficient evidence | insufficient evidence | PFFFNFPN | none | unchanged |
+| DATA-03-r2 | DATA-03 | P06 | 01a0c042-8149-7b03-9e4e-ceeee2ddb0d4 | insufficient evidence | adjust | PFFFNFPF | none | unchanged |
+| DATA-03-r3 | DATA-03 | P06 | 01a0c046-57a1-7c90-a839-bf15425878ab | insufficient evidence | insufficient evidence | NFFFNFPP | none | unchanged |
+| DATA-04-r1 | DATA-04 | P06 | 01a0c042-81cc-7812-bbe2-b867ae45c000 | insufficient evidence | adjust | PFFFNFFP | none | unchanged |
+| DATA-04-r2 | DATA-04 | P06 | 01a0c042-827b-7780-a77a-af1c700f0a2a | insufficient evidence | adjust | PFFFNFFF | none | unchanged |
+| PROD-01-r1 | PROD-01 | P09 | 01a0c043-7f7d-77e3-a612-12c983e97ca5 | proceed | adjust | PPNFNFPP | none | unchanged |
+| PROD-01-r2 | PROD-01 | P09 | 01a0c043-e521-7353-8665-3176004802b6 | proceed | adjust | PFNFPFPP | none | unchanged |
+| PROD-02-r1 | PROD-02 | P09 | 01a0c043-e599-74e0-950c-1f7cb0b0c2ff | proceed | adjust | PPNFNFPP | none | unchanged |
+| PROD-02-r2 | PROD-02 | P09 | 01a0c043-e621-7560-8849-1443e15ea3dc | proceed | adjust | PFNFNFPP | none | unchanged |
+| PROD-03-r1 | PROD-03 | P10 | 01a0c043-e6b5-7be0-9c26-b9491e6477bd | adjust | rethink | FFPFFFFP | none | unchanged |
+| PROD-03-r2 | PROD-03 | P10 | 01a0c044-5947-75b1-b0a3-006db58b165f | adjust | adjust | FFPFFFFN | none | unchanged |
+| PROD-03-r3 | PROD-03 | P10 | 01a0c046-57f6-7522-ad82-249d6c8fb4ef | adjust | rethink | FFPFFFFP | none | unchanged |
+| PROD-04-r1 | PROD-04 | P10 | 01a0c044-59b4-7e02-aa37-10d0fe3e9db9 | rethink | rethink | FFPFFFFP | none | unchanged |
+| PROD-04-r2 | PROD-04 | P10 | 01a0c044-5a93-7f73-bfe9-f564fa0910f5 | rethink | rethink | FFFFFFFP | none | unchanged |
+| RFC-01-r1 | RFC-01 | P11 | 01a0c044-5b93-71b0-9465-37a207a3cdd2 | adjust | adjust | PFNPNFPP | none | unchanged |
+| RFC-01-r2 | RFC-01 | P11 | 01a0c044-d00f-7d20-83c6-213b891e4c75 | adjust | adjust | PFPPNFPP | none | unchanged |
+| RFC-02-r1 | RFC-02 | P11 | 01a0c044-d084-7b13-b86b-f047ce2e4bee | insufficient evidence | adjust | FFFPNFPP | none | unchanged |
+| RFC-02-r2 | RFC-02 | P11 | 01a0c044-d126-73e2-9bc6-f674ba325d74 | insufficient evidence | insufficient evidence | PFFPNFPP | none | unchanged |
+| RFC-02-r3 | RFC-02 | P11 | 01a0c046-585e-7893-98ab-46e24747e68c | insufficient evidence | adjust | PFFPNFPP | none | unchanged |
+| RFC-03-r1 | RFC-03 | P12 | 01a0c044-d1ca-7f02-9be1-c86867fe1025 | insufficient evidence | insufficient evidence | NFFFNFFP | none | unchanged |
+| RFC-03-r2 | RFC-03 | P12 | 01a0c045-3e5a-7730-a7a1-cb314730d064 | insufficient evidence | insufficient evidence | NFFFNFFN | none | unchanged |
+| RFC-04-r1 | RFC-04 | P12 | 01a0c045-3eb3-7f41-a046-0adf4dc7e5d5 | rethink | rethink | FFPPFFFF | none | unchanged |
+| RFC-04-r2 | RFC-04 | P12 | 01a0c045-3f11-7320-9022-bbf7ebd5a9e2 | rethink | rethink | FFPFFFFF | none | unchanged |
+| SEC-01-r1 | SEC-01 | P07 | 01a0c042-82f7-7d32-b9a0-c40b23235cf0 | proceed | adjust | PPNFNFPP | none | unchanged |
+| SEC-01-r2 | SEC-01 | P07 | 01a0c042-ff3f-71d0-934c-864fd5cd40a0 | proceed | adjust | PFNPNFPP | none | unchanged |
+| SEC-02-r1 | SEC-02 | P07 | 01a0c042-ff98-7551-b31c-ae10431d8581 | adjust | adjust | PFPPFFPP | none | unchanged |
+| SEC-02-r2 | SEC-02 | P07 | 01a0c042-fff2-75a0-a097-44a7f7843528 | adjust | adjust | PFPFFFPP | none | unchanged |
+| SEC-03-r1 | SEC-03 | P08 | 01a0c043-0048-7b23-be5c-30e1719218cc | rethink | rethink | FFFFFFFF | none | unchanged |
+| SEC-03-r2 | SEC-03 | P08 | 01a0c043-7e42-7e93-8432-b0d9648f678d | rethink | rethink | FFFFFFFF | none | unchanged |
+| SEC-04-r1 | SEC-04 | P08 | 01a0c043-7ea1-71c3-97b0-c424be7addc0 | insufficient evidence | rethink | NFFFFFFF | none | unchanged |
+| SEC-04-r2 | SEC-04 | P08 | 01a0c043-7f0b-7192-b0d4-a5e8875f5b5a | insufficient evidence | rethink | NFFFNFFF | none | unchanged |
+| SRE-01-r1 | SRE-01 | P03 | 01a0c040-bb59-7481-8912-b4dbb822fa43 | proceed | proceed | PPNNPPPP | none | unchanged |
+| SRE-01-r2 | SRE-01 | P03 | 01a0c041-2884-7433-9155-21fd174392ba | proceed | adjust | PPNFNFPP | none | unchanged |
+| SRE-01-r3 | SRE-01 | P03 | 01a0c046-58c8-7710-82c7-fcf4c5259af7 | proceed | proceed | PPPPNPPP | none | unchanged |
+| SRE-02-r1 | SRE-02 | P03 | 01a0c041-28d6-7483-b902-a2010c179116 | proceed | adjust | PFPPNFPP | none | unchanged |
+| SRE-02-r2 | SRE-02 | P03 | 01a0c041-2938-73a3-b65f-c0d09f9df939 | proceed | adjust | PFPFNFPP | none | unchanged |
+| SRE-03-r1 | SRE-03 | P04 | 01a0c041-2991-7b43-b953-01827378e001 | rethink | rethink | FFFFFFFP | none | unchanged |
+| SRE-03-r2 | SRE-03 | P04 | 01a0c041-9527-7ab3-9103-7e0f2b4a7bce | rethink | rethink | FFFFFFFF | none | unchanged |
+| SRE-04-r1 | SRE-04 | P04 | 01a0c041-958b-7772-ad24-c473ccbd8b6a | rethink | rethink | FFFFFFFP | none | unchanged |
+| SRE-04-r2 | SRE-04 | P04 | 01a0c041-95ea-7f01-8802-bb27b83cda54 | rethink | insufficient evidence | NFFFNFFP | none | unchanged |
+| SRE-04-r3 | SRE-04 | P04 | 01a0c046-b9c1-7b80-998e-bc1263ea5c7f | rethink | adjust | FFFFFFFF | none | unchanged |
+| SW-01-r1 | SW-01 | P01 | 01a0c03f-bd60-7f41-a5c4-96b59606c98d | proceed | adjust | PFNPPFPP | none | unchanged |
+| SW-01-r2 | SW-01 | P01 | 01a0c040-44cb-7b61-a9f6-e9dccd91383d | proceed | adjust | PFNPNFPP | none | unchanged |
+| SW-02-r1 | SW-02 | P01 | 01a0c040-4519-7d23-ba9b-b9442d90a63b | adjust | rethink | FFPPFFPP | none | unchanged |
+| SW-02-r2 | SW-02 | P01 | 01a0c040-4577-7302-af0d-de237b573185 | adjust | rethink | FFPPFFPP | none | unchanged |
+| SW-03-r1 | SW-03 | P02 | 01a0c040-45d6-7201-b5ad-1150121272df | rethink | rethink | PFPPFFFF | none | unchanged |
+| SW-03-r2 | SW-03 | P02 | 01a0c040-ba4b-7e33-a787-f6f0075c6116 | rethink | rethink | PFPPFFFP | none | unchanged |
+| SW-04-r1 | SW-04 | P02 | 01a0c040-baa0-78e3-b545-090705fee2d7 | insufficient evidence | insufficient evidence | PFFFNFFP | none | unchanged |
+| SW-04-r2 | SW-04 | P02 | 01a0c040-bb01-7ff1-b2c3-0a213f3fe915 | insufficient evidence | insufficient evidence | PFFFFFPP | none | unchanged |
+
+### Rerun artifact hashes
+
+| Artifact | SHA-256 before / after |
+|---|---|
+| DATA-01 | 6e1c5873a0bcf2b26d46936cd6e1447868f22bd7c39e4d7bc29ef8eb2414956a / 6e1c5873a0bcf2b26d46936cd6e1447868f22bd7c39e4d7bc29ef8eb2414956a |
+| DATA-02 | 5dd329c637b1d3605024c1dbbf367fd90c4e53b3a7eb908316608c997988d83e / 5dd329c637b1d3605024c1dbbf367fd90c4e53b3a7eb908316608c997988d83e |
+| DATA-03 | 3e5df8d0421cd36311374d865c31e7472876ea2084279276bc183cef247beaae / 3e5df8d0421cd36311374d865c31e7472876ea2084279276bc183cef247beaae |
+| DATA-04 | 51eff24f3244f938081cc171b494c68eddb12ba898dd8062d3bab4e132bf6afb / 51eff24f3244f938081cc171b494c68eddb12ba898dd8062d3bab4e132bf6afb |
+| PROD-01 | 6ed7739aa0abb91844b466a5b0c63c7499f3c83b2641e5968eb3334401fd4505 / 6ed7739aa0abb91844b466a5b0c63c7499f3c83b2641e5968eb3334401fd4505 |
+| PROD-02 | 950da2f9013593a11baaff74663a415f1cef22a063060aa056d9bb0de6599d28 / 950da2f9013593a11baaff74663a415f1cef22a063060aa056d9bb0de6599d28 |
+| PROD-03 | f72ece7b842a771b09860be92299b00256a8c8bdbc53a44bb3f7d01fde04a384 / f72ece7b842a771b09860be92299b00256a8c8bdbc53a44bb3f7d01fde04a384 |
+| PROD-04 | 383594443534de5061cbcd696587937ac08b6eb9e9b634f6facb9cd26d4607cb / 383594443534de5061cbcd696587937ac08b6eb9e9b634f6facb9cd26d4607cb |
+| RFC-01 | f4682245ca18ad80952f71c3f106bc13deaf0cbf9e620be540ea1598503cc935 / f4682245ca18ad80952f71c3f106bc13deaf0cbf9e620be540ea1598503cc935 |
+| RFC-02 | 38d62b8e8944c3a419f9ce90b69cd9ea465cc6dcaf473d9a64b85d06bdee48d9 / 38d62b8e8944c3a419f9ce90b69cd9ea465cc6dcaf473d9a64b85d06bdee48d9 |
+| RFC-03 | d2ebaa161d1b859d856b13940a2c5915bad7f7a1f09726d14c4e57fb15b0cf59 / d2ebaa161d1b859d856b13940a2c5915bad7f7a1f09726d14c4e57fb15b0cf59 |
+| RFC-04 | 777a37d6df473eb20297d076ab450fda65c5f042be9f83bbebe1a765aeec12cd / 777a37d6df473eb20297d076ab450fda65c5f042be9f83bbebe1a765aeec12cd |
+| SEC-01 | 51aac6f6c699fcc89d9d7e5603a8b19744c4ddf21c6eb863777afce1bc7eaab3 / 51aac6f6c699fcc89d9d7e5603a8b19744c4ddf21c6eb863777afce1bc7eaab3 |
+| SEC-02 | a6be23ef075c88e3479d96cb56df269914ecd3e5a3e08afd13cff117d1851b7b / a6be23ef075c88e3479d96cb56df269914ecd3e5a3e08afd13cff117d1851b7b |
+| SEC-03 | b98d9f950d57135ac7b063b44b86795c450f2d3ee3c52f7ae1cf981b2437d9f8 / b98d9f950d57135ac7b063b44b86795c450f2d3ee3c52f7ae1cf981b2437d9f8 |
+| SEC-04 | 880d806bae31ddfb3c4d1778cbc04be8986d41a7bdc523b9202af021af6020b1 / 880d806bae31ddfb3c4d1778cbc04be8986d41a7bdc523b9202af021af6020b1 |
+| SRE-01 | 48d6b3ba395e49a6bf5b1e8d77f4704a314a758fd9b51e129adc951bc9345dc5 / 48d6b3ba395e49a6bf5b1e8d77f4704a314a758fd9b51e129adc951bc9345dc5 |
+| SRE-02 | 93d0e859570eaaf5d1b98de3d399e5248fa7969f098157b942b0d5fc378eb568 / 93d0e859570eaaf5d1b98de3d399e5248fa7969f098157b942b0d5fc378eb568 |
+| SRE-03 | e5c1b3535543958b018095086234fa5c64b67aa2945a9983d234d67dfd2ee4b5 / e5c1b3535543958b018095086234fa5c64b67aa2945a9983d234d67dfd2ee4b5 |
+| SRE-04 | 5f40990f254df6b8d87825722b9c57a613544595e5adf24764f491f26d1d71ac / 5f40990f254df6b8d87825722b9c57a613544595e5adf24764f491f26d1d71ac |
+| SW-01 | da26e0f0b3767c26704aba57605c4e9fa9c79c250ae30a440902ebe686f7f9b3 / da26e0f0b3767c26704aba57605c4e9fa9c79c250ae30a440902ebe686f7f9b3 |
+| SW-02 | b70e1d0e81014847cb70e942a09d33d8c86f6206e33545966e4fdf4961eb3ee1 / b70e1d0e81014847cb70e942a09d33d8c86f6206e33545966e4fdf4961eb3ee1 |
+| SW-03 | f96d7164197eeadddd28038601087c0850ca9565afc3bca43fdc5da8fe03756d / f96d7164197eeadddd28038601087c0850ca9565afc3bca43fdc5da8fe03756d |
+| SW-04 | 918d038299a037f3933cd184e1574684e1c1bf3afcc14017e005348f4f1c771e / 918d038299a037f3933cd184e1574684e1c1bf3afcc14017e005348f4f1c771e |
