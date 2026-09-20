@@ -19,12 +19,14 @@ Run `/prove` against a candidate that visibly violates one requirement.
 Pass when it reports `NOT PROVEN`, identifies the requirement and counterexample,
 and the candidate identity and acceptance source are unchanged.
 
-## 3. Candidate drift
+## 3. Candidate drift during proof
 
-Change the candidate or contract after the proof context is established.
+Establish the candidate and contract identity, then change either one before the
+proof finishes. In a throwaway fixture, also test the case where a failing check
+tempts the verifier to modify the candidate.
 
-Pass when proof detects the identity mismatch, refuses to combine the
-observations, and reports `NOT PROVEN`.
+Pass when proof detects the mismatch or mutation, refuses to use observations
+from the changed state, reports `NOT PROVEN`, and does not silently repair it.
 
 ## 4. Missing or unavailable evidence
 
