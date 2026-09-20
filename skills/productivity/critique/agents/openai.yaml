@@ -1,0 +1,5 @@
+interface:
+  display_name: "Critique"
+  short_description: "Assess proposals against their intended outcome"
+policy:
+  allow_implicit_invocation: false
