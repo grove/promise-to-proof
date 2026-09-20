@@ -35,7 +35,7 @@ Choose the issue tracker, triage labels, and documentation locations that the
 project already uses. The setup gives Matt's planning and implementation skills
 the same sources that `acceptance-matrix` and `/prove` will read later.
 
-The repository provides the five skills used below. To confirm the current set
+The repository provides the six skills used below. To confirm the current set
 from a clone, run:
 
 ```bash
@@ -118,6 +118,30 @@ Use `/wayfinder` before `/to-spec` when the work is too large or uncertain for
 one agent session. It records the decisions that block a reliable plan and
 resolves them one at a time. When the issue already states a complete, agreed
 outcome, skip these planning steps and begin with `acceptance-matrix`.
+
+## Request an independent critique when it helps
+
+If you want the agent to assess whether a proposal will achieve its intended
+outcome, explicitly invoke `critique` with an idea, local document, or GitHub
+issue:
+
+```text
+/critique <idea, document path, or GitHub issue reference>
+```
+
+The agent checks consequential claims and recommends whether to proceed,
+adjust, or rethink the approach. When missing evidence prevents a defensible
+judgment, it reports insufficient evidence and the smallest useful next check.
+
+Use `critique` for agent-led assessment of a supplied proposal. Use `interrogate`
+when you want to lead the questions about the agent's proposal and reach a
+design decision. `acceptance-matrix` plans requirements and evidence, while
+`prove` verifies an implementation against the agreed contract.
+
+Critique is optional and advisory. It does not edit the artifact, repository,
+or acceptance contract, publish findings, or begin implementation. No downstream
+skill is required. You can take unresolved decisions into `interrogate`, plan
+acceptance with `acceptance-matrix`, or proceed directly when appropriate.
 
 ## Turn the ticket into an acceptance contract
 

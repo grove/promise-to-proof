@@ -15,6 +15,7 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 
 | Skill | Use it when | It gives you |
 |---|---|---|
+| [`critique`](./skills/productivity/critique/SKILL.md) | You explicitly request an independent review of a proposal against its intended outcome | Evidence-backed advice and a recommendation |
 | [`interrogate`](./skills/productivity/interrogate/SKILL.md) | A design needs stress-testing | An agreed approach, assumptions, and open decisions |
 | [`acceptance-matrix`](./skills/productivity/acceptance-matrix/SKILL.md) | A ticket needs clear acceptance criteria | Stable requirements and evidence plans |
 | [`prove`](./skills/productivity/prove/SKILL.md) | Implementation is ready to verify | `PROVEN` or `NOT PROVEN` with evidence |
@@ -22,6 +23,9 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 | [`fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
 
 ## Typical workflow
+
+Optionally invoke `critique` to assess an idea, issue, specification, plan, or
+proposal before committing to it. Its advice requires no downstream skill.
 
 ```text
 Ticket/spec → acceptance-matrix → implementation → prove
@@ -43,6 +47,7 @@ Ticket/spec → acceptance-matrix → implementation → prove
 
 | Skill | Responsibility | Boundary |
 |---|---|---|
+| `critique` | Give optional, agent-led advice on a proposal | Does not edit the artifact, repository, or acceptance contract, publish findings, or implement |
 | `acceptance-matrix` | Plan requirements and evidence | Does not implement or verify |
 | `prove` | Verify one fixed candidate | Does not edit, commit, push, or publish |
 | `repair-proof` | Repair named implementation or evidence gaps | Does not declare acceptance |
@@ -63,6 +68,7 @@ Ticket/spec → acceptance-matrix → implementation → prove
 ## Use a skill
 
 ```text
+/critique <idea, document path, or GitHub issue reference>
 /interrogate Should we use approach A or B?
 /acceptance-matrix #123
 /prove #123
@@ -98,6 +104,7 @@ npx skills@latest update prove
 ```text
 skills/productivity/
 ├── acceptance-matrix/
+├── critique/
 ├── fix-pr/
 ├── interrogate/
 ├── prove/
