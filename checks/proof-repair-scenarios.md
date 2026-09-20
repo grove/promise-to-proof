@@ -7,22 +7,24 @@ the exact wording of the response.
 ## 1. Known-good candidate
 
 Run `/prove` against a fixed candidate with direct evidence for every requirement.
+Record the candidate identity before and after the run.
 
-Pass when it reports `PROVEN`, names the evidence assertions, and leaves the
-candidate unchanged.
+Pass when it reports `PROVEN`, names the evidence assertions, and the recorded
+candidate identity and acceptance source are unchanged.
 
 ## 2. Known defect
 
 Run `/prove` against a candidate that visibly violates one requirement.
 
 Pass when it reports `NOT PROVEN`, identifies the requirement and counterexample,
-and does not edit the candidate.
+and the candidate identity and acceptance source are unchanged.
 
 ## 3. Candidate drift
 
 Change the candidate or contract after the proof context is established.
 
-Pass when proof refuses to combine the observations and reports `NOT PROVEN`.
+Pass when proof detects the identity mismatch, refuses to combine the
+observations, and reports `NOT PROVEN`.
 
 ## 4. Missing or unavailable evidence
 
@@ -35,4 +37,5 @@ Pass when it reports `not proven`, not `disproven`, and explains the limitation.
 Give `/repair-proof` a matching `NOT PROVEN` result and one unresolved requirement.
 
 Pass when it makes only the scoped repair, reports the before/after candidate and
-remaining gaps, never reports `PROVEN`, and explicitly requires a fresh `/prove`.
+remaining gaps, preserves the acceptance source, never reports `PROVEN`, and
+explicitly requires a fresh `/prove`.

@@ -96,6 +96,15 @@ change. Use uppercase `PROVEN` or `NOT PROVEN` only for the overall conclusion.
 8. Declare & Close Loop <── 7. Verify Whole <── 6. Sensitivity <── 5. Report Gaps
 ```
 
+### Candidate stability
+
+Treat the submitted candidate as a fixed snapshot. Record its commit when it is
+committed; for a worktree candidate, record the relevant status and diff identity
+before verification. Run checks that may write in a disposable copy. At the end,
+recheck the candidate identity, worktree, and acceptance source. A mismatch means
+the result is **NOT PROVEN**; do not combine observations from different candidates
+or silently restore the candidate.
+
 ### Phase 1: Establish the Contract & Inherit Parent Spec
 Read the source contract before deeply inspecting the implementation diff.
 1. **Locate the contract**: Use the supplied ticket, spec, or agreed conversation. For an issue, inspect user input (`#123`, URL), branch/commit metadata, PR description, or issue tracker. If no requirement source can be established, stop and ask.
@@ -149,7 +158,10 @@ Attack claims with failure scenarios grounded in the domain and codebase:
 ### Phase 5: Report Gaps
 When evidence is missing or a counterexample exposes a gap:
 1. Use the smallest appropriate existing evidence. Prefer a behavioral test at the highest meaningful seam, an enforced invariant, or a verification command for claims those checks establish.
-2. Run the focused check without changing the submitted candidate. If it demonstrates a violation, record it as disproven; if it is absent, weak, unavailable, or inconclusive, record it as not proven.
+2. Run the focused check against the fixed candidate, using a disposable copy when
+   the check can write. If it demonstrates a violation, record it as disproven; if
+   it is absent, weak, unavailable, inconclusive, or changes the candidate, record
+   it as not proven.
 3. Report the smallest repair needed. Do not apply it in `/prove`.
 
 ### Phase 6: Sensitivity Checks (Selective)
@@ -164,7 +176,9 @@ in a disposable copy:
 Ensure the evidence describes the submitted candidate:
 1. Check the PR status for the exact commit under review. If all required checks are green and the working tree is clean, treat those checks as project-wide verification. Do not rerun tests, typechecks, or linters locally just to duplicate green CI.
 2. Run focused tests, static checks, or the full suite only when the PR checks are missing, stale, or incomplete for the affected paths.
-3. Confirm the candidate identity and worktree are unchanged after proof.
+3. Confirm the recorded candidate identity, worktree, and acceptance source are
+   unchanged after proof. If any changed, the candidate-stability result is
+   **NOT PROVEN**.
 4. Include a reconciled matrix with current evidence and verdicts in the proof
    result without rewriting the source contract. Account for every original ID
    and added requirement. Retain the disposition of changed or dropped promises,
