@@ -22,8 +22,9 @@ requirement IDs. It repairs only those gaps and never replaces fresh proof.
 2. Confirm the candidate identity and the unresolved requirement IDs.
 3. Apply the smallest scoped implementation or evidence repair, when editing is authorized.
 4. Run the focused check and inspect the resulting diff.
-5. Report the candidate before and after, changed files, addressed requirements,
-   changed evidence, and remaining gaps.
+5. Recheck the contract and report the candidate before and after, changed files,
+   addressed requirements, changed evidence, and remaining gaps. The candidate
+   may change only in the scoped repair; the acceptance requirements stay intact.
 6. End with: **Fresh `/prove` required before acceptance.**
 
 ## Outcomes

@@ -94,6 +94,11 @@ cannot justify `proven`: a concrete proposal with no verification verdict remain
 `planned`, while an inspection-only verification verdict is `not proven`.
 A tool or environment failure does not establish `disproven`.
 
+Keep planning and verification separate: a matrix proposes evidence and records
+gaps; it does not claim that evidence ran. Completed verdicts belong to a later
+`/prove` result and must name the candidate and verification context that produced
+them.
+
 ## Check and hand off
 
 Audit the draft before returning:

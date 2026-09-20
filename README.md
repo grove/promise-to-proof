@@ -56,6 +56,11 @@ when authorized, `/prove` only reports gaps, and `/repair-proof` handles scoped
 repairs without declaring acceptance. Invoking `/fix-pr`
 also authorizes scoped commit, push, and workflow reruns for its target.
 
+`/prove` binds its result to one candidate and verification context. It leaves
+that candidate and the acceptance source unchanged; if either drifts, the result
+is `NOT PROVEN`. `/repair-proof` is the only step in this workflow that repairs a
+named gap, and every repair requires a fresh `/prove`.
+
 ---
 
 ## 🎯 Featured Skill: `interrogate`
