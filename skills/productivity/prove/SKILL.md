@@ -1,6 +1,6 @@
 ---
 name: prove
-description: Prove that an implemented issue is actually resolved by mapping every material requirement to independent evidence, hunting counterexamples, strengthening tests, fixing discovered gaps, and refusing to declare success while any requirement remains unproven.
+description: Prove that an implemented issue is actually resolved by mapping every material requirement to independent evidence, hunting counterexamples, and refusing to declare success while any requirement remains unproven.
 disable-model-invocation: true
 ---
 
@@ -9,6 +9,9 @@ ticket, spec, or agreed conversation has been implemented by checking its promis
 against independent, observable evidence. Treat that source and its authorized
 amendments as the contract; an acceptance matrix records the contract but does not
 replace it.
+
+`/prove` verifies a fixed candidate. It reports gaps; it does not repair the
+candidate. Use `/repair-proof` for scoped repairs, then run `/prove` again.
 
 Unlike a conventional code review, `/prove` does not primarily ask whether the diff looks clean or follows style guidelines. It starts from the desired outcome:
 
@@ -30,7 +33,7 @@ The output is never "looks good" or "seems complete." It is strictly **PROVEN** 
 3. **Evidence Over Confidence Language**: Never use phrases like "looks correct" or "tests appear comprehensive." State demonstrable facts: *"R1 is proven by test X; R2 currently lacks direct evidence."*
 4. **Behavioral Completeness Over Test Quantity**: Five meaningful behavioral tests through public seams provide more confidence than fifty shallow unit tests mocking internals.
 5. **Independent Oracles**: Assertions must come from domain rules, specs, and issue requirements—not mirrored calculations copied from the production code.
-6. **Fix Local Gaps**: When a test or implementation gap within the issue's scope is uncovered, fix it and rerun verification.
+6. **Name Local Gaps**: When a test or implementation gap within the issue's scope is uncovered, report the smallest repair that would address it.
 7. **Comfortable with NOT PROVEN**: Ending in `NOT PROVEN` is a successful outcome when evidence is missing or a genuine gap remains. Never massage evidence to force a pass.
 
 ---
@@ -38,11 +41,11 @@ The output is never "looks good" or "seems complete." It is strictly **PROVEN** 
 ## Non-Goals & Scope Discipline
 
 * **Not a general code review**: Formatting, naming, stylistic preferences, and repository conventions belong in `/code-review`.
-* **Not a general simplification pass**: Do not refactor working code because another design looks prettier. Changes must strictly strengthen the proof or fix a demonstrated defect.
+* **Not a repair pass**: Do not edit working code, tests, CI, or the acceptance contract to make proof pass.
 * **Not a coverage maximizer**: Never add tests solely to inflate line or branch coverage percentages.
 * **Not a replacement for TDD**: TDD governs development; `/prove` audits the finished outcome and retrofits acceptance proof where missing.
 * **Not speculative paranoia**: Counterexamples must be rooted in real domain states, actual control flow, public APIs, storage semantics, and concrete caller contracts.
-* **Scope boundaries**: Only make issue-local repairs and tests. Do not redesign surrounding architecture or expand feature scope. Report larger defects in the final assessment.
+* **Scope boundaries**: Inspect the issue-local candidate and report repairs without changing it. Do not redesign surrounding architecture or expand feature scope.
 
 For a report-only or read-only request, inspect and run safe diagnostics within
 that scope. Report needed repairs instead of editing files or injecting faults.
@@ -90,7 +93,7 @@ change. Use uppercase `PROVEN` or `NOT PROVEN` only for the overall conclusion.
 ```text
 1. Contract & Parent ──> 2. Map Evidence ──> 3. Audit Tests ──> 4. Hunt Counterexamples
                                                                              │
-8. Declare & Close Loop <── 7. Verify Whole <── 6. Sensitivity <── 5. Strengthen & Fix
+8. Declare & Close Loop <── 7. Verify Whole <── 6. Sensitivity <── 5. Report Gaps
 ```
 
 ### Phase 1: Establish the Contract & Inherit Parent Spec
@@ -108,7 +111,8 @@ Read the source contract before deeply inspecting the implementation diff.
    from the issue, or supplied with the task. Preserve its requirement IDs,
    promised results, boundaries, and open questions. If none exists, draft one
    (`R1, R2, ...`). Independently compare the matrix with the issue and applicable
-   parent constraints; add omitted material requirements with unused IDs.
+   parent constraints; report omitted material requirements with unused IDs in the
+   proof result without rewriting the source contract.
    - Record changed or dropped promises with their original IDs, source, and
      explicit authorization for any scope change. A PR's implementation or
      weaker tests do not authorize narrowing the contract. Keep unsupported
@@ -133,40 +137,39 @@ Ensure tests serving as evidence are credible:
 * **Behavioral & Seam-focused**: Verifies observable behavior at public seams, not private implementation details.
 * **Independent Oracles**: Expected values derive from domain rules and specs, not copied production code logic.
 * **Sensitive & Durable**: Fails when the requirement is broken; does not break on internal refactoring.
-* *Reference*: See [Testing Heuristics & Anti-Patterns](./references/testing-heuristics.md) for mock illusions, tautologies, and common traps.
 
 ### Phase 4: Hunt Concrete Counterexamples
 Attack claims with failure scenarios grounded in the domain and codebase:
 * Explore adjacent lifecycle states, semantic boundaries (`0 / 1 / N`, tenant/auth boundaries), persistence/restart transitions, retries & idempotency, check-then-write race windows, and caller contracts.
 * Trace the requested workflow from trigger through completion. Could every row
   pass while the intended user or operational outcome still fails? Check how the
-  steps connect and what the user can observe at completion. Strengthen evidence
-  or add a missing obligation where the contract supports it.
-* *Reference*: See [Counterexample Hunting Patterns](./references/counterexample-patterns.md) for domain-specific attack vectors.
+  steps connect and what the user can observe at completion. Prefer strong
+  existing evidence or report a missing obligation where the contract supports it.
 
-### Phase 5: Strengthen the Proof & Repair Gaps
+### Phase 5: Report Gaps
 When evidence is missing or a counterexample exposes a gap:
-1. Strengthen the smallest appropriate evidence. Use a behavioral test at the highest meaningful seam for behavioral gaps, or an enforced invariant or verification command for claims those checks establish.
-2. Run the focused check. If it demonstrates a violation, fix the issue-scoped defect and rerun. If it passes but sensitivity is uncertain, consider a Phase 6 sensitivity check. Report unavailable verification as an evidence gap.
-3. Keep changes tightly focused on the issue contract.
+1. Use the smallest appropriate existing evidence. Prefer a behavioral test at the highest meaningful seam, an enforced invariant, or a verification command for claims those checks establish.
+2. Run the focused check without changing the submitted candidate. If it demonstrates a violation, record it as disproven; if it is absent, weak, unavailable, or inconclusive, record it as not proven.
+3. Report the smallest repair needed. Do not apply it in `/prove`.
 
 ### Phase 6: Sensitivity Checks (Selective)
-When cheap, safe, and materially confidence-improving (such as for critical bug fixes, deduplication guards, or idempotency checks), confirm the test is sensitive to regressions:
-1. Temporarily introduce a controlled fault (e.g. comment out the guard or inversion).
-2. Run the test and confirm it turns **RED**.
-3. Restore the implementation and confirm it returns **GREEN**.
-4. Clean diff check: Never leave intentional faults or disabled guards in the code.
+When cheap, safe, and materially confidence-improving, run sensitivity checks only
+in a disposable copy:
+1. Introduce a controlled fault in the disposable copy.
+2. Run the evidence and confirm it turns **RED**.
+3. Discard the copy and confirm the submitted candidate remains unchanged.
 *Note: Skip fault injection when it is costly, risky, or provides negligible confidence gain.*
 
-### Phase 7: Verify the Whole Change
-Ensure proof fixes did not introduce regressions:
+### Phase 7: Verify the Whole Candidate
+Ensure the evidence describes the submitted candidate:
 1. Check the PR status for the exact commit under review. If all required checks are green and the working tree is clean, treat those checks as project-wide verification. Do not rerun tests, typechecks, or linters locally just to duplicate green CI.
-2. Run focused tests, static checks, or the full suite only when the PR checks are missing, stale, incomplete for the affected paths, or no longer cover the final diff because `/prove` changed files.
-3. Inspect `git diff` to ensure no temporary test scaffolding remains.
-4. Update the reconciled Acceptance Matrix with current evidence and verdicts.
-   Account for every original ID and added requirement. Retain the disposition
-   of changed or dropped promises, including their source and authorization;
-   unresolved requirements and product decisions prevent **PROVEN**.
+2. Run focused tests, static checks, or the full suite only when the PR checks are missing, stale, or incomplete for the affected paths.
+3. Confirm the candidate identity and worktree are unchanged after proof.
+4. Include a reconciled matrix with current evidence and verdicts in the proof
+   result without rewriting the source contract. Account for every original ID
+   and added requirement. Retain the disposition of changed or dropped promises,
+   including their source and authorization; unresolved requirements and product
+   decisions prevent **PROVEN**.
 
 ### Phase 8: Declare the Result & Close the Review Loop
 Report the conclusion with complete objectivity.
@@ -176,12 +179,9 @@ replaced evidence by ID, or state that none changed. Keep unmet requirements and
 missing evidence visible in the final matrix and unresolved gaps.
 
 #### Closing the Review / Prove Loop
-If `/prove` added tests, changed code, or fixed defects, **it modified the diff and may have invalidated a prior code review**.
-Whenever files are changed during `/prove`, the final output MUST conclude with an explicit directive:
-> **Diff modified during proof.** Repeat the repository's code review against the actual target base. Use `/code-review <base>` if installed, or the repository's equivalent review process.
-
-This handoff does not invoke another skill, publish a result, or merge the PR.
-An acceptance verdict and a code review assess different parts of PR quality.
+If a repair is needed, hand the named requirement IDs to `/repair-proof`.
+After repair-proof changes the candidate, run `/prove` again and review the changed
+candidate. `/prove` itself never modifies the diff.
 
 #### Reporting Format
 
@@ -191,7 +191,7 @@ An acceptance verdict and a code review assess different parts of PR quality.
 > <PROVEN means every material requirement has credible evidence. NOT PROVEN means at least one requirement lacks direct evidence or has a failing counterexample.>
 
 **Requirements:** <proven_count>/<total_count> demonstrated (including inherited parent constraints)
-**Counterexamples tested:** <count> (<fixed_count> resolved)
+**Counterexamples tested:** <count> (<violations demonstrated>: <count>)
 **Requirements relying on inspection alone:** <count>
 
 **Outcome:** <intended result and evidence of workflow completion, or what prevents establishing it>
@@ -208,22 +208,17 @@ An acceptance verdict and a code review assess different parts of PR quality.
 - Focused tests: <result>
 - Typecheck: <result>
 - Project-wide verification: <result>
+- Candidate stability: <unchanged or NOT PROVEN>
 
 ### Unresolved Gaps (when NOT PROVEN)
 - **Requirement R<X>**: <description>
   - *Evidence / Counterexample*: <scenario or failing check>
   - *Why unresolved*: <limitation or unavailable capability>
 
-### Changes Made During Proof (if any)
-- Added regression test for <case> (`<file>`)
-- Fixed <defect found> in `<file>`
-
-> **Diff modified during proof** (if changes were made): Repeat code review against the actual target base using `/code-review <base>` if installed, or the repository's equivalent review process.
+### Repairs Needed (if any)
+- **Requirement R<X>**: <smallest repair needed; hand to `/repair-proof`>
 ```
 
 ---
 
 ## Detailed References
-
-* [Counterexample Patterns](./references/counterexample-patterns.md): Domain boundary, state, idempotency, and failure hunting techniques.
-* [Testing Heuristics & Anti-Patterns](./references/testing-heuristics.md): Test illusions, tautological checks, and sensitivity verification protocol.
