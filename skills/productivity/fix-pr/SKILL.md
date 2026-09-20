@@ -117,22 +117,13 @@ associated PR when available; otherwise verify every check represented by the
 run and state that branch-protection requirements could not be established.
 Count a required check only when it succeeds for the exact repaired SHA.
 Pending, queued, cancelled, timed-out, skipped, missing, or stale results are
-not successful verification. When waiting is authorized, poll adaptively:
-use the workflow's observed duration when available, otherwise start at 30
-seconds, double the interval up to 5 minutes, and stop at a bounded wait
-budget: use the workflow's recent p95 duration when available, otherwise 15
-minutes, capped at 30 minutes. Stop immediately on a terminal result; do not
-spend calls checking an unchanged run at a fixed short interval. If the budget
-expires, return `NOT FIXED — VERIFICATION PENDING` with the run URLs. Confirm
-that the repaired commit is pushed, no verification was weakened, and no
-unrelated quality regression was introduced.
-
-Allow at most two repair attempts. After a failed verification, use the second
-attempt only when the failure identifies a concrete, scoped correction. Stop
-after the second unsuccessful attempt. Stop immediately if the cause remains
-uncertain, a required capability is unavailable, or the repair would weaken quality.
-Also stop when the repair introduces an unexplained quality regression, removes
-required verification, or makes an existing quality signal unmeasurable.
+not successful verification. Use the environment's waiting mechanism when one is
+available; do not invent polling intervals, wait budgets, or repair-attempt caps.
+Without a waiting mechanism, return `NOT FIXED — VERIFICATION PENDING` with the
+run URLs. Stop when the cause is uncertain, a required capability is unavailable,
+the repair would weaken quality, or the repair introduces an unexplained quality
+regression. Confirm that the repaired commit is pushed and all required signals
+remain measurable.
 
 ## Forbidden repairs
 
