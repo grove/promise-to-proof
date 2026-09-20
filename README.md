@@ -2,29 +2,60 @@
 
 Practical agent skills for turning requirements into implementation, proof, and repair.
 
-## Quick install
+The skills are written for agent-skill-compatible coding tools. They keep the
+source ticket's promises visible, make evidence explicit, and carry unresolved
+questions into the next step. They do not provide a workflow runtime.
 
-```bash
-npx skills@latest add grove/skills
-```
+Issues and specifications for this repository live in [GitHub Issues](https://github.com/grove/skills/issues).
 
-| Skill | Use it for |
-|---|---|
-| [`interrogate`](./skills/productivity/interrogate/SKILL.md) | Stress-test a design before implementation |
-| [`acceptance-matrix`](./skills/productivity/acceptance-matrix/SKILL.md) | Turn promises into a testable checklist |
-| [`prove`](./skills/productivity/prove/SKILL.md) | Verify a fixed candidate without changing it |
-| [`repair-proof`](./skills/productivity/repair-proof/SKILL.md) | Repair named proof gaps and require fresh proof |
-| [`fix-pr`](./skills/productivity/fix-pr/SKILL.md) | Repair failed PR workflows without weakening checks |
+## Choose a skill
 
-Typical workflow:
+| Skill | Use it when | It gives you |
+|---|---|---|
+| [`interrogate`](./skills/productivity/interrogate/SKILL.md) | A design needs stress-testing | An agreed approach, assumptions, and open decisions |
+| [`acceptance-matrix`](./skills/productivity/acceptance-matrix/SKILL.md) | A ticket needs clear acceptance criteria | Stable requirements and evidence plans |
+| [`prove`](./skills/productivity/prove/SKILL.md) | Implementation is ready to verify | `PROVEN` or `NOT PROVEN` with evidence |
+| [`repair-proof`](./skills/productivity/repair-proof/SKILL.md) | Proof found a specific gap | A scoped repair report; fresh proof is still required |
+| [`fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
+
+## Typical workflow
 
 ```text
 Ticket/spec → acceptance-matrix → implementation → prove
            → repair-proof if needed → prove again → review
 ```
 
-These skills preserve the source ticket's promises, make evidence explicit, and
-keep unresolved requirements visible. They do not provide a workflow runtime.
+1. **Plan acceptance.** Run `acceptance-matrix` on the ticket or specification.
+   It turns broad promises into stable, observable requirements.
+2. **Implement.** Build the requested behavior while keeping the matrix with the
+   work.
+3. **Prove.** Run `prove` against the fixed candidate. It checks the requirements,
+   hunts realistic counterexamples, and reports the evidence.
+4. **Repair only named gaps.** If proof is `NOT PROVEN`, pass its unresolved
+   requirement IDs to `repair-proof`.
+5. **Prove again.** A repair never counts as acceptance by itself. Review the
+   changed candidate after fresh proof.
+
+## Important boundaries
+
+| Skill | Responsibility | Boundary |
+|---|---|---|
+| `acceptance-matrix` | Plan requirements and evidence | Does not implement or verify |
+| `prove` | Verify one fixed candidate | Does not edit, commit, push, or publish |
+| `repair-proof` | Repair named implementation or evidence gaps | Does not declare acceptance |
+| `fix-pr` | Repair a failed PR workflow | Does not prove the whole ticket |
+| `interrogate` | Reach a design decision | Does not imply implementation authority |
+
+## What the results mean
+
+- **PROVEN** means every material requirement has credible evidence, no contract
+  discrepancy remains, and the candidate stayed fixed during verification.
+- **NOT PROVEN** means evidence is missing, weak, unavailable, contradictory, or
+  tied to the wrong candidate. It is a useful result, not a failure of the skill.
+- **FIXED** means the target CI workflow was repaired and its required checks pass.
+  It does not mean the ticket is fully proven.
+- **NOT FIXED** means the workflow is still unresolved or verification could not
+  establish a durable repair.
 
 ## Use a skill
 
@@ -36,13 +67,24 @@ keep unresolved requirements visible. They do not provide a workflow runtime.
 /fix-pr #456
 ```
 
-Install one skill directly:
+The skills also accept direct ticket URLs or a specification when their skill
+instructions describe that input.
+
+## Install and update
+
+Install the full collection:
+
+```bash
+npx skills@latest add grove/skills
+```
+
+Install one skill:
 
 ```bash
 npx skills@latest add grove/skills --skill prove
 ```
 
-Update an installed skill:
+Update one installed skill:
 
 ```bash
 npx skills@latest update prove
@@ -60,17 +102,16 @@ skills/productivity/
 ```
 
 Each skill has a `SKILL.md`. Some also have an `agents/openai.yaml` display
-metadata file.
+metadata file. The [`checks/`](./checks/) directory contains small, human-runnable
+workflow checks.
 
 ## Contributing
 
-1. Fork the repository.
-2. Create a branch.
+1. Read [AGENTS.md](./AGENTS.md).
+2. Find or create the relevant GitHub issue.
 3. Change the smallest relevant skill.
 4. Run the checks described by that skill.
-5. Open a pull request.
-
-See [AGENTS.md](./AGENTS.md) for repository guidance.
+5. Open a pull request that explains the behavior and evidence.
 
 ## License
 
