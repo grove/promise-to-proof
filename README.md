@@ -6,6 +6,9 @@ The skills are written for agent-skill-compatible coding tools. They keep the
 source ticket's promises visible, make evidence explicit, and carry unresolved
 questions into the next step. They do not provide a workflow runtime.
 
+Follow [How to take a ticket from promise to proof](./docs/promise-to-proof.md)
+for an end-to-end workflow that uses every skill in this repository.
+
 Issues and specifications for this repository live in [GitHub Issues](https://github.com/grove/skills/issues).
 
 ## Choose a skill
