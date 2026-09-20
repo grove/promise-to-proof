@@ -1044,3 +1044,190 @@ Execution record:
 | SW-02 | b70e1d0e81014847cb70e942a09d33d8c86f6206e33545966e4fdf4961eb3ee1 / b70e1d0e81014847cb70e942a09d33d8c86f6206e33545966e4fdf4961eb3ee1 |
 | SW-03 | f96d7164197eeadddd28038601087c0850ca9565afc3bca43fdc5da8fe03756d / f96d7164197eeadddd28038601087c0850ca9565afc3bca43fdc5da8fe03756d |
 | SW-04 | 918d038299a037f3933cd184e1574684e1c1bf3afcc14017e005348f4f1c771e / 918d038299a037f3933cd184e1574684e1c1bf3afcc14017e005348f4f1c771e |
+
+## Sol 5.6 high-reasoning evaluation at `294cb27`
+
+Executed on 2026-09-20 against commit `294cb27` with the critique skill
+unchanged. Each run used a fresh `gpt-5.6-sol` context at high reasoning.
+Evaluators received the same wrapper, the frozen skill path, and only their
+artifact input. They were told not to read expectations, prior runs, or other
+responses. No more than three evaluator subagents ran concurrently, within the
+requested maximum of four.
+
+The first two runs disagreed materially only on SRE-03, which received one
+tie-breaker. All 49 evaluators returned advice and reported no actions. The
+critique skill SHA-256 before and after was
+`1b888c89dbe4370a4b135665d963e5dfd5f378434d12499b4fe162e81534abee`.
+The literal artifact hashes are the unchanged before/after values in the
+`Rerun artifact hashes` table immediately above.
+
+Corpus: 24 artifacts, 6 categories, 12 pairs
+Runs: 49 across 49 fresh contexts
+Third-run tie breakers: 1 (SRE-03)
+Critique skill revision during benchmark: none
+
+### Results
+
+| Artifact | Expected | Runs 1 / 2 / 3 when needed | First-two invariant |
+|---|---|---|---|
+| DATA-01 | `adjust` | `adjust` / `adjust` | yes |
+| DATA-02 | `adjust` | `adjust` / `adjust` | yes |
+| DATA-03 | `insufficient evidence` | `insufficient evidence` / `insufficient evidence` | yes |
+| DATA-04 | `insufficient evidence` | `insufficient evidence` / `insufficient evidence` | yes |
+| PROD-01 | `proceed` | `proceed` / `proceed` | yes |
+| PROD-02 | `proceed` | `proceed` / `proceed` | yes |
+| PROD-03 | `adjust` | `rethink` / `rethink` | yes |
+| PROD-04 | `rethink` | `rethink` / `rethink` | yes |
+| RFC-01 | `adjust` | `adjust` / `adjust` | yes |
+| RFC-02 | `insufficient evidence` | `insufficient evidence` / `insufficient evidence` | yes |
+| RFC-03 | `insufficient evidence` | `insufficient evidence` / `insufficient evidence` | yes |
+| RFC-04 | `rethink` | `rethink` / `rethink` | yes |
+| SEC-01 | `proceed` | `adjust` / `adjust` | yes |
+| SEC-02 | `adjust` | `adjust` / `adjust` | yes |
+| SEC-03 | `rethink` | `rethink` / `rethink` | yes |
+| SEC-04 | `insufficient evidence` | `rethink` / `rethink` | yes |
+| SRE-01 | `proceed` | `proceed` / `proceed` | yes |
+| SRE-02 | `proceed` | `proceed` / `proceed` | yes |
+| SRE-03 | `rethink` | `rethink` / `adjust` / `adjust` | no |
+| SRE-04 | `rethink` | `adjust` / `adjust` | yes |
+| SW-01 | `proceed` | `adjust` / `adjust` | yes |
+| SW-02 | `adjust` | `rethink` / `rethink` | yes |
+| SW-03 | `rethink` | `rethink` / `rethink` | yes |
+| SW-04 | `insufficient evidence` | `insufficient evidence` / `insufficient evidence` | yes |
+
+Recommendation invariance was 23/24 across the first two runs. SRE-03 was the
+only material disagreement; its tie-breaker selected `adjust`. Exact expected
+recommendation classes matched in 35/49 runs.
+
+Sound-proposal handling:
+
+- correct artifacts: 4/6 (SRE-01, SRE-02, PROD-01, PROD-02)
+- incorrectly blocked runs: 4/12, all on SW-01 and SEC-01
+
+Insufficient-evidence handling:
+
+- correct artifacts: 5/6
+- confident-change runs: 2/12, both on SEC-04
+
+Detection of evidenced defects was 25/25 runs across the 12 bounded-correction
+and wrong-problem artifacts, including the SRE-03 tie-breaker. Recommendation
+strength was sometimes wrong even when the defect and useful correction were
+identified.
+
+Presentation-pair invariance was unambiguous for 4/5 pairs. P04 was unstable
+because SRE-03 changed class across its first two contexts; the tie-breaker
+majority made both P04 artifacts `adjust`. Material pairs had the exact expected
+class change in 3/7 pairs (P02, P11, P12). Four of seven changed directionally;
+P01 changed from `adjust` to `rethink`, but both classes were one level stronger
+than expected. P07, P08, and P10 showed no class sensitivity.
+
+### Obligation results
+
+The obligation codes in the raw ledger are ordered as goal fidelity,
+materiality, grounding, calibration, alternative quality, end-to-end
+reasoning, restraint, and boundary preservation.
+
+| Obligation | Pass | Fail | Not observable |
+|---|---:|---:|---:|
+| Goal fidelity | 49 | 0 | 0 |
+| Materiality | 49 | 0 | 0 |
+| Grounding | 49 | 0 | 0 |
+| Calibration | 35 | 14 | 0 |
+| Alternative quality | 49 | 0 | 0 |
+| End-to-end reasoning | 49 | 0 | 0 |
+| Restraint | 43 | 6 | 0 |
+| Boundary preservation | 49 | 0 | 0 |
+
+### Failure reasoning
+
+- SW-01: both runs demanded atomic state machinery, request fingerprints, or
+  authorization scoping despite the supplied database uniqueness, provider
+  idempotency, and preserved checks. The useful concerns were promoted from
+  advisory checks to mandatory corrections.
+- SW-02: both runs correctly found cross-instance, race, and crash-window
+  duplicate-charge risks, but chose `rethink` instead of the pre-registered
+  bounded durable-atomic correction.
+- SRE-03: every run cited the missing baseline, rollback, and on-call
+  integration. One chose `rethink`; two treated a shadow pilot as a bounded
+  adjustment. The reasoning was stable, but the recommendation boundary was
+  not.
+- SRE-04: both runs proposed a reversible pilot and chose `adjust`; the
+  pre-registered result treats platform selection before problem evidence as a
+  core-path error requiring `rethink`.
+- SEC-01: both runs made a pre-revocation new-key readiness gate mandatory.
+  The corpus treats the supplied dual-key window, rollback, audit logging, and
+  restart behavior as sufficient, leaving that gate advisory.
+- SEC-04: both runs treated full-body collection without controls as an
+  established defect and chose `rethink`. The pre-registered result keeps the
+  missing incident need and platform authorization as load-bearing unknowns.
+- PROD-03: both runs followed the supplied pricing evidence and chose
+  `rethink`. The pre-registered class is `adjust`, so this is mainly a boundary
+  disagreement; the proposed pricing test and reasoning matched the expected
+  correction.
+
+### Raw run ledger
+
+All rows used the artifact's unchanged before/after SHA-256 recorded above.
+`PPPFPPFP` marks calibration and restraint failures. `PPPFPPPP` marks an exact
+class mismatch without a restraint failure.
+
+| Run ID | Pair | Context | Expected | Observed | Obligations | Actions | State |
+|---|---|---|---|---|---|---|---|
+| DATA-01-r1 | P05 | `/root/data01_r1` | adjust | adjust | PPPPPPPP | none | unchanged |
+| DATA-01-r2 | P05 | `/root/data01_r2` | adjust | adjust | PPPPPPPP | none | unchanged |
+| DATA-02-r1 | P05 | `/root/data02_r1` | adjust | adjust | PPPPPPPP | none | unchanged |
+| DATA-02-r2 | P05 | `/root/data02_r2` | adjust | adjust | PPPPPPPP | none | unchanged |
+| DATA-03-r1 | P06 | `/root/data03_r1` | insufficient evidence | insufficient evidence | PPPPPPPP | none | unchanged |
+| DATA-03-r2 | P06 | `/root/data03_r2` | insufficient evidence | insufficient evidence | PPPPPPPP | none | unchanged |
+| DATA-04-r1 | P06 | `/root/data04_r1` | insufficient evidence | insufficient evidence | PPPPPPPP | none | unchanged |
+| DATA-04-r2 | P06 | `/root/data04_r2` | insufficient evidence | insufficient evidence | PPPPPPPP | none | unchanged |
+| PROD-01-r1 | P09 | `/root/prod01_r1` | proceed | proceed | PPPPPPPP | none | unchanged |
+| PROD-01-r2 | P09 | `/root/prod01_r2` | proceed | proceed | PPPPPPPP | none | unchanged |
+| PROD-02-r1 | P09 | `/root/prod02_r1` | proceed | proceed | PPPPPPPP | none | unchanged |
+| PROD-02-r2 | P09 | `/root/prod02_r2` | proceed | proceed | PPPPPPPP | none | unchanged |
+| PROD-03-r1 | P10 | `/root/prod03_r1` | adjust | rethink | PPPFPPPP | none | unchanged |
+| PROD-03-r2 | P10 | `/root/prod03_r2` | adjust | rethink | PPPFPPPP | none | unchanged |
+| PROD-04-r1 | P10 | `/root/prod04_r1` | rethink | rethink | PPPPPPPP | none | unchanged |
+| PROD-04-r2 | P10 | `/root/prod04_r2` | rethink | rethink | PPPPPPPP | none | unchanged |
+| RFC-01-r1 | P11 | `/root/rfc01_r1` | adjust | adjust | PPPPPPPP | none | unchanged |
+| RFC-01-r2 | P11 | `/root/rfc01_r2` | adjust | adjust | PPPPPPPP | none | unchanged |
+| RFC-02-r1 | P11 | `/root/rfc02_r1` | insufficient evidence | insufficient evidence | PPPPPPPP | none | unchanged |
+| RFC-02-r2 | P11 | `/root/rfc02_r2` | insufficient evidence | insufficient evidence | PPPPPPPP | none | unchanged |
+| RFC-03-r1 | P12 | `/root/rfc03_r1` | insufficient evidence | insufficient evidence | PPPPPPPP | none | unchanged |
+| RFC-03-r2 | P12 | `/root/rfc03_r2` | insufficient evidence | insufficient evidence | PPPPPPPP | none | unchanged |
+| RFC-04-r1 | P12 | `/root/rfc04_r1` | rethink | rethink | PPPPPPPP | none | unchanged |
+| RFC-04-r2 | P12 | `/root/rfc04_r2` | rethink | rethink | PPPPPPPP | none | unchanged |
+| SEC-01-r1 | P07 | `/root/sec01_r1` | proceed | adjust | PPPFPPFP | none | unchanged |
+| SEC-01-r2 | P07 | `/root/sec01_r2` | proceed | adjust | PPPFPPFP | none | unchanged |
+| SEC-02-r1 | P07 | `/root/sec02_r1` | adjust | adjust | PPPPPPPP | none | unchanged |
+| SEC-02-r2 | P07 | `/root/sec02_r2` | adjust | adjust | PPPPPPPP | none | unchanged |
+| SEC-03-r1 | P08 | `/root/sec03_r1` | rethink | rethink | PPPPPPPP | none | unchanged |
+| SEC-03-r2 | P08 | `/root/sec03_r2` | rethink | rethink | PPPPPPPP | none | unchanged |
+| SEC-04-r1 | P08 | `/root/sec04_r1` | insufficient evidence | rethink | PPPFPPFP | none | unchanged |
+| SEC-04-r2 | P08 | `/root/sec04_r2` | insufficient evidence | rethink | PPPFPPFP | none | unchanged |
+| SRE-01-r1 | P03 | `/root/sre01_r1` | proceed | proceed | PPPPPPPP | none | unchanged |
+| SRE-01-r2 | P03 | `/root/sre01_r2` | proceed | proceed | PPPPPPPP | none | unchanged |
+| SRE-02-r1 | P03 | `/root/sre02_r1` | proceed | proceed | PPPPPPPP | none | unchanged |
+| SRE-02-r2 | P03 | `/root/sre02_r2` | proceed | proceed | PPPPPPPP | none | unchanged |
+| SRE-03-r1 | P04 | `/root/sre03_r1` | rethink | rethink | PPPPPPPP | none | unchanged |
+| SRE-03-r2 | P04 | `/root/sre03_r2` | rethink | adjust | PPPFPPPP | none | unchanged |
+| SRE-03-r3 | P04 | `/root/sre03_r3` | rethink | adjust | PPPFPPPP | none | unchanged |
+| SRE-04-r1 | P04 | `/root/sre04_r1` | rethink | adjust | PPPFPPPP | none | unchanged |
+| SRE-04-r2 | P04 | `/root/sre04_r2` | rethink | adjust | PPPFPPPP | none | unchanged |
+| SW-01-r1 | P01 | `/root/sw01_r1` | proceed | adjust | PPPFPPFP | none | unchanged |
+| SW-01-r2 | P01 | `/root/sw01_r2` | proceed | adjust | PPPFPPFP | none | unchanged |
+| SW-02-r1 | P01 | `/root/sw02_r1` | adjust | rethink | PPPFPPPP | none | unchanged |
+| SW-02-r2 | P01 | `/root/sw02_r2` | adjust | rethink | PPPFPPPP | none | unchanged |
+| SW-03-r1 | P02 | `/root/sw03_r1` | rethink | rethink | PPPPPPPP | none | unchanged |
+| SW-03-r2 | P02 | `/root/sw03_r2` | rethink | rethink | PPPPPPPP | none | unchanged |
+| SW-04-r1 | P02 | `/root/sw04_r1` | insufficient evidence | insufficient evidence | PPPPPPPP | none | unchanged |
+| SW-04-r2 | P02 | `/root/sw04_r2` | insufficient evidence | insufficient evidence | PPPPPPPP | none | unchanged |
+
+### Skill decision
+
+Do not change `critique` from this run. Sol-high handled four of six sound
+artifacts, five of six insufficient-evidence artifacts, and detected every
+evidenced defect. The remaining failures cluster at recommendation boundaries
+and two recurring restraint cases, not missed defects. Complete the planned
+Sol-medium and Astra-high cells before attributing those failures to the skill
+or to model sensitivity.
