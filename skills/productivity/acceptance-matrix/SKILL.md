@@ -11,6 +11,8 @@ result and credible evidence.
 
 By itself, this skill only produces the matrix. Implementing code, writing tests,
 running proof, or publishing requires authorization from the broader user request.
+New matrices describe requirements and evidence plans; only `/prove` assigns
+completed verification verdicts.
 
 Aim for the smallest complete set of independently verifiable requirements.
 Row count follows the contract; completeness and credible evidence take priority
@@ -80,9 +82,9 @@ gap by ID. Keep the requirement visible without inventing repository facts.
 | Status | Use when |
 |---|---|
 | `planned` | A concrete evidence path is proposed for implementation or a future run; no verification verdict exists |
-| `proven` | The named evidence ran successfully in the current verification context, directly supports the row, and `/prove` accepted it |
+| `proven` | A prior `/prove` result accepted the named evidence in its verification context; do not assign this in a new matrix |
 | `not proven` | Evidence cannot yet be mapped, or a verification attempt cannot establish the claim because checks are unrun, weak, or inconclusive |
-| `disproven` | A concrete counterexample or failing check demonstrates a requirement violation |
+| `disproven` | A prior `/prove` result recorded a concrete counterexample or failing check; do not assign this in a new matrix |
 
 New matrices normally use `planned` and `not proven`. Carry verification
 verdicts only with their supporting results and context, including the verified

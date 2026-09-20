@@ -24,13 +24,14 @@ success looks like, and carry evidence and unresolved gaps into the next step.
 |---|---|---|
 | [`interrogate`](./skills/productivity/interrogate/SKILL.md) | Stress-test a proposal and agree on changes | An agreed approach, explicit decisions, and checks for success |
 | [`acceptance-matrix`](./skills/productivity/acceptance-matrix/SKILL.md) | Make a ticket's promises testable before implementation | Stable requirement IDs, observable results, evidence plans, and gaps |
-| [`prove`](./skills/productivity/prove/SKILL.md) | Verify the implementation against the agreement | Every requirement reconciled with evidence and an overall `PROVEN` or `NOT PROVEN` verdict |
+| [`prove`](./skills/productivity/prove/SKILL.md) | Verify the implementation against the agreement without changing it | Every requirement reconciled with evidence and an overall `PROVEN` or `NOT PROVEN` verdict |
+| [`repair-proof`](./skills/productivity/repair-proof/SKILL.md) | Repair named proof gaps | A scoped repair report that always requires fresh proof |
 | [`fix-pr`](./skills/productivity/fix-pr/SKILL.md) | Repair failed PR workflows without weakening the agreement | `FIXED` or `NOT FIXED` for the workflow on the repaired commit |
 
 A typical workflow is:
 
 ```text
-Ticket or spec → /acceptance-matrix → implementation → /prove → code review
+Ticket or spec → /acceptance-matrix → implementation → /prove → /repair-proof if needed → /prove again → code review
 ```
 
 Use `/interrogate` when the design needs discussion and `/fix-pr` when CI fails.
@@ -51,7 +52,8 @@ require reassessing affected verdicts. Code review still checks code quality.
 
 These handoffs do not automatically invoke other skills or authorize publishing.
 `/acceptance-matrix` produces a planning artifact. `/interrogate` implements only
-when authorized, and `/prove` can make issue-scoped repairs. Invoking `/fix-pr`
+when authorized, `/prove` only reports gaps, and `/repair-proof` handles scoped
+repairs without declaring acceptance. Invoking `/fix-pr`
 also authorizes scoped commit, push, and workflow reruns for its target.
 
 ---
@@ -153,7 +155,7 @@ converges on a plan, then implements and verifies it when authorized. See the
 ## 🎯 Featured Skill: `prove`
 
 > **"Looks good to me" is not evidence.**  
-> Map every material requirement in an issue to observable evidence, hunt concrete counterexamples, repair gaps, and refuse to declare success until proven.
+> Map every material requirement in an issue to observable evidence, hunt concrete counterexamples, report gaps, and refuse to declare success until proven.
 
 ### Why `prove`?
 
@@ -164,14 +166,15 @@ Traditional code reviews and test suites leave dangerous blind spots:
 
 **`prove` works from requirements to evidence, not from diff to opinions.**  
 It reads the originating ticket, spec, or agreed conversation, reconciles any
-existing acceptance matrix, audits evidence, and repairs issue-scoped gaps.
-Missing requirements are added; existing promises cannot quietly disappear.
+existing acceptance matrix, audits evidence, and reports issue-scoped gaps.
+Missing requirements are reported; existing promises cannot quietly disappear.
 
 | Skill | Phase | Question |
 | :--- | :--- | :--- |
 | **`/interrogate`** | Design discussion | *Does the approach deliver the agreed outcome?* |
 | **`/acceptance-matrix`** | Acceptance planning | *What must the PR deliver, and how will we check it?* |
-| **`/prove`** | Acceptance verification | *Does the implementation fulfill every promise?* |
+| **`/prove`** | Acceptance verification | *Does the fixed candidate fulfill every promise?* |
+| **`/repair-proof`** | Scoped repair | *Can we address a named proof gap without accepting the result?* |
 | **`/fix-pr`** | CI repair | *Is the workflow repaired without weakening its checks or the ticket's promises?* |
 
 ---
@@ -191,24 +194,18 @@ Agent:  Contract: Issue #482 — Retry failed payment capture
 
         Auditing Evidence & Hunting Counterexamples...
         • R1: Verified by payment_retry_test.go.
-        • R2: Found weak mock. Replacing with integration idempotency check.
-              Running sensitivity check (temporarily removing idempotency key)...
-              [Sensitivity check RED: duplicate charge detected]
-              Restored implementation. [Sensitivity check GREEN].
-        • R3: No existing assertion found. Added test:
-              [Test RED: retry path creates replacement record without invoice_id]
-              Fixing retry logic in payments/service.go to preserve invoice_id...
-              [Test GREEN: invoice_id preserved].
+        • R2: Existing check uses a weak mock. R2 is NOT PROVEN.
+        • R3: No direct assertion found. R3 is NOT PROVEN.
         • R4: Verified by clear_failure_test.go.
 
         Running full verification suite (412 tests passed, 0 failed)...
 
         ============================================================
-        PROVEN — Issue #482
-        Requirements: 4/4 demonstrated
-        Counterexamples tested: 3 (1 defect fixed, 1 test strengthened)
+        NOT PROVEN — Issue #482
+        Requirements: 2/4 demonstrated
+        Counterexamples tested: 3 (2 evidence gaps reported)
         ============================================================
-        Diff modified during proof. Repeat code review against the PR's target base.
+        No candidate changes made. Use /repair-proof for the named gaps, then run /prove again.
 ```
 
 ---
@@ -216,7 +213,7 @@ Agent:  Contract: Issue #482 — Retry failed payment capture
 ### 🛡️ The 8-Phase Proof Loop
 
 `/prove` reads the contract, maps and audits evidence, hunts counterexamples,
-repairs issue-local gaps, verifies the whole change, and reports `PROVEN` or
+reports issue-local gaps, verifies the fixed candidate, and reports `PROVEN` or
 `NOT PROVEN`. See the [`prove` skill](./skills/productivity/prove/SKILL.md).
 
 ---
@@ -233,6 +230,7 @@ npx skills@latest add grove/skills
 npx skills@latest add grove/skills --skill interrogate
 npx skills@latest add grove/skills --skill acceptance-matrix
 npx skills@latest add grove/skills --skill prove
+npx skills@latest add grove/skills --skill repair-proof
 npx skills@latest add grove/skills --skill fix-pr
 ```
 
@@ -242,6 +240,7 @@ npx skills@latest add grove/skills --skill fix-pr
 npx skills@latest update interrogate
 npx skills@latest update acceptance-matrix
 npx skills@latest update prove
+npx skills@latest update repair-proof
 npx skills@latest update fix-pr
 ```
 
@@ -262,6 +261,10 @@ Invoke the skill for the work you need:
 ```
 
 ```text
+/repair-proof #482
+```
+
+```text
 /fix-pr #123
 ```
 
@@ -275,7 +278,7 @@ skills/productivity/
 ├── fix-pr/
 ├── interrogate/
 ├── prove/
-│   └── references/              # Testing and counterexample guidance
+├── repair-proof/
 └── README.md
 ```
 
