@@ -24,6 +24,9 @@ candidate. Use `/repair-proof` for scoped repairs, then run `/prove` again.
   contract. Do not silently narrow or rewrite it.
 - Use a clean commit as the candidate when possible. A dirty or changing
   worktree is `NOT PROVEN` unless its exact snapshot can be established.
+- A proof run may not mutate the candidate, worktree, or contract. If any such
+  change occurs, return `NOT PROVEN` and discard observations from the changed
+  state; the repair belongs to `/repair-proof` and requires a fresh `/prove`.
 - Do not edit product code, tests, CI configuration, or the acceptance contract.
 - Do not commit, push, publish, or declare a repair.
 - Prefer behavioral evidence through public interfaces and independent oracles.
@@ -41,9 +44,9 @@ contract.
 
 ### 2. Identify the candidate
 
-Record the commit or exact snapshot, target or base when relevant, and verification
-environment. Confirm the candidate before checks begin. If the candidate drifts or
-the observations cannot be tied to it, return `NOT PROVEN`.
+Record the commit or exact snapshot, contract, target or base when relevant, and
+verification environment. Confirm them before checks begin. If the candidate or
+contract drifts, or the observations cannot be tied to them, return `NOT PROVEN`.
 
 ### 3. Map and audit evidence
 
