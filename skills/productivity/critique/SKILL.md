@@ -39,11 +39,28 @@ including gaps between individually plausible steps.
 
 Stop when further investigation is unlikely to change the recommendation.
 When evidence is unavailable, state the limit and smallest useful next check.
-A missing fact is load-bearing when its value could change whether the stated
-goal is achieved or a material constraint is respected. Treat missing optional
-detail as an unknown or advisory follow-up, not a defect or required correction.
 Refer material specialist concerns to a focused review without invoking it
 automatically or expanding this review into an expert checklist.
+
+## Establish materiality before choosing a recommendation
+
+For each concern that would change the recommendation, identify its evidence
+and source, the stated goal or material constraint it affects, and how it affects
+that outcome. Separate evidenced defects from load-bearing unknowns at this gate.
+An unsupported possibility, unspecified optional detail, or preferred practice
+stays advisory and cannot justify `adjust` or `rethink`.
+
+For a conditional risk, name the triggering condition and evidence that it
+applies. Evidence that the proposed mechanism creates material exposure to
+future failure can justify a correction. The adverse event need not have occurred.
+If applicability is unsupported, keep the risk advisory unless the unresolved
+condition qualifies as a load-bearing unknown.
+
+For a load-bearing unknown, identify the necessary dependency on the missing
+fact and explain which decision about success or a material constraint cannot
+be made without it. A fact that could conceivably matter is not enough. Use the
+uncertainty branch below unless a separate, evidenced material defect justifies
+a change.
 
 ## Return a recommendation
 
@@ -53,20 +70,23 @@ Order findings by consequence; there is no minimum finding count.
 
 Classify each material finding in plain language as an observed defect,
 conditional risk, unknown, or preference. Name its evidence and source or an
-explicit evidence limit, consequence for the outcome, and smallest effective
-adjustment. For conditional risks, state the triggering condition and whether
-evidence shows it holds. Unsupported possibilities and preferences are not
-established defects.
+explicit evidence limit and consequence for the outcome. For an evidenced
+defect or applicable material risk, give the smallest effective adjustment.
+For a load-bearing unknown, give the smallest useful next check.
 
-Recommend `proceed` when the stated goal and material constraints are satisfied
-and remaining gaps are optional. Use `adjust` for a bounded, evidence-backed
-correction that preserves the viable approach. Reserve `rethink` for a core path
-that targets the wrong problem, violates a material constraint, or is clearly
-displaced by a simpler evidenced path. Use `insufficient evidence` only when a
-load-bearing unknown prevents choosing among the other recommendations. Missing
-evidence does not erase an established reason to change direction. Explain what
-survived scrutiny only when it helps the decision; a sound proposal can get a
-short result.
+Select the recommendation in order:
+
+1. If evidence establishes a material reason to change the proposal, use `adjust`
+   for a bounded correction that preserves the viable approach. Use `rethink`
+   when the core path targets the wrong problem, violates a material constraint,
+   or is displaced by a simpler evidenced path. Unrelated unknowns do not cancel
+   a separate, evidenced material defect.
+2. Otherwise, if a load-bearing unknown prevents judging the proposal's success,
+   use `insufficient evidence` and identify the smallest useful next check.
+3. Otherwise, use `proceed`. Keep optional refinements advisory.
+
+Explain what survived scrutiny only when it helps the decision. A sound proposal
+can get a short result.
 
 ## Keep the review advisory
 
