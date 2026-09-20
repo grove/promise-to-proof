@@ -53,10 +53,12 @@ consequence for the outcome, and smallest effective adjustment. Distinguish
 observed defects, conditional risks, unknowns, and preferences in plain language.
 Unsupported possibilities and style preferences are not established defects.
 
-Recommend `proceed`, `adjust`, `rethink`, or `insufficient evidence`. Use
-`insufficient evidence` when missing evidence prevents a defensible judgment.
-A minor uncertainty need not block a sound proposal. Explain what survived
-scrutiny only when it helps the decision; a sound proposal can get a short result.
+Recommend `proceed` when the approach needs no material change; `adjust` when it
+remains viable after a bounded correction; `rethink` when its core should be
+replaced or abandoned; and `insufficient evidence` when a load-bearing unknown
+prevents judgment. A minor uncertainty need not block a sound proposal. Explain
+what survived scrutiny only when it helps the decision; a sound proposal can get
+a short result.
 
 ## Keep the review advisory
 
