@@ -82,9 +82,10 @@ Update one installed skill:
 npx skills@latest update plan-acceptance
 ```
 
-If you installed `review-contract` or `repair-proof`, install the new
-`review-implementation` and `repair-gaps` skills, then remove the old copies
-using your installer's normal removal mechanism.
+If you installed `acceptance-contract`, `review-contract`, or `repair-proof`,
+install `plan-acceptance`, `review-implementation`, and `repair-gaps` as
+applicable, then remove the old copies using your installer's normal removal
+mechanism.
 
 ## Repository structure
 

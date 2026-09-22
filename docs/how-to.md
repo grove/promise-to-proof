@@ -89,6 +89,10 @@ boundaries in that issue; `plan-acceptance` turns them into a contract. Keep the
 contract on the originating issue or link it directly from that issue. Do not
 create a second issue merely to store the contract.
 
+```bash
+gh issue create --title "Retry failed uploads" --body "Users can retry a failed upload after restarting the app."
+```
+
 For a project using Grove's skills, follow that project's issue-tracker rules.
 `plan-acceptance` also accepts a specification path or agreed outcome, so a local
 specification can remain the source when no tracker issue is required. If you
@@ -127,10 +131,10 @@ that input first.
 /review-implementation <repaired candidate handoff> against <comparison base>
 ```
 
-Run proof against every contract row after a candidate change, including rows
-that the earlier proof marked `proven`. Refresh review for the changed candidate
-as well. The focused check in a repair report helps you decide whether to rerun
-proof; it does not itself establish acceptance.
+After any candidate change, run `/prove` against every contract row, including
+rows previously marked `proven`. Focused checks can show whether the repair is
+promising; they never replace that full proof. Refresh review for the changed
+candidate as well.
 
 ## Reconcile a changed requirement
 
