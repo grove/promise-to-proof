@@ -58,7 +58,7 @@ that decision.
 Remove the upload contract and all links claiming one exists. Supply the large
 source and request a complete published breakdown.
 
-Pass when the result is `BLOCKED` with an `acceptance-contract` handoff.
+Pass when the result is `BLOCKED` with a `plan-acceptance` handoff.
 Preliminary observations are allowed, but there are no invented parent IDs,
 revision, complete-coverage claim, or supposedly ready published tickets.
 
@@ -68,7 +68,7 @@ First keep restart in the source but omit it from the saved contract. Separately
 link an authorized pending ownership amendment while retaining v1. Request
 publication. Repeat with a speculative comment proposing removal of restart.
 
-Pass when material discrepancies route through `acceptance-contract` before
+Pass when material discrepancies route through `plan-acceptance` before
 dependent publication. Contract text and revision stay unchanged. Speculation
 alone cannot amend the agreement.
 
@@ -220,20 +220,20 @@ material amendment. Separately insert human content into an active child and
 record started implementation before requesting a changed breakdown.
 
 Pass when affected writes pause and scoped reconciliation preserves human content
-and successful work. Contract decisions return to `acceptance-contract`.
+and successful work. Contract decisions return to `plan-acceptance`.
 Regrouping unchanged promises alone does not increment the parent revision.
 
 ## T17. Retrieve a child in a fresh session
 
 Publish locally or to the authorized tracker. Give a fresh session only one child
-reference and invoke `/acceptance-contract`. Authorize saving its child contract.
+reference and invoke `/plan-acceptance`. Authorize saving its child contract.
 Arrange for parent R4 to contribute to the child's first local row.
 
 Pass when the session retrieves the plan, exact parent snapshot, contribution,
 inherited constraints, and prerequisites. `Source` uses qualified parent IDs;
 child R1 does not mean parent R1. Unrelated sibling outcomes stay outside child
 scope. Repeat with the amendment variant in
-[acceptance case 15](./acceptance-contract-scenarios.md#15-plan-a-sliced-child-from-durable-parent-context).
+[acceptance case 15](./plan-acceptance-scenarios.md#15-plan-a-sliced-child-from-durable-parent-context).
 
 ## T18. Keep preparation separate from readiness
 
@@ -246,7 +246,7 @@ even after publication completes. Ineligible children do not get `ready-for-agen
 Unrelated labels remain and publication does not claim implementation.
 
 Continue in the authorized disposable GitHub repository with
-`/acceptance-contract` for each child. Authorize the invoking workflow to save and
+`/plan-acceptance` for each child. Authorize the invoking workflow to save and
 reread the contracts and update readiness labels. Verify that a child with all
 required decisions, approvals, and prerequisites satisfied gains `ready-for-agent`.
 The child with an unavailable API prerequisite remains ineligible despite its
@@ -267,7 +267,7 @@ unchanged; writes cover only approved planning metadata, tickets, and links.
 
 ## T20. Install alone and preserve the two-child delivery chain
 
-Run [acceptance packaging case 12](./acceptance-contract-scenarios.md#12-check-standalone-skill-packaging)
+Run [acceptance packaging case 12](./plan-acceptance-scenarios.md#12-check-standalone-skill-packaging)
 for `slice-contract`, including supported installation and an isolated invocation.
 Use the upload fixture with only that installed package, no source skills checkout,
 no Matt skills, and no downstream packages.

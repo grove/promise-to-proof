@@ -13,7 +13,7 @@ The acceptance contract defines the spec envelope. Implementation fills it.
 Proof establishes that one exact candidate satisfies one exact contract revision.
 
 ```text
-source → acceptance-contract → saved canonical contract
+source → plan-acceptance → saved canonical acceptance contract
        → implement-contract → captured candidate → review-contract → prove
 ```
 
@@ -50,7 +50,7 @@ rg --files skills -g SKILL.md | sort
 The delivery path uses explicit phases:
 
 ```text
-/acceptance-contract -> save and reread the contract
+/plan-acceptance -> save and reread the contract
 /implement-contract -> save the report and capture the candidate
 /review-contract    -> save findings for that candidate and comparison base
 /prove              -> save the proof and requirement evidence
@@ -85,7 +85,7 @@ inputs. To divide an agreed parent contract, use Grove's optional
 Use `/wayfinder` before `/to-spec` when the work is too large or uncertain for
 one agent session. It records the decisions that block a reliable plan and
 resolves them one at a time. When the issue already states a complete, agreed
-outcome, skip these planning steps and begin with `acceptance-contract`.
+outcome, skip these planning steps and begin with `plan-acceptance`.
 
 ## Request an independent critique when it helps
 
@@ -103,13 +103,13 @@ judgment, it reports insufficient evidence and the smallest useful next check.
 
 Use `critique` for agent-led assessment of a supplied proposal. Use `interrogate`
 when you want to lead the questions about the agent's proposal and reach a
-design decision. `acceptance-contract` plans requirements and evidence, while
+design decision. `plan-acceptance` plans requirements and evidence, while
 `prove` verifies an implementation against the agreed contract.
 
 Critique is optional and advisory. It does not edit the artifact, repository,
 or acceptance contract, publish findings, or begin implementation. No downstream
 skill is required. You can take unresolved decisions into `interrogate`, plan
-acceptance with `acceptance-contract`, or proceed directly when appropriate.
+acceptance with `plan-acceptance`, or proceed directly when appropriate.
 
 ## Turn the ticket into an acceptance contract
 
@@ -118,10 +118,10 @@ what the change must accomplish. If the source only says "improve retries" or
 "make uploads reliable," resolve that ambiguity before implementation. The
 workflow cannot preserve a promise that nobody has made concrete.
 
-Run `acceptance-contract` against the source:
+Run `plan-acceptance` against the source:
 
 ```text
-/acceptance-contract #124
+/plan-acceptance #124
 ```
 
 Follow the [acceptance contract protocol](./acceptance-contract-protocol.md)
@@ -167,7 +167,7 @@ Reconcile GitHub checkboxes with the contract. A checked box is a completion
 claim to verify, not evidence. Resolve a mismatch before claiming acceptance.
 
 Save the returned contract before handing the work to a fresh session. The
-workflow invoking `acceptance-contract` owns this step under existing authority.
+workflow invoking `plan-acceptance` owns this step under existing authority.
 Follow the protocol's [durable handoff convention](./acceptance-contract-protocol.md#durable-contract-handoff):
 attach the contract or its direct reference to the originating ticket. Without
 a tracker, use `docs/acceptance-contracts/<work-id>.md` unless the repository
@@ -189,7 +189,7 @@ The skill inspects the source, exact parent revision, existing work, and relevan
 implementation. It proposes the fewest useful outcomes, maps every parent promise
 to a contribution and completion check, and records genuine prerequisites.
 `NO SPLIT` means separate tickets add no useful boundary. A missing parent contract
-returns to `acceptance-contract`; slicing cannot invent its requirements or revision.
+returns to `plan-acceptance`; slicing cannot invent its requirements or revision.
 
 Review the ticket outcomes, coverage map, dependency order, parent completion plan,
 labels, destination, and intended links. Approve consequential exceptions, such
@@ -233,7 +233,7 @@ requirements allow it. Otherwise publication remains incomplete.
 For each child, explicitly run acceptance planning:
 
 ```text
-/acceptance-contract <child-reference>
+/plan-acceptance <child-reference>
 ```
 
 The child retains the exact parent reference and applicable constraints. Its
@@ -282,7 +282,7 @@ revises the proposal when an objection holds, and identifies checks that could
 settle unknowns. Continue until you are ready to move on; there is no turn limit.
 Then carry the agreed approach, authorized requirement changes, and unresolved
 questions into the next step. Save authorized amendments in the source or link
-them directly from it. Have `acceptance-contract` reconcile them before work
+them directly from it. Have `plan-acceptance` reconcile them before work
 that depends on the changed promise. Use implementation authority
 already present in the request. If the request covers design only, obtain
 implementation authority before editing code.
@@ -376,7 +376,7 @@ identity, and the captured base and comparison scope.
 For supported implementation findings under the same agreement, explicitly
 invoke `implement-contract` with the saved report and selected finding IDs.
 For changed promises or consequential seam decisions, save a source-linked
-amendment and return to `acceptance-contract`. `interrogate` can help resolve the
+amendment and return to `plan-acceptance`. `interrogate` can help resolve the
 decision. A review finding alone is not the matching `NOT PROVEN` report required
 by `repair-proof`.
 
@@ -525,7 +525,7 @@ as well.
 For a straightforward ticket with a settled design, use the compact path:
 
 ```text
-/acceptance-contract #124
+/plan-acceptance #124
 /implement-contract #124
 /review-contract <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
@@ -538,13 +538,13 @@ For a feature that starts as an idea, optionally add Matt's planning tools:
 ```text
 /grill-with-docs <idea>
 /to-spec
-/acceptance-contract #123
+/plan-acceptance #123
 /slice-contract #123; draft only
 # Approve the breakdown and authorize publication.
 /slice-contract #123; publish the approved breakdown
 
 # For each child ticket:
-/acceptance-contract #124
+/plan-acceptance #124
 /interrogate #124
 /implement-contract #124
 /review-contract <saved child handoff> against <child comparison base>
@@ -560,7 +560,7 @@ open the pull request when authorized
 For a difficult bug, optionally use Matt's `diagnosing-bugs` before implementation:
 
 ```text
-/acceptance-contract #124
+/plan-acceptance #124
 /diagnosing-bugs
 /implement-contract #124
 /review-contract <saved implementation handoff> against <comparison base>

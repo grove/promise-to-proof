@@ -1,5 +1,8 @@
 # Implementation and review validation, 2026-09-22
 
+> Historical note: the `acceptance-contract` skill used in this validation was
+> renamed to `plan-acceptance`; the acceptance-contract artifact and protocol are unchanged.
+
 This record describes observed local runs of the new skills and their handoffs.
 The evaluation exercised 43 local skill invocations across nine actor contexts.
 The [implementation scenarios](./implement-contract-scenarios.md) and

@@ -104,7 +104,7 @@ A matching `NOT PROVEN` report with named gaps belongs to `/repair-proof`;
 do not bypass its candidate, contract, or scope checks through this skill.
 
 For a missing contract, omitted source promise, material conflict, or changed
-promise, hand back to `/acceptance-contract`. A consequential seam or design
+promise, hand back to `/plan-acceptance`. A consequential seam or design
 decision may need user-led `/interrogate`. Preserve a source-linked amendment
 with affected IDs, old and proposed agreement, authority given or still needed,
 and dependent work. Identify an omitted promise by its source rather than inventing

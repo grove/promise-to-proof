@@ -1,0 +1,5 @@
+interface:
+  display_name: "Plan Acceptance"
+  short_description: "Turn agreed work into a versioned acceptance contract"
+policy:
+  allow_implicit_invocation: false

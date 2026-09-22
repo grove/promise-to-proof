@@ -80,7 +80,7 @@ authorized amendment. We are discussing the design only."
 
 Pass when the agent identifies the changed exclusion and affected error boundary,
 records the old and new agreement and authorization, and hands the amendment to
-`/acceptance-contract`. It leaves the canonical contract, revision, and product
+`/plan-acceptance`. It leaves the canonical contract, revision, and product
 code unchanged, and reports whether storage remains pending. The invoking
 workflow saves the amendment in the source or links it directly from there under
 appropriate authority before another session consumes it.

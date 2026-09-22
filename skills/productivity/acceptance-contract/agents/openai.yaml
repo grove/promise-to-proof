@@ -1,5 +1,0 @@
-interface:
-  display_name: "Acceptance Contract"
-  short_description: "Plan complete acceptance with stable requirements"
-policy:
-  allow_implicit_invocation: false

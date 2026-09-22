@@ -117,7 +117,7 @@ Keep cheap experiments isolated from reviewed artifacts and avoid persistent
 changes to external systems.
 
 When useful, suggest user-led `interrogate` for unresolved design decisions,
-`acceptance-contract` for acceptance planning, or an explicitly authorized
+`plan-acceptance` for acceptance planning, or an explicitly authorized
 `implement-contract` invocation when the agreement is ready. These are
 optional next steps, not automatic invocations. `prove` verifies implementation;
 `review-contract` reviews implementation. This critique neither grants

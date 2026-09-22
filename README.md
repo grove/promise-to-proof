@@ -19,7 +19,7 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 |---|---|---|
 | [`critique`](./skills/productivity/critique/SKILL.md) | You explicitly request an independent review of a proposal against its intended outcome | Evidence-backed advice and a recommendation |
 | [`interrogate`](./skills/productivity/interrogate/SKILL.md) | You want to question the agent's proposal and reasoning | Evidence-backed answers, a revised approach, and explicit unknowns |
-| [`acceptance-contract`](./skills/productivity/acceptance-contract/SKILL.md) | A ticket needs clear acceptance criteria | A candidate-independent revision with stable requirement IDs and evidence plans |
+| [`plan-acceptance`](./skills/productivity/plan-acceptance/SKILL.md) | A ticket needs clear acceptance criteria | A candidate-independent revision with stable requirement IDs and evidence plans |
 | [`slice-contract`](./skills/productivity/slice-contract/SKILL.md) | A parent contract is too large for one coherent task | A traceable breakdown and, when authorized, published child tickets |
 | [`implement-contract`](./skills/productivity/implement-contract/SKILL.md) | An agreed contract is ready to implement | Scoped implementation, development checks, and a recoverable candidate handoff |
 | [`review-contract`](./skills/productivity/review-contract/SKILL.md) | A captured implementation is ready to inspect | Findings on contract fidelity, scope, and engineering quality |
@@ -33,12 +33,12 @@ Optionally invoke `critique` to assess an idea, issue, specification, plan, or
 proposal before committing to it. Its advice requires no downstream skill.
 
 ```text
-Source → acceptance-contract → saved contract → implement-contract
+Source → plan-acceptance → saved acceptance contract → implement-contract
        → captured candidate → review-contract → prove
        → repair-proof if needed → fresh proof and review
 ```
 
-1. **Plan acceptance.** Run `acceptance-contract` on the ticket or specification.
+1. **Plan acceptance.** Run `plan-acceptance` on the ticket or specification.
    It records a revision such as `v1`, stable `R` IDs, boundaries, seams,
    independent oracles, and planned evidence. Plan state is `planned` or `gap`.
    Save its output using the [durable handoff convention](./docs/acceptance-contract-protocol.md#durable-contract-handoff)
@@ -55,7 +55,7 @@ Source → acceptance-contract → saved contract → implement-contract
    evidence gaps, pass the unresolved requirement IDs to `repair-proof`. Resolve
    contract, verification, or candidate identity gaps before running proof again.
 6. **Refresh results.** Every candidate change needs fresh proof of every row and
-   refreshed review. A changed agreement returns to `acceptance-contract` first.
+   refreshed review. A changed agreement returns to `plan-acceptance` first.
 
 For large work, optionally insert `slice-contract` after saving the parent
 contract. Approve the breakdown and authorize publication to the named tracker
@@ -64,7 +64,7 @@ Small work keeps the direct path above; `NO SPLIT` is a valid result.
 
 ```text
 saved parent contract → slice-contract → approved/published child tickets
-→ acceptance-contract for each child → implementation, review, and child proof
+→ plan-acceptance for each child → implementation, review, and child proof
 → integrated candidate → final integration review if needed → full parent prove
 ```
 
@@ -100,7 +100,7 @@ GitHub checkboxes with the contract, but never use them as proof.
 | Skill | Responsibility | Boundary |
 |---|---|---|
 | `critique` | Give optional, agent-led advice on a proposal | Does not edit the artifact, repository, or acceptance contract, publish findings, or implement |
-| `acceptance-contract` | Plan requirements and evidence | Does not implement or verify |
+| `plan-acceptance` | Plan requirements and evidence | Does not implement or verify |
 | `slice-contract` | Allocate parent obligations and publish approved tickets | Does not author contracts, implement, prove, or close work |
 | `implement-contract` | Implement the agreed scope and run development checks | Does not revise the contract, declare acceptance, or implicitly run review or proof |
 | `review-contract` | Inspect a fixed implementation and comparison scope | Does not edit, repair, approve, or declare acceptance |
@@ -139,7 +139,7 @@ destructive changes, or merges.
 ```text
 /critique <idea, document path, or GitHub issue reference>
 /interrogate Walk me through your proposal so I can question it.
-/acceptance-contract #123
+/plan-acceptance #123
 /slice-contract #123; draft only
 /implement-contract #123
 /review-contract <saved implementation handoff> against <comparison base>
@@ -162,20 +162,20 @@ npx skills@latest add grove/skills
 Install one skill:
 
 ```bash
-npx skills@latest add grove/skills --skill prove
+npx skills@latest add grove/skills --skill plan-acceptance
 ```
 
 Update one installed skill:
 
 ```bash
-npx skills@latest update prove
+npx skills@latest update plan-acceptance
 ```
 
 ## Repository structure
 
 ```text
 skills/productivity/
-├── acceptance-contract/
+├── plan-acceptance/
 ├── critique/
 ├── fix-pr/
 ├── implement-contract/

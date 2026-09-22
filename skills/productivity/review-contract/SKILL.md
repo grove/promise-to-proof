@@ -37,7 +37,7 @@ are insufficient. Review the child's complete contribution and all applicable
 inherited constraints without demanding unrelated sibling functionality or
 claiming whole-parent delivery. Capture and recheck parent identity; a material
 unresolved parent change blocks a current-agreement review conclusion and needs
-reconciliation through `acceptance-contract` and the decomposition workflow.
+reconciliation through `plan-acceptance` and the decomposition workflow.
 
 Capture the candidate and comparison base before inspecting. Resolve mutable
 references to fixed identities. For branch or PR review, establish the actual
@@ -137,7 +137,7 @@ conclusion. Retain findings only as observations about their captured state.
 For corrections within the agreement, hand findings to an explicitly authorized
 `/implement-contract` invocation. For a missing contract, omitted source promise,
 material conflict, changed promise, or consequential seam decision, hand back to
-`/acceptance-contract`, with user-led `/interrogate` available for discussion.
+`/plan-acceptance`, with user-led `/interrogate` available for discussion.
 Identify an omitted promise by its source rather than inventing a requirement ID.
 Preserve a source-linked amendment with affected IDs, old and proposed agreement,
 authority given or needed, and dependent work. Do not revise the contract or

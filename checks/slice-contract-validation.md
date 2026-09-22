@@ -1,5 +1,8 @@
 # Slice contract validation, 2026-09-22
 
+> Historical note: the `acceptance-contract` skill used in this validation was
+> renamed to `plan-acceptance`; the acceptance-contract artifact and protocol are unchanged.
+
 This record covers observed local and simulated-tracker runs. The reusable
 [scenario checks](./slice-contract-scenarios.md) contain the full evaluation set.
 This was a sampled run, not a full-suite pass or live GitHub validation.

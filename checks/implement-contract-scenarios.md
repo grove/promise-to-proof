@@ -106,7 +106,7 @@ that changes R4 to create missing parent directories. In the amendment case, pro
 an independently safe R1 correction and explicit authority to perform it.
 
 Pass when implementation preserves the agreement and routes the decision to
-`acceptance-contract`. The handoff identifies affected IDs, old and proposed
+`plan-acceptance`. The handoff identifies affected IDs, old and proposed
 promises, authorization, and dependent work. It may complete independent R1 work
 but reports `PARTIAL`, preserving the R4 gap. A missing agreement that permits no
 safe progress produces `BLOCKED`. Neither case silently reconstructs the contract.
@@ -168,10 +168,10 @@ only when the supplied or inspected baseline establishes that fact.
 
 ## T15 and T16. Transfer work across sessions and standalone installs
 
-Run [acceptance case 13](./acceptance-contract-scenarios.md#13-recover-the-agreement-across-fresh-sessions)
+Run [acceptance case 13](./plan-acceptance-scenarios.md#13-recover-the-agreement-across-fresh-sessions)
 and [proof and repair case 14](./proof-repair-scenarios.md#14-complete-the-native-delivery-handoff).
 Use the supported installer and the standalone checks in
-[acceptance case 12](./acceptance-contract-scenarios.md#12-check-standalone-skill-packaging).
+[acceptance case 12](./plan-acceptance-scenarios.md#12-check-standalone-skill-packaging).
 
 Pass when a fresh context retrieves the source-linked agreement, exact candidate
 content, and reports without prior chat or the source skills checkout. Repeat

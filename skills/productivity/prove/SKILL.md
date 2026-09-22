@@ -57,7 +57,7 @@ and exact acceptance contract revision. Preserve all requirement IDs, boundaries
 seams, oracles, open questions, and exclusions. Report omitted, conflicting, or
 ambiguous source promises instead of editing the contract. If no versioned
 contract can be established, report `NOT PROVEN` and hand off to
-`/acceptance-contract`; do not create or revise it during proof.
+`/plan-acceptance`; do not create or revise it during proof.
 
 For a sliced child, retrieve the decomposition, contribution mapping, parent
 snapshot, and prerequisite outcomes. Follow the protocol's parent/child rules
