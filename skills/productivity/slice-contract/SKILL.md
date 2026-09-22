@@ -7,7 +7,7 @@ disable-model-invocation: true
 Split large work into the fewest useful implementation tickets while preserving
 the agreement. Read the [acceptance contract protocol](references/acceptance-contract-protocol.md)
 before planning. This skill owns decomposition and authorized ticket publication.
-`acceptance-contract` alone authors parent and child contracts and revisions.
+`plan-acceptance` alone authors parent and child contracts and revisions.
 
 ## Resolve the agreement
 
@@ -24,11 +24,11 @@ The source matters too: expose promises omitted during contract normalization.
 For a clearly small, coherent task, return `NO SPLIT` and retain the direct
 acceptance, implementation, review, and proof path. Otherwise a complete
 decomposition requires an established, versioned parent contract. If absent,
-return `BLOCKED` with a handoff to `/acceptance-contract`. Preliminary observations
+return `BLOCKED` with a handoff to `/plan-acceptance`. Preliminary observations
 are allowed, but do not invent parent IDs, `v1`, or a complete coverage claim.
 
 Route material source conflicts and authorized amendments through
-`acceptance-contract` before dependent publication. A comment exploring an option
+`plan-acceptance` before dependent publication. A comment exploring an option
 does not change the agreement. Keep outcome-defining unknowns that affect slice
 boundaries or dependency order as blocking decisions. A missing evidence harness
 for a clear outcome can instead be assigned as necessary work.
@@ -103,7 +103,7 @@ choices open. Use inspected file references where consequential, without a
 speculative file-by-file plan. Include durable references to the exact parent
 snapshot and canonical decomposition so a fresh session needs no chat history.
 
-Child criteria are source material for `/acceptance-contract <child-reference>`.
+Child criteria are source material for `/plan-acceptance <child-reference>`.
 It allocates child IDs and maps their `Source` fields to qualified parent
 obligations. Preserve applicable constraints without requiring unrelated sibling
 outcomes. New consequential seams or narrowed boundaries need explicit resolution.

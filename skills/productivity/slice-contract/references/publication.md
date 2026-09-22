@@ -38,7 +38,7 @@ Recheck the parent agreement and ticket state before writing. If amendments,
 concurrent edits, or started implementation invalidate the approved plan, pause
 affected writes and present a scoped reconciliation. Regrouping unchanged promises
 changes the decomposition, not the parent revision. Child contract revisions
-still belong to `acceptance-contract`. Preserve unrelated human content.
+still belong to `plan-acceptance`. Preserve unrelated human content.
 
 ## Save tickets and relationships
 
@@ -116,7 +116,7 @@ Contribution: <qualified parent IDs and precise portion delivered>
 <Agreed seams, independent expected outcomes, evidence gaps, and decisions.>
 
 ## Handoff
-Run /acceptance-contract on this ticket, preserving the parent mapping.
+Run /plan-acceptance on this ticket, preserving the parent mapping.
 Then use the chosen implementation, review, and proof workflows.
 Child completion does not establish parent acceptance.
 ```

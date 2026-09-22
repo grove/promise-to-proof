@@ -63,7 +63,7 @@ behavior in scope when promised outcomes depend on them. Keep speculative
 additions out. An informal discussion needs no new contract.
 
 Distinguish exploring an alternative from agreeing to change a requirement.
-For an authorized material change, hand off an amendment to `/acceptance-contract`
+For an authorized material change, hand off an amendment to `/plan-acceptance`
 with the affected IDs, old and new agreement, and authorization. Leave the contract
 and revision unchanged. Carry the amendment into the protocol's durable handoff
 so a later session can reconcile it. Implementation convenience does not change

@@ -23,7 +23,7 @@ oracles. A valid candidate can use
 Commit the fixture and record its full SHA. Capture the exact contract text and
 digest as well as `v1`. Give each row a concrete evidence plan before proof.
 
-Also run the [acceptance scenarios](./acceptance-contract-scenarios.md) for
+Also run the [acceptance scenarios](./plan-acceptance-scenarios.md) for
 incomplete happy paths, fixture-specific behavior, excluded infrastructure, and
 necessary invariant complexity. Their proof cases test both bounds of the spec
 envelope. Feed any resulting named gaps into repair, then repeat full proof.
@@ -64,7 +64,7 @@ identify the candidate only as a mutable branch in an unavailable checkout, so
 its full SHA or exact snapshot cannot be resolved.
 
 Pass when proof reports `NOT PROVEN` and names the unavailable identity. Missing
-contract versioning is handed back to `/acceptance-contract`. Proof must not
+contract versioning is handed back to `/plan-acceptance`. Proof must not
 invent `v1`, edit the contract, or treat a branch name as an exact candidate.
 
 ## 4. Candidate or contract drift during proof
@@ -82,7 +82,7 @@ distinguish the operator's injected change from any verifier mutation.
 
 Supply an old matrix with R1 marked `proven`, a matching historical proof report,
 and R2 marked `disproven` without candidate provenance. Invoke
-`/acceptance-contract`, then run `/prove` against the resulting fixed contract.
+`/plan-acceptance`, then run `/prove` against the resulting fixed contract.
 
 Pass when planning leaves only `planned` or `gap` in the contract. Historical
 verdicts stay in a separate identified report; missing provenance remains an
@@ -158,7 +158,7 @@ The report identifies the stale input needed for a fresh handoff.
 
 Start with a valid report for the upload contract excluding restart. Supply an
 authorized amendment requiring restart and obtain a revised contract from
-`/acceptance-contract`. Ask whether the previous proof still accepts the ticket.
+`/plan-acceptance`. Ask whether the previous proof still accepts the ticket.
 Separately change only the planned evidence file path, keeping the agreement.
 
 Pass when the material amendment increments the revision and requires proof
@@ -170,7 +170,7 @@ evidence that a newly added promise holds.
 Repeat across fresh sessions. Link an authorized restart amendment from the
 source while leaving the canonical contract at `v1`. Give `/prove` only the source
 reference. Pass when it discovers the amendment, reports `NOT PROVEN` for the
-contract discrepancy, and hands it to `/acceptance-contract` without editing.
+contract discrepancy, and hands it to `/plan-acceptance` without editing.
 Have the invoking workflow save the reconciled contract and preserve `v1`.
 A fresh session must retrieve `v2` and require new proof for every row.
 
@@ -221,7 +221,7 @@ agent inputs and reports outside the candidate. Record the target/model, install
 skill revision, fixture identity, request, action log, actual results, and artifact
 references at every phase. These instructions are not an execution record.
 
-1. In a fresh context, invoke `acceptance-contract` for the saved source. Authorize
+1. In a fresh context, invoke `plan-acceptance` for the saved source. Authorize
    the enclosing workflow to save and reread the canonical contract. Preserve its
    exact text, v1, and stable R1 through R4.
 2. In another context, explicitly invoke `implement-contract` against the source
@@ -249,7 +249,7 @@ Pass when every phase retrieves the saved agreement, exact candidate content,
 comparison context, and preceding reports without chat history. Each outcome
 retains its own meaning. A supported review correction routes to authorized
 `implement-contract`; only a matching named proof gap routes to `repair-proof`.
-An amendment routes to `acceptance-contract` without changing the agreement in
+An amendment routes to `plan-acceptance` without changing the agreement in
 implementation, review, proof, or repair. Reread reports to verify the durable
 handoff. If storage was not authorized or is unavailable, report it as pending.
 
@@ -257,7 +257,7 @@ Repeat the handoffs with each skill installed alone through the supported instal
 without Matt skills, the source skills checkout, or subagent tools. The evaluator
 starts each downstream phase explicitly in its own installation. A phase whose
 downstream skill is unavailable must hand off truthfully rather than pretend to
-invoke it. Use [acceptance case 12](./acceptance-contract-scenarios.md#12-check-standalone-skill-packaging)
+invoke it. Use [acceptance case 12](./plan-acceptance-scenarios.md#12-check-standalone-skill-packaging)
 to check bundled references and record the actual installation. Keep live tracker
 and CI cases separate and mark them unexecuted unless actually exercised.
 
@@ -284,10 +284,13 @@ Pass when repair preserves inherited constraints, fixes the complete named cause
 and reports focused checks without acceptance. Run fresh full parent proof and
 applicable review on the repaired candidate. Every parent row needs current
 evidence; a passing focused check or refreshed child proof alone is insufficient.
-A pending parent amendment instead returns to `acceptance-contract` before any
+A pending parent amendment instead returns to `plan-acceptance` before any
 repair that depends on the changed promise.
 
 ## Sampled validation, 2026-09-22
+
+> Historical note: the `acceptance-contract` skill used in these runs was renamed
+> to `plan-acceptance`; the acceptance-contract artifact and protocol are unchanged.
 
 Independent agent runs used standalone copied skills against disposable JSON
 export fixtures. These were focused behavior checks, not a run of every scenario
@@ -305,7 +308,7 @@ assertions, and outputs outside the candidates.
 
 Candidate and contract snapshots stayed unchanged during each proof. Repair
 preserved the contract and earlier evidence. The standalone resource copy check
-in [acceptance scenario 12](./acceptance-contract-scenarios.md#12-check-standalone-skill-packaging)
+in [acceptance scenario 12](./plan-acceptance-scenarios.md#12-check-standalone-skill-packaging)
 also passed using Node's dereferencing copy operation, matching the inspected
 `skills` CLI 1.7.0 installer. Live GitHub Actions and the remaining manual
 scenarios were not executed.

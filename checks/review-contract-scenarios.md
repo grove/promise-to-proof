@@ -67,7 +67,7 @@ Review a source with no canonical contract. Separately, review a source with a
 pending material R4 amendment and a saved v1 contract.
 
 Pass when review reports the missing or conflicting agreement and hands the
-source-linked decision to `acceptance-contract`. Any bounded observations retain
+source-linked decision to `plan-acceptance`. Any bounded observations retain
 their captured identities and limitations. Review does not rewrite the agreement,
 invent IDs for missing source promises, or imply the proposed amendment is approved.
 

@@ -60,7 +60,7 @@ file. Otherwise use the repository's documented location, defaulting to
 `docs/acceptance-contracts/<work-id>.md`. Use a stable ticket key or source slug
 for `<work-id>`. Preserve prior contract text in version history or saved revisions.
 
-The workflow invoking `acceptance-contract` owns saving its returned text under
+The workflow invoking `plan-acceptance` owns saving its returned text under
 existing authorization. For tracker storage, attach or link it on the originating
 ticket without creating a separate issue. Reread the saved destination before
 handing off its location and revision. If saving is unavailable, return the
@@ -93,10 +93,10 @@ change note. Preserve the prior revision so old proof remains interpretable.
 New evidence, a changed test path, or wording that preserves meaning does not
 increment the revision. A changed promise requires fresh proof.
 
-`acceptance-contract` is the sole author of contract revisions. Other skills
+`plan-acceptance` is the sole author of acceptance-contract revisions. Other skills
 hand it amendments naming affected IDs, old and new agreement, and authorization.
 The invoking workflow saves pending amendments in the source or links them
-directly from it. Reconcile them through `acceptance-contract` before work that
+directly from it. Reconcile them through `plan-acceptance` before work that
 depends on the changed promise. Storing its returned text does not authorize
 rewriting it.
 
@@ -104,7 +104,7 @@ rewriting it.
 
 `slice-contract` owns decomposition, coverage allocation, dependency planning,
 and authorized ticket publication. It consumes an established parent contract;
-`acceptance-contract` alone authors parent and child contracts and revisions.
+`plan-acceptance` alone authors parent and child contracts and revisions.
 Child ticket criteria are source material for that planning, not a child contract.
 Small work can retain the direct contract, implementation, review, and proof path.
 
@@ -131,7 +131,7 @@ Consumers read the captured parent, current canonical agreement, source-linked
 amendments, contribution mapping, and prerequisites. Capture applicable parent
 identities with child reports and recheck them before handoff. If a material
 parent change invalidates the mapping or inherited agreement, pause dependent
-work and reconcile through `acceptance-contract` and the decomposition workflow.
+work and reconcile through `plan-acceptance` and the decomposition workflow.
 Preserve prior snapshots and human edits. Regrouping unchanged promises changes
 the plan, not the parent's semantic revision. Historical reports retain their
 original meaning; they do not establish acceptance of a changed agreement.
@@ -198,7 +198,7 @@ artifact per requirement.
 Review findings use local IDs distinct from contract requirement IDs. Supported
 corrections within the agreement go to an authorized `implement-contract`
 invocation. Named gaps in a matching `NOT PROVEN` report go to `repair-proof`.
-Changed promises or consequential seam decisions return to `acceptance-contract`
+Changed promises or consequential seam decisions return to `plan-acceptance`
 through the source-linked amendment convention. These handoffs do not invoke
 the next skill or grant publication authority.
 

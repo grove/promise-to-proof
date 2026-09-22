@@ -1,7 +1,7 @@
-# Acceptance contract checks
+# Plan acceptance checks
 
 These are human-runnable scenarios, not execution results. Use a throwaway
-repository and invoke `/acceptance-contract` with the stated inputs. For proof
+repository and invoke `/plan-acceptance` with the stated inputs. For proof
 cases, implement the described candidate in that repository and run `/prove`.
 Keep expected behavior out of the skill's input. Record the request, returned
 contract or report, observed actions, and file hashes before and after each run.
@@ -168,10 +168,10 @@ import { cp, lstat, mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const root = await mkdtemp(join(tmpdir(), 'acceptance-install-'));
+const root = await mkdtemp(join(tmpdir(), 'plan-acceptance-install-'));
 const protocol = await readFile('docs/acceptance-contract-protocol.md', 'utf8');
 try {
-	for (const name of ['acceptance-contract', 'slice-contract', 'implement-contract', 'review-contract', 'prove', 'repair-proof', 'interrogate', 'fix-pr']) {
+	for (const name of ['plan-acceptance', 'slice-contract', 'implement-contract', 'review-contract', 'prove', 'repair-proof', 'interrogate', 'fix-pr']) {
 		const dest = join(root, name);
 		await cp(`skills/productivity/${name}`, dest, { recursive: true, dereference: true });
 		const ref = join(dest, 'references/acceptance-contract-protocol.md');
@@ -191,7 +191,7 @@ changes. Record the CLI version, full command, selected skill, and installed fil
 Inspect the installed protocol content rather than inferring installer behavior
 from this copy check. Run each installed skill in an isolated invocation where the
 source checkout and sibling skill directories are unavailable. Run scenario 1 with
-`acceptance-contract`, [implementation T1](./implement-contract-scenarios.md#t1-complete-a-small-implementation-and-rerun)
+`plan-acceptance`, [implementation T1](./implement-contract-scenarios.md#t1-complete-a-small-implementation-and-rerun)
 with `implement-contract`, and [review T12](./review-contract-scenarios.md#t12-accept-a-complete-small-design-without-embellishment)
 with `review-contract`, and [slicing T4](./slice-contract-scenarios.md#t4-allocate-outcomes-and-shared-constraints)
 with `slice-contract`. Disable Matt skills and subagent tools for these cases.

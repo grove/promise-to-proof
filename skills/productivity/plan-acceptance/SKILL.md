@@ -1,6 +1,6 @@
 ---
-name: acceptance-contract
-description: Turn a spec, ticket, or conversation into a versioned acceptance contract with stable requirements, seams, oracles, and evidence plans.
+name: plan-acceptance
+description: Plan a spec, ticket, or conversation as a versioned acceptance contract with stable requirements, seams, oracles, and evidence plans.
 disable-model-invocation: true
 ---
 
