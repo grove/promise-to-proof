@@ -64,7 +64,7 @@ Small work keeps the direct path above; `NO SPLIT` is a valid result.
 ```text
 saved parent contract → slice-contract → approved/published child tickets
 → acceptance-contract for each child → implementation, review, and child proof
-→ integrated candidate → full parent prove
+→ integrated candidate → final integration review when needed → full parent prove
 ```
 
 Slicing defaults to inspection and a draft. Publication needs authority for the
@@ -138,9 +138,9 @@ destructive changes, or merges.
 /acceptance-contract #123
 /slice-contract #123; draft only
 /implement-contract #123
-/review-contract #123 against main
-/prove #123
-/repair-proof #123
+/review-contract <saved implementation handoff> against <comparison base>
+/prove <saved contract>; candidate <saved implementation handoff>
+/repair-proof <matching proof report>; candidate <saved candidate handoff>; requirements <IDs>
 /fix-pr #456
 ```
 

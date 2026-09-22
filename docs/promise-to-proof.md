@@ -247,8 +247,10 @@ companion skills do not block slicing; their next steps remain explicit handoffs
 Finally, invoke `/prove` on the full parent contract against one integrated
 candidate, including interactions between children. Allocate actual integration
 code and checks to a ticket when needed. Ordinary parent proof needs no separate
-integration ticket. Closed children and proofs on earlier candidates cannot replace
-this parent evaluation or the applicable review and merge gates.
+integration ticket. If the integrated candidate differs from the reviewed child
+candidates or contains shared integration code, review that candidate too. Closed
+children and proofs on earlier candidates cannot replace this parent evaluation or
+the applicable review and merge gates.
 
 ## Challenge the design before code makes it expensive
 
@@ -335,6 +337,12 @@ relevant uncommitted and untracked content. A commit is optional. Preserve exist
 work and include only the agreed candidate scope. Record the comparison base
 when known, or leave it explicitly unresolved for the next phase.
 
+Pass the saved implementation handoff to review, proof, and repair. An issue
+number alone does not identify a candidate. For a committed candidate, pass the
+full SHA. For uncommitted work, pass the reproducible snapshot and its included
+files. Pass the matching proof report and unresolved requirement IDs to
+`repair-proof`.
+
 When another session uses another checkout, transfer recoverable content as well
 as its identity. A hash without content, or a local path left behind in a previous
 session, does not complete the handoff. Transfer source and contract files too.
@@ -344,8 +352,8 @@ session, does not complete the handoff. Transfer source and contract files too.
 Invoke review separately with the source, candidate, and comparison context:
 
 ```text
-/review-contract #124 against main
-/review-contract docs/acceptance-contracts/upload-retry.md; include uncommitted work
+/review-contract <saved implementation handoff> against <comparison base>
+/review-contract <saved implementation handoff>; include uncommitted work
 ```
 
 `review-contract` resolves mutable references to fixed identities and examines
@@ -379,7 +387,7 @@ Neither the implementation nor review skill runs the next phase implicitly.
 Run `prove` only after the candidate and the contract revision are fixed:
 
 ```text
-/prove #124
+/prove <saved contract>; candidate <saved implementation handoff>
 ```
 
 The skill starts from the source promises instead of the implementation. For
@@ -428,7 +436,7 @@ When `/prove` returns `NOT PROVEN`, pass the proof result and its unresolved
 requirement IDs to `repair-proof`:
 
 ```text
-/repair-proof #124
+/repair-proof <matching proof report>; candidate <saved implementation handoff>; requirements <IDs>
 ```
 
 Check that the proof result, contract revision, and candidate still match.
@@ -447,7 +455,7 @@ the other requirements against the changed candidate. Run full proof again
 for every contract row after each candidate change:
 
 ```text
-/prove #124
+/prove <saved contract>; candidate <repaired candidate handoff>
 ```
 
 Repeat this pair only while proof identifies specific, repairable gaps:
@@ -463,7 +471,7 @@ ambiguous contract.
 After a repair changes the candidate, refresh review as well as full proof:
 
 ```text
-/review-contract #124 against main
+/review-contract <repaired candidate handoff> against <comparison base>
 ```
 
 Proof checks whether the ticket's promises hold. Review examines contract fidelity,
@@ -513,8 +521,8 @@ For a straightforward ticket with a settled design, use the compact path:
 ```text
 /acceptance-contract #124
 /implement-contract #124
-/review-contract #124 against main
-/prove #124
+/review-contract <saved implementation handoff> against <comparison base>
+/prove <saved contract>; candidate <saved implementation handoff>
 open the pull request when authorized
 ```
 
@@ -532,12 +540,13 @@ For a feature that starts as an idea, optionally add Matt's planning tools:
 /acceptance-contract #124
 /interrogate #124
 /implement-contract #124
-/review-contract #124 against main
-/prove #124
+/review-contract <saved child handoff> against <child comparison base>
+/prove <saved child contract>; candidate <saved child handoff>
 open the pull request when authorized
 
 # On the final integrated candidate:
-/prove #123
+/review-contract <saved integrated handoff> against <parent comparison base>
+/prove <saved parent contract>; candidate <saved integrated handoff>
 # Apply the repository review and merge gates.
 ```
 
@@ -547,17 +556,17 @@ For a difficult bug, optionally use Matt's `diagnosing-bugs` before implementati
 /acceptance-contract #124
 /diagnosing-bugs
 /implement-contract #124
-/review-contract #124 against main
-/prove #124
+/review-contract <saved implementation handoff> against <comparison base>
+/prove <saved contract>; candidate <saved implementation handoff>
 ```
 
 When proof finds a gap, insert the repair loop without blurring its roles:
 
 ```text
-/prove #124
-/repair-proof #124
-/prove #124
-/review-contract #124 against main
+/prove <saved contract>; candidate <saved implementation handoff>
+/repair-proof <matching proof report>; candidate <saved implementation handoff>; requirements <IDs>
+/prove <saved contract>; candidate <repaired candidate handoff>
+/review-contract <repaired candidate handoff> against <comparison base>
 ```
 
 When GitHub Actions fails, repair that workflow and refresh any result that the
@@ -565,8 +574,8 @@ new commit invalidates:
 
 ```text
 /fix-pr #456
-/prove #124       full proof for every changed candidate
-/review-contract #124 against main
+/prove <saved contract>; candidate <repaired candidate handoff>
+/review-contract <repaired candidate handoff> against <comparison base>
 ```
 
 Keep each result attached to the agreement and candidate it actually describes.
