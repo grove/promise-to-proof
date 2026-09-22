@@ -1,6 +1,6 @@
 # Frequently asked questions
 
-Grove keeps the source promise, the work done, and the evidence about that work
+Promise to Proof keeps the source promise, the work done, and the evidence about that work
 as separate records. That separation matters most when a ticket is sliced, a
 candidate changes after review, or someone resumes the work in a fresh session.
 For commands and handoffs, use the [HOW-TO](./how-to.md). For the binding rules,
@@ -11,13 +11,13 @@ use the [acceptance contract protocol](./acceptance-contract-protocol.md).
 ### Who creates the original GitHub issue?
 
 For work in this repository, the person or authorized workflow starting the work
-creates the source GitHub issue. Grove has no dedicated originating-issue skill;
+creates the source GitHub issue. Promise to Proof has no dedicated originating-issue skill;
 use `gh issue create` under this repository's
 [issue tracker instructions](./agents/issue-tracker.md). `plan-acceptance` reads a
 source and returns a contract for the invoking workflow to save. `slice-contract`
 publishes an approved breakdown. Neither silently creates an originating issue.
 
-Projects using Grove may keep a local specification as the source.
+Projects using these skills may keep a local specification as the source.
 `plan-acceptance` accepts a specification or agreed outcome without a GitHub
 issue. If an approved split needs a tracker parent for that local source,
 `slice-contract` needs explicit approval to create one. It can publish approved
@@ -82,7 +82,7 @@ the code in front of it.
 ### Why save artifacts instead of relying on chat?
 
 A new session or checkout cannot reliably recover the contract text, candidate
-files, evidence, and comparison base from a conversation summary. Grove's
+files, evidence, and comparison base from a conversation summary. Its
 handoffs therefore use saved, retrievable records. A location finds the
 contract; the revision and captured text identify its meaning. A candidate
 digest can help verify content, but it cannot replace the content needed to
@@ -143,7 +143,7 @@ review decisions and lets another session resume the work without guessing.
 ### Do I need Matt Pocock's skills or TDD?
 
 No. Matt Pocock's planning and TDD skills can help prepare a specification or
-develop behavior, but Grove's delivery path works without them. Use test-first
+develop behavior, but the project's delivery path works without them. Use test-first
 development where a useful seam exists, and provide credible evidence for each
 contract promise regardless of the development method.
 
