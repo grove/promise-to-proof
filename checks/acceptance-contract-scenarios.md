@@ -139,7 +139,8 @@ not demand replacement with an in-memory counter merely to reduce line count.
 
 Input: require `save_report(path, text)` to save UTF-8 text to a supplied local
 path, overwrite an existing disposable report, return `None`, and propagate
-I/O errors. Exclude atomic replacement and crash durability. Supply this code:
+I/O errors. Exclude parent-directory creation, atomic replacement, and crash
+durability. Supply this code:
 
 ```python
 from pathlib import Path
@@ -170,7 +171,7 @@ import { join } from 'node:path';
 const root = await mkdtemp(join(tmpdir(), 'acceptance-install-'));
 const protocol = await readFile('docs/acceptance-contract-protocol.md', 'utf8');
 try {
-	for (const name of ['acceptance-contract', 'prove', 'repair-proof', 'interrogate', 'fix-pr']) {
+	for (const name of ['acceptance-contract', 'implement-contract', 'review-contract', 'prove', 'repair-proof', 'interrogate', 'fix-pr']) {
 		const dest = join(root, name);
 		await cp(`skills/productivity/${name}`, dest, { recursive: true, dereference: true });
 		const ref = join(dest, 'references/acceptance-contract-protocol.md');
@@ -184,9 +185,15 @@ try {
 JS
 ```
 
-Separately install each copied skill in an isolated invocation where the source
-checkout and sibling skill directories are unavailable. Run scenario 1 with
-`acceptance-contract`.
+Separately install each skill through the supported `skills` CLI in a disposable
+installation root. Use the local checkout as the source when testing unpublished
+changes. Record the CLI version, full command, selected skill, and installed files.
+Inspect the installed protocol content rather than inferring installer behavior
+from this copy check. Run each installed skill in an isolated invocation where the
+source checkout and sibling skill directories are unavailable. Run scenario 1 with
+`acceptance-contract`, [implementation T1](./implement-contract-scenarios.md#t1-complete-a-small-implementation-and-rerun)
+with `implement-contract`, and [review T12](./review-contract-scenarios.md#t12-accept-a-complete-small-design-without-embellishment)
+with `review-contract`. Disable Matt skills and subagent tools for these cases.
 
 Pass when every local reference resolves within its copied skill directory,
 including the protocol. The planning run must obey the revision and plan-state
@@ -198,14 +205,22 @@ record. The copy check alone does not exercise agent behavior after installation
 ## 13. Recover the agreement across fresh sessions
 
 Use separate sessions with no shared conversation history. Start from scenario
-11's source and a valid fixed candidate. In session A, request acceptance planning
-and authorize the invoking workflow to save the returned contract locally.
+11's source and an incomplete candidate. In session A, request acceptance planning
+and authorize the invoking workflow to save and reread the returned contract.
 Transfer the source, contract, and revision history to a fresh checkout. Give
-session B only the source reference and request implementation, then proof.
+session B only the source reference and explicitly invoke `implement-contract`.
+Authorize report storage outside the candidate. Transfer its recoverable final
+candidate, including relevant uncommitted and untracked files, to another checkout.
+Invoke `review-contract` in session C using the saved handoff. Explicitly invoke
+`prove` in session D against the same captured candidate.
 
-Pass when A names the canonical location and confirms it can reread the saved
-contract. B retrieves it through the documented convention, preserves IDs and
-revision, and proves the fixed candidate without reconstructing the contract.
+Pass when A names the canonical location and confirms retrieval. Later sessions
+retrieve the agreement through the documented convention and preserve IDs and
+revision without reconstructing it. B reports development observations, C reports
+review findings, and only D gives acceptance verdicts. Reread each saved report
+from the next session. A digest or a path in a vanished prior checkout does not
+complete transfer. Continue through a named repair and fresh results using
+[proof and repair case 14](./proof-repair-scenarios.md#14-complete-the-native-delivery-handoff).
 
 Repeat with a configured tracker and an originating ticket that links to the
 contract. Give B only the ticket reference. The workflow must use that location

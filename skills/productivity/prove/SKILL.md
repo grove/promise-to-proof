@@ -7,6 +7,8 @@ disable-model-invocation: true
 `/prove` checks whether a ticket, specification, or agreed outcome is actually
 met. It verifies a fixed candidate and reports gaps; it does not repair the
 candidate. Use `/repair-proof` for scoped repairs, then run `/prove` again.
+`/implement-contract` develops the candidate; `/review-contract` separately
+examines contract fidelity, scope, and engineering quality. Neither replaces proof.
 
 Before verification, read the [acceptance contract protocol](references/acceptance-contract-protocol.md).
 It defines the spec envelope, identities, evidence, and verdicts.
@@ -130,4 +132,5 @@ Verification context: <environment>
 - <requirement ID and smallest complete repair, or "None">
 
 Fresh `/prove` is required after any repair.
+Refresh `/review-contract` for the changed candidate as a separate phase.
 ```

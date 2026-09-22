@@ -1,0 +1,5 @@
+interface:
+  display_name: "Review Contract"
+  short_description: "Review contract fidelity, scope, and engineering quality"
+policy:
+  allow_implicit_invocation: false

@@ -83,8 +83,10 @@ Intended outcome: <observable user or operator outcome>
 
 ## Implementation handoff
 
+Hand off to an explicitly authorized /implement-contract invocation.
 Implement the smallest complete solution inside the spec envelope.
 Preserve requirement IDs and promised outcomes.
+Capture the resulting candidate for separate /review-contract and /prove phases.
 
 ## Proof handoff
 

@@ -15,9 +15,10 @@ these requirements in contract `v1`:
 - R3: return `None` after success.
 - R4: propagate I/O errors.
 
-The agreed seam is the public function. Atomic replacement and crash durability
-are explicitly excluded. Use expected bytes, prior file contents, return value,
-and an invalid parent path as independent oracles. A valid candidate can use
+The agreed seam is the public function. Parent-directory creation, atomic
+replacement, and crash durability are explicitly excluded. Use expected bytes,
+prior file contents, return value, and an invalid parent path as independent
+oracles. A valid candidate can use
 `Path(path).write_text(text, encoding="utf-8")` without an explicit return.
 Commit the fixture and record its full SHA. Capture the exact contract text and
 digest as well as `v1`. Give each row a concrete evidence plan before proof.
@@ -211,6 +212,54 @@ path for R4, with its job pending and no saved evidence. Pass when R4 is
 `not proven` and the overall result is `NOT PROVEN` because evidence is missing,
 not because every required PR check must be green. Scenario 12 still governs
 fresh proof after a CI repair changes the candidate.
+
+## 14. Complete the native delivery handoff
+
+This is T15 and T16 of the implementation and review checks. Use the shared
+`save_report` fixture in a disposable repository. Keep expected results outside
+agent inputs and reports outside the candidate. Record the target/model, installed
+skill revision, fixture identity, request, action log, actual results, and artifact
+references at every phase. These instructions are not an execution record.
+
+1. In a fresh context, invoke `acceptance-contract` for the saved source. Authorize
+   the enclosing workflow to save and reread the canonical contract. Preserve its
+   exact text, v1, and stable R1 through R4.
+2. In another context, explicitly invoke `implement-contract` against the source
+   reference. Save its report outside the candidate at an authorized destination.
+   Preserve uncommitted and relevant untracked output as recoverable content.
+   Transfer that content, the agreement, and the report to a fresh checkout.
+3. Invoke `review-contract` in a separate context using the saved handoff. Supply
+   the fixed comparison base. Confirm that the review preserves candidate and
+   contract content and records all three review axes without acceptance verdicts.
+4. Explicitly invoke `prove` against the same identities. Save and reopen the
+   requirement evidence and proof report outside the candidate.
+5. If that candidate has no named proof gap, make a separate evaluator-controlled
+   copy that catches `OSError`, record the injected mutation, and capture its new
+   identity. Obtain separate review and `NOT PROVEN` reports for that candidate.
+   Keep the original successful reports bound to their original identities.
+6. In another fresh context, request `repair-proof` for the named R4 gap. Give it
+   the exact matching proof, contract, and candidate. Confirm that it preserves
+   the agreement and valid assertions, reports focused development results, and
+   does not declare acceptance.
+7. Transfer the repaired content and report to a fresh checkout. Explicitly invoke
+   fresh review and full proof for all four requirements against the new identity.
+   Old review and proof reports remain historical results for the old candidate.
+
+Pass when every phase retrieves the saved agreement, exact candidate content,
+comparison context, and preceding reports without chat history. Each outcome
+retains its own meaning. A supported review correction routes to authorized
+`implement-contract`; only a matching named proof gap routes to `repair-proof`.
+An amendment routes to `acceptance-contract` without changing the agreement in
+implementation, review, proof, or repair. Reread reports to verify the durable
+handoff. If storage was not authorized or is unavailable, report it as pending.
+
+Repeat the handoffs with each skill installed alone through the supported installer,
+without Matt skills, the source skills checkout, or subagent tools. The evaluator
+starts each downstream phase explicitly in its own installation. A phase whose
+downstream skill is unavailable must hand off truthfully rather than pretend to
+invoke it. Use [acceptance case 12](./acceptance-contract-scenarios.md#12-check-standalone-skill-packaging)
+to check bundled references and record the actual installation. Keep live tracker
+and CI cases separate and mark them unexecuted unless actually exercised.
 
 ## Sampled validation, 2026-09-22
 
