@@ -6,8 +6,8 @@ disable-model-invocation: true
 
 `/prove` checks whether a ticket, specification, or agreed outcome is actually
 met. It verifies a fixed candidate and reports gaps; it does not repair the
-candidate. Use `/repair-proof` for scoped repairs, then run `/prove` again.
-`/implement-contract` develops the candidate; `/review-contract` separately
+candidate. Use `/repair-gaps` for scoped repairs, then run `/prove` again.
+`/implement-contract` develops the candidate; `/review-implementation` separately
 examines contract fidelity, scope, and engineering quality. Neither replaces proof.
 
 Before verification, read the [acceptance contract protocol](references/acceptance-contract-protocol.md).
@@ -34,7 +34,7 @@ It defines the spec envelope, identities, evidence, and verdicts.
   worktree is `NOT PROVEN` unless its exact snapshot can be established.
 - A proof run may not mutate the candidate, worktree, or contract. If any such
   change occurs, return `NOT PROVEN` and discard observations from the changed
-  state; the repair belongs to `/repair-proof` and requires a fresh `/prove`.
+  state; the repair belongs to `/repair-gaps` and requires a fresh `/prove`.
 - Do not edit product code, tests, CI configuration, or the acceptance contract.
 - Do not commit, push, publish, or declare a repair.
 - Prefer behavioral evidence through public interfaces and independent oracles.
@@ -100,7 +100,7 @@ assertion, command, and environment. The saved proof report may hold the evidenc
 itself under the protocol's evidence rules. Check the candidate, worktree, and
 captured contract again afterward. Never fix a failure in this skill. Report
 the smallest complete repair needed and name the affected requirement IDs for
-`/repair-proof`.
+`/repair-gaps`.
 
 ### 6. Report
 
@@ -143,5 +143,5 @@ Verification context: <environment>
 - <requirement ID and smallest complete repair, or "None">
 
 Fresh `/prove` is required after any repair.
-Refresh `/review-contract` for the changed candidate as a separate phase.
+Refresh `/review-implementation` for the changed candidate as a separate phase.
 ```

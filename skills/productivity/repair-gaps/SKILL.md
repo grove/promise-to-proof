@@ -1,10 +1,10 @@
 ---
-name: repair-proof
+name: repair-gaps
 description: Repair named implementation or evidence gaps from a NOT PROVEN proof, report the change honestly, and require fresh proof without declaring acceptance.
 disable-model-invocation: true
 ---
 
-`/repair-proof` is the repair step after `/prove`. It consumes the source
+`/repair-gaps` is the repair step after `/prove`. It consumes the source
 contract, the proof result, the matching candidate, and specific unresolved
 requirement IDs. It repairs only those gaps and never replaces fresh proof.
 Review-only findings belong to an authorized `/implement-contract` invocation;
@@ -39,7 +39,7 @@ complete in depth.
 5. Recheck the contract and report the candidate before and after, changed files,
    addressed requirements, changed evidence, and remaining gaps. The candidate
    may change only in the scoped repair; the acceptance requirements stay intact.
-6. Hand off the changed candidate for separate `/review-contract` and fresh proof.
+6. Hand off the changed candidate for separate `/review-implementation` and fresh proof.
    End with: **Fresh `/prove` required before acceptance.**
 
 ## Outcomes

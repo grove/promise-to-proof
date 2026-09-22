@@ -14,7 +14,7 @@ Proof establishes that one exact candidate satisfies one exact contract revision
 
 ```text
 source → plan-acceptance → saved canonical acceptance contract
-       → implement-contract → captured candidate → review-contract → prove
+       → implement-contract → captured candidate → review-implementation → prove
 ```
 
 The sequence is not a ceremony. Each skill answers a different question.
@@ -50,10 +50,10 @@ rg --files skills -g SKILL.md | sort
 The delivery path uses explicit phases:
 
 ```text
-/plan-acceptance -> save and reread the contract
-/implement-contract -> save the report and capture the candidate
-/review-contract    -> save findings for that candidate and comparison base
-/prove              -> save the proof and requirement evidence
+/plan-acceptance       -> save and reread the contract
+/implement-contract    -> save the report and capture the candidate
+/review-implementation -> save findings for that candidate and comparison base
+/prove                 -> save the proof and requirement evidence
 ```
 
 Review and proof may run in either order against the same fixed candidate.
@@ -342,7 +342,7 @@ Pass the saved implementation handoff to review, proof, and repair. An issue
 number alone does not identify a candidate. For a committed candidate, pass the
 full SHA. For uncommitted work, pass the reproducible snapshot and its included
 files. Pass the matching proof report and unresolved requirement IDs to
-`repair-proof`.
+`repair-gaps`.
 
 When another session uses another checkout, transfer recoverable content as well
 as its identity. A hash without content, or a local path left behind in a previous
@@ -353,11 +353,11 @@ session, does not complete the handoff. Transfer source and contract files too.
 Invoke review separately with the source, candidate, and comparison context:
 
 ```text
-/review-contract <saved implementation handoff> against <comparison base>
-/review-contract <saved implementation handoff>; include uncommitted work
+/review-implementation <saved implementation handoff> against <comparison base>
+/review-implementation <saved implementation handoff>; include uncommitted work
 ```
 
-`review-contract` resolves mutable references to fixed identities and examines
+`review-implementation` resolves mutable references to fixed identities and examines
 contract fidelity, scope and simplicity, and engineering quality. It reads the
 actual diff and relevant surrounding implementation, including unchanged code
 that a requirement depends on. A working-tree review includes the requested
@@ -378,7 +378,7 @@ invoke `implement-contract` with the saved report and selected finding IDs.
 For changed promises or consequential seam decisions, save a source-linked
 amendment and return to `plan-acceptance`. `interrogate` can help resolve the
 decision. A review finding alone is not the matching `NOT PROVEN` report required
-by `repair-proof`.
+by `repair-gaps`.
 
 After implementation changes the candidate, refresh review and any prior proof.
 Neither the implementation nor review skill runs the next phase implicitly.
@@ -434,10 +434,10 @@ but they call for different repairs.
 ## Repair only the gaps that proof named
 
 When `/prove` returns `NOT PROVEN`, pass the proof result and its unresolved
-requirement IDs to `repair-proof`:
+requirement IDs to `repair-gaps`:
 
 ```text
-/repair-proof <matching proof report>; candidate <saved implementation handoff>; requirements <IDs>
+/repair-gaps <matching proof report>; candidate <saved implementation handoff>; requirements <IDs>
 ```
 
 Check that the proof result, contract revision, and candidate still match.
@@ -459,20 +459,30 @@ for every contract row after each candidate change:
 /prove <saved contract>; candidate <repaired candidate handoff>
 ```
 
-Repeat this pair only while proof identifies specific, repairable gaps:
+Repeat this loop only while proof identifies specific, repairable gaps:
 
 ```text
-NOT PROVEN -> /repair-proof -> fresh /prove
+prove
+   ↓
+NOT PROVEN with repairable named gaps
+   ↓
+repair-gaps
+   ↓
+changed candidate
+   ↓
+fresh prove
+   ↓
+fresh review-implementation when the reviewed candidate changed
 ```
 
 Stop when the missing input is a product decision, unavailable credential, or
-external capability. `repair-proof` must not guess its way through a stale or
+external capability. `repair-gaps` must not guess its way through a stale or
 ambiguous contract.
 
 After a repair changes the candidate, refresh review as well as full proof:
 
 ```text
-/review-contract <repaired candidate handoff> against <comparison base>
+/review-implementation <repaired candidate handoff> against <comparison base>
 ```
 
 Proof checks whether the ticket's promises hold. Review examines contract fidelity,
@@ -517,7 +527,7 @@ checks passed without showing that every ticket promise was checked. Every
 changed candidate makes its previous proof stale. Run full `/prove` again on
 the repaired candidate, especially after product, acceptance evidence, or
 relevant test changes. A contract revision can remain unchanged while its
-candidate needs fresh proof. Refresh `/review-contract` for the changed candidate
+candidate needs fresh proof. Refresh `/review-implementation` for the changed candidate
 as well.
 
 ## Choose the shortest workflow that covers the risk
@@ -527,7 +537,7 @@ For a straightforward ticket with a settled design, use the compact path:
 ```text
 /plan-acceptance #124
 /implement-contract #124
-/review-contract <saved implementation handoff> against <comparison base>
+/review-implementation <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
 open the pull request when authorized
 confirm the PR head matches the captured candidate
@@ -547,12 +557,12 @@ For a feature that starts as an idea, optionally add Matt's planning tools:
 /plan-acceptance #124
 /interrogate #124
 /implement-contract #124
-/review-contract <saved child handoff> against <child comparison base>
+/review-implementation <saved child handoff> against <child comparison base>
 /prove <saved child contract>; candidate <saved child handoff>
 open the pull request when authorized
 
 # On the final integrated candidate:
-/review-contract <saved integrated handoff> against <parent comparison base>
+/review-implementation <saved integrated handoff> against <parent comparison base>
 /prove <saved parent contract>; candidate <saved integrated handoff>
 # Apply the repository review and merge gates.
 ```
@@ -563,7 +573,7 @@ For a difficult bug, optionally use Matt's `diagnosing-bugs` before implementati
 /plan-acceptance #124
 /diagnosing-bugs
 /implement-contract #124
-/review-contract <saved implementation handoff> against <comparison base>
+/review-implementation <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
 ```
 
@@ -571,9 +581,9 @@ When proof finds a gap, insert the repair loop without blurring its roles:
 
 ```text
 /prove <saved contract>; candidate <saved implementation handoff>
-/repair-proof <matching proof report>; candidate <saved implementation handoff>; requirements <IDs>
+/repair-gaps <matching proof report>; candidate <saved implementation handoff>; requirements <IDs>
 /prove <saved contract>; candidate <repaired candidate handoff>
-/review-contract <repaired candidate handoff> against <comparison base>
+/review-implementation <repaired candidate handoff> against <comparison base>
 ```
 
 When GitHub Actions fails, repair that workflow and refresh any result that the
@@ -582,10 +592,10 @@ new commit invalidates:
 ```text
 /fix-pr #456
 /prove <saved contract>; candidate <repaired candidate handoff>
-/review-contract <repaired candidate handoff> against <comparison base>
+/review-implementation <repaired candidate handoff> against <comparison base>
 ```
 
 Keep each result attached to the agreement and candidate it actually describes.
-`implement-contract` builds the requested capability, `review-contract` examines
+`implement-contract` builds the requested capability, `review-implementation` examines
 it, and `/prove` establishes acceptance evidence. Repairs change the candidate
 and require fresh results. None of these phases grants permission to merge.

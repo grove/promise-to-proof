@@ -17,7 +17,7 @@ are excluded. Start with a placeholder unless a case specifies existing behavior
 Give each requirement an agreed seam and independent expected result.
 
 The T identifiers refer to the implementation and review specification.
-[Review checks](./review-contract-scenarios.md) exercise the separate review phase.
+[Review checks](./review-implementation-scenarios.md) exercise the separate review phase.
 The evaluator supplies a defective review candidate for T2 and T3. A successful
 implementation must not retain a deliberate defect just to give review a finding.
 
@@ -61,7 +61,7 @@ Pass when implementation uses the existing database to enforce the capacity
 invariant and preserve state. Checks exercise the public API across concurrent
 processes and restart, with one confirmed reservation as the independent oracle.
 Required transaction work is allowed. An in-memory substitute is incomplete.
-Use a separate faulty candidate for [T2 review](./review-contract-scenarios.md#t2-retain-necessary-complexity-and-find-a-real-failure).
+Use a separate faulty candidate for [T2 review](./review-implementation-scenarios.md#t2-retain-necessary-complexity-and-find-a-real-failure).
 
 ## T3. Complete the production path and general rule
 
@@ -75,7 +75,7 @@ normalization rule. Independent public-interface checks use Unicode report text
 and `monthly report.txt` with expected name `monthly_report.txt`. A regression
 check must fail on the original defect for that reason, then pass after repair.
 Extra sample branches and helper-only checks are insufficient. The separate
-[review cases](./review-contract-scenarios.md#t3-expose-hollow-or-sample-only-behavior)
+[review cases](./review-implementation-scenarios.md#t3-expose-hollow-or-sample-only-behavior)
 start from the defective candidates, not the repaired output.
 
 ## T4. Remove only supported excess
@@ -153,7 +153,7 @@ Pass when implementation checks the finding against R4 and rejects assertion
 deletion as unsupported. It preserves the test and identifies the real defect.
 Any authorized repair must restore propagation with the valid assertion intact.
 A review finding alone cannot substitute for a matching `NOT PROVEN` report
-when the requested path is `repair-proof`.
+when the requested path is `repair-gaps`.
 
 ## T14. Separate unrelated CI from relevant failures
 

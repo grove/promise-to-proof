@@ -22,9 +22,9 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 | [`plan-acceptance`](./skills/productivity/plan-acceptance/SKILL.md) | A ticket needs clear acceptance criteria | A candidate-independent revision with stable requirement IDs and evidence plans |
 | [`slice-contract`](./skills/productivity/slice-contract/SKILL.md) | A parent contract is too large for one coherent task | A traceable breakdown and, when authorized, published child tickets |
 | [`implement-contract`](./skills/productivity/implement-contract/SKILL.md) | An agreed contract is ready to implement | Scoped implementation, development checks, and a recoverable candidate handoff |
-| [`review-contract`](./skills/productivity/review-contract/SKILL.md) | A captured implementation is ready to inspect | Findings on contract fidelity, scope, and engineering quality |
+| [`review-implementation`](./skills/productivity/review-implementation/SKILL.md) | A captured implementation is ready to inspect | Findings on contract fidelity, scope, and engineering quality |
 | [`prove`](./skills/productivity/prove/SKILL.md) | Implementation is ready to verify | `PROVEN` or `NOT PROVEN` with evidence |
-| [`repair-proof`](./skills/productivity/repair-proof/SKILL.md) | Proof found a specific gap | A scoped repair report; fresh proof is still required |
+| [`repair-gaps`](./skills/productivity/repair-gaps/SKILL.md) | Proof found specific repairable gaps | A scoped repair report; fresh proof is still required |
 | [`fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
 
 ## Typical workflow
@@ -34,8 +34,8 @@ proposal before committing to it. Its advice requires no downstream skill.
 
 ```text
 Source → plan-acceptance → saved acceptance contract → implement-contract
-       → captured candidate → review-contract → prove
-       → repair-proof if needed → fresh proof and review
+       → captured candidate → review-implementation → prove
+       → repair-gaps if needed → fresh proof and review
 ```
 
 1. **Plan acceptance.** Run `plan-acceptance` on the ticket or specification.
@@ -46,13 +46,13 @@ Source → plan-acceptance → saved acceptance contract → implement-contract
 2. **Implement.** Run `implement-contract` to build the smallest complete change,
    including necessary invariants, state, failure handling, and persistence.
    Save its report and recoverable candidate content for the next session.
-3. **Review.** Run `review-contract` against that candidate and a fixed comparison
-   base. Pass supported findings to a separately authorized `implement-contract`
-   invocation. Review does not edit the candidate.
+3. **Review.** Run `review-implementation` against that candidate and a fixed
+   comparison base. Pass supported findings to a separately authorized
+   `implement-contract` invocation. Review does not edit the candidate.
 4. **Prove.** Run `prove` against the exact contract and candidate. Each row gets
    `proven`, `disproven`, or `not proven` with durable evidence.
 5. **Repair named proof gaps.** If `NOT PROVEN` names repairable implementation or
-   evidence gaps, pass the unresolved requirement IDs to `repair-proof`. Resolve
+   evidence gaps, pass the unresolved requirement IDs to `repair-gaps`. Resolve
    contract, verification, or candidate identity gaps before running proof again.
 6. **Refresh results.** Every candidate change needs fresh proof of every row and
    refreshed review. A changed agreement returns to `plan-acceptance` first.
@@ -103,14 +103,14 @@ GitHub checkboxes with the contract, but never use them as proof.
 | `plan-acceptance` | Plan requirements and evidence | Does not implement or verify |
 | `slice-contract` | Allocate parent obligations and publish approved tickets | Does not author contracts, implement, prove, or close work |
 | `implement-contract` | Implement the agreed scope and run development checks | Does not revise the contract, declare acceptance, or implicitly run review or proof |
-| `review-contract` | Inspect a fixed implementation and comparison scope | Does not edit, repair, approve, or declare acceptance |
+| `review-implementation` | Inspect a fixed implementation and comparison scope | Does not edit, repair, approve, or declare acceptance |
 | `prove` | Verify one fixed candidate | Does not edit, commit, push, or publish |
-| `repair-proof` | Repair named implementation or evidence gaps | Does not declare acceptance |
+| `repair-gaps` | Repair named implementation or evidence gaps | Does not declare acceptance |
 | `fix-pr` | Repair a failed PR workflow | Does not prove the whole ticket |
 | `interrogate` | Let you examine the agent's proposal through questions | You lead the discussion; invocation does not grant implementation authority |
 
 Explicit `implement-contract` invocation authorizes scoped local edits and safe
-checks. `review-contract` authorizes inspection and safe isolated diagnostics.
+checks. `review-implementation` authorizes inspection and safe isolated diagnostics.
 Neither invocation alone authorizes commits, pushes, publication, deployments,
 destructive changes, or merges.
 
@@ -142,9 +142,9 @@ destructive changes, or merges.
 /plan-acceptance #123
 /slice-contract #123; draft only
 /implement-contract #123
-/review-contract <saved implementation handoff> against <comparison base>
+/review-implementation <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
-/repair-proof <matching proof report>; candidate <saved candidate handoff>; requirements <IDs>
+/repair-gaps <matching proof report>; candidate <saved candidate handoff>; requirements <IDs>
 /fix-pr #456
 ```
 
@@ -171,6 +171,10 @@ Update one installed skill:
 npx skills@latest update plan-acceptance
 ```
 
+If you installed `review-contract` or `repair-proof`, install the new
+`review-implementation` and `repair-gaps` skills, then remove the old copies
+using your installer's normal removal mechanism.
+
 ## Repository structure
 
 ```text
@@ -181,8 +185,8 @@ skills/productivity/
 ├── implement-contract/
 ├── interrogate/
 ├── prove/
-├── repair-proof/
-├── review-contract/
+├── repair-gaps/
+├── review-implementation/
 └── slice-contract/
 ```
 

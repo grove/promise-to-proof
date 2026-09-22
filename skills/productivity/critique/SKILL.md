@@ -120,5 +120,5 @@ When useful, suggest user-led `interrogate` for unresolved design decisions,
 `plan-acceptance` for acceptance planning, or an explicitly authorized
 `implement-contract` invocation when the agreement is ready. These are
 optional next steps, not automatic invocations. `prove` verifies implementation;
-`review-contract` reviews implementation. This critique neither grants
+`review-implementation` reviews implementation. This critique neither grants
 implementation authority nor declares acceptance.

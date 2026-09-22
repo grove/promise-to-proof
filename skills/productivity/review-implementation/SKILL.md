@@ -1,5 +1,5 @@
 ---
-name: review-contract
+name: review-implementation
 description: Review a fixed implementation against its acceptance contract, scope, and engineering obligations without editing it or declaring acceptance.
 disable-model-invocation: true
 ---
@@ -141,7 +141,7 @@ material conflict, changed promise, or consequential seam decision, hand back to
 Identify an omitted promise by its source rather than inventing a requirement ID.
 Preserve a source-linked amendment with affected IDs, old and proposed agreement,
 authority given or needed, and dependent work. Do not revise the contract or
-invoke a downstream skill. A review report does not satisfy `/repair-proof`'s
+invoke a downstream skill. A review report does not satisfy `/repair-gaps`'s
 requirement for a matching `NOT PROVEN` proof.
 
 Follow the protocol's report storage and transfer rules. Preserve the report,

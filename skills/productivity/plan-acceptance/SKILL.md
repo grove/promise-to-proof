@@ -104,7 +104,7 @@ Intended outcome: <observable user or operator outcome>
 Hand off to an explicitly authorized /implement-contract invocation.
 Implement the smallest complete solution inside the spec envelope.
 Preserve requirement IDs and promised outcomes.
-Capture the resulting candidate for separate /review-contract and /prove phases.
+Capture the resulting candidate for separate /review-implementation and /prove phases.
 
 ## Proof handoff
 

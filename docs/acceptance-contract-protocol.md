@@ -175,7 +175,7 @@ seam. Prefer existing repository mechanisms and add machinery only where
 correctness requires it. Preserve requirement IDs and promised outcomes.
 
 `implement-contract` consumes the saved agreement and reports development work
-for an exact candidate. `review-contract` inspects a captured candidate against
+for an exact candidate. `review-implementation` inspects a captured candidate against
 the agreement, scope, and engineering obligations without repairing it. Neither
 authors the contract, grants acceptance, or establishes merge readiness.
 Specification, ticket slicing, and TDD may supply inputs without being required.
@@ -197,7 +197,7 @@ artifact per requirement.
 
 Review findings use local IDs distinct from contract requirement IDs. Supported
 corrections within the agreement go to an authorized `implement-contract`
-invocation. Named gaps in a matching `NOT PROVEN` report go to `repair-proof`.
+invocation. Named gaps in a matching `NOT PROVEN` report go to `repair-gaps`.
 Changed promises or consequential seam decisions return to `plan-acceptance`
 through the source-linked amendment convention. These handoffs do not invoke
 the next skill or grant publication authority.
