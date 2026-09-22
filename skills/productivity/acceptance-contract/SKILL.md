@@ -12,8 +12,10 @@ It defines the spec envelope, revision rules, evidence terms, and handoffs.
 
 ## Build the contract
 
-1. Read the source, existing contract, and applicable parent contract. If the
-   source cannot be established, report the gap and stop.
+1. Resolve the canonical contract location using the protocol's durable handoff
+   convention. Read the source, existing contract, pending amendments, and
+   applicable parent contract. If the source cannot be established, report the
+   gap and stop.
 2. Reconcile existing acceptance criteria, including GitHub checkboxes, with
    the contract. Extract every material promise and necessary invariant. Keep
    source references so each criterion maps to its requirements without duplication.
@@ -41,6 +43,10 @@ unrequested scope. Keep implementation preferences out of requirements.
 Return the contract using the shape below. Use only `planned` or `gap` for plan
 state. Move any legacy proof verdicts into a separately identified proof report
 with their original candidate and context, or flag missing provenance as a gap.
+
+Include a storage handoff naming the canonical destination and revision, and
+whether saving remains pending. The invoking workflow saves the returned text
+and confirms retrieval as the protocol requires; planning does not publish it.
 
 ## Output
 

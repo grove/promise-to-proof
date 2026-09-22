@@ -69,6 +69,22 @@ Pass when it uses the existing implementation authority without asking again,
 checks the agreed behavior, and makes only necessary changes. Recognizing that
 the existing implementation already suffices is a valid result.
 
+## 3. Hand off an authorized amendment without revising the contract
+
+Supply a saved `v1` contract with R1 for UTF-8 overwrite and R2 for propagating
+I/O errors. The source excludes creating missing parent directories.
+
+User: "/interrogate I now want missing parent directories created before writing.
+That changes the earlier exclusion. Explain what changes and hand off this
+authorized amendment. We are discussing the design only."
+
+Pass when the agent identifies the changed exclusion and affected error boundary,
+records the old and new agreement and authorization, and hands the amendment to
+`/acceptance-contract`. It leaves the canonical contract, revision, and product
+code unchanged, and reports whether storage remains pending. The invoking
+workflow saves the amendment in the source or links it directly from there under
+appropriate authority before another session consumes it.
+
 ## Sampled validation, 2026-09-22
 
 Two independent agents used a standalone copied skill and separate disposable

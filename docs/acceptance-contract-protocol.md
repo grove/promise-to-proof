@@ -36,6 +36,32 @@ The target is the smallest complete solution. Line count does not establish
 completeness or overengineering. Implementation choices stay inside this envelope
 and do not authorize changing it.
 
+Repository standards, security constraints, compatibility guarantees, and
+applicable parent contracts remain binding even when the ticket does not restate
+them. Satisfying them does not constitute product scope expansion.
+
+## Durable contract handoff
+
+Keep one canonical contract location per work item. With a configured tracker,
+the originating ticket holds the contract or a direct reference to its repository
+file. Otherwise use the repository's documented location, defaulting to
+`docs/acceptance-contracts/<work-id>.md`. Use a stable ticket key or source slug
+for `<work-id>`. Preserve prior contract text in version history or saved revisions.
+
+The workflow invoking `acceptance-contract` owns saving its returned text under
+existing authorization. For tracker storage, attach or link it on the originating
+ticket without creating a separate issue. Reread the saved destination before
+handing off its location and revision. If saving is unavailable, return the
+proposed destination and mark storage pending. A chat response alone is not a
+completed durable handoff.
+Repository files must travel with the work in a commit or transferred snapshot
+when the next session uses another checkout.
+
+Consumers resolve that location and read the source and authorized amendments
+before implementation, proof, or repair. Report missing or conflicting inputs
+instead of reconstructing an agreement from memory. The location finds the
+contract; proof still captures its exact text under the identity rules below.
+
 ## Requirements and revisions
 
 Each independently falsifiable promise has a stable ID such as `R1`. Input
@@ -54,6 +80,13 @@ Record the affected IDs, previous and new agreement, and authorization in a
 change note. Preserve the prior revision so old proof remains interpretable.
 New evidence, a changed test path, or wording that preserves meaning does not
 increment the revision. A changed promise requires fresh proof.
+
+`acceptance-contract` is the sole author of contract revisions. Other skills
+hand it amendments naming affected IDs, old and new agreement, and authorization.
+The invoking workflow saves pending amendments in the source or links them
+directly from it. Reconcile them through `acceptance-contract` before work that
+depends on the changed promise. Storing its returned text does not authorize
+rewriting it.
 
 ## Seams, oracles, and evidence plans
 
@@ -100,6 +133,12 @@ Proof records each requirement's observation, independent oracle, durable
 evidence reference, and verdict. Evidence references identify the assertion and
 its saved output, artifact, or immutable run, with the command and environment
 needed to interpret it. Checkbox state and green CI alone do not prove a ticket.
+
+The saved proof report itself may contain the evidence: command, named assertion,
+actual observation or relevant output, environment, and candidate identity.
+Several requirements may reference the same report section or run. Separate
+artifacts per requirement are unnecessary. Save the report outside the candidate
+and provide a retrievable reference; a command without its result is not evidence.
 
 - `proven`: credible evidence establishes the full requirement for this candidate.
 - `disproven`: a concrete observation violates the requirement.

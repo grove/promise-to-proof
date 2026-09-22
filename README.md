@@ -37,6 +37,8 @@ Ticket/spec → acceptance-contract → implementation → prove
 1. **Plan acceptance.** Run `acceptance-contract` on the ticket or specification.
    It records a revision such as `v1`, stable `R` IDs, boundaries, seams,
    independent oracles, and planned evidence. Plan state is `planned` or `gap`.
+   Save its output using the [durable handoff convention](./docs/acceptance-contract-protocol.md#durable-contract-handoff)
+   before passing its location and revision to another session.
 2. **Implement.** Use the existing implementation and TDD workflow to build the
    smallest complete change within the specification, including necessary
    invariants, state, failure handling, and persistence. Skip speculative machinery.

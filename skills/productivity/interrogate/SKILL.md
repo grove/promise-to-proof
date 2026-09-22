@@ -63,10 +63,12 @@ behavior in scope when promised outcomes depend on them. Keep speculative
 additions out. An informal discussion needs no new contract.
 
 Distinguish exploring an alternative from agreeing to change a requirement.
-Record authorized material changes under the protocol's revision rules;
-implementation convenience does not change the agreement. Discussion and cheap
-experiments do not establish acceptance. Candidate-specific verdicts belong in
-`/prove` reports.
+For an authorized material change, hand off an amendment to `/acceptance-contract`
+with the affected IDs, old and new agreement, and authorization. Leave the contract
+and revision unchanged. Carry the amendment into the protocol's durable handoff
+so a later session can reconcile it. Implementation convenience does not change
+the agreement. Discussion and cheap experiments do not establish acceptance.
+Candidate-specific verdicts belong in `/prove` reports.
 
 ## Let the user finish the examination
 
@@ -76,8 +78,8 @@ or the proposal changes materially, briefly summarize the current approach,
 what changed and why, and any unresolved decision or evidence gap. Keep the
 summary proportional; avoid repeating the whole plan after every answer.
 
-When the user is ready to move on, carry the agreed approach, authorized contract
-changes, unresolved questions, and intended checks into the next step. An unresolved
+When the user is ready to move on, carry the agreed approach, contract amendments,
+unresolved questions, and intended checks into the next step. An unresolved
 question can remain open if the next step does not depend on its answer.
 Invoking this skill authorizes discussion and investigation, not implementation.
 Preserve implementation authority already granted and act on it when the discussion

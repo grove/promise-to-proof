@@ -208,6 +208,15 @@ implementation that loses retry state on restart.
 Reconcile GitHub checkboxes with the contract. A checked box is a completion
 claim to verify, not evidence. Resolve a mismatch before claiming acceptance.
 
+Save the returned contract before handing the work to a fresh session. The
+workflow invoking `acceptance-contract` owns this step under existing authority.
+Follow the protocol's [durable handoff convention](./acceptance-contract-protocol.md#durable-contract-handoff):
+attach the contract or its direct reference to the originating ticket. Without
+a tracker, use `docs/acceptance-contracts/<work-id>.md` unless the repository
+documents another location. Reread the saved contract and pass its location and
+revision onward. Include local files in the commit or snapshot transferred to
+another checkout. Report storage as pending when it cannot be completed.
+
 ## Challenge the design before code makes it expensive
 
 When the implementation has a consequential choice, run `interrogate` after
@@ -236,9 +245,11 @@ Lead with the questions you need answered. The agent explains the evidence,
 revises the proposal when an objection holds, and identifies checks that could
 settle unknowns. Continue until you are ready to move on; there is no turn limit.
 Then carry the agreed approach, authorized requirement changes, and unresolved
-questions into the next step. Use implementation authority already present in
-the request. If the request covers design only, obtain implementation authority
-before editing code.
+questions into the next step. Save authorized amendments in the source or link
+them directly from it. Have `acceptance-contract` reconcile them before work
+that depends on the changed promise. Use implementation authority
+already present in the request. If the request covers design only, obtain
+implementation authority before editing code.
 
 Skip `interrogate` when the design is already clear and the cost of a wrong
 choice is low. A one-line correction with an existing regression seam rarely
@@ -253,12 +264,14 @@ Pass the ticket and its acceptance contract into Matt's implementation workflow:
 /implement #124
 ```
 
-Keep the contract beside the work and map each meaningful code path or check back
-to its requirement ID. `/implement` uses `/tdd` at the agreed seams, so each
-vertical slice moves through a failing test, the smallest working change, and a
-cleanup pass. TDD drives the next piece of code, while the contract keeps every
-ticket promise in view. Use Matt's existing planning, implementation, TDD, and
-review steps rather than creating a second implementation workflow.
+Resolve the saved contract from the ticket reference or documented local path.
+Reconcile pending amendments before implementing affected behavior. Map each
+meaningful code path or check back to its requirement ID. `/implement` uses `/tdd`
+at the agreed seams, so each vertical slice moves through a failing test, the
+smallest working change, and a cleanup pass. TDD drives the next piece of code,
+while the contract keeps every ticket promise in view. Use Matt's existing
+planning, implementation, TDD, and review steps rather than creating a second
+implementation workflow.
 
 Build the smallest complete implementation within the specification. Include
 necessary invariants, state transitions, failure handling, and persistence.
@@ -309,6 +322,10 @@ identity, and preserve the exact contract text used. For each row, retain
 durable evidence references with the command or observation, actual result, and
 oracle comparison. A passing suite summary
 cannot replace missing row evidence.
+
+The saved proof report can hold the commands, named assertions, actual outputs,
+environment, and candidate identity itself. Reference its sections from the
+requirement rows and save it outside the candidate. One report can cover many rows.
 
 Do not ask `/prove` to fix what it finds. Proof must leave both the candidate
 and the contract unchanged so that every observation still belongs to the same

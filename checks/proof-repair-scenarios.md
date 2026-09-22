@@ -38,6 +38,13 @@ output or immutable runs, assertions, commands, and the environment. Reopen the
 references after the invocation to confirm they still identify the observed
 results. Candidate and contract hashes remain unchanged.
 
+Repeat with the saved proof report as the only evidence container. Allow several
+rows to reference one section containing the command, named assertions, actual
+outputs, environment, and candidate identity. Pass when proof accepts sufficient
+evidence without demanding separate artifacts per row. Reopen that report outside
+the candidate and check its observations. A report listing only commands to run
+or "all tests passed" still fails to establish the requirements.
+
 ## 2. Known defect versus unavailable evidence
 
 First supply a candidate that silently catches `OSError`, then run `/prove`.
@@ -159,6 +166,13 @@ revision, but proof must still preserve the exact contract text it used. Neither
 case permits editing the contract during proof or treating an old report as
 evidence that a newly added promise holds.
 
+Repeat across fresh sessions. Link an authorized restart amendment from the
+source while leaving the canonical contract at `v1`. Give `/prove` only the source
+reference. Pass when it discovers the amendment, reports `NOT PROVEN` for the
+contract discrepancy, and hands it to `/acceptance-contract` without editing.
+Have the invoking workflow save the reconciled contract and preserve `v1`.
+A fresh session must retrieve `v2` and require new proof for every row.
+
 ## 12. Green CI after a repair does not refresh acceptance
 
 Use a proven candidate and a failed PR workflow in a throwaway repository with
@@ -196,3 +210,23 @@ in [acceptance scenario 12](./acceptance-contract-scenarios.md#12-check-standalo
 also passed using Node's dereferencing copy operation, matching the inspected
 `skills` CLI 1.7.0 installer. Live GitHub Actions and the remaining manual
 scenarios were not executed.
+
+## Sampled handoff validation, 2026-09-22
+
+Separate agent contexts used standalone skill copies and disposable `save_report`
+repositories. The invoking workflow saved documentation in Git and transferred it
+to fresh local clones before proof. The proof agents received only the source
+reference, repository path, skill, and an external report destination.
+
+| Check | Observed result |
+|---|---|
+| Plan and save locally | Created four `planned` rows at `docs/acceptance-contracts/save-report.md`, saved v1, and confirmed retrieval without implementing or running proof |
+| Authorized amendment during interrogation | Recorded the changed missing-parent promise while preserving contract v1 and product code. The first handoff lacked a source link; after the protocol required one, the agent added it |
+| Fresh checkout and self-contained proof report | Retrieved v1 from the source reference, proved all four rows with eight behavioral cases, and saved commands, assertions, outputs, identities, and captured contract text in one report outside the candidate |
+| Fresh proof with a pending amendment | Followed the source's amendment link and returned `NOT PROVEN` for the conflict with v1, handing reconciliation to `acceptance-contract` without changing the candidate or contract |
+
+Both proof reports were reopened and both candidates remained clean. The standalone
+copy check, Ruby YAML validation, and local Markdown link checks passed. The
+bundled Python validator remained unavailable because PyYAML was not installed.
+These focused checks do not establish the full scenario suite, tracker publishing,
+or integration with Matt's implementation workflow.
