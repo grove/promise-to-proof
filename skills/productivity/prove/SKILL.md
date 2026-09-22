@@ -16,8 +16,8 @@ It defines the spec envelope, identities, evidence, and verdicts.
 - `PROVEN`: every material requirement has credible evidence, no contract
   discrepancy remains, and the candidate stayed fixed during verification.
 - `NOT PROVEN`: any requirement lacks evidence, a counterexample remains, the
-  contract is incomplete or ambiguous, tooling is unavailable, or candidate
-  identity is uncertain.
+  contract is incomplete or ambiguous, required verification is unavailable,
+  or candidate identity is uncertain.
 - A concrete violation is `disproven`; unavailable or inconclusive evidence is
   `not proven`, not `disproven`.
 
@@ -25,6 +25,9 @@ It defines the spec envelope, identities, evidence, and verdicts.
 
 - Reconcile the versioned acceptance contract with the source and authorized
   amendments. Report discrepancies without narrowing or rewriting the contract.
+- Judge requirement evidence independently of overall PR status, following the
+  protocol's proof and merge readiness rules. Leave unrelated CI repair to
+  `/fix-pr` without waiting for green checks or making it a prerequisite to proof.
 - Use a clean commit as the candidate when possible. A dirty or changing
   worktree is `NOT PROVEN` unless its exact snapshot can be established.
 - A proof run may not mutate the candidate, worktree, or contract. If any such

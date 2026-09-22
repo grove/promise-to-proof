@@ -17,6 +17,18 @@ The contract is candidate-independent. Its acceptance matrix uses only `planned`
 and `gap` as plan states. Candidate-specific verdicts belong only in proof
 reports, including verdicts imported from earlier runs.
 
+Proof and merge readiness are separate. Proof requires neither an open PR nor
+green CI. Unrelated failed or pending checks do not block `PROVEN`, and proof
+does not wait for them. CI affects a requirement verdict when it supplies
+evidence, reveals a counterexample, or prevents verification without another
+credible evidence path. Repository standards and other binding constraints
+still apply.
+
+Before merge, require current proof, green required checks for the final
+candidate, and the repository's review requirements. Use `/fix-pr` to repair CI
+failures separately from proof. A repair that changes the candidate requires
+fresh proof under the handoff rules below.
+
 ## Spec envelope
 
 The lower bound is completeness. Every material promise must reach its complete
