@@ -1,4 +1,4 @@
-# How to deliver a change with Grove
+# How to deliver a change with Promise to Proof
 
 Start here when you have a change to deliver. Pick the path that matches your
 source, save each result, and give the next skill the saved result rather than a
@@ -93,7 +93,7 @@ create a second issue merely to store the contract.
 gh issue create --title "Retry failed uploads" --body "Users can retry a failed upload after restarting the app."
 ```
 
-For a project using Grove's skills, follow that project's issue-tracker rules.
+For a project using Promise to Proof, follow that project's issue-tracker rules.
 `plan-acceptance` also accepts a specification path or agreed outcome, so a local
 specification can remain the source when no tracker issue is required. If you
 later publish a decomposition from a local source, `slice-contract` may create

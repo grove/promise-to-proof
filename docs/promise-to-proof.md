@@ -9,7 +9,7 @@ look right while one sentence from the issue never reaches a test. A test suite
 can pass while its assertions miss the promised result. A green pull request can
 hide a weakened check.
 
-Use Grove's native skills to plan acceptance, implement the agreed capability,
+Use Promise to Proof's native skills to plan acceptance, implement the agreed capability,
 review a captured candidate, and prove the result. [Matt Pocock's skills](https://github.com/mattpocock/skills)
 can help with planning and TDD, but the delivery path works without them.
 
@@ -27,7 +27,7 @@ Merge still requires current proof for the final candidate.
 
 ## Install the skills
 
-Install Grove:
+Install the skills:
 
 ```bash
 npx skills@latest add grove/promise-to-proof
@@ -43,7 +43,7 @@ npx skills@latest add mattpocock/skills
 
 Matt's optional `setup-matt-pocock-skills` configures its tools for your repository.
 Keep the issue tracker, triage labels, and documentation locations consistent
-with the sources Grove reads.
+with the sources it reads.
 
 To list the current skills from a clone, run:
 
@@ -83,7 +83,7 @@ settled, turn the conversation into a durable specification:
 ```
 
 Existing tickets from `/to-tickets` or another planning workflow remain valid
-inputs. To divide an agreed parent contract, use Grove's optional
+inputs. To divide an agreed parent contract, use the optional
 [slicing step](#divide-large-work-without-changing-the-agreement).
 
 Use `/wayfinder` before `/to-spec` when the work is too large or uncertain for
@@ -298,7 +298,7 @@ small diffs can omit behavior too.
 
 ## Implement the saved agreement
 
-Pass the ticket or canonical contract path to Grove's implementation skill:
+Pass the ticket or canonical contract path to the implementation skill:
 
 ```text
 /implement-contract #124
