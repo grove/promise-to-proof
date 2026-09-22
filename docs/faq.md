@@ -140,10 +140,10 @@ No. Each skill returns a result and a handoff. Invoke the next skill with the
 saved contract, candidate, report, and identities it needs. This lets a person
 review decisions and lets another session resume the work without guessing.
 
-### Do I need Matt Pocock's skills or TDD?
+### Do I need external planning or TDD skills?
 
-No. Matt Pocock's planning and TDD skills can help prepare a specification or
-develop behavior, but the project's delivery path works without them. Use test-first
+No. Separate planning and TDD skills can help prepare a specification or develop
+behavior, but the project's delivery path works without them. Use test-first
 development where a useful seam exists, and provide credible evidence for each
 contract promise regardless of the development method.
 
