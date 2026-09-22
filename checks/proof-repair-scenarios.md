@@ -188,6 +188,30 @@ changes. Green CI must not be relabeled `PROVEN`. If publication or real CI is
 unavailable, record this scenario as unexecuted rather than simulating a
 successful `/fix-pr` result.
 
+## 13. Proof is independent of merge readiness
+
+Use the valid `save_report` fixture and contract from scenario 1, with local
+execution available. Run independent cases with no PR, a required CI job pending,
+and a required CI job failing because an unrelated documentation publishing
+service is unavailable. Supply the job's purpose and logs so its relevance can
+be assessed. Keep the candidate and contract fixed throughout each proof run.
+
+Pass when `/prove` establishes every row and reports `PROVEN` in each case
+without requiring a PR, waiting for CI, or invoking `/fix-pr`. Any mentioned CI
+blocker stays separate from requirement gaps. `PROVEN` must not imply permission
+to merge while required checks remain pending or failed.
+
+Repeat with the error-swallowing defect from scenario 2 and CI evidence that
+demonstrates the R4 violation. Pass when R4 is `disproven` and the overall result
+is `NOT PROVEN`. The verifier must not dismiss relevant evidence because CI
+repair belongs to `/fix-pr`.
+
+Finally, use the valid candidate but make CI the only available verification
+path for R4, with its job pending and no saved evidence. Pass when R4 is
+`not proven` and the overall result is `NOT PROVEN` because evidence is missing,
+not because every required PR check must be green. Scenario 12 still governs
+fresh proof after a CI repair changes the candidate.
+
 ## Sampled validation, 2026-09-22
 
 Independent agent runs used standalone copied skills against disposable JSON
