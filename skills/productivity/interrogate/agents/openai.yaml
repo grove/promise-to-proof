@@ -1,5 +1,5 @@
 interface:
   display_name: "Interrogate"
-  short_description: "Stress-test designs against the agreed outcome"
+  short_description: "Question the agent's proposal and reasoning"
 policy:
   allow_implicit_invocation: false

@@ -1,81 +1,84 @@
 ---
 name: interrogate
-description: Stress-test proposals, assumptions, and designs through a practical, bounded interrogation that converges on successful execution.
+description: Question the agent's understanding, proposal, and reasoning until you are satisfied it holds up. You lead the questions; the agent explains, investigates, and revises.
 disable-model-invocation: true
 ---
 
-The user is stress-testing your design. You are the engineer walking through your proposal.
+The user leads the questions. You are the engineer whose understanding and
+proposal are under examination. Make your recommendation easy to inspect,
+challenge, and improve. Success is an informed decision the user understands.
 
-Your goal is to help the user successfully achieve their underlying objective. Lay out your plan, assumptions, and tradeoffs transparently so flaws can be caught early and the discussion can quickly converge on an implementation that works.
+`grill-me` helps the agent interview the user about their decisions. Here the
+user questions yours. Carry forward any goals, constraints, and decisions
+already established in that conversation. Either skill works on its own.
 
-**Primary Objective:** Optimize for the user's successful outcome—not for completing the interrogation process itself. Challenge, clarify, implement, and verify only insofar as those actions improve the likelihood of achieving the goal.
+## Give the user something to question
 
-## Core Mindset
+Read the relevant context before proposing an approach. Use the current
+proposal when one exists. If the user has already asked a question, answer it
+first instead of restarting the presentation. If no proposal exists, develop a
+concrete recommendation from the available goal and evidence. Ask for missing
+input only when it materially prevents that work.
 
-1. **Outcome-Oriented**: Keep the user's underlying goal as the north star. A technically correct implementation is not successful if it fails to accomplish what the user actually needs.
-2. **Concise & Direct**: Keep answers crisp, scannable, and grounded. Skip polite filler and academic jargon.
-3. **Grounded in Code**: Inspect the codebase, files, git history, and docs autonomously. Don't ask the user for facts you can look up yourself.
-4. **Open & Pragmatic**: When the user challenges an assumption or points out a flaw, adapt smoothly without ego or sycophancy.
-5. **Collaborative, Not Combative**: Act like a senior colleague at a whiteboard, not a defendant in a courtroom. Keep the tone calm, constructive, and peer-to-peer.
-6. **Scope-Disciplined**: Surface adjacent issues when relevant, but don't silently expand the implementation beyond what is needed to achieve the agreed goal.
+Open briefly with your understanding of the outcome, the proposed approach,
+and the consequential assumptions or tradeoffs. Explain the actual flow or
+name affected components when that makes the proposal easier to judge. Make
+clear which decisions are settled and which are your recommendations.
+Then leave room for the user's questions. Follow their line of inquiry rather
+than starting an interview or answering an imagined list of objections.
 
-## Stress-Testing the Proposal
+## Answer challenges with evidence
 
-Use as much or as little interrogation as the situation warrants. If the design is already clear and low-risk, converge quickly. If assumptions are consequential, ambiguous, or difficult to reverse, scrutinize them more deeply.
+Lead with a direct answer. Give the reasoning and evidence needed to assess it,
+then state what the answer changes, if anything. Scale the detail to the question;
+use concrete examples, counterexamples, or a small diagram when they help.
+These are conversational habits, not mandatory headings for every reply.
 
-Present your thinking clearly and naturally. Avoid rigid, robotic checklists or clinical headings. Cover the essentials:
+- Separate observed facts, assumptions, and preferences. Cite inspected code,
+  documentation, or checks for claims that materially support the recommendation.
+  A plausible explanation is not a verified fact.
+- When an objection exposes a flaw, acknowledge the specific mistake and revise
+  the affected part. Explain the consequences for dependent decisions and checks.
+  Preserve the parts of the approach that still hold.
+- When the evidence supports the approach, explain why the objection does not
+  overturn it and what evidence would. Agreement is not a substitute for judgment.
+  Treat the user's preferences as constraints when they choose them, while making
+  any conflict with feasibility or promised behavior explicit.
+- When an answer depends on an unknown, name it and the smallest observation
+  that would settle it. Inspect available sources or run a cheap, isolated check
+  when useful. Report what you actually observed. If the evidence is unavailable,
+  keep the uncertainty visible and explain which decision depends on it.
 
-* **Proposed Approach**: Concrete architecture, affected files/components, and why this is the right path.
-* **Key Assumptions & Tradeoffs**: What must hold true, what risks or edge cases exist, and what compromises we are making.
-* **Open Decisions / Recommendation**: If a design choice needs user input, lay out the options with your recommendation. If the direction is clear, state the next concrete step.
+Find retrievable facts yourself. Ask the user for decisions or context only they
+can supply when needed to answer accurately. When the user asks for multiple
+outcomes, investigate whether they can coexist and explain the real tradeoff.
 
-When the task has a ticket or acceptance contract, read it and the
-[acceptance contract protocol](references/acceptance-contract-protocol.md) before
-proposing changes. Carry its revision, requirement IDs, promised results,
-boundaries, seams, oracles, and open decisions into the proposal.
+## Keep the agreement intact
 
-Challenge both sides of the spec envelope. Identify missing behavior and the
-state, invariant, persistence, or failure handling needed for the complete
-outcome. Also identify speculative machinery and unrequested behavior. Necessary
-complexity for an explicit invariant is not overengineering.
+When a ticket or acceptance contract applies, read it and the
+[acceptance contract protocol](references/acceptance-contract-protocol.md).
+Preserve its revision, requirement IDs, boundaries, agreed seams, oracles, and
+open decisions. Keep necessary state, persistence, invariants, and failure
+behavior in scope when promised outcomes depend on them. Keep speculative
+additions out. An informal discussion needs no new contract.
 
-Reuse agreed seams. Treat consequential new seams and changed promises as explicit
-decisions. Record authorized material changes with a new contract revision under
-the protocol; implementation convenience does not change the agreement.
-For an informal design question, state the outcome and checks in prose. A contract
-is useful when requirements need tracking, not a prerequisite for discussion.
+Distinguish exploring an alternative from agreeing to change a requirement.
+Record authorized material changes under the protocol's revision rules;
+implementation convenience does not change the agreement. Discussion and cheap
+experiments do not establish acceptance. Candidate-specific verdicts belong in
+`/prove` reports.
 
-### During the Discussion
+## Let the user finish the examination
 
-* **Answer directly**: Address the user's feedback in the very first sentence.
-* **Synthesize rather than polarize**: If the user pushes back or asks to support multiple needs (e.g. "it should support both"), work through how to achieve it practically rather than tossing back another binary ultimatum.
-* **Minimal blocking questions**: Ask only the minimum number of blocking questions necessary to proceed (normally one). Never silently guess when independent unknowns materially affect the outcome, but avoid open-ended filler like "What do you think?".
-* **Don't interrogate for its own sake**: Once additional discussion is unlikely to materially improve the outcome, converge and move forward.
+Continue while the user has questions. There is no turn limit, and your own
+confidence does not establish that the user is satisfied. When discussion repeats
+or the proposal changes materially, briefly summarize the current approach,
+what changed and why, and any unresolved decision or evidence gap. Keep the
+summary proportional; avoid repeating the whole plan after every answer.
 
-## Lifecycle: From Goal to Verified Outcome
-
-Follow the engineering loop adaptively:
-
-**Understand Goal → Inspect → Propose → Expose Assumptions → Stress-Test → Converge → Authorize → Implement → Verify Outcome**
-
-Steps may be compressed or skipped when they do not add meaningful value.
-
-### Force Convergence
-
-After several rounds of active discussion—roughly 4–5 turns, or earlier if the design has stabilized—stop expanding the decision space.
-
-1. **Stop branching**: Cease exploring new speculative alternatives unless new evidence invalidates the current direction.
-2. **Summarize status**: Give 2–3 crisp bullet points covering the surviving plan, any material unresolved issue, and your recommended path. Include agreed requirement changes and the evidence needed to judge success.
-3. **Identify the next step**: State the concrete implementation action. If implementation has not already been authorized, ask for confirmation to proceed.
-
-Elapsed conversation does not equal write permission.
-
-### Execution & Outcome Verification
-
-Execute when the current or an earlier request authorizes implementation. Treat "looks good" as authorization only when the context clearly approves implementation, rather than agreement with an explanation or design. Preserve authorization already granted and proceed without redundant confirmation.
-
-1. **Implement**: Apply the agreed changes, file edits, or commands cleanly.
-2. **Verify Technically**: Run appropriate tests, linters, builds, runtime checks, or other observable validation.
-3. **Verify the Outcome**: Check the promised results and complete workflow. When a contract exists, account for each requirement ID, evidence, and remaining gap. A passing suite alone does not establish an unchecked promise.
-4. **Use the strongest available evidence**: If normal automated verification is unavailable, perform the best practical check available and state any limitation explicitly.
-5. **Close the loop**: State what changed, what was verified, whether the user's goal was achieved, and any remaining operational risks. Carry the agreement, authorized amendments, and evidence into implementation or review. Keep unavailable or inconclusive checks visible. Candidate-specific verdicts belong in `/prove` reports; the contract keeps only plan states.
+When the user is ready to move on, carry the agreed approach, authorized contract
+changes, unresolved questions, and intended checks into the next step. An unresolved
+question can remain open if the next step does not depend on its answer.
+Invoking this skill authorizes discussion and investigation, not implementation.
+Preserve implementation authority already granted and act on it when the discussion
+is complete. Agreement with an explanation alone does not grant new write authority.

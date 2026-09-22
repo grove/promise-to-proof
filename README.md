@@ -18,7 +18,7 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 | Skill | Use it when | It gives you |
 |---|---|---|
 | [`critique`](./skills/productivity/critique/SKILL.md) | You explicitly request an independent review of a proposal against its intended outcome | Evidence-backed advice and a recommendation |
-| [`interrogate`](./skills/productivity/interrogate/SKILL.md) | A design needs stress-testing | An agreed approach, assumptions, and open decisions |
+| [`interrogate`](./skills/productivity/interrogate/SKILL.md) | You want to question the agent's proposal and reasoning | Evidence-backed answers, a revised approach, and explicit unknowns |
 | [`acceptance-contract`](./skills/productivity/acceptance-contract/SKILL.md) | A ticket needs clear acceptance criteria | A candidate-independent revision with stable requirement IDs and evidence plans |
 | [`prove`](./skills/productivity/prove/SKILL.md) | Implementation is ready to verify | `PROVEN` or `NOT PROVEN` with evidence |
 | [`repair-proof`](./skills/productivity/repair-proof/SKILL.md) | Proof found a specific gap | A scoped repair report; fresh proof is still required |
@@ -61,7 +61,7 @@ GitHub checkboxes with the contract, but never use them as proof.
 | `prove` | Verify one fixed candidate | Does not edit, commit, push, or publish |
 | `repair-proof` | Repair named implementation or evidence gaps | Does not declare acceptance |
 | `fix-pr` | Repair a failed PR workflow | Does not prove the whole ticket |
-| `interrogate` | Reach a design decision | Does not imply implementation authority |
+| `interrogate` | Let you examine the agent's proposal through questions | You lead the discussion; invocation does not grant implementation authority |
 
 ## What the results mean
 
@@ -79,7 +79,7 @@ GitHub checkboxes with the contract, but never use them as proof.
 
 ```text
 /critique <idea, document path, or GitHub issue reference>
-/interrogate Should we use approach A or B?
+/interrogate Walk me through your proposal so I can question it.
 /acceptance-contract #123
 /prove #123
 /repair-proof #123

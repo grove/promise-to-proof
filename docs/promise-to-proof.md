@@ -227,11 +227,18 @@ areas can fail far from the edited line.
 Challenge both missing required behavior and speculative machinery. Reuse the
 agreed testing seams; treat consequential new seams as explicit decisions.
 
-Use the conversation to reach a decision, not to generate an unlimited list of
-possibilities. Once the plan survives the important objections, state the
-chosen approach and any authorized requirement changes. Use implementation
-authority already present in the request. If the request covers design only,
-obtain implementation authority before editing code.
+`grill-me` lets the agent interview you about your decisions. `interrogate`
+lets you question the agent's understanding and proposal. You can use either
+on its own, or carry the decisions from `grill-me` into `interrogate` without
+repeating the interview.
+
+Lead with the questions you need answered. The agent explains the evidence,
+revises the proposal when an objection holds, and identifies checks that could
+settle unknowns. Continue until you are ready to move on; there is no turn limit.
+Then carry the agreed approach, authorized requirement changes, and unresolved
+questions into the next step. Use implementation authority already present in
+the request. If the request covers design only, obtain implementation authority
+before editing code.
 
 Skip `interrogate` when the design is already clear and the cost of a wrong
 choice is low. A one-line correction with an existing regression seam rarely
