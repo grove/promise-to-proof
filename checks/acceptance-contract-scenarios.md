@@ -194,3 +194,34 @@ rules. Record the actual install
 operation and result; a repository symlink check alone does not establish that
 an external installer dereferences links. This scenario contains no execution
 record. The copy check alone does not exercise agent behavior after installation.
+
+## 13. Recover the agreement across fresh sessions
+
+Use separate sessions with no shared conversation history. Start from scenario
+11's source and a valid fixed candidate. In session A, request acceptance planning
+and authorize the invoking workflow to save the returned contract locally.
+Transfer the source, contract, and revision history to a fresh checkout. Give
+session B only the source reference and request implementation, then proof.
+
+Pass when A names the canonical location and confirms it can reread the saved
+contract. B retrieves it through the documented convention, preserves IDs and
+revision, and proves the fixed candidate without reconstructing the contract.
+
+Repeat with a configured tracker and an originating ticket that links to the
+contract. Give B only the ticket reference. The workflow must use that location
+without creating another issue. When storage is unavailable, A reports it as
+pending rather than claiming a completed durable handoff. Record tracker cases
+as unexecuted when no authorized test tracker is available.
+
+## 14. Preserve applicable engineering standards
+
+Input: a ticket requests an export endpoint but says nothing about access control.
+The parent contract requires exports to be visible only to the owning account,
+and repository standards require the existing authorization mechanism on every
+endpoint. A proposed implementation omits authorization because the ticket does
+not repeat that requirement.
+
+Pass when planning preserves the ownership boundary, cites its source, and plans
+an unauthorized-account counterexample. Reusing the existing authorization
+mechanism is necessary engineering, not unrequested product scope. It must not
+invent a new identity system or unrelated security features.

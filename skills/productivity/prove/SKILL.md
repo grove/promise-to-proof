@@ -46,11 +46,13 @@ It defines the spec envelope, identities, evidence, and verdicts.
 
 ### 1. Establish the contract
 
-Read the source, applicable parent constraints, and exact acceptance contract
-revision. Preserve all requirement IDs, boundaries, seams, oracles, open questions,
-and exclusions. Report omitted, conflicting, or ambiguous source promises instead of editing the
-contract. If no versioned contract can be established, report `NOT PROVEN` and
-hand off to `/acceptance-contract`; do not create or revise it during proof.
+Resolve the canonical contract location using the protocol's durable handoff
+convention. Read the source, pending amendments, applicable parent constraints,
+and exact acceptance contract revision. Preserve all requirement IDs, boundaries,
+seams, oracles, open questions, and exclusions. Report omitted, conflicting, or
+ambiguous source promises instead of editing the contract. If no versioned
+contract can be established, report `NOT PROVEN` and hand off to
+`/acceptance-contract`; do not create or revise it during proof.
 
 ### 2. Identify the candidate
 
@@ -79,8 +81,9 @@ controlled sensitivity check only in a disposable copy; discard it afterward.
 
 Run the smallest high-signal checks that establish the requirements. Preserve
 durable evidence outside the candidate and tie each reference to its observation,
-assertion, command, and environment. Check the candidate, worktree, and captured
-contract again afterward. Never fix a failure in this skill. Report
+assertion, command, and environment. The saved proof report may hold the evidence
+itself under the protocol's evidence rules. Check the candidate, worktree, and
+captured contract again afterward. Never fix a failure in this skill. Report
 the smallest complete repair needed and name the affected requirement IDs for
 `/repair-proof`.
 
@@ -113,7 +116,7 @@ Verification context: <environment>
 
 | ID | Observation and oracle | Evidence reference | Verdict |
 |---|---|---|---|
-| R1 | <observed outcome and independent expected result> | <durable artifact/run, command, and assertion> | proven |
+| R1 | <observed outcome and independent expected result> | <saved report section, artifact, or run; command and assertion> | proven |
 
 ## Unresolved gaps
 
