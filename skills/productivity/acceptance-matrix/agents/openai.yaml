@@ -1,5 +1,5 @@
 interface:
-  display_name: "Acceptance Matrix"
-  short_description: "Turn ticket promises into testable acceptance requirements"
+  display_name: "Acceptance Matrix (Deprecated)"
+  short_description: "Deprecated alias for Acceptance Contract"
 policy:
   allow_implicit_invocation: false

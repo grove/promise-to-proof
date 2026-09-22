@@ -117,6 +117,6 @@ Keep cheap experiments isolated from reviewed artifacts and avoid persistent
 changes to external systems.
 
 When useful, suggest user-led `interrogate` for unresolved design decisions,
-`acceptance-matrix` for acceptance planning, or proceeding directly. These are
+`acceptance-contract` for acceptance planning, or proceeding directly. These are
 optional next steps, not automatic invocations. `prove` verifies implementation;
 this critique neither grants implementation authority nor declares acceptance.

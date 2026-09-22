@@ -59,10 +59,12 @@ Determine what the failed workflow was meant to guarantee, such as validating
 the PR branch before merge or running required checks for a specific commit.
 Define success from that guarantee.
 
-Read the linked ticket and any supplied acceptance matrix when they define the
-behavior under repair. Preserve requirement IDs, promised results, and relevant
-boundaries. If that contract is unavailable or ambiguous, continue only with
-repairs whose correctness does not depend on guessing the missing requirement.
+Read the [acceptance contract protocol](references/acceptance-contract-protocol.md)
+and the linked ticket and acceptance contract when they define the behavior under
+repair. Preserve the revision, requirement IDs, promised results, boundaries,
+agreed seams, and independent oracles. If that contract is unavailable or
+ambiguous, continue only with repairs whose correctness does not depend on
+guessing the missing requirement.
 Report the gap; a CI failure does not authorize changing the ticket's promises.
 
 ### 2. Diagnose before editing
@@ -96,7 +98,7 @@ is understood.
 
 ### 3. Repair and verify
 
-Apply the smallest correct repair at the layer that owns the failure. Keep
+Apply the smallest complete repair at the layer that owns the failure. Keep
 required checks and their failure semantics, subject to the evidence rule in
 `Forbidden repairs`. For product and test
 defects, add or strengthen the focused regression evidence before declaring
@@ -156,10 +158,12 @@ For either outcome, report the intended operation, failure classification,
 earliest causal error, files changed, verification performed, required-check
 status, and the remaining reason when `NOT FIXED`.
 Include the repaired SHA, affected requirement IDs, replaced evidence, and any
-acceptance gaps. Changes to implementation or evidence require reassessing prior
-proof and review. Identify which results need refreshing on the repaired commit;
-use `/prove` for full acceptance verification and the repository's review process
-for code quality when those steps are requested or required.
+acceptance gaps. Record the preserved contract revision when one exists.
+Any changed candidate leaves prior proof tied to the old candidate. Changes to
+product behavior, acceptance evidence, or relevant tests require fresh `/prove`
+against every requirement before acceptance. Green CI cannot refresh proof.
+Identify stale proof and review results, and hand off to `/prove` and the
+repository's review process when those steps are requested or required.
 
 Invoking `/fix-pr` authorizes scoped inspection, edits, commit, push, and
 workflow reruns for the target PR or workflow run. It does not authorize

@@ -29,12 +29,20 @@ Present your thinking clearly and naturally. Avoid rigid, robotic checklists or 
 * **Key Assumptions & Tradeoffs**: What must hold true, what risks or edge cases exist, and what compromises we are making.
 * **Open Decisions / Recommendation**: If a design choice needs user input, lay out the options with your recommendation. If the direction is clear, state the next concrete step.
 
-When the task has a ticket or acceptance matrix, read it before proposing changes.
-Carry its requirement IDs, promised results, boundaries, and open decisions into
-the proposal. Explain how the proposed workflow reaches the intended outcome and
-what evidence would demonstrate it. Record user-authorized changes against the
-affected requirements; an implementation shortcut does not change the agreement.
-For an informal design question, state the outcome and checks in prose. A matrix
+When the task has a ticket or acceptance contract, read it and the
+[acceptance contract protocol](references/acceptance-contract-protocol.md) before
+proposing changes. Carry its revision, requirement IDs, promised results,
+boundaries, seams, oracles, and open decisions into the proposal.
+
+Challenge both sides of the spec envelope. Identify missing behavior and the
+state, invariant, persistence, or failure handling needed for the complete
+outcome. Also identify speculative machinery and unrequested behavior. Necessary
+complexity for an explicit invariant is not overengineering.
+
+Reuse agreed seams. Treat consequential new seams and changed promises as explicit
+decisions. Record authorized material changes with a new contract revision under
+the protocol; implementation convenience does not change the agreement.
+For an informal design question, state the outcome and checks in prose. A contract
 is useful when requirements need tracking, not a prerequisite for discussion.
 
 ### During the Discussion
@@ -68,6 +76,6 @@ Execute when the current or an earlier request authorizes implementation. Treat 
 
 1. **Implement**: Apply the agreed changes, file edits, or commands cleanly.
 2. **Verify Technically**: Run appropriate tests, linters, builds, runtime checks, or other observable validation.
-3. **Verify the Outcome**: Check the promised results and complete workflow. When a matrix exists, account for each requirement ID, evidence, and remaining gap. A passing suite alone does not establish an unchecked promise.
+3. **Verify the Outcome**: Check the promised results and complete workflow. When a contract exists, account for each requirement ID, evidence, and remaining gap. A passing suite alone does not establish an unchecked promise.
 4. **Use the strongest available evidence**: If normal automated verification is unavailable, perform the best practical check available and state any limitation explicitly.
-5. **Close the loop**: State what changed, what was verified, whether the user's goal was achieved, and any remaining operational risks. Carry the agreement, authorized amendments, and evidence into implementation or review. Keep unavailable or inconclusive checks visible; reserve matrix status `proven` for independent acceptance by `/prove`.
+5. **Close the loop**: State what changed, what was verified, whether the user's goal was achieved, and any remaining operational risks. Carry the agreement, authorized amendments, and evidence into implementation or review. Keep unavailable or inconclusive checks visible. Candidate-specific verdicts belong in `/prove` reports; the contract keeps only plan states.
