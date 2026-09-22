@@ -1,12 +1,15 @@
-# Skills
+# Promise to Proof
 
-Practical agent skills for turning requirements into implementation, proof, and repair.
+Agent skills for carrying software requirements from promise to implementation
+and evidence-backed acceptance.
 
-The skills are written for agent-skill-compatible coding tools. They use a
-saved acceptance contract to carry the source ticket's promises through
-implementation, review, and proof. Implementation, review, and proof reports
-identify the contract and exact candidate they describe. The skills do not
-provide a workflow runtime.
+It keeps the agreement, implementation, review, and proof separate so agents
+can deliver exactly the promised capability: no less in substance, no more in scope.
+
+The skills work with agent-skill-compatible coding tools. A saved acceptance
+contract carries the source ticket's promises through implementation, review,
+and proof. Reports identify the contract and exact candidate they describe.
+The skills do not provide a workflow runtime.
 
 New here? Start with the [HOW-TO](./docs/how-to.md) to choose and run a delivery
 path. For questions about issues, slicing, review, and proof, read the
@@ -15,7 +18,7 @@ gives the detailed workflow; the [acceptance contract protocol](./docs/acceptanc
 defines the shared contract, revision, and proof rules. Matt Pocock's planning
 and TDD skills are optional additions.
 
-Issues and specifications for this repository live in [GitHub Issues](https://github.com/grove/skills/issues).
+Issues and specifications for this repository live in [GitHub Issues](https://github.com/grove/promise-to-proof/issues).
 
 ## Choose a skill
 
@@ -67,13 +70,13 @@ instructions describe that input.
 Install the full collection:
 
 ```bash
-npx skills@latest add grove/skills
+npx skills@latest add grove/promise-to-proof
 ```
 
 Install one skill:
 
 ```bash
-npx skills@latest add grove/skills --skill plan-acceptance
+npx skills@latest add grove/promise-to-proof --skill plan-acceptance
 ```
 
 Update one installed skill:

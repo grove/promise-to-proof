@@ -30,7 +30,7 @@ Merge still requires current proof for the final candidate.
 Install Grove:
 
 ```bash
-npx skills@latest add grove/skills
+npx skills@latest add grove/promise-to-proof
 ```
 
 Use the repository's existing issue-tracker and domain-document configuration.
