@@ -2,9 +2,11 @@
 
 Practical agent skills for turning requirements into implementation, proof, and repair.
 
-The skills are written for agent-skill-compatible coding tools. They keep the
-source ticket's promises visible, make evidence explicit, and carry unresolved
-questions into the next step. They do not provide a workflow runtime.
+The skills are written for agent-skill-compatible coding tools. They use a
+saved acceptance contract to carry the source ticket's promises through
+implementation, review, and proof. Implementation, review, and proof reports
+identify the contract and exact candidate they describe. The skills do not
+provide a workflow runtime.
 
 Follow [How to take a ticket from promise to proof](./docs/promise-to-proof.md)
 for the native delivery workflow. Matt Pocock's planning and TDD skills are
@@ -33,10 +35,16 @@ Optionally invoke `critique` to assess an idea, issue, specification, plan, or
 proposal before committing to it. Its advice requires no downstream skill.
 
 ```text
-Source → plan-acceptance → saved acceptance contract → implement-contract
-       → captured candidate → review-implementation → prove
-       → repair-gaps if needed → fresh proof and review
+source → plan-acceptance → saved acceptance contract
+       → [slice-contract → child tickets → plan-acceptance for each child] if needed
+       → implement-contract → captured candidate
+       → review-implementation and prove, in either order
+       → [repair-gaps → fresh review and proof] for named proof gaps
 ```
+
+`plan-acceptance` defines what must be true. `implement-contract` builds it,
+`review-implementation` checks the candidate's fidelity and engineering, and
+`prove` checks each promised outcome against evidence from that candidate.
 
 1. **Plan acceptance.** Run `plan-acceptance` on the ticket or specification.
    It records a revision such as `v1`, stable `R` IDs, boundaries, seams,
@@ -56,6 +64,15 @@ Source → plan-acceptance → saved acceptance contract → implement-contract
    contract, verification, or candidate identity gaps before running proof again.
 6. **Refresh results.** Every candidate change needs fresh proof of every row and
    refreshed review. A changed agreement returns to `plan-acceptance` first.
+
+Use these handoffs when work changes course:
+
+| Result | Next step |
+|---|---|
+| A review finding within the current agreement | Pass the saved finding and its ID to `implement-contract`. |
+| A named implementation or evidence gap in a matching `NOT PROVEN` proof | Pass the proof report and requirement IDs to `repair-gaps`. A review finding alone is not enough. |
+| A changed promise, boundary, or consequential seam | Return to `plan-acceptance` to reconcile the agreement before dependent work. |
+| A failed PR workflow | Use `fix-pr`. If the candidate changes, refresh review and full proof. |
 
 For large work, optionally insert `slice-contract` after saving the parent
 contract. Approve the breakdown and authorize publication to the named tracker
