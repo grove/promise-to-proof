@@ -1,5 +1,9 @@
 # How to take a ticket from promise to proof
 
+For a shorter set of task recipes, start with the [HOW-TO](./how-to.md).
+The [FAQ](./faq.md) answers common questions about issue creation, slicing,
+review, and proof. This guide gives the detailed path and examples.
+
 A convincing implementation is not the same as a finished ticket. The code can
 look right while one sentence from the issue never reaches a test. A test suite
 can pass while its assertions miss the promised result. A green pull request can

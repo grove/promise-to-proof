@@ -8,10 +8,12 @@ implementation, review, and proof. Implementation, review, and proof reports
 identify the contract and exact candidate they describe. The skills do not
 provide a workflow runtime.
 
-Follow [How to take a ticket from promise to proof](./docs/promise-to-proof.md)
-for the native delivery workflow. Matt Pocock's planning and TDD skills are
-optional additions. The [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
-defines the shared contract, revision, and proof rules.
+New here? Start with the [HOW-TO](./docs/how-to.md) to choose and run a delivery
+path. For questions about issues, slicing, review, and proof, read the
+[FAQ](./docs/faq.md). [How to take a ticket from promise to proof](./docs/promise-to-proof.md)
+gives the detailed workflow; the [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
+defines the shared contract, revision, and proof rules. Matt Pocock's planning
+and TDD skills are optional additions.
 
 Issues and specifications for this repository live in [GitHub Issues](https://github.com/grove/skills/issues).
 
@@ -29,127 +31,19 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 | [`repair-gaps`](./skills/productivity/repair-gaps/SKILL.md) | Proof found specific repairable gaps | A scoped repair report; fresh proof is still required |
 | [`fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
 
-## Typical workflow
+## Follow the workflow
 
-Optionally invoke `critique` to assess an idea, issue, specification, plan, or
-proposal before committing to it. Its advice requires no downstream skill.
+Start with the [HOW-TO](./docs/how-to.md) for a GitHub issue, a local
+specification, a large parent contract, a review finding, or failed proof. It
+names the saved contract, candidate, and reports each phase needs. Read the
+[FAQ](./docs/faq.md) when you need to distinguish child proof from parent proof,
+review findings from proof gaps, or acceptance from CI and merge readiness.
 
-```text
-source → plan-acceptance → saved acceptance contract
-       → [slice-contract → child tickets → plan-acceptance for each child] if needed
-       → implement-contract → captured candidate
-       → review-implementation and prove, in either order
-       → [repair-gaps → fresh review and proof] for named proof gaps
-```
-
-`plan-acceptance` defines what must be true. `implement-contract` builds it,
-`review-implementation` checks the candidate's fidelity and engineering, and
-`prove` checks each promised outcome against evidence from that candidate.
-
-1. **Plan acceptance.** Run `plan-acceptance` on the ticket or specification.
-   It records a revision such as `v1`, stable `R` IDs, boundaries, seams,
-   independent oracles, and planned evidence. Plan state is `planned` or `gap`.
-   Save its output using the [durable handoff convention](./docs/acceptance-contract-protocol.md#durable-contract-handoff)
-   before passing its location and revision to another session.
-2. **Implement.** Run `implement-contract` to build the smallest complete change,
-   including necessary invariants, state, failure handling, and persistence.
-   Save its report and recoverable candidate content for the next session.
-3. **Review.** Run `review-implementation` against that candidate and a fixed
-   comparison base. Pass supported findings to a separately authorized
-   `implement-contract` invocation. Review does not edit the candidate.
-4. **Prove.** Run `prove` against the exact contract and candidate. Each row gets
-   `proven`, `disproven`, or `not proven` with durable evidence.
-5. **Repair named proof gaps.** If `NOT PROVEN` names repairable implementation or
-   evidence gaps, pass the unresolved requirement IDs to `repair-gaps`. Resolve
-   contract, verification, or candidate identity gaps before running proof again.
-6. **Refresh results.** Every candidate change needs fresh proof of every row and
-   refreshed review. A changed agreement returns to `plan-acceptance` first.
-
-Use these handoffs when work changes course:
-
-| Result | Next step |
-|---|---|
-| A review finding within the current agreement | Pass the saved finding and its ID to `implement-contract`. |
-| A named implementation or evidence gap in a matching `NOT PROVEN` proof | Pass the proof report and requirement IDs to `repair-gaps`. A review finding alone is not enough. |
-| A changed promise, boundary, or consequential seam | Return to `plan-acceptance` to reconcile the agreement before dependent work. |
-| A failed PR workflow | Use `fix-pr`. If the candidate changes, refresh review and full proof. |
-
-For large work, optionally insert `slice-contract` after saving the parent
-contract. Approve the breakdown and authorize publication to the named tracker
-or local destination. Then plan each child's contract before implementation.
-Small work keeps the direct path above; `NO SPLIT` is a valid result.
-
-```text
-saved parent contract → slice-contract → approved/published child tickets
-→ plan-acceptance for each child → implementation, review, and child proof
-→ integrated candidate → final integration review if needed → full parent prove
-```
-
-Review the integrated candidate if it differs from the reviewed child candidates
-or contains shared integration code.
-
-Slicing defaults to inspection and a draft. Publication needs authority for the
-approved tickets, metadata, and links. An unchanged approved plan retains its
-authority on rerun. Resume partial publication from the saved mapping, confirm
-uncertain writes before retrying, and preserve successful tickets and human edits.
-See the [slicing guide](./docs/promise-to-proof.md#divide-large-work-without-changing-the-agreement)
-for recovery and durable handoffs. Complete allocation and child proofs do not
-establish parent acceptance.
-
-Review and proof can run in either order against the same fixed candidate.
-Each phase is an explicit handoff, not an automatic loop. Neither review nor proof
-requires an open PR or unrelated green CI. Merge still requires current proof,
-green required checks, and the repository's review requirements.
-
-Save implementation and review reports at a supplied or documented destination.
-Otherwise propose a destination outside the candidate and mark storage pending
-until the authorized workflow saves and rereads the report. Transfer recoverable
-candidate content, contract text, and review comparison identities across
-checkouts. A digest or a path available only in a previous session is insufficient.
-
-Keep requirement IDs stable. Increment the revision for authorized material
-changes to promises, boundaries, outcomes, or exclusions. Evidence paths, test
-paths, and wording changes that preserve meaning do not increment it. Reconcile
-GitHub checkboxes with the contract, but never use them as proof.
-
-## Important boundaries
-
-| Skill | Responsibility | Boundary |
-|---|---|---|
-| `critique` | Give optional, agent-led advice on a proposal | Does not edit the artifact, repository, or acceptance contract, publish findings, or implement |
-| `plan-acceptance` | Plan requirements and evidence | Does not implement or verify |
-| `slice-contract` | Allocate parent obligations and publish approved tickets | Does not author contracts, implement, prove, or close work |
-| `implement-contract` | Implement the agreed scope and run development checks | Does not revise the contract, declare acceptance, or implicitly run review or proof |
-| `review-implementation` | Inspect a fixed implementation and comparison scope | Does not edit, repair, approve, or declare acceptance |
-| `prove` | Verify one fixed candidate | Does not edit, commit, push, or publish |
-| `repair-gaps` | Repair named implementation or evidence gaps | Does not declare acceptance |
-| `fix-pr` | Repair a failed PR workflow | Does not prove the whole ticket |
-| `interrogate` | Let you examine the agent's proposal through questions | You lead the discussion; invocation does not grant implementation authority |
-
-Explicit `implement-contract` invocation authorizes scoped local edits and safe
-checks. `review-implementation` authorizes inspection and safe isolated diagnostics.
-Neither invocation alone authorizes commits, pushes, publication, deployments,
-destructive changes, or merges.
-
-## What the results mean
-
-- Slicing returns **DRAFT**, **PUBLISHED**, **PARTIAL**, **BLOCKED**, or **NO SPLIT**.
-  **PUBLISHED** confirms saved tickets and required links, not implementation readiness.
-- **IMPLEMENTED** means the requested scope is implemented and its material
-  development checks passed. **PARTIAL** exposes incomplete work or validation.
-- **REVIEWED** means the captured scope has no material review findings.
-  **CHANGES NEEDED** names supported corrections. **BLOCKED** means a necessary
-  input or capability prevents the relevant phase from completing.
-- Implementation and review outcomes establish neither acceptance nor merge readiness.
-- **PROVEN** means every material requirement has credible, durable evidence for
-  the exact contract revision and candidate, with no unresolved discrepancy.
-- **NOT PROVEN** means evidence is missing, weak, unavailable, contradictory, or
-  tied to the wrong candidate. It is a useful result, not a failure of the skill.
-- **FIXED** means the target CI workflow was repaired and its required checks pass.
-  Green CI does not establish acceptance. Any changed candidate needs fresh
-  full proof, including product, acceptance evidence, and relevant test changes.
-- **NOT FIXED** means the workflow is still unresolved or verification could not
-  establish a durable repair.
+The [detailed workflow](./docs/promise-to-proof.md) includes examples and
+recovery paths. The [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
+sets the rules for revisions, candidate identity, evidence, and durable handoffs.
+Each skill returns a result for an explicit next invocation; the skills do not
+call one another automatically.
 
 ## Use a skill
 
