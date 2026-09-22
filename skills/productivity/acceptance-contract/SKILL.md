@@ -16,9 +16,16 @@ It defines the spec envelope, revision rules, evidence terms, and handoffs.
    convention. Read the source, existing contract, pending amendments, and
    applicable parent contract. If the source cannot be established, report the
    gap and stop.
+   For a sliced child, retrieve its decomposition, precise contribution,
+   prerequisites, and exact parent snapshot under the protocol's parent/child
+   rules. Compare the current parent and pending amendments before planning;
+   resolve material mismatches rather than silently adopting a changed parent.
 2. Reconcile existing acceptance criteria, including GitHub checkboxes, with
    the contract. Extract every material promise and necessary invariant. Keep
    source references so each criterion maps to its requirements without duplication.
+   Map child rows through `Source` to qualified parent obligations. Preserve
+   applicable inherited boundaries and exclusions while requiring only the
+   child's outcome and contribution, not unrelated sibling functionality.
 3. Give each independently falsifiable promise one row. Split compound criteria,
    merge duplicate claims, and record ID mappings when restructuring existing
    rows. Preserve existing IDs across reruns and allocate unused IDs for new rows.
@@ -55,7 +62,10 @@ and confirms retrieval as the protocol requires; planning does not publish it.
 
 Contract revision: v1
 Source: <issue/spec and precise criterion references>
-Parent contract: <reference and revision, or None>
+Parent contract: <canonical location and revision, or None>
+Parent snapshot: <immutable reference or retrievable captured text and digest; omit if none>
+Contribution: <decomposition reference, qualified parent obligations and precise contribution; omit if none>
+Prerequisites: <references and required outcomes, or None>
 
 Intended outcome: <observable user or operator outcome>
 

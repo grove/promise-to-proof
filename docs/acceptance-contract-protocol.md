@@ -100,6 +100,50 @@ directly from it. Reconcile them through `acceptance-contract` before work that
 depends on the changed promise. Storing its returned text does not authorize
 rewriting it.
 
+## Parent and child contracts
+
+`slice-contract` owns decomposition, coverage allocation, dependency planning,
+and authorized ticket publication. It consumes an established parent contract;
+`acceptance-contract` alone authors parent and child contracts and revisions.
+Child ticket criteria are source material for that planning, not a child contract.
+Small work can retain the direct contract, implementation, review, and proof path.
+
+A sliced child records the parent's canonical location, revision, and exact text
+as an immutable reference or retrievable captured text with a digest. Link the
+canonical decomposition and record the child's precise contribution and
+prerequisite outcomes. These references must be retrievable in a fresh checkout.
+Use qualified obligations in durable cross-ticket references, for example
+`grove/project#123 v2:R4`, or an unambiguous repository/source path, revision,
+and ID for local work. Child IDs are local to the child contract. Its `R1` does
+not mean parent `R1`; map each child row through its `Source` to the qualified
+parent obligations it refines. Planning IDs such as `S1` are separate from both.
+
+Judge a child by its own complete outcome and declared contribution, with all
+applicable inherited boundaries, invariants, exclusions, and repository
+constraints. The parent remains authoritative when a child omits or contradicts
+them. Unrelated sibling functionality need not exist for child completion.
+For obligations spanning slices, record each contribution, apply constraints to
+every affected child, and name where the complete parent obligation will be
+checked. A closed prerequisite ticket does not establish its required outcome;
+the receiving workflow must confirm the needed artifact or behavior is available.
+
+Consumers read the captured parent, current canonical agreement, source-linked
+amendments, contribution mapping, and prerequisites. Capture applicable parent
+identities with child reports and recheck them before handoff. If a material
+parent change invalidates the mapping or inherited agreement, pause dependent
+work and reconcile through `acceptance-contract` and the decomposition workflow.
+Preserve prior snapshots and human edits. Regrouping unchanged promises changes
+the plan, not the parent's semantic revision. Historical reports retain their
+original meaning; they do not establish acceptance of a changed agreement.
+
+Complete allocation is not acceptance evidence. Child proof evaluates the
+child contract with its applicable inherited constraints. Final parent proof
+evaluates every parent obligation, including interactions and shared invariants,
+against one exact integrated candidate. Closed tickets and historical child
+proofs do not compose into a parent verdict. Allocate actual integration work
+to a named ticket when needed; ordinary parent-level `/prove` needs no separate
+integration ticket. Existing review and merge conditions still apply.
+
 ## Seams, oracles, and evidence plans
 
 A seam is the highest meaningful public interface through which a requirement

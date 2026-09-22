@@ -21,6 +21,14 @@ contracts through the protocol's location convention. Use configured tracker and
 domain docs when present. An accessible local source needs no external setup
 skill. Capture the contract location, revision, and exact text identity.
 
+For a sliced child, retrieve the decomposition, exact parent snapshot, qualified
+contribution mapping, and prerequisites under the protocol's parent/child rules.
+Confirm prerequisite outcomes before dependent implementation; closed issue
+status is insufficient. Implement the child's complete contribution with all
+applicable inherited constraints, without requiring unrelated sibling work or
+claiming the whole parent is delivered. Reconcile a changed parent before
+affected work and capture/recheck its identity with the child handoff.
+
 Read relevant implementation, callers, tests, public interfaces, architectural
 decisions, and configured checks. Determine what already works. Apply binding
 repository, security, and compatibility constraints even when the ticket omits
@@ -144,6 +152,7 @@ neither review approval, acceptance, nor merge readiness.
 # <IMPLEMENTED | PARTIAL | BLOCKED>: <source>
 
 Contract: <canonical location, revision, exact text identity>
+Parent context: <parent identity, snapshot, contribution mapping and prerequisites; omit if none>
 Scope: <all requirements, or explicit subset and dependencies>
 Candidate before: <identity>
 Candidate after: <identity and recoverable content reference>

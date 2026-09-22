@@ -30,6 +30,15 @@ the contract location, revision, and exact text identity. Preserve IDs, boundari
 exclusions, agreed seams, and independent oracles. Apply binding repository,
 security, and compatibility constraints even when omitted from the ticket.
 
+For a sliced child, retrieve the decomposition, exact parent snapshot, qualified
+contribution mapping, and prerequisite outcomes under the protocol's parent/child
+rules. Inspect whether required prerequisites are present; closed tickets alone
+are insufficient. Review the child's complete contribution and all applicable
+inherited constraints without demanding unrelated sibling functionality or
+claiming whole-parent delivery. Capture and recheck parent identity; a material
+unresolved parent change blocks a current-agreement review conclusion and needs
+reconciliation through `acceptance-contract` and the decomposition workflow.
+
 Capture the candidate and comparison base before inspecting. Resolve mutable
 references to fixed identities. For branch or PR review, establish the actual
 head, base, merge base, and intended change set. A local branch represents a PR
@@ -144,6 +153,7 @@ plan states unchanged; only `/prove` issues acceptance verdicts.
 # <REVIEWED | CHANGES NEEDED | BLOCKED>: <source>
 
 Contract: <canonical location, revision, exact text identity>
+Parent context: <parent identity, snapshot, contribution mapping and prerequisites; omit if none>
 Candidate: <exact identity and recoverable content reference>
 Comparison: <base/merge base and included working-tree scope>
 Stability: <candidate and contract unchanged, or drift>

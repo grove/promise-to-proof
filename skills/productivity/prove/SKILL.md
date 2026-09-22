@@ -59,6 +59,16 @@ ambiguous source promises instead of editing the contract. If no versioned
 contract can be established, report `NOT PROVEN` and hand off to
 `/acceptance-contract`; do not create or revise it during proof.
 
+For a sliced child, retrieve the decomposition, contribution mapping, parent
+snapshot, and prerequisite outcomes. Follow the protocol's parent/child rules
+to reconcile the current parent and amendments. Judge the child's own contract
+with applicable inherited constraints; unrelated sibling functionality is not
+a child requirement. A material unresolved parent change is `NOT PROVEN` for
+the current agreement. Capture and recheck applicable parent identities with
+the child contract. For parent proof, evaluate all parent obligations and
+cross-slice interactions on one exact integrated candidate. Historical child
+proofs and closed issues are references, not an aggregated parent verdict.
+
 ### 2. Identify the candidate
 
 Record the full commit SHA or exact snapshot, contract source and revision,
@@ -108,6 +118,7 @@ Requirements: <proven>/<total>
 Counterexamples tested: <count>
 Contract: <source and exact revision, such as #124 v3>
 Contract snapshot: <immutable reference or captured text and digest>
+Parent context: <parent identity, snapshot, contribution mapping and prerequisites; omit if none>
 Candidate: <commit or exact snapshot>
 Candidate stability: <unchanged or NOT PROVEN>
 Contract stability: <unchanged or NOT PROVEN>

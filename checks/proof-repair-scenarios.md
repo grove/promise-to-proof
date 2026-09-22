@@ -261,6 +261,32 @@ invoke it. Use [acceptance case 12](./acceptance-contract-scenarios.md#12-check-
 to check bundled references and record the actual installation. Keep live tracker
 and CI cases separate and mark them unexecuted unless actually exercised.
 
+## 15. Prove and repair the correct child or parent agreement
+
+Use the upload parent and two children from [slicing T20](./slice-contract-scenarios.md#t20-install-alone-and-preserve-the-two-child-delivery-chain).
+Capture each child contract with qualified parent `Source` references. Prove the
+API child before the browser exists, preserving ownership, metadata, durability,
+and duplicate prevention where applicable. Then prove the completed browser
+child against its own fixed agreement and candidate.
+
+Pass when proof evaluates each child's contribution and inherited boundaries
+without requiring unrelated sibling functionality or claiming parent acceptance.
+Closed issues and historical child proofs cannot establish the final parent.
+
+In a separate assembled candidate, inject a browser/API race that stores duplicate
+uploads. Record the evaluator mutation and capture a new candidate identity.
+Run full parent proof and obtain the named parent R3 `NOT PROVEN` gap. First pass
+that parent report to repair with only a child contract; repair must block the
+identity mismatch before edits. Then supply the matching parent agreement and
+candidate and explicitly authorize repair of the named gap.
+
+Pass when repair preserves inherited constraints, fixes the complete named cause,
+and reports focused checks without acceptance. Run fresh full parent proof and
+applicable review on the repaired candidate. Every parent row needs current
+evidence; a passing focused check or refreshed child proof alone is insufficient.
+A pending parent amendment instead returns to `acceptance-contract` before any
+repair that depends on the changed promise.
+
 ## Sampled validation, 2026-09-22
 
 Independent agent runs used standalone copied skills against disposable JSON

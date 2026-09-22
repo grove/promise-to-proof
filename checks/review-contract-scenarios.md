@@ -166,3 +166,15 @@ Pass when the first report returns `CHANGES NEEDED`, preserves the evidenced
 finding, and exposes incomplete coverage. The control returns `BLOCKED` with the
 smallest useful next check. Neither hides a known correction behind an unrelated
 unknown nor claims a complete review when necessary inspection is unavailable.
+
+## Sliced child handoff
+
+Run the child phase of [slicing T20](./slice-contract-scenarios.md#t20-install-alone-and-preserve-the-two-child-delivery-chain)
+in a fresh context with only the child reference. Supply its canonical contract,
+parent snapshot, plan mapping, and prerequisite references through durable links.
+Repeat with an unavailable prerequisite and a pending material parent amendment.
+
+Pass when the skill resolves the child's own contribution and inherited constraints
+without requiring unrelated sibling functionality or claiming whole-parent delivery.
+Missing prerequisites and affected amendments stay explicit before dependent work.
+The handoff preserves qualified parent references and exact agreement identities.
