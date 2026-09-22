@@ -1,1 +1,0 @@
-../../../../docs/acceptance-contract-protocol.md

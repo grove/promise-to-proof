@@ -170,18 +170,14 @@ import { join } from 'node:path';
 const root = await mkdtemp(join(tmpdir(), 'acceptance-install-'));
 const protocol = await readFile('docs/acceptance-contract-protocol.md', 'utf8');
 try {
-	for (const name of ['acceptance-contract', 'acceptance-matrix', 'prove', 'repair-proof', 'interrogate', 'fix-pr']) {
+	for (const name of ['acceptance-contract', 'prove', 'repair-proof', 'interrogate', 'fix-pr']) {
 		const dest = join(root, name);
 		await cp(`skills/productivity/${name}`, dest, { recursive: true, dereference: true });
 		const ref = join(dest, 'references/acceptance-contract-protocol.md');
 		assert((await lstat(ref)).isFile());
 		assert.equal(await readFile(ref, 'utf8'), protocol);
 	}
-	const alias = join(root, 'acceptance-matrix/acceptance-contract.md');
-	assert((await lstat(alias)).isFile());
-	assert.equal(await readFile(alias, 'utf8'),
-		await readFile('skills/productivity/acceptance-contract/SKILL.md', 'utf8'));
-	console.log('Copied protocol and alias references match their sources.');
+	console.log('Copied protocol references match their source.');
 } finally {
 	await rm(root, { recursive: true, force: true });
 }
@@ -189,13 +185,12 @@ JS
 ```
 
 Separately install each copied skill in an isolated invocation where the source
-checkout and sibling skill directories are unavailable. Run scenario 1 once
-with the canonical skill and once with the deprecated alias.
+checkout and sibling skill directories are unavailable. Run scenario 1 with
+`acceptance-contract`.
 
 Pass when every local reference resolves within its copied skill directory,
-including the protocol. The alias must load the canonical instructions and
-protocol without relying on the canonical sibling's install path. Both planning
-runs obey the same revision and plan-state rules. Record the actual install
+including the protocol. The planning run must obey the revision and plan-state
+rules. Record the actual install
 operation and result; a repository symlink check alone does not establish that
 an external installer dereferences links. This scenario contains no execution
 record. The copy check alone does not exercise agent behavior after installation.
