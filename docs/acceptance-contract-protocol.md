@@ -70,7 +70,7 @@ Repository files must travel with the work in a commit or transferred snapshot
 when the next session uses another checkout.
 
 Consumers resolve that location and read the source and authorized amendments
-before implementation, proof, or repair. Report missing or conflicting inputs
+before implementation, review, proof, or repair. Report missing or conflicting inputs
 instead of reconstructing an agreement from memory. The location finds the
 contract; proof still captures its exact text under the identity rules below.
 
@@ -122,7 +122,7 @@ acceptance. `gap` means the path, seam, or oracle is missing or inadequate.
 Unresolved product decisions go in open questions, evidence limits in unresolved
 gaps, and deliberate exclusions in out of scope. Planning does not run proof.
 
-## Implementation handoff
+## Implementation and review handoffs
 
 Implement the minimum complete solution inside the spec envelope. For every
 requirement, reach the real observable outcome and implement the state,
@@ -130,8 +130,38 @@ invariant, and failure behavior it needs. Start evidence at the agreed public
 seam. Prefer existing repository mechanisms and add machinery only where
 correctness requires it. Preserve requirement IDs and promised outcomes.
 
-Specification, ticket slicing, implementation, and TDD retain their own
-workflows. This contract is the artifact those workflows consume.
+`implement-contract` consumes the saved agreement and reports development work
+for an exact candidate. `review-contract` inspects a captured candidate against
+the agreement, scope, and engineering obligations without repairing it. Neither
+authors the contract, grants acceptance, or establishes merge readiness.
+Specification, ticket slicing, and TDD may supply inputs without being required.
+
+Implementation and review reports capture the canonical contract location,
+revision, and exact text through an immutable reference or retrievable captured
+text and digest. Capture the full candidate commit SHA or a reproducible snapshot
+including relevant uncommitted and untracked files. A digest without recoverable
+content is insufficient for transfer to another checkout. Review also preserves
+the comparison base or merge base and included working-tree scope. Implementation
+labels an unresolved review base instead of guessing it.
+
+Keep reports outside the candidate. Use a supplied or documented destination;
+otherwise propose a destination and mark storage pending until the authorized
+workflow saves and rereads it. A prior-session path alone is not a completed
+handoff. Transfer the report and recoverable candidate when the next session uses
+another checkout. Do not add another canonical contract store or require one
+artifact per requirement.
+
+Review findings use local IDs distinct from contract requirement IDs. Supported
+corrections within the agreement go to an authorized `implement-contract`
+invocation. Named gaps in a matching `NOT PROVEN` report go to `repair-proof`.
+Changed promises or consequential seam decisions return to `acceptance-contract`
+through the source-linked amendment convention. These handoffs do not invoke
+the next skill or grant publication authority.
+
+Review and proof may run in either order or separately on the same fixed candidate.
+Refresh review and any stale proof after candidate changes. Neither stage requires
+an open PR or unrelated green CI. Only `prove` issues acceptance verdicts;
+the existing merge conditions still apply.
 
 ## Proof and repair handoffs
 

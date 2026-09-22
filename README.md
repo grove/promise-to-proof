@@ -7,8 +7,8 @@ source ticket's promises visible, make evidence explicit, and carry unresolved
 questions into the next step. They do not provide a workflow runtime.
 
 Follow [How to take a ticket from promise to proof](./docs/promise-to-proof.md)
-for the workflow alongside Matt Pocock's planning, implementation, TDD, and
-review skills. The [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
+for the native delivery workflow. Matt Pocock's planning and TDD skills are
+optional additions. The [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
 defines the shared contract, revision, and proof rules.
 
 Issues and specifications for this repository live in [GitHub Issues](https://github.com/grove/skills/issues).
@@ -20,6 +20,8 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 | [`critique`](./skills/productivity/critique/SKILL.md) | You explicitly request an independent review of a proposal against its intended outcome | Evidence-backed advice and a recommendation |
 | [`interrogate`](./skills/productivity/interrogate/SKILL.md) | You want to question the agent's proposal and reasoning | Evidence-backed answers, a revised approach, and explicit unknowns |
 | [`acceptance-contract`](./skills/productivity/acceptance-contract/SKILL.md) | A ticket needs clear acceptance criteria | A candidate-independent revision with stable requirement IDs and evidence plans |
+| [`implement-contract`](./skills/productivity/implement-contract/SKILL.md) | An agreed contract is ready to implement | Scoped implementation, development checks, and a recoverable candidate handoff |
+| [`review-contract`](./skills/productivity/review-contract/SKILL.md) | A captured implementation is ready to inspect | Findings on contract fidelity, scope, and engineering quality |
 | [`prove`](./skills/productivity/prove/SKILL.md) | Implementation is ready to verify | `PROVEN` or `NOT PROVEN` with evidence |
 | [`repair-proof`](./skills/productivity/repair-proof/SKILL.md) | Proof found a specific gap | A scoped repair report; fresh proof is still required |
 | [`fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
@@ -30,8 +32,9 @@ Optionally invoke `critique` to assess an idea, issue, specification, plan, or
 proposal before committing to it. Its advice requires no downstream skill.
 
 ```text
-Ticket/spec → acceptance-contract → implementation → prove
-           → repair-proof if needed → prove again → review
+Source → acceptance-contract → saved contract → implement-contract
+       → captured candidate → review-contract → prove
+       → repair-proof if needed → fresh proof and review
 ```
 
 1. **Plan acceptance.** Run `acceptance-contract` on the ticket or specification.
@@ -39,15 +42,29 @@ Ticket/spec → acceptance-contract → implementation → prove
    independent oracles, and planned evidence. Plan state is `planned` or `gap`.
    Save its output using the [durable handoff convention](./docs/acceptance-contract-protocol.md#durable-contract-handoff)
    before passing its location and revision to another session.
-2. **Implement.** Use the existing implementation and TDD workflow to build the
-   smallest complete change within the specification, including necessary
-   invariants, state, failure handling, and persistence. Skip speculative machinery.
-3. **Prove.** Bind the report to the exact contract revision and candidate. Each
-   row gets `proven`, `disproven`, or `not proven` with durable evidence.
-4. **Repair only named gaps.** If proof is `NOT PROVEN`, pass its unresolved
+2. **Implement.** Run `implement-contract` to build the smallest complete change,
+   including necessary invariants, state, failure handling, and persistence.
+   Save its report and recoverable candidate content for the next session.
+3. **Review.** Run `review-contract` against that candidate and a fixed comparison
+   base. Pass supported findings to a separately authorized `implement-contract`
+   invocation. Review does not edit the candidate.
+4. **Prove.** Run `prove` against the exact contract and candidate. Each row gets
+   `proven`, `disproven`, or `not proven` with durable evidence.
+5. **Repair only named proof gaps.** If proof is `NOT PROVEN`, pass its unresolved
    requirement IDs to `repair-proof` for the smallest complete repair.
-5. **Prove again.** A repair never counts as acceptance by itself. Review the
-   changed candidate after fresh full proof of every row.
+6. **Refresh results.** Every candidate change needs fresh proof of every row and
+   refreshed review. A changed agreement returns to `acceptance-contract` first.
+
+Review and proof can run in either order against the same fixed candidate.
+Each phase is an explicit handoff, not an automatic loop. Neither review nor proof
+requires an open PR or unrelated green CI. Merge still requires current proof,
+green required checks, and the repository's review requirements.
+
+Save implementation and review reports at a supplied or documented destination.
+Otherwise propose a destination outside the candidate and mark storage pending
+until the authorized workflow saves and rereads the report. Transfer recoverable
+candidate content, contract text, and review comparison identities across
+checkouts. A digest or a path available only in a previous session is insufficient.
 
 Keep requirement IDs stable. Increment the revision for authorized material
 changes to promises, boundaries, outcomes, or exclusions. Evidence paths, test
@@ -60,13 +77,26 @@ GitHub checkboxes with the contract, but never use them as proof.
 |---|---|---|
 | `critique` | Give optional, agent-led advice on a proposal | Does not edit the artifact, repository, or acceptance contract, publish findings, or implement |
 | `acceptance-contract` | Plan requirements and evidence | Does not implement or verify |
+| `implement-contract` | Implement the agreed scope and run development checks | Does not revise the contract, declare acceptance, or implicitly run review or proof |
+| `review-contract` | Inspect a fixed implementation and comparison scope | Does not edit, repair, approve, or declare acceptance |
 | `prove` | Verify one fixed candidate | Does not edit, commit, push, or publish |
 | `repair-proof` | Repair named implementation or evidence gaps | Does not declare acceptance |
 | `fix-pr` | Repair a failed PR workflow | Does not prove the whole ticket |
 | `interrogate` | Let you examine the agent's proposal through questions | You lead the discussion; invocation does not grant implementation authority |
 
+Explicit `implement-contract` invocation authorizes scoped local edits and safe
+checks. `review-contract` authorizes inspection and safe isolated diagnostics.
+Neither invocation alone authorizes commits, pushes, publication, deployments,
+destructive changes, or merges.
+
 ## What the results mean
 
+- **IMPLEMENTED** means the requested scope is implemented and its material
+  development checks passed. **PARTIAL** exposes incomplete work or validation.
+- **REVIEWED** means the captured scope has no material review findings.
+  **CHANGES NEEDED** names supported corrections. **BLOCKED** means a necessary
+  input or capability prevents the relevant phase from completing.
+- Implementation and review outcomes establish neither acceptance nor merge readiness.
 - **PROVEN** means every material requirement has credible, durable evidence for
   the exact contract revision and candidate, with no unresolved discrepancy.
 - **NOT PROVEN** means evidence is missing, weak, unavailable, contradictory, or
@@ -83,6 +113,8 @@ GitHub checkboxes with the contract, but never use them as proof.
 /critique <idea, document path, or GitHub issue reference>
 /interrogate Walk me through your proposal so I can question it.
 /acceptance-contract #123
+/implement-contract #123
+/review-contract #123 against main
 /prove #123
 /repair-proof #123
 /fix-pr #456
@@ -118,9 +150,11 @@ skills/productivity/
 ├── acceptance-contract/
 ├── critique/
 ├── fix-pr/
+├── implement-contract/
 ├── interrogate/
 ├── prove/
-└── repair-proof/
+├── repair-proof/
+└── review-contract/
 ```
 
 Each skill has a `SKILL.md`. Some also have an `agents/openai.yaml` display

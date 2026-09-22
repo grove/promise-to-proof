@@ -5,19 +5,16 @@ look right while one sentence from the issue never reaches a test. A test suite
 can pass while its assertions miss the promised result. A green pull request can
 hide a weakened check.
 
-Use [Matt Pocock's skills](https://github.com/mattpocock/skills) to understand
-the problem, write the specification, divide the work, implement it, and review
-the result. Add the skills from this repository where the workflow needs a clear
-acceptance contract or independent evidence. Together, the collections carry
-the original agreement from the first design discussion through the final
-GitHub Actions run.
+Use Grove's native skills to plan acceptance, implement the agreed capability,
+review a captured candidate, and prove the result. [Matt Pocock's skills](https://github.com/mattpocock/skills)
+can help with planning and TDD, but the delivery path works without them.
 
 The acceptance contract defines the spec envelope. Implementation fills it.
 Proof establishes that one exact candidate satisfies one exact contract revision.
 
 ```text
-source promise → acceptance contract vN → minimum complete implementation
-               → fixed candidate → candidate-bound proof
+source → acceptance-contract → saved canonical contract
+       → implement-contract → captured candidate → review-contract → prove
 ```
 
 The sequence is not a ceremony. Each skill answers a different question, and
@@ -25,23 +22,23 @@ you can omit a step when that question has a clear, low-risk answer.
 
 ## Install the skills
 
-Install both collections before you start:
+Install Grove:
 
 ```bash
-npx skills@latest add mattpocock/skills
 npx skills@latest add grove/skills
 ```
 
-When the first command asks which skills to install, include
-`setup-matt-pocock-skills`. Run the setup once in each repository:
+Use the repository's existing issue-tracker and domain-document configuration.
+A local specification and saved contract do not require an external setup skill.
+If you want Matt's planning or TDD tools, install that collection separately:
 
-```text
-/setup-matt-pocock-skills
+```bash
+npx skills@latest add mattpocock/skills
 ```
 
-Choose the issue tracker, triage labels, and documentation locations that the
-project already uses. The setup gives Matt's planning and implementation skills
-the same sources that `acceptance-contract` and `/prove` will read later.
+Matt's optional `setup-matt-pocock-skills` configures its tools for your repository.
+Keep the issue tracker, triage labels, and documentation locations consistent
+with the sources Grove reads.
 
 To list the current skills from a clone, run:
 
@@ -49,59 +46,22 @@ To list the current skills from a clone, run:
 rg --files skills -g SKILL.md | sort
 ```
 
-The complete path looks like this:
+The delivery path uses explicit phases:
 
 ```text
-idea or problem
-      |
-      v
-/grill-with-docs
-      |
-      +---- /wayfinder when one session cannot resolve the work
-      |
-      v
-/to-spec -> /to-tickets
-      |
-      v
-for each ticket
-      |
-      v
-/acceptance-contract
-      |
-      v
-/interrogate       optional when the design is already settled
-      |
-      v
-/implement         uses /tdd and closes with /code-review
-      |
-      v
-/prove
-   |         |
-   |         +---- PROVEN --------------------+
-   |                                           |
-   +---- NOT PROVEN                            |
-             |                                 |
-             v                                 |
-       /repair-proof                           |
-             |                                 |
-             +----> fresh /prove, then review -+
-                                                 |
-                                                 v
-                                           pull request
-                                                 |
-                                      CI red ----+---- CI green
-                                         |                  |
-                                         v                  v
-                                      /fix-pr          current proof + review
-                                         |                  |
-                                         |                  v
-                                         |             ready to merge
-                                         |
-                                         v
-                              refresh stale proof or review
+/acceptance-contract -> save and reread the contract
+/implement-contract -> save the report and capture the candidate
+/review-contract    -> save findings for that candidate and comparison base
+/prove              -> save the proof and requirement evidence
 ```
 
-## Shape the work with Matt's planning skills
+Review and proof may run in either order against the same fixed candidate.
+A handoff does not invoke the next skill. The enclosing authorized workflow owns
+invocation and any publishing. Neither review nor proof needs an open PR or
+unrelated green CI. Merge requires current proof, green required checks for the
+final candidate, and the repository's review requirements.
+
+## Optionally shape the work with Matt's planning skills
 
 For a feature that begins as an idea, start with a focused conversation:
 
@@ -256,51 +216,90 @@ choice is low. A one-line correction with an existing regression seam rarely
 needs a separate design session. The acceptance contract still helps because
 small diffs can omit behavior too.
 
-## Implement with Matt's feedback loops
+## Implement the saved agreement
 
-Pass the ticket and its acceptance contract into Matt's implementation workflow:
+Pass the ticket or canonical contract path to Grove's implementation skill:
 
 ```text
-/implement #124
+/implement-contract #124
 ```
 
-Resolve the saved contract from the ticket reference or documented local path.
-Reconcile pending amendments before implementing affected behavior. Map each
-meaningful code path or check back to its requirement ID. `/implement` uses `/tdd`
-at the agreed seams, so each vertical slice moves through a failing test, the
-smallest working change, and a cleanup pass. TDD drives the next piece of code,
-while the contract keeps every ticket promise in view. Use Matt's existing
-planning, implementation, TDD, and review steps rather than creating a second
-implementation workflow.
+Explicit invocation authorizes scoped local implementation and safe development
+checks unless your request limits the work to planning or inspection. It does
+not authorize commits, pushes, publication, deployments, or destructive changes.
+
+Resolve the saved contract, inspect the source, and reconcile pending amendments
+before implementing affected behavior. Preserve unrelated work. Stop affected
+edits when ownership overlaps or concurrent changes make the target uncertain.
+Do not reset, stash, or discard changes to produce a clean worktree.
 
 Build the smallest complete implementation within the specification. Include
 necessary invariants, state transitions, failure handling, and persistence.
 For the retry example, R4 requires durable retry state even if an in-memory fix
 has a smaller diff. Omit speculative machinery that no promise requires.
 
-For a difficult defect or performance regression, use `/diagnosing-bugs` to
-build a reproduction, test hypotheses, and leave a regression check. Once the
-cause is known, return to the same requirement IDs so the fix does not solve one
-symptom while leaving the promised outcome unverified.
+Use meaningful checks at the agreed public seams. Prefer test-first development
+for new behavior and regressions where a suitable seam exists. Matt's `/tdd` is
+an optional aid, not a required dependency. Existing checks may suffice for
+already-covered behavior or documentation. A missing planned test is work to
+perform; an unavailable material check must remain a reported limitation.
 
-Matt's `/implement` closes with `/code-review`, which checks both repository
-standards and fidelity to the source specification. Review both missing promised
-behavior and unrequested scope. Finish the review and
-commit the candidate before proof. A clean commit gives every later observation
-one exact identity and avoids the awkward question of whether a file changed
-halfway through verification.
+Expect `IMPLEMENTED`, `PARTIAL`, or `BLOCKED`. The report maps requested requirement
+IDs to implementation locations, observed checks, and remaining gaps. For an
+explicit subset such as R2, the outcome covers that subset and keeps unresolved
+R4 visible. No implementation outcome declares acceptance.
 
-Record that identity before you invoke proof:
+## Capture and transfer the candidate
 
-```bash
-git status --short
-git rev-parse HEAD
+Save the implementation report at the supplied or documented destination.
+Without one, propose a destination outside the candidate and mark storage pending
+until the authorized workflow saves and rereads it. Preserve the canonical
+contract location, semantic revision, and exact text through an immutable
+reference or retrievable captured text with a digest.
+
+Capture the candidate as a full commit SHA or reproducible snapshot, including
+relevant uncommitted and untracked content. A commit is optional. Preserve existing
+work and include only the agreed candidate scope. Record the comparison base
+when known, or leave it explicitly unresolved for the next phase.
+
+When another session uses another checkout, transfer recoverable content as well
+as its identity. A hash without content, or a local path left behind in a previous
+session, does not complete the handoff. Transfer source and contract files too.
+
+## Review the captured implementation
+
+Invoke review separately with the source, candidate, and comparison context:
+
+```text
+/review-contract #124 against main
+/review-contract docs/acceptance-contracts/upload-retry.md; include uncommitted work
 ```
 
-If `git status --short` reports unrelated changes, separate or resolve them
-before proof. `/prove` can use an exact snapshot when necessary, but a dirty or
-changing worktree is `NOT PROVEN` unless the verifier can establish precisely
-which files the observations cover.
+`review-contract` resolves mutable references to fixed identities and examines
+contract fidelity, scope and simplicity, and engineering quality. It reads the
+actual diff and relevant surrounding implementation, including unchanged code
+that a requirement depends on. A working-tree review includes the requested
+staged, unstaged, deleted, and relevant untracked files.
+
+Expect `REVIEWED`, `CHANGES NEEDED`, or `BLOCKED`, with coverage and limitations
+visible. `REVIEWED` is neither acceptance proof nor platform approval. Review
+inspects and may run safe isolated diagnostics, but never edits or repairs the
+candidate. Candidate or contract drift prevents a complete conclusion for the
+changed target.
+
+Save and reread the review report outside the candidate under the same report
+storage convention. Preserve finding IDs, affected requirement IDs, candidate
+identity, and the captured base and comparison scope.
+
+For supported implementation findings under the same agreement, explicitly
+invoke `implement-contract` with the saved report and selected finding IDs.
+For changed promises or consequential seam decisions, save a source-linked
+amendment and return to `acceptance-contract`. `interrogate` can help resolve the
+decision. A review finding alone is not the matching `NOT PROVEN` report required
+by `repair-proof`.
+
+After implementation changes the candidate, refresh review and any prior proof.
+Neither the implementation nor review skill runs the next phase implicitly.
 
 ## Prove the fixed candidate
 
@@ -388,22 +387,21 @@ Stop when the missing input is a product decision, unavailable credential, or
 external capability. `repair-proof` must not guess its way through a stale or
 ambiguous contract.
 
-If the repair changes a diff that `/code-review` already checked, run the review
-again after fresh proof succeeds:
+After a repair changes the candidate, refresh review as well as full proof:
 
 ```text
-/code-review main
+/review-contract #124 against main
 ```
 
-Proof checks whether the ticket's promises hold. Code review checks whether the
-new diff follows project standards and still matches the specification. Keep
-both results tied to the repaired candidate.
+Proof checks whether the ticket's promises hold. Review examines contract fidelity,
+scope, and engineering quality. Keep both results tied to the repaired candidate;
+you may run them in either order.
 
 ## Repair failed GitHub Actions without weakening the check
 
-Open the pull request after the candidate is proven and reviewed according to
-the repository's process. If a required GitHub Actions workflow fails, invoke
-`fix-pr` with the pull request or the failed workflow run:
+When separately authorized, open the pull request after the candidate is proven
+and reviewed according to the repository's process. If a required GitHub Actions
+workflow fails, invoke `fix-pr` with the pull request or the failed workflow run:
 
 ```text
 /fix-pr #456
@@ -432,8 +430,8 @@ checks passed without showing that every ticket promise was checked. Every
 changed candidate makes its previous proof stale. Run full `/prove` again on
 the repaired candidate, especially after product, acceptance evidence, or
 relevant test changes. A contract revision can remain unchanged while its
-candidate needs fresh proof. Refresh code review when the repair changes the
-reviewed diff.
+candidate needs fresh proof. Refresh `/review-contract` for the changed candidate
+as well.
 
 ## Choose the shortest workflow that covers the risk
 
@@ -441,12 +439,13 @@ For a straightforward ticket with a settled design, use the compact path:
 
 ```text
 /acceptance-contract #124
-/implement #124
+/implement-contract #124
+/review-contract #124 against main
 /prove #124
-open the pull request
+open the pull request when authorized
 ```
 
-For a feature that starts as an idea, use the full planning and delivery path:
+For a feature that starts as an idea, optionally add Matt's planning tools:
 
 ```text
 /grill-with-docs <idea>
@@ -456,18 +455,19 @@ For a feature that starts as an idea, use the full planning and delivery path:
 # For each ticket:
 /acceptance-contract #124
 /interrogate #124
-/implement #124
+/implement-contract #124
+/review-contract #124 against main
 /prove #124
-open the pull request
+open the pull request when authorized
 ```
 
-For a difficult bug, replace the broad planning phase with a disciplined
-diagnosis while keeping the acceptance and proof steps:
+For a difficult bug, optionally use Matt's `diagnosing-bugs` before implementation:
 
 ```text
 /acceptance-contract #124
 /diagnosing-bugs
-/implement #124
+/implement-contract #124
+/review-contract #124 against main
 /prove #124
 ```
 
@@ -477,7 +477,7 @@ When proof finds a gap, insert the repair loop without blurring its roles:
 /prove #124
 /repair-proof #124
 /prove #124
-/code-review main  if the repair changed the reviewed diff
+/review-contract #124 against main
 ```
 
 When GitHub Actions fails, repair that workflow and refresh any result that the
@@ -486,13 +486,10 @@ new commit invalidates:
 ```text
 /fix-pr #456
 /prove #124       full proof for every changed candidate
-review again      if the reviewed diff changed materially
+/review-contract #124 against main
 ```
 
-Use every step that closes a real uncertainty and omit the rest. The workflow
-works because Matt's skills move the work from an idea to reviewed code, while
-the skills in this repository keep the acceptance contract and evidence intact.
-`acceptance-contract` defines the checks, `interrogate` tests the proposed design,
-`/prove` verifies a fixed candidate, `repair-proof` changes only named gaps, and
-`fix-pr` restores the pull request's required automation. None of those results
-is a substitute for another.
+Keep each result attached to the agreement and candidate it actually describes.
+`implement-contract` builds the requested capability, `review-contract` examines
+it, and `/prove` establishes acceptance evidence. Repairs change the candidate
+and require fresh results. None of these phases grants permission to merge.
