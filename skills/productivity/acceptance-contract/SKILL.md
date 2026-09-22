@@ -55,6 +55,14 @@ Include a storage handoff naming the canonical destination and revision, and
 whether saving remains pending. The invoking workflow saves the returned text
 and confirms retrieval as the protocol requires; planning does not publish it.
 
+For a tracked child, hand readiness reconciliation to that invoking workflow.
+After saving and rereading the contract, it checks configured triage meanings,
+required approvals, unresolved decisions, and availability of prerequisite
+outcomes. With label-edit authority, it applies `ready-for-agent` only when the
+child is ready for unattended implementation and preserves unrelated labels.
+Otherwise report the remaining blockers or pending label update. Recheck when a
+prerequisite becomes available; contract creation alone does not grant readiness.
+
 ## Output
 
 ```markdown

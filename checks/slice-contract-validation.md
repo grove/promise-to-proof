@@ -217,8 +217,10 @@ all tested skill and protocol bytes still match the identities recorded above.
 
 ## Validation limits
 
-No authorized disposable GitHub repository was supplied. Live T11, T12, and T15
-remain unexecuted; no live publishing support is established by this record.
+This run had no authorized disposable GitHub repository. Live T11, T12, and T15
+were unexecuted; no live publishing support is established by this record.
+The later [live validation](./slice-contract-live-validation.md) records real
+GitHub publication, recovery, unchanged reruns, and the readiness-label lifecycle.
 The installed GitHub CLI exposes parent and blocking flags, but help output is
 not evidence of successful server operations or account permissions.
 

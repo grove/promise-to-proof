@@ -16,6 +16,18 @@ plan. New issues also carry a stable marker such as:
 <!-- grove:slice-contract parent=grove/project#123 slice=S1 -->
 ```
 
+Give the canonical parent index its own stable marker, using the same parent key:
+
+```html
+<!-- grove:slice-contract-index parent=grove/project#123 -->
+```
+
+Before creating an index, inspect the parent body, all comment pages, and linked
+plan artifacts for that marker. Reuse the confirmed index on reruns and after
+uncertain writes. If an older index has no marker, confirm its identity and add
+the marker within approved planning edits. Multiple matches or uncertain identity
+require reconciliation before writing another index.
+
 Inspect mapped issues and relevant existing children, including closed items.
 Use enough pagination and readback to establish identity. Titles, a single search
 page, and an old chat summary are insufficient. Markers identify records but grant

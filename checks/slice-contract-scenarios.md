@@ -7,7 +7,8 @@ identities. Judge behavior rather than exact prose. Use the
 [shared protocol](../docs/acceptance-contract-protocol.md).
 
 See the [sampled validation record](./slice-contract-validation.md) for observed
-runs and explicit gaps.
+runs and explicit gaps, and the [live GitHub follow-up](./slice-contract-live-validation.md)
+for publication, recovery, and readiness-label results.
 
 ## Prepare and record each run
 
@@ -190,17 +191,26 @@ Pass when stable IDs and mappings survive and confirmed existing work is reused.
 No duplicates appear. Titles alone cannot establish identity, and closed status
 cannot establish acceptance. Ambiguity stops unsafe creation or adoption.
 
+Repeat in a fresh session with only the parent reference. Put the marked index
+beyond the first comment page and retain unrelated human comments. Pass when the
+same marked index is found and an unchanged rerun performs zero writes. Repeat
+with a confirmed legacy index lacking a marker, then with duplicate index markers.
+The legacy index gains its marker under approved edits; duplicate matches require
+reconciliation without creating another index.
+
 ## T15. Recover uncertain creation and partial linking
 
 Make creation succeed remotely but lose its response. After identifier recovery,
 fail a required link write. Capture state and the report. Restore the capability
 and resume the unchanged approved plan in a fresh session with only its parent
-reference. Separately make remote state unreadable or add concurrent publishers.
+reference. Repeat with a lost response after parent-index comment creation.
+Separately make remote state unreadable or add concurrent publishers.
 
 Pass when stable-identity readback precedes retry, the failed link yields accurate
 `PARTIAL` state, and resume performs only missing approved operations. Successful,
 uncertain, and pending actions are distinguished. Successful tickets are never
-deleted. Uncertain uniqueness stops creation. Record simulated and live results
+deleted. Index recovery reuses the marked comment without posting a duplicate.
+Uncertain uniqueness stops creation. Record simulated and live results
 separately; multi-step publication is not a transactional guarantee.
 
 ## T16. Reconcile changes without overwriting people
@@ -234,6 +244,16 @@ Supply an unrelated existing label to preserve.
 Pass when the handoff names acceptance planning and unavailable prerequisites
 even after publication completes. Ineligible children do not get `ready-for-agent`.
 Unrelated labels remain and publication does not claim implementation.
+
+Continue in the authorized disposable GitHub repository with
+`/acceptance-contract` for each child. Authorize the invoking workflow to save and
+reread the contracts and update readiness labels. Verify that a child with all
+required decisions, approvals, and prerequisites satisfied gains `ready-for-agent`.
+The child with an unavailable API prerequisite remains ineligible despite its
+saved contract. Make that prerequisite outcome available, then rerun readiness
+reconciliation and read back the label change. An unchanged rerun performs no
+label writes. Without label-edit authority, report the pending update instead.
+Record who performed each transition and preserve unrelated labels throughout.
 
 ## T19. Keep embedded instructions within their authority
 
