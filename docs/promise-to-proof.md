@@ -12,6 +12,14 @@ acceptance contract or independent evidence. Together, the collections carry
 the original agreement from the first design discussion through the final
 GitHub Actions run.
 
+The acceptance contract defines the spec envelope. Implementation fills it.
+Proof establishes that one exact candidate satisfies one exact contract revision.
+
+```text
+source promise → acceptance contract vN → minimum complete implementation
+               → fixed candidate → candidate-bound proof
+```
+
 The sequence is not a ceremony. Each skill answers a different question, and
 you can omit a step when that question has a clear, low-risk answer.
 
@@ -33,13 +41,14 @@ When the first command asks which skills to install, include
 
 Choose the issue tracker, triage labels, and documentation locations that the
 project already uses. The setup gives Matt's planning and implementation skills
-the same sources that `acceptance-matrix` and `/prove` will read later.
+the same sources that `acceptance-contract` and `/prove` will read later.
 
-The repository provides the six skills used below. To confirm the current set
-from a clone, run:
+The repository retains `acceptance-matrix` as a deprecated alias for
+`acceptance-contract`. Both use the same contract protocol. To list the current
+skills from a clone, run:
 
 ```bash
-find skills -name SKILL.md -print | sort
+rg --files skills -g SKILL.md | sort
 ```
 
 The complete path looks like this:
@@ -59,7 +68,7 @@ idea or problem
 for each ticket
       |
       v
-/acceptance-matrix
+/acceptance-contract
       |
       v
 /interrogate       optional when the design is already settled
@@ -85,7 +94,10 @@ for each ticket
                                       CI red ----+---- CI green
                                          |                  |
                                          v                  v
-                                      /fix-pr          ready to merge
+                                      /fix-pr          current proof + review
+                                         |                  |
+                                         |                  v
+                                         |             ready to merge
                                          |
                                          v
                               refresh stale proof or review
@@ -117,7 +129,7 @@ slices that can each deliver and verify useful behavior:
 Use `/wayfinder` before `/to-spec` when the work is too large or uncertain for
 one agent session. It records the decisions that block a reliable plan and
 resolves them one at a time. When the issue already states a complete, agreed
-outcome, skip these planning steps and begin with `acceptance-matrix`.
+outcome, skip these planning steps and begin with `acceptance-contract`.
 
 ## Request an independent critique when it helps
 
@@ -135,13 +147,13 @@ judgment, it reports insufficient evidence and the smallest useful next check.
 
 Use `critique` for agent-led assessment of a supplied proposal. Use `interrogate`
 when you want to lead the questions about the agent's proposal and reach a
-design decision. `acceptance-matrix` plans requirements and evidence, while
+design decision. `acceptance-contract` plans requirements and evidence, while
 `prove` verifies an implementation against the agreed contract.
 
 Critique is optional and advisory. It does not edit the artifact, repository,
 or acceptance contract, publish findings, or begin implementation. No downstream
 skill is required. You can take unresolved decisions into `interrogate`, plan
-acceptance with `acceptance-matrix`, or proceed directly when appropriate.
+acceptance with `acceptance-contract`, or proceed directly when appropriate.
 
 ## Turn the ticket into an acceptance contract
 
@@ -150,23 +162,28 @@ what the change must accomplish. If the source only says "improve retries" or
 "make uploads reliable," resolve that ambiguity before implementation. The
 workflow cannot preserve a promise that nobody has made concrete.
 
-Run `acceptance-matrix` against the source:
+Run `acceptance-contract` against the source:
 
 ```text
-/acceptance-matrix #124
+/acceptance-contract #124
 ```
 
-The skill separates the source into stable requirements that a real observation
-can prove or disprove. It also records boundaries such as an empty collection, a
-retry after restart, a different authorization level, or a partial failure when
-the source or code path makes those cases relevant. Each row names one primary
-form of evidence: a behavioral test through a public interface, an invariant
-that prevents the counterexample, or an exact verification command.
+Follow the [acceptance contract protocol](./acceptance-contract-protocol.md)
+for the shared rules. The skill records a contract revision
+such as `v1` with stable `R` IDs, independent of any implementation candidate.
+Each row names the promise, relevant boundaries, the seam where behavior is
+observed, an independent oracle, and planned evidence. An oracle defines the
+correct result without taking the candidate's output as the answer.
 
-Do not treat the new matrix as a test report. Its rows begin as `planned` or
-`not proven` because `acceptance-matrix` designs the checks but does not run
-them. That distinction matters. A thoughtful test name is still only a plan
-until a fixed candidate produces the expected observation.
+Include empty inputs, retries, restarts, authorization boundaries, and partial
+failures when the promise depends on them. Record outcomes and exclusions so
+the contract states both what completion requires and what remains out of scope.
+
+Keep plan state separate from proof. Contract rows use only `planned` or `gap`.
+Use `gap` when the seam, oracle, or evidence path is missing or inadequate.
+Record unresolved product decisions as open questions. Only `prove` assigns
+`proven`, `disproven`, or `not proven` to rows for a fixed candidate. A test name or
+planned command does not establish behavior.
 
 For a retry ticket, the useful result is a contract with separate promises such
 as these:
@@ -178,14 +195,25 @@ R3: The retry preserves the original filename and metadata.
 R4: The retry succeeds after the application reloads its state.
 ```
 
-Keep those IDs and statements unchanged as work moves forward. If the product
-decision changes, record the authorized change. Do not let an implementation
-shortcut quietly rewrite the agreement.
+For R4, plan a check through the upload API and a fresh application process.
+Use the original filename, metadata, and stored upload count as independent
+expected results. A test that retries against the same in-memory object cannot
+establish the restart promise.
+
+Preserve requirement IDs across revisions. Increment `v1` to `v2` only for an
+authorized material change to a promise, boundary, outcome, or exclusion.
+Record the affected IDs, agreement, and authorization, and preserve the prior
+revision. Moving a test file, changing an evidence path, or clarifying wording
+without changing meaning does not increment the revision. Never weaken R4 to fit an
+implementation that loses retry state on restart.
+
+Reconcile GitHub checkboxes with the contract. A checked box is a completion
+claim to verify, not evidence. Resolve a mismatch before claiming acceptance.
 
 ## Challenge the design before code makes it expensive
 
 When the implementation has a consequential choice, run `interrogate` after
-the matrix and before editing code:
+the contract and before editing code:
 
 ```text
 /interrogate #124
@@ -198,11 +226,14 @@ concurrency, authorization, migrations, caching, and cross-service changes
 deserve more scrutiny than a local rename because a plausible design in those
 areas can fail far from the edited line.
 
+Challenge both missing required behavior and speculative machinery. Reuse the
+agreed testing seams; treat consequential new seams as explicit decisions.
+
 Use the conversation to reach a decision, not to generate an unlimited list of
 possibilities. Once the plan survives the important objections, state the
-chosen approach and any authorized requirement changes. Then authorize
-implementation explicitly. Agreement with a design does not by itself grant
-permission to edit the repository.
+chosen approach and any authorized requirement changes. Use implementation
+authority already present in the request. If the request covers design only,
+obtain implementation authority before editing code.
 
 Skip `interrogate` when the design is already clear and the cost of a wrong
 choice is low. A one-line correction with an existing regression seam rarely
@@ -211,17 +242,23 @@ small diffs can omit behavior too.
 
 ## Implement with Matt's feedback loops
 
-Pass the ticket and its acceptance matrix into Matt's implementation workflow:
+Pass the ticket and its acceptance contract into Matt's implementation workflow:
 
 ```text
 /implement #124
 ```
 
-Keep the matrix beside the work and map each meaningful code path or check back
+Keep the contract beside the work and map each meaningful code path or check back
 to its requirement ID. `/implement` uses `/tdd` at the agreed seams, so each
 vertical slice moves through a failing test, the smallest working change, and a
-cleanup pass. The matrix and TDD answer different questions. TDD drives the next
-piece of code, while the matrix keeps every ticket promise in view.
+cleanup pass. TDD drives the next piece of code, while the contract keeps every
+ticket promise in view. Use Matt's existing planning, implementation, TDD, and
+review steps rather than creating a second implementation workflow.
+
+Build the smallest complete implementation within the specification. Include
+necessary invariants, state transitions, failure handling, and persistence.
+For the retry example, R4 requires durable retry state even if an in-memory fix
+has a smaller diff. Omit speculative machinery that no promise requires.
 
 For a difficult defect or performance regression, use `/diagnosing-bugs` to
 build a reproduction, test hypotheses, and leave a regression check. Once the
@@ -229,7 +266,8 @@ cause is known, return to the same requirement IDs so the fix does not solve one
 symptom while leaving the promised outcome unverified.
 
 Matt's `/implement` closes with `/code-review`, which checks both repository
-standards and fidelity to the source specification. Finish the review and
+standards and fidelity to the source specification. Review both missing promised
+behavior and unrequested scope. Finish the review and
 commit the candidate before proof. A clean commit gives every later observation
 one exact identity and avoids the awkward question of whether a file changed
 halfway through verification.
@@ -248,7 +286,7 @@ which files the observations cover.
 
 ## Prove the fixed candidate
 
-Run `prove` only after the candidate and the contract are fixed:
+Run `prove` only after the candidate and the contract revision are fixed:
 
 ```text
 /prove #124
@@ -261,6 +299,12 @@ counterexamples at state transitions, retries, restarts, authorization
 boundaries, concurrency windows, and the final workflow outcome when those
 cases apply.
 
+Bind the proof report to the exact contract revision and exact candidate
+identity, and preserve the exact contract text used. For each row, retain
+durable evidence references with the command or observation, actual result, and
+oracle comparison. A passing suite summary
+cannot replace missing row evidence.
+
 Do not ask `/prove` to fix what it finds. Proof must leave both the candidate
 and the contract unchanged so that every observation still belongs to the same
 code. If a file changes during the run, the old observations no longer support
@@ -271,7 +315,8 @@ Read the verdict literally:
 
 ```text
 PROVEN
-Every material requirement has credible evidence for the fixed candidate.
+Every material requirement has credible, durable evidence for the exact
+contract revision and fixed candidate.
 
 NOT PROVEN
 At least one requirement, evidence path, contract detail, or candidate identity
@@ -292,15 +337,20 @@ requirement IDs to `repair-proof`:
 /repair-proof #124
 ```
 
-Authorize the edit only after the proof result, the contract, and the candidate
-still match. The skill changes the smallest amount of implementation or evidence
-needed for the named IDs, runs a focused check, and reports the candidate before
-and after the repair. It leaves unrelated gaps alone and preserves every valid
-check that already exists.
+Check that the proof result, contract revision, and candidate still match.
+Proceed under existing repair authority, including the current request. Ask
+for authority only if the request does not authorize the needed edit.
+
+The skill makes the smallest complete implementation or evidence repair for the
+named IDs. Keep the scope narrow while repairing the full cause, including
+necessary state, failure, and persistence paths. For R4, another in-memory retry
+guard is incomplete if restart still loses the upload. Preserve valid checks,
+run a focused check, and report the candidate before and after the repair.
 
 Expect `REPAIRED`, `NO CHANGE`, or `BLOCKED`, never `PROVEN`. A passing focused
 check shows that the repair is worth testing again, but it does not re-evaluate
-the other requirements against the changed candidate. Run proof again:
+the other requirements against the changed candidate. Run full proof again
+for every contract row after each candidate change:
 
 ```text
 /prove #124
@@ -356,17 +406,19 @@ keeps an unavailable dependency, unsafe branch state, uncertain cause, or
 pending verification visible.
 
 `FIXED` is narrower than `PROVEN`. GitHub Actions can show that the configured
-checks passed without showing that every ticket promise was checked. If
-`fix-pr` changes product behavior or acceptance evidence, run `/prove` again on
-the repaired commit. Refresh the repository's code review when the repair makes
-the previous review stale.
+checks passed without showing that every ticket promise was checked. Every
+changed candidate makes its previous proof stale. Run full `/prove` again on
+the repaired candidate, especially after product, acceptance evidence, or
+relevant test changes. A contract revision can remain unchanged while its
+candidate needs fresh proof. Refresh code review when the repair changes the
+reviewed diff.
 
 ## Choose the shortest workflow that covers the risk
 
 For a straightforward ticket with a settled design, use the compact path:
 
 ```text
-/acceptance-matrix #124
+/acceptance-contract #124
 /implement #124
 /prove #124
 open the pull request
@@ -380,7 +432,7 @@ For a feature that starts as an idea, use the full planning and delivery path:
 /to-tickets #123
 
 # For each ticket:
-/acceptance-matrix #124
+/acceptance-contract #124
 /interrogate #124
 /implement #124
 /prove #124
@@ -391,7 +443,7 @@ For a difficult bug, replace the broad planning phase with a disciplined
 diagnosis while keeping the acceptance and proof steps:
 
 ```text
-/acceptance-matrix #124
+/acceptance-contract #124
 /diagnosing-bugs
 /implement #124
 /prove #124
@@ -411,14 +463,14 @@ new commit invalidates:
 
 ```text
 /fix-pr #456
-/prove #124       if product behavior or acceptance evidence changed
+/prove #124       full proof for every changed candidate
 review again      if the reviewed diff changed materially
 ```
 
 Use every step that closes a real uncertainty and omit the rest. The workflow
 works because Matt's skills move the work from an idea to reviewed code, while
 the skills in this repository keep the acceptance contract and evidence intact.
-`acceptance-matrix` defines the checks, `interrogate` tests the proposed design,
+`acceptance-contract` defines the checks, `interrogate` tests the proposed design,
 `/prove` verifies a fixed candidate, `repair-proof` changes only named gaps, and
 `fix-pr` restores the pull request's required automation. None of those results
 is a substitute for another.
