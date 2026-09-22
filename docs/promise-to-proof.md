@@ -77,12 +77,9 @@ settled, turn the conversation into a durable specification:
 /to-spec
 ```
 
-If the specification is too large for one ticket, divide it into complete
-slices that can each deliver and verify useful behavior:
-
-```text
-/to-tickets #123
-```
+Existing tickets from `/to-tickets` or another planning workflow remain valid
+inputs. To divide an agreed parent contract, use Grove's optional
+[slicing step](#divide-large-work-without-changing-the-agreement).
 
 Use `/wayfinder` before `/to-spec` when the work is too large or uncertain for
 one agent session. It records the decisions that block a reliable plan and
@@ -176,6 +173,82 @@ a tracker, use `docs/acceptance-contracts/<work-id>.md` unless the repository
 documents another location. Reread the saved contract and pass its location and
 revision onward. Include local files in the commit or snapshot transferred to
 another checkout. Report storage as pending when it cannot be completed.
+
+## Divide large work without changing the agreement
+
+Keep a small, coherent task on the direct acceptance, implementation, review,
+and proof path. For larger work, save the parent contract first, then request a
+draft decomposition:
+
+```text
+/slice-contract #123; draft only
+```
+
+The skill inspects the source, exact parent revision, existing work, and relevant
+implementation. It proposes the fewest useful outcomes, maps every parent promise
+to a contribution and completion check, and records genuine prerequisites.
+`NO SPLIT` means separate tickets add no useful boundary. A missing parent contract
+returns to `acceptance-contract`; slicing cannot invent its requirements or revision.
+
+Review the ticket outcomes, coverage map, dependency order, parent completion plan,
+labels, destination, and intended links. Approve consequential exceptions, such
+as batches that need a shared integration candidate. Resolve outcome-changing
+unknowns before dependent publication. A missing test with a clear outcome can
+instead become assigned evidence work.
+
+Invocation alone permits inspection and a draft. Authorize local plan storage
+separately when needed. Publication requires approval of the breakdown and
+authority for the named destination and changes. You can give both together:
+
+```text
+/slice-contract #123; publish the approved breakdown as GitHub issues
+```
+
+The skill retains prior authority for an unchanged approved plan. A materially
+changed allocation, destination, dependency, or exception needs approval unless
+already delegated. Publication covers the approved tickets, planning metadata,
+and necessary links. It does not grant contract edits, assignments, issue closure,
+commits, pushes, or implementation authority.
+
+Use the configured tracker and local paths. If you explicitly choose local tickets
+and no layout exists, the default is `.scratch/<work-id>/plan.md` with one child
+file under `.scratch/<work-id>/issues/`. Transfer those artifacts and the parent
+snapshot to the next checkout. Saving files does not authorize a commit.
+
+After publication, reopen the canonical index, tickets, and relationships.
+`PUBLISHED` means the intended artifacts and required links were saved and reread.
+`PARTIAL` records successful, pending, and uncertain operations. `BLOCKED` identifies
+an input, decision, permission, or capability that prevents safe progress.
+A draft remains `DRAFT`; a chat draft alone is not a saved handoff.
+
+To resume, pass the parent or saved plan back to `slice-contract`. The skill uses
+stable slice IDs and actual ticket references, including closed tickets, to
+reconcile work. After a lost response, confirm remote state before retrying.
+Preserve successful writes and human edits. If the parent or an active child
+changed, reconcile affected writes before continuing. A disclosed text-link
+fallback can replace unavailable native relationships only when repository
+requirements allow it. Otherwise publication remains incomplete.
+
+For each child, explicitly run acceptance planning:
+
+```text
+/acceptance-contract <child-reference>
+```
+
+The child retains the exact parent reference and applicable constraints. Its
+local requirement IDs map through `Source` to qualified parent obligations,
+such as `grove/project#123 v2:R4`. Slice IDs such as `S1` are planning identities.
+A child contract covers its own contribution without requiring unrelated sibling
+functionality. Missing contracts and prerequisites prevent unattended implementation
+readiness even after successful publication.
+
+Continue with the chosen implementation, review, and proof workflows. Missing
+companion skills do not block slicing; their next steps remain explicit handoffs.
+Finally, invoke `/prove` on the full parent contract against one integrated
+candidate, including interactions between children. Allocate actual integration
+code and checks to a ticket when needed. Ordinary parent proof needs no separate
+integration ticket. Closed children and proofs on earlier candidates cannot replace
+this parent evaluation or the applicable review and merge gates.
 
 ## Challenge the design before code makes it expensive
 
@@ -450,15 +523,22 @@ For a feature that starts as an idea, optionally add Matt's planning tools:
 ```text
 /grill-with-docs <idea>
 /to-spec
-/to-tickets #123
+/acceptance-contract #123
+/slice-contract #123; draft only
+# Approve the breakdown and authorize publication.
+/slice-contract #123; publish the approved breakdown
 
-# For each ticket:
+# For each child ticket:
 /acceptance-contract #124
 /interrogate #124
 /implement-contract #124
 /review-contract #124 against main
 /prove #124
 open the pull request when authorized
+
+# On the final integrated candidate:
+/prove #123
+# Apply the repository review and merge gates.
 ```
 
 For a difficult bug, optionally use Matt's `diagnosing-bugs` before implementation:

@@ -171,7 +171,7 @@ import { join } from 'node:path';
 const root = await mkdtemp(join(tmpdir(), 'acceptance-install-'));
 const protocol = await readFile('docs/acceptance-contract-protocol.md', 'utf8');
 try {
-	for (const name of ['acceptance-contract', 'implement-contract', 'review-contract', 'prove', 'repair-proof', 'interrogate', 'fix-pr']) {
+	for (const name of ['acceptance-contract', 'slice-contract', 'implement-contract', 'review-contract', 'prove', 'repair-proof', 'interrogate', 'fix-pr']) {
 		const dest = join(root, name);
 		await cp(`skills/productivity/${name}`, dest, { recursive: true, dereference: true });
 		const ref = join(dest, 'references/acceptance-contract-protocol.md');
@@ -193,7 +193,8 @@ from this copy check. Run each installed skill in an isolated invocation where t
 source checkout and sibling skill directories are unavailable. Run scenario 1 with
 `acceptance-contract`, [implementation T1](./implement-contract-scenarios.md#t1-complete-a-small-implementation-and-rerun)
 with `implement-contract`, and [review T12](./review-contract-scenarios.md#t12-accept-a-complete-small-design-without-embellishment)
-with `review-contract`. Disable Matt skills and subagent tools for these cases.
+with `review-contract`, and [slicing T4](./slice-contract-scenarios.md#t4-allocate-outcomes-and-shared-constraints)
+with `slice-contract`. Disable Matt skills and subagent tools for these cases.
 
 Pass when every local reference resolves within its copied skill directory,
 including the protocol. The planning run must obey the revision and plan-state
@@ -240,3 +241,21 @@ Pass when planning preserves the ownership boundary, cites its source, and plans
 an unauthorized-account counterexample. Reusing the existing authorization
 mechanism is necessary engineering, not unrequested product scope. It must not
 invent a new identity system or unrelated security features.
+
+## 15. Plan a sliced child from durable parent context
+
+Use [slicing T17](./slice-contract-scenarios.md#t17-retrieve-a-child-in-a-fresh-session)
+with only a published browser child reference in a fresh checkout. Its parent
+snapshot promises API and browser retry with owner-only access and durable state.
+The child contributes browser behavior after the API prerequisite exists.
+
+Pass when child rows map through `Source` to qualified parent obligations and
+preserve applicable ownership and restart boundaries. The contract does not
+require unrelated API implementation or confuse child IDs with parent IDs.
+The exact parent snapshot and canonical plan remain retrievable.
+
+Repeat with an authorized pending parent amendment and with an unavailable parent
+snapshot. The agent preserves the existing child and parent contracts while
+exposing the affected decision or retrieval gap. It must not silently narrow
+inherited constraints, invent parent text from its digest, or treat a slice
+marker as authority to revise the agreement.

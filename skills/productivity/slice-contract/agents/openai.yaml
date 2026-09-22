@@ -1,0 +1,5 @@
+interface:
+  display_name: "Slice Contract"
+  short_description: "Split agreed work into traceable implementation tickets"
+policy:
+  allow_implicit_invocation: false
