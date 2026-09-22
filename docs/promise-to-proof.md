@@ -17,8 +17,9 @@ source → acceptance-contract → saved canonical contract
        → implement-contract → captured candidate → review-contract → prove
 ```
 
-The sequence is not a ceremony. Each skill answers a different question, and
-you can omit a step when that question has a clear, low-risk answer.
+The sequence is not a ceremony. Each skill answers a different question.
+Skip optional planning, slicing, and repair steps when they do not apply.
+Merge still requires current proof for the final candidate.
 
 ## Install the skills
 
@@ -481,8 +482,13 @@ you may run them in either order.
 ## Repair failed GitHub Actions without weakening the check
 
 When separately authorized, open the pull request after the candidate is proven
-and reviewed according to the repository's process. If a required GitHub Actions
-workflow fails, invoke `fix-pr` with the pull request or the failed workflow run:
+and reviewed according to the repository's process. Before merge, confirm that
+the PR head SHA is the captured commit. If the candidate was a snapshot, record
+an exact content match between it and the content at the PR head SHA. If neither
+condition holds, run review and proof again on the PR head.
+
+If a required GitHub Actions workflow fails, invoke `fix-pr` with the pull
+request or the failed workflow run:
 
 ```text
 /fix-pr #456
@@ -524,6 +530,7 @@ For a straightforward ticket with a settled design, use the compact path:
 /review-contract <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
 open the pull request when authorized
+confirm the PR head matches the captured candidate
 ```
 
 For a feature that starts as an idea, optionally add Matt's planning tools:
