@@ -100,7 +100,7 @@ validation remains a gap even when code appears complete.
 Investigate selected review findings against their captured candidate, current
 code, and contract. Findings are inputs, not automatically correct instructions.
 Repair supported, in-scope concerns and explain obsolete or unsupported findings.
-A matching `NOT PROVEN` report with named gaps belongs to `/repair-proof`;
+A matching `NOT PROVEN` report with named gaps belongs to `/repair-gaps`;
 do not bypass its candidate, contract, or scope checks through this skill.
 
 For a missing contract, omitted source promise, material conflict, or changed
@@ -130,7 +130,7 @@ content, report storage, and comparison context. A missing commit is not a
 blocker when a transferable snapshot exists. Label an unresolved review base
 instead of guessing it.
 
-Return development observations. Hand off separately to `/review-contract` and
+Return development observations. Hand off separately to `/review-implementation` and
 `/prove` without invoking either implicitly. Only `/prove` produces acceptance
 verdicts. Leave the canonical contract and its `planned` or `gap` states unchanged.
 

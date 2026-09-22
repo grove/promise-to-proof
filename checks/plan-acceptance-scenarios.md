@@ -171,7 +171,7 @@ import { join } from 'node:path';
 const root = await mkdtemp(join(tmpdir(), 'plan-acceptance-install-'));
 const protocol = await readFile('docs/acceptance-contract-protocol.md', 'utf8');
 try {
-	for (const name of ['plan-acceptance', 'slice-contract', 'implement-contract', 'review-contract', 'prove', 'repair-proof', 'interrogate', 'fix-pr']) {
+	for (const name of ['plan-acceptance', 'slice-contract', 'implement-contract', 'review-implementation', 'prove', 'repair-gaps', 'interrogate', 'fix-pr']) {
 		const dest = join(root, name);
 		await cp(`skills/productivity/${name}`, dest, { recursive: true, dereference: true });
 		const ref = join(dest, 'references/acceptance-contract-protocol.md');
@@ -192,8 +192,8 @@ Inspect the installed protocol content rather than inferring installer behavior
 from this copy check. Run each installed skill in an isolated invocation where the
 source checkout and sibling skill directories are unavailable. Run scenario 1 with
 `plan-acceptance`, [implementation T1](./implement-contract-scenarios.md#t1-complete-a-small-implementation-and-rerun)
-with `implement-contract`, and [review T12](./review-contract-scenarios.md#t12-accept-a-complete-small-design-without-embellishment)
-with `review-contract`, and [slicing T4](./slice-contract-scenarios.md#t4-allocate-outcomes-and-shared-constraints)
+with `implement-contract`, and [review T12](./review-implementation-scenarios.md#t12-accept-a-complete-small-design-without-embellishment)
+with `review-implementation`, and [slicing T4](./slice-contract-scenarios.md#t4-allocate-outcomes-and-shared-constraints)
 with `slice-contract`. Disable Matt skills and subagent tools for these cases.
 
 Pass when every local reference resolves within its copied skill directory,
@@ -212,7 +212,7 @@ Transfer the source, contract, and revision history to a fresh checkout. Give
 session B only the source reference and explicitly invoke `implement-contract`.
 Authorize report storage outside the candidate. Transfer its recoverable final
 candidate, including relevant uncommitted and untracked files, to another checkout.
-Invoke `review-contract` in session C using the saved handoff. Explicitly invoke
+Invoke `review-implementation` in session C using the saved handoff. Explicitly invoke
 `prove` in session D against the same captured candidate.
 
 Pass when A names the canonical location and confirms retrieval. Later sessions

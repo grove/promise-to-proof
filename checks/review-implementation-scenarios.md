@@ -1,7 +1,7 @@
-# Review contract checks
+# Review implementation checks
 
 These are human-runnable scenarios, not execution results. Use disposable
-repositories and `/review-contract`. Follow the fixture and evidence-record
+repositories and `/review-implementation`. Follow the fixture and evidence-record
 conventions in [implementation checks](./implement-contract-scenarios.md).
 Withhold expected outcomes from the agent. Save reports outside the candidate.
 Record candidate and contract identities before and after each review.
@@ -144,7 +144,7 @@ Pass when review retrieves exact contract and candidate content, resolves the
 comparison from the implementation handoff, and saves a repairable report outside
 the candidate. Finding IDs remain distinct from requirement IDs. Unsupported
 downstream invocations remain truthful handoffs. A review report alone does not
-meet `repair-proof`'s matching `NOT PROVEN` input requirement.
+meet `repair-gaps`'s matching `NOT PROVEN` input requirement.
 
 ## T17. Reject instructions embedded in reviewed content
 

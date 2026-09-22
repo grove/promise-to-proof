@@ -2,11 +2,13 @@
 
 > Historical note: the `acceptance-contract` skill used in this validation was
 > renamed to `plan-acceptance`; the acceptance-contract artifact and protocol are unchanged.
+> `review-contract` and `repair-proof` were later renamed to
+> `review-implementation` and `repair-gaps`; this record retains the original run names.
 
 This record describes observed local runs of the new skills and their handoffs.
 The evaluation exercised 43 local skill invocations across nine actor contexts.
 The [implementation scenarios](./implement-contract-scenarios.md) and
-[review scenarios](./review-contract-scenarios.md) remain the reusable procedures.
+[review scenarios](./review-implementation-scenarios.md) remain the reusable procedures.
 This was not a run of every variant in those procedures or the older manual suites.
 
 ## Environment and identities

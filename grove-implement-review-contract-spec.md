@@ -1,5 +1,8 @@
 # Specification: `implement-contract` and `review-contract`
 
+> Naming update: the implemented `review-contract` skill was subsequently
+> renamed to `review-implementation`. The behavior specified below is unchanged.
+
 **Status:** Proposed  
 **Repository:** `grove/skills`  
 **Baseline reviewed:** `087384f7a346d2f495eac3d130f0d2e2acc7cbba` — 22 September 2026  

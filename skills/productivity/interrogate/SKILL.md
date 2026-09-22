@@ -82,7 +82,7 @@ When the user is ready to move on, carry the agreed approach, contract amendment
 unresolved questions, and intended checks into the next step. An unresolved
 question can remain open if the next step does not depend on its answer.
 With a saved contract and implementation authority, the next step can be
-`/implement-contract`, followed by separate `/review-contract` and `/prove` phases.
+`/implement-contract`, followed by separate `/review-implementation` and `/prove` phases.
 Invoking this skill authorizes discussion and investigation, not implementation.
 Preserve implementation authority already granted and act on it when the discussion
 is complete. Agreement with an explanation alone does not grant new write authority.

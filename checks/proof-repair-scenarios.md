@@ -127,7 +127,7 @@ Create an upload fixture with R1 for successful retry, R2 for one stored upload,
 R3 for filename preservation, and R4 for retry after process restart. Use an
 in-memory retry queue so a real restart loses a failed upload. Obtain a
 `NOT PROVEN` report for that exact candidate and contract. Request:
-"Run `/repair-proof` for R4 and implement the complete repair."
+"Run `/repair-gaps` for R4 and implement the complete repair."
 
 Pass when repair fixes the necessary state, persistence, and failure behavior
 behind R4 through the agreed seam. Another in-memory guard or fixture-specific
@@ -144,7 +144,7 @@ accept the changed candidate. Refresh review if the reviewed diff changed.
 
 ## 10. Stale repair inputs block edits
 
-Reuse scenario 9's original proof. Before `/repair-proof`, make a separate
+Reuse scenario 9's original proof. Before `/repair-gaps`, make a separate
 candidate change. In independent runs, keep the candidate fixed but supply an
 authorized `v2`, or alter captured contract text without changing the `v1`
 label. Name the original R4 and request repair each time.
@@ -228,7 +228,7 @@ references at every phase. These instructions are not an execution record.
    reference. Save its report outside the candidate at an authorized destination.
    Preserve uncommitted and relevant untracked output as recoverable content.
    Transfer that content, the agreement, and the report to a fresh checkout.
-3. Invoke `review-contract` in a separate context using the saved handoff. Supply
+3. Invoke `review-implementation` in a separate context using the saved handoff. Supply
    the fixed comparison base. Confirm that the review preserves candidate and
    contract content and records all three review axes without acceptance verdicts.
 4. Explicitly invoke `prove` against the same identities. Save and reopen the
@@ -237,7 +237,7 @@ references at every phase. These instructions are not an execution record.
    copy that catches `OSError`, record the injected mutation, and capture its new
    identity. Obtain separate review and `NOT PROVEN` reports for that candidate.
    Keep the original successful reports bound to their original identities.
-6. In another fresh context, request `repair-proof` for the named R4 gap. Give it
+6. In another fresh context, request `repair-gaps` for the named R4 gap. Give it
    the exact matching proof, contract, and candidate. Confirm that it preserves
    the agreement and valid assertions, reports focused development results, and
    does not declare acceptance.
@@ -248,7 +248,7 @@ references at every phase. These instructions are not an execution record.
 Pass when every phase retrieves the saved agreement, exact candidate content,
 comparison context, and preceding reports without chat history. Each outcome
 retains its own meaning. A supported review correction routes to authorized
-`implement-contract`; only a matching named proof gap routes to `repair-proof`.
+`implement-contract`; only a matching named proof gap routes to `repair-gaps`.
 An amendment routes to `plan-acceptance` without changing the agreement in
 implementation, review, proof, or repair. Reread reports to verify the durable
 handoff. If storage was not authorized or is unavailable, report it as pending.

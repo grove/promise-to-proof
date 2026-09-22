@@ -1,0 +1,5 @@
+interface:
+  display_name: "Repair Gaps"
+  short_description: "Repair named proof gaps and require fresh acceptance proof"
+policy:
+  allow_implicit_invocation: false

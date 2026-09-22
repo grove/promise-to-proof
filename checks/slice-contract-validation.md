@@ -2,6 +2,8 @@
 
 > Historical note: the `acceptance-contract` skill used in this validation was
 > renamed to `plan-acceptance`; the acceptance-contract artifact and protocol are unchanged.
+> `review-contract` and `repair-proof` were later renamed to
+> `review-implementation` and `repair-gaps`; the recorded installations remain historical.
 
 This record covers observed local and simulated-tracker runs. The reusable
 [scenario checks](./slice-contract-scenarios.md) contain the full evaluation set.
