@@ -15,8 +15,7 @@ New here? Start with the [HOW-TO](./docs/how-to.md) to choose and run a delivery
 path. For questions about issues, slicing, review, and proof, read the
 [FAQ](./docs/faq.md). [How to take a ticket from promise to proof](./docs/promise-to-proof.md)
 gives the detailed workflow; the [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
-defines the shared contract, revision, and proof rules. Matt Pocock's planning
-and TDD skills are optional additions.
+defines the shared contract, revision, and proof rules.
 
 Issues and specifications for this repository live in [GitHub Issues](https://github.com/grove/promise-to-proof/issues).
 

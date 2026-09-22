@@ -10,8 +10,8 @@ can pass while its assertions miss the promised result. A green pull request can
 hide a weakened check.
 
 Use Promise to Proof's native skills to plan acceptance, implement the agreed capability,
-review a captured candidate, and prove the result. [Matt Pocock's skills](https://github.com/mattpocock/skills)
-can help with planning and TDD, but the delivery path works without them.
+review a captured candidate, and prove the result. Optional external planning and TDD
+tools can help, but the delivery path works without them.
 
 The acceptance contract defines the spec envelope. Implementation fills it.
 Proof establishes that one exact candidate satisfies one exact contract revision.
@@ -35,13 +35,13 @@ npx skills@latest add grove/promise-to-proof
 
 Use the repository's existing issue-tracker and domain-document configuration.
 A local specification and saved contract do not require an external setup skill.
-If you want Matt's planning or TDD tools, install that collection separately:
+If you want external planning or TDD tools, install that collection separately:
 
 ```bash
 npx skills@latest add mattpocock/skills
 ```
 
-Matt's optional `setup-matt-pocock-skills` configures its tools for your repository.
+The collection's optional setup skill configures its tools for your repository.
 Keep the issue tracker, triage labels, and documentation locations consistent
 with the sources it reads.
 
@@ -66,7 +66,7 @@ invocation and any publishing. Neither review nor proof needs an open PR or
 unrelated green CI. Merge requires current proof, green required checks for the
 final candidate, and the repository's review requirements.
 
-## Optionally shape the work with Matt's planning skills
+## Optionally shape the work with external planning tools
 
 For a feature that begins as an idea, start with a focused conversation:
 
@@ -319,8 +319,8 @@ For the retry example, R4 requires durable retry state even if an in-memory fix
 has a smaller diff. Omit speculative machinery that no promise requires.
 
 Use meaningful checks at the agreed public seams. Prefer test-first development
-for new behavior and regressions where a suitable seam exists. Matt's `/tdd` is
-an optional aid, not a required dependency. Existing checks may suffice for
+for new behavior and regressions where a suitable seam exists. An external `/tdd`
+skill is an optional aid, not a required dependency. Existing checks may suffice for
 already-covered behavior or documentation. A missing planned test is work to
 perform; an unavailable material check must remain a reported limitation.
 
@@ -547,7 +547,7 @@ open the pull request when authorized
 confirm the PR head matches the captured candidate
 ```
 
-For a feature that starts as an idea, optionally add Matt's planning tools:
+For a feature that starts as an idea, optionally add external planning tools:
 
 ```text
 /grill-with-docs <idea>
@@ -571,7 +571,7 @@ open the pull request when authorized
 # Apply the repository review and merge gates.
 ```
 
-For a difficult bug, optionally use Matt's `diagnosing-bugs` before implementation:
+For a difficult bug, optionally use an external `diagnosing-bugs` skill before implementation:
 
 ```text
 /plan-acceptance #124
