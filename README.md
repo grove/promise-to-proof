@@ -20,7 +20,6 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 | [`critique`](./skills/productivity/critique/SKILL.md) | You explicitly request an independent review of a proposal against its intended outcome | Evidence-backed advice and a recommendation |
 | [`interrogate`](./skills/productivity/interrogate/SKILL.md) | A design needs stress-testing | An agreed approach, assumptions, and open decisions |
 | [`acceptance-contract`](./skills/productivity/acceptance-contract/SKILL.md) | A ticket needs clear acceptance criteria | A candidate-independent revision with stable requirement IDs and evidence plans |
-| [`acceptance-matrix`](./skills/productivity/acceptance-matrix/SKILL.md) | An existing workflow uses the old name | Deprecated alias for `acceptance-contract` |
 | [`prove`](./skills/productivity/prove/SKILL.md) | Implementation is ready to verify | `PROVEN` or `NOT PROVEN` with evidence |
 | [`repair-proof`](./skills/productivity/repair-proof/SKILL.md) | Proof found a specific gap | A scoped repair report; fresh proof is still required |
 | [`fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
@@ -115,7 +114,6 @@ npx skills@latest update prove
 ```text
 skills/productivity/
 ├── acceptance-contract/
-├── acceptance-matrix/     deprecated alias
 ├── critique/
 ├── fix-pr/
 ├── interrogate/

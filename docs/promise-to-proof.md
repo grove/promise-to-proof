@@ -43,9 +43,7 @@ Choose the issue tracker, triage labels, and documentation locations that the
 project already uses. The setup gives Matt's planning and implementation skills
 the same sources that `acceptance-contract` and `/prove` will read later.
 
-The repository retains `acceptance-matrix` as a deprecated alias for
-`acceptance-contract`. Both use the same contract protocol. To list the current
-skills from a clone, run:
+To list the current skills from a clone, run:
 
 ```bash
 rg --files skills -g SKILL.md | sort
