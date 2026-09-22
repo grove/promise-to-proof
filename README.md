@@ -51,8 +51,9 @@ Source → acceptance-contract → saved contract → implement-contract
    invocation. Review does not edit the candidate.
 4. **Prove.** Run `prove` against the exact contract and candidate. Each row gets
    `proven`, `disproven`, or `not proven` with durable evidence.
-5. **Repair only named proof gaps.** If proof is `NOT PROVEN`, pass its unresolved
-   requirement IDs to `repair-proof` for the smallest complete repair.
+5. **Repair named proof gaps.** If `NOT PROVEN` names repairable implementation or
+   evidence gaps, pass the unresolved requirement IDs to `repair-proof`. Resolve
+   contract, verification, or candidate identity gaps before running proof again.
 6. **Refresh results.** Every candidate change needs fresh proof of every row and
    refreshed review. A changed agreement returns to `acceptance-contract` first.
 
@@ -64,8 +65,11 @@ Small work keeps the direct path above; `NO SPLIT` is a valid result.
 ```text
 saved parent contract → slice-contract → approved/published child tickets
 → acceptance-contract for each child → implementation, review, and child proof
-→ integrated candidate → final integration review when needed → full parent prove
+→ integrated candidate → final integration review if needed → full parent prove
 ```
+
+Review the integrated candidate if it differs from the reviewed child candidates
+or contains shared integration code.
 
 Slicing defaults to inspection and a draft. Publication needs authority for the
 approved tickets, metadata, and links. An unchanged approved plan retains its
