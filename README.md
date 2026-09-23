@@ -21,15 +21,32 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 
 ## Choose a skill
 
+### Shape the work
+
 | Skill | Use it when | It gives you |
 |---|---|---|
 | [`critique`](./skills/productivity/critique/SKILL.md) | You explicitly request an independent review of a proposal against its intended outcome | Evidence-backed advice and a recommendation |
 | [`interrogate`](./skills/productivity/interrogate/SKILL.md) | You want to question the agent's proposal and reasoning | Evidence-backed answers, a revised approach, and explicit unknowns |
+
+### Plan and divide
+
+| Skill | Use it when | It gives you |
+|---|---|---|
 | [`plan-acceptance`](./skills/productivity/plan-acceptance/SKILL.md) | A ticket needs clear acceptance criteria | A candidate-independent revision with stable requirement IDs and evidence plans |
 | [`slice-contract`](./skills/productivity/slice-contract/SKILL.md) | A parent contract is too large for one coherent task | A traceable breakdown and, when authorized, published child tickets |
+
+### Implement and verify
+
+| Skill | Use it when | It gives you |
+|---|---|---|
 | [`implement-contract`](./skills/productivity/implement-contract/SKILL.md) | An agreed contract is ready to implement | Scoped implementation, development checks, and a recoverable candidate handoff |
 | [`review-implementation`](./skills/productivity/review-implementation/SKILL.md) | A captured implementation is ready to inspect | Findings on contract fidelity, scope, and engineering quality |
 | [`prove`](./skills/productivity/prove/SKILL.md) | Implementation is ready to verify | `PROVEN` or `NOT PROVEN` with evidence |
+
+### Recover
+
+| Skill | Use it when | It gives you |
+|---|---|---|
 | [`repair-gaps`](./skills/productivity/repair-gaps/SKILL.md) | Proof found specific repairable gaps | A scoped repair report; fresh proof is still required |
 | [`fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
 
