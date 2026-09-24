@@ -27,7 +27,8 @@ Confirm that the PR head represents the exact candidate covered by a current
 and exact agreement. For a snapshot handoff, compare its recoverable content and
 comparison base with the PR head; do not infer equivalence from a matching title,
 branch name, or patch description. Confirm that the review's change set covers the
-PR against its current base. If commit creation, rebasing, repairs, integration,
+PR against its current base and that its scope covers every applicable contract
+obligation, not only selected requirement IDs. If commit creation, rebasing, repairs, integration,
 or base changes make that identity or scope uncertain, withhold readiness and name
 the review or full proof that must be refreshed. Do not rerun either skill here.
 
@@ -41,10 +42,12 @@ merge conditions separately. An unknown policy or unavailable status is not a
 pass. A merge queue entry is not itself authorization to claim its eventual
 merge-group candidate is ready.
 
-Reread the PR head, target, and relevant gate state before reporting. If they
-changed during inspection, report the earlier observations as stale and withhold
-readiness for the new state. Do not commit, push, open or edit PRs, approve,
-rerun checks, alter reports, or merge.
+Reread the canonical contract, source-linked amendments, PR head, target, and
+relevant gate state before reporting. If the agreement or PR state changed during
+inspection, report the earlier observations as stale and withhold readiness for
+the new state. Keep the candidate, worktree, contract, reports, and external
+systems unchanged. Do not commit, push, open or edit PRs, approve, rerun checks,
+or merge.
 
 ## Report
 
