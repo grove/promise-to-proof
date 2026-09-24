@@ -7,10 +7,6 @@ It keeps the agreement, implementation, review, and proof separate so the
 promised capability does not get lost between ticket and implementation: no less
 in substance, no more in scope.
 
-The skills work with agent-skill-compatible coding tools. A saved acceptance
-contract carries the source ticket's promises through implementation, review,
-and proof. The skills do not provide a workflow runtime.
-
 Issues and specifications for this repository live in [GitHub Issues](https://github.com/grove/promise-to-proof/issues).
 
 ## How Promise to Proof works
@@ -23,12 +19,12 @@ proves the promised behavior on one exact candidate.
 flowchart LR
   promise["1. Start with a promise<br/>Issue, spec, or agreed outcome"]
   plan["2. Define what success means<br/>/plan-acceptance"]
-  contract["Acceptance contract<br/>What must be true + how to verify it"]
+  contract["Acceptance contract<br/>What must be true + what evidence will prove it"]
   implement["3. Build exactly that<br/>/implement-contract"]
   candidate["Exact implementation candidate<br/>Commit or reproducible snapshot"]
   review["4a. Review: Is the implementation sound?<br/>/review-implementation"]
   prove["4b. Proof: Does the promised behavior actually hold?<br/>/prove"]
-  done["5. Evidence matches the implementation<br/>Review + proof refer to this exact contract and candidate"]
+  done["5. The promise is backed by evidence<br/>Review + proof match this exact contract and candidate"]
 
   promise --> plan --> contract --> implement --> candidate
   candidate --> review --> done
@@ -50,6 +46,10 @@ contract. Review and proof can run in either order. Start with the
 [HOW-TO](./docs/how-to.md) for the saved artifacts and commands.
 
 ## Install and update
+
+The skills work with agent-skill-compatible coding tools. A saved acceptance
+contract carries the source ticket's promises through implementation, review,
+and proof. The skills do not provide a workflow runtime.
 
 Install the full collection:
 
@@ -76,41 +76,24 @@ mechanism.
 
 ## Choose a skill
 
-### Start with an issue
+**New users: start with these four:**
+
+[`/plan-acceptance`](./skills/productivity/plan-acceptance/SKILL.md) →
+[`/implement-contract`](./skills/productivity/implement-contract/SKILL.md) →
+[`/review-implementation`](./skills/productivity/review-implementation/SKILL.md) +
+[`/prove`](./skills/productivity/prove/SKILL.md)
+
+### Other skills when you need them
 
 | Skill | Use it when | It gives you |
 |---|---|---|
 | [`/create-parent-issue`](./skills/productivity/create-parent-issue/SKILL.md) | A local specification needs one originating GitHub issue | One source issue with a durable reference to the exact spec |
 | [`/triage-issue`](./skills/productivity/triage-issue/SKILL.md) | An existing issue needs a next action or triage label | A recommendation and, when explicitly approved, a verified issue update |
-
-### Shape the work
-
-| Skill | Use it when | It gives you |
-|---|---|---|
 | [`/critique`](./skills/productivity/critique/SKILL.md) | You explicitly request an independent review of a proposal against its intended outcome | Evidence-backed advice and a recommendation |
 | [`/interrogate`](./skills/productivity/interrogate/SKILL.md) | You want to question the agent's proposal and reasoning | Evidence-backed answers, a revised approach, and explicit unknowns |
-
-### Plan and divide
-
-| Skill | Use it when | It gives you |
-|---|---|---|
-| [`/plan-acceptance`](./skills/productivity/plan-acceptance/SKILL.md) | A ticket needs clear acceptance criteria | A candidate-independent revision with stable requirement IDs and evidence plans |
 | [`/slice-contract`](./skills/productivity/slice-contract/SKILL.md) | A parent contract is too large for one coherent task | A traceable breakdown and, when authorized, published child tickets |
-
-### Implement and verify
-
-| Skill | Use it when | It gives you |
-|---|---|---|
-| [`/implement-contract`](./skills/productivity/implement-contract/SKILL.md) | An agreed contract is ready to implement | Scoped implementation, development checks, and a recoverable candidate handoff |
-| [`/review-implementation`](./skills/productivity/review-implementation/SKILL.md) | A captured implementation is ready to inspect | Findings on contract fidelity, scope, and engineering quality |
-| [`/prove`](./skills/productivity/prove/SKILL.md) | Implementation is ready to verify | `PROVEN` or `NOT PROVEN` with evidence |
-| [`/merge-readiness`](./skills/productivity/merge-readiness/SKILL.md) | An existing PR is near a merge decision | Read-only readiness or specific blockers for the current PR state |
-
-### Recover
-
-| Skill | Use it when | It gives you |
-|---|---|---|
 | [`/repair-gaps`](./skills/productivity/repair-gaps/SKILL.md) | Proof found specific repairable gaps | A scoped repair report; fresh proof is still required |
+| [`/merge-readiness`](./skills/productivity/merge-readiness/SKILL.md) | An existing PR is near a merge decision | Read-only readiness or specific blockers for the current PR state |
 | [`/fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
 
 ## Use a skill
