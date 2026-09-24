@@ -76,12 +76,27 @@ before checking the fix. An import or setup failure does not establish that.
 Reuse valid existing checks for covered behavior, mechanical edits, and docs;
 do not invent an artificial red-green exercise.
 
+For every selected acceptance requirement, materialize its planned executable
+evidence during implementation. When the contract names a behavioral test or
+invariant check, add or strengthen an automated test or check that directly
+asserts the promised outcome at the agreed seam, and run it before handoff.
+Existing tests satisfy this obligation only when their assertions actually cover
+the requirement. One test may cover several requirements only when its assertions
+make each promised outcome independently observable. A passing suite, path
+execution without a meaningful assertion, or indirect coverage is insufficient.
+Do not defer missing executable acceptance coverage to `/prove`; proof verifies
+a fixed candidate and may not add tests.
+
 Assert promised outcomes through meaningful public interfaces with independent
 expected results. Mocks may isolate external dependencies but cannot replace the
 claimed capability. Exercise applicable boundaries and real state or integration
 behavior where required. Generalize behavior rather than adding branches for
 individual fixtures. A missing planned test is work to perform, not by itself
-a missing product decision.
+a missing product decision. When a contract-approved primary evidence path is
+inherently non-test, such as an exact static verification command, use that path
+rather than manufacturing an artificial test. If credible required validation
+is unavailable, report the gap. An executable acceptance requirement without a
+meaningful test or check is unfinished and prevents `IMPLEMENTED`.
 
 Use configured commands. Run focused checks during work and suitable broader
 checks afterward, chosen by risk and information gained. Record commands and
@@ -119,8 +134,9 @@ and report partial state rather than chasing a new target or overwriting work.
 ## Reconcile and hand off
 
 Inspect the complete resulting diff for missing substance and unjustified scope.
-Account for each selected requirement with implementation locations, meaningful
-checks, and remaining gaps. Record test/assertion relationships in the report;
+Account for each selected requirement with implementation locations, its direct
+acceptance test/check or contract-approved non-test evidence path, observed
+result, and remaining gaps. Record test/assertion relationships in the report;
 requirement IDs need not appear in every test name or code comment.
 
 Recheck the agreement and capture the final candidate as a full commit SHA or
@@ -136,9 +152,11 @@ verdicts. Leave the canonical contract and its `planned` or `gap` states unchang
 
 Use these outcomes for the explicitly stated scope:
 
-- `IMPLEMENTED`: all requested obligations are addressed, appropriate focused
-  development checks passed, and the candidate is identifiable. Already-sufficient
-  code can qualify with `Changes: none`, supported by inspection and checks.
+- `IMPLEMENTED`: all requested obligations are addressed, every executable
+  acceptance requirement has meaningful test/check coverage with passing observed
+  results, appropriate focused development checks passed, and the candidate is
+  identifiable. Already-sufficient code can qualify with `Changes: none`, supported
+  by inspection and checks.
 - `PARTIAL`: requested implementation or material development validation remains
   incomplete. Name what exists and what is blocked or unavailable.
 - `BLOCKED`: no safe progress is possible because required agreement, input,
@@ -161,7 +179,7 @@ Changes: <summary; unrelated existing changes preserved>
 
 ## Requirement handoff
 
-| ID | Implementation reference | Check and observed result | Remaining gap |
+| ID | Implementation reference | Acceptance test/check or evidence path and observed result | Remaining gap |
 |---|---|---|---|
 
 ## Checks and limitations
