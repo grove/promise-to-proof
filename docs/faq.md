@@ -62,6 +62,15 @@ ticket when needed; ordinary parent proof needs no extra integration ticket.
 
 ## Contracts and candidates
 
+### What does `audit-acceptance` do?
+
+It assesses whether one exact proposed contract is complete enough for a human
+approval decision. It checks the source coverage, scope, requirement identity,
+and evidence plans without revising, saving, approving, implementing, or proving
+the contract. `READY_FOR_APPROVAL` is advice, not approval. Return
+`CHANGES_NEEDED` findings to `plan-acceptance`; resolve the missing input or
+decision behind `BLOCKED` before continuing.
+
 ### When does a contract revision change?
 
 `plan-acceptance` increments the revision after an authorized material change to
@@ -131,6 +140,18 @@ for the repaired commit. `repair-gaps` repairs named implementation or evidence
 gaps from a matching `NOT PROVEN` report. A proof can succeed while unrelated CI
 fails, and `fix-pr` can return `FIXED` without proving the ticket. When either
 repair changes the candidate, refresh the results that described the old one.
+
+### How is `publish-pr` different from `merge-readiness`?
+
+`publish-pr` requires matching full review and proof for one exact candidate. It
+prepares a read-only preview, then needs explicit authorization of that exact
+preview before it may create a commit in an isolated workspace, push a new
+branch, and create a draft PR. Its readback confirms publication, not merge
+readiness.
+
+`merge-readiness` inspects the current PR head, matching reports, required CI,
+repository approvals, and merge conditions near the merge decision. It does not
+publish or merge the PR.
 
 ## Workflow choices
 
