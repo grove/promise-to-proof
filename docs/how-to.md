@@ -96,7 +96,20 @@ checks every promised outcome against observed evidence. A `REVIEWED` result
 does not stand in for `PROVEN`, and neither result replaces required CI or the
 repository's review gate.
 
-After an authorized PR exists, invoke `/merge-readiness <PR URL>` with the saved
+To publish that exact reviewed and proven candidate, first inspect a read-only
+preview, then explicitly authorize its complete effects:
+
+```text
+/publish-pr <saved candidate, review, and proof handoff>; target <branch>; draft only
+/publish-pr <approved exact preview>; publish the draft PR
+```
+
+The skill uses a matching commit or creates one in an isolated publication
+workspace, verifies that its complete tree preserves the candidate content,
+pushes without force, and rereads the draft PR. It does not change the candidate
+or assess merge readiness.
+
+After the PR is confirmed, invoke `/merge-readiness <PR URL>` with the saved
 review and proof reports near the merge decision. It checks that the PR's current
 candidate has matching evidence, required CI, and repository approval and merge
 conditions. It reports blockers without merging or replacing the repository's
@@ -259,6 +272,7 @@ describe the required identities.
 | `/review-implementation` | Inspect a fixed candidate against a comparison base. |
 | `/prove` | Check every contract promise on one exact candidate. |
 | `/repair-gaps` | Repair named gaps in a matching `NOT PROVEN` report. |
+| `/publish-pr` | Preview or explicitly publish an exact reviewed and proven candidate as a draft PR. |
 | `/fix-pr` | Repair a failed pull request workflow. |
 | `/interrogate` | Question the agent's proposal and reasoning. |
 | `/critique` | Request an independent assessment of a proposal. |

@@ -11,6 +11,12 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
 - **Close**: `gh issue close <number> --comment "..."`
 
+For pull requests, inspect all states before creating one and use exact head and
+base refs. Create a draft with `gh pr create --draft`, supplying explicit base,
+head, title, and body arguments. Read it back with `gh pr view` and explicit JSON
+fields for URL, head SHA, base branch, title, body, and draft state. Never infer
+publication from a successful command without readback.
+
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 
 ## Pull requests as a triage surface

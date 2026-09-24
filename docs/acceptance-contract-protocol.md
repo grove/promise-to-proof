@@ -258,3 +258,36 @@ Any changed candidate requires fresh proof against all requirements before
 acceptance. Prior proof describes only its original candidate. This includes CI
 repairs that change product behavior, acceptance evidence, or relevant tests.
 A green CI repair does not refresh proof automatically.
+
+## Pull-request publication handoff
+
+`publish-pr` may prepare and, under exact publication authority, publish one
+recoverable candidate with matching full `REVIEWED` and `PROVEN` reports as a
+draft pull request. Its preview binds the candidate and agreement identities,
+reports, destination, target and head refs, commit inputs, title, body, and
+authorized commit, push, and pull-request effects. Changed inputs require a new
+preview. Publication does not grant merge readiness or merge authority.
+
+The stable publication identity uses the candidate key to which review and proof
+bind: `git:<full-object-id>` for a commit or
+`snapshot:sha256:<64-lowercase-hex>` for a snapshot. Contract publication
+identity uses SHA-256 of the exact canonical contract UTF-8 bytes with no text
+normalization. A content-equivalent commit does not replace a report-bound
+snapshot key.
+
+When a snapshot needs a commit, create it in an isolated publication workspace
+and compare its complete Git tree with the captured candidate. Record the exact
+snapshot-to-commit mapping. A content-equivalent commit preserves candidate-bound
+review and proof; any byte, path, mode, symlink, deletion, or included-fixture
+mismatch is a changed candidate and cannot be published under those reports.
+Persist and reread the created commit and mapping before remote effects. Resume
+uses that retained commit; missing or conflicting mapping state blocks creating
+a different publication commit from implicit Git metadata.
+
+Push without force to one approved head branch and confirm the remote SHA before
+creating a draft pull request. Use stable identity markers and readback to reuse
+one exact existing effect after retries or lost responses. Conflicting refs,
+ambiguous matches, or uncertain readback block repetition. Reread the pull
+request and confirm its head, base, title, body, marker, and draft state before
+reporting publication. Required CI, repository approvals, and merge policy remain
+separate checks for `merge-readiness`.

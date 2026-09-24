@@ -1,0 +1,5 @@
+interface:
+  display_name: "Publish PR"
+  short_description: "Publish an exact verified candidate as a draft PR"
+policy:
+  allow_implicit_invocation: false
