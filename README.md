@@ -1,23 +1,78 @@
 # Promise to Proof
 
-Agent skills for carrying software requirements from promise to implementation
-and evidence-backed acceptance.
+Promise to Proof carries software requirements from an agreed outcome through
+implementation to evidence-backed acceptance.
 
-It keeps the agreement, implementation, review, and proof separate so agents
-can deliver exactly the promised capability: no less in substance, no more in scope.
+It keeps the agreement, implementation, review, and proof separate so the
+promised capability does not get lost between ticket and implementation: no less
+in substance, no more in scope.
 
 The skills work with agent-skill-compatible coding tools. A saved acceptance
 contract carries the source ticket's promises through implementation, review,
-and proof. Reports identify the contract and exact candidate they describe.
-The skills do not provide a workflow runtime.
-
-New here? Start with the [HOW-TO](./docs/how-to.md) to choose and run a delivery
-path. For questions about issues, slicing, review, and proof, read the
-[FAQ](./docs/faq.md). [How to take a ticket from promise to proof](./docs/promise-to-proof.md)
-gives the detailed workflow; the [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
-defines the shared contract, revision, and proof rules.
+and proof. The skills do not provide a workflow runtime.
 
 Issues and specifications for this repository live in [GitHub Issues](https://github.com/grove/promise-to-proof/issues).
+
+## How Promise to Proof works
+
+Promise to Proof turns an agreed outcome into a precise acceptance contract,
+builds against that contract, then independently reviews the implementation and
+proves the promised behavior on one exact candidate.
+
+```mermaid
+flowchart LR
+  promise["1. Start with a promise<br/>Issue, spec, or agreed outcome"]
+  plan["2. Define what success means<br/>/plan-acceptance"]
+  contract["Acceptance contract<br/>What must be true + how to verify it"]
+  implement["3. Build exactly that<br/>/implement-contract"]
+  candidate["Exact implementation candidate<br/>Commit or reproducible snapshot"]
+  review["4a. Review: Is the implementation sound?<br/>/review-implementation"]
+  prove["4b. Proof: Does the promised behavior actually hold?<br/>/prove"]
+  done["5. Evidence matches the implementation<br/>Review + proof refer to this exact contract and candidate"]
+
+  promise --> plan --> contract --> implement --> candidate
+  candidate --> review --> done
+  candidate --> prove --> done
+```
+
+Each stage answers a different question:
+
+- **Promise:** What are we agreeing to deliver?
+- **Plan acceptance:** What exactly would make that promise true?
+- **Implementation:** Did we build what we agreed?
+- **Review:** Is the implementation sound, faithful to the contract, and in scope?
+- **Proof:** Does the promised behavior actually hold, with evidence for every outcome?
+
+Save and pass each result before invoking the next skill; skills do not invoke
+one another. Capture the candidate as a commit or reproducible snapshot so the
+independent review and proof reports refer to the same exact implementation and
+contract. Review and proof can run in either order. Start with the
+[HOW-TO](./docs/how-to.md) for the saved artifacts and commands.
+
+## Install and update
+
+Install the full collection:
+
+```bash
+npx skills@latest add grove/promise-to-proof
+```
+
+Install one skill:
+
+```bash
+npx skills@latest add grove/promise-to-proof --skill plan-acceptance
+```
+
+Update one installed skill:
+
+```bash
+npx skills@latest update plan-acceptance
+```
+
+If you installed `acceptance-contract`, `review-contract`, or `repair-proof`,
+install `plan-acceptance`, `review-implementation`, and `repair-gaps` as
+applicable, then remove the old copies using your installer's normal removal
+mechanism.
 
 ## Choose a skill
 
@@ -58,84 +113,6 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 | [`/repair-gaps`](./skills/productivity/repair-gaps/SKILL.md) | Proof found specific repairable gaps | A scoped repair report; fresh proof is still required |
 | [`/fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
 
-## How Promise to Proof works
-
-Promise to Proof turns an agreed outcome into a precise acceptance contract,
-builds against that contract, then independently reviews the implementation and
-proves the promised behavior on one exact candidate.
-
-```mermaid
-flowchart LR
-  promise["1. Start with a promise<br/>Issue, spec, or agreed outcome"]
-  plan["2. Define what success means<br/>/plan-acceptance"]
-  contract["Acceptance contract<br/>What must be true + how to verify it"]
-  implement["3. Build exactly that<br/>/implement-contract"]
-  candidate["Exact candidate<br/>Commit or reproducible snapshot"]
-  review["4a. Review the implementation<br/>/review-implementation"]
-  prove["4b. Prove the promised outcomes<br/>/prove"]
-  done["5. Review + proof are current<br/>for the same contract and candidate"]
-
-  promise --> plan --> contract --> implement --> candidate
-  candidate --> review --> done
-  candidate --> prove --> done
-```
-
-Each stage answers a different question:
-
-- **Promise:** What are we agreeing to deliver?
-- **Plan acceptance:** What exactly would make that promise true?
-- **Implementation:** Did we build what we agreed?
-- **Review:** Is the implementation faithful, scoped, and sound?
-- **Proof:** Can we demonstrate that every promised outcome holds?
-
-Save and pass each result before invoking the next skill; skills do not invoke
-one another. Capture the candidate as a commit or reproducible snapshot so the
-independent review and proof reports refer to the same exact implementation and
-contract. Review and proof can run in either order. Start with the
-[HOW-TO](./docs/how-to.md) for the saved artifacts and commands.
-
-### What if the direct path isn't enough?
-
-```mermaid
-flowchart TD
-  contract["Acceptance contract"] --> large{"Too large for one coherent task?"}
-  large -->|No| core["Follow the core workflow"]
-  large -->|Yes| slice["Slice into independent outcomes<br/>/slice-contract"]
-  slice --> children["Run the core workflow for each child"]
-  children --> integrated["Create one exact integrated candidate"]
-  integrated --> parent["Prove the full parent promise<br/>Review integration if needed"]
-
-  core --> result{"Review or proof finds a problem?"}
-  parent --> result
-  result -->|No| ready["Ready for repository merge checks"]
-  result -->|Review finding| fix["Implement the finding<br/>/implement-contract"]
-  result -->|Repairable proof gap| repair["Repair the proven gap<br/>/repair-gaps"]
-  fix --> refresh["Capture new candidate<br/>Review + prove again"]
-  repair --> refresh
-  refresh --> result
-```
-
-Before planning, use `/triage-issue` for an issue needing a next action, or
-`/create-parent-issue` for a local spec in this repo needing an originating
-issue. `/critique` and `/interrogate` can help settle a proposal first.
-
-For published child issues, save a contract and run the direct path for each
-child. Child proof does not replace `/prove` for the integrated parent. Review
-the integrated candidate if it differs from the reviewed child candidates or
-contains shared integration code. After any repair, capture the changed candidate
-and refresh review and proof. `/fix-pr` addresses failed CI. If a promise changes,
-reconcile the authorized amendment through `/plan-acceptance` before continuing.
-
-For an existing PR near merge, `/merge-readiness` checks the current review,
-proof, CI, and repository merge conditions without merging the PR. Read the
-[FAQ](./docs/faq.md) for the distinction between acceptance and merge readiness.
-
-The [detailed workflow](./docs/promise-to-proof.md) includes examples and
-recovery paths. The [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
-sets the rules for revisions, candidate identity, evidence, and durable handoffs.
-Each skill returns a result for an explicit next invocation; the skills do not
-call one another automatically.
-
 ## Use a skill
 
 ```text
@@ -155,30 +132,53 @@ call one another automatically.
 The skills also accept direct ticket URLs or a specification when their skill
 instructions describe that input.
 
-## Install and update
+## Advanced and recovery paths
 
-Install the full collection:
+```mermaid
+flowchart TD
+  contract["Acceptance contract"] --> large{"Too large for one coherent task?"}
+  large -->|No| core["Run the core workflow"]
+  large -->|Yes| slice["Slice into independent outcomes<br/>/slice-contract"]
+  slice --> children["Run the core workflow for each child"]
+  children --> integrated["Create one exact integrated candidate"]
+  integrated --> parent["Prove the full parent contract<br/>Review integration when needed"]
 
-```bash
-npx skills@latest add grove/promise-to-proof
+  core --> problem{"Problem found?"}
+  parent --> problem
+  problem -->|No| ready["Continue to repository merge checks"]
+  problem -->|Review finding| fix["Implement the finding"]
+  problem -->|Proof gap| repair["Repair the named gap<br/>/repair-gaps"]
+  fix --> rerun["New candidate -> review + prove again"]
+  repair --> rerun
+  rerun --> problem
 ```
 
-Install one skill:
+Before planning, use `/triage-issue` for an issue needing a next action, or
+`/create-parent-issue` for a local spec in this repo needing an originating
+issue. `/critique` and `/interrogate` can help settle a proposal first.
 
-```bash
-npx skills@latest add grove/promise-to-proof --skill plan-acceptance
-```
+For published child issues, save a contract and run the direct path for each
+child. Child proof does not replace `/prove` for the integrated parent. Review
+the integrated candidate if it differs from the reviewed child candidates or
+contains shared integration code. After any repair, capture the changed candidate
+and refresh review and proof. `/fix-pr` addresses failed CI. If a promise changes,
+reconcile the authorized amendment through `/plan-acceptance` before continuing.
 
-Update one installed skill:
+For an existing PR near merge, `/merge-readiness` checks the current review,
+proof, CI, and repository merge conditions without merging the PR. Read the
+[FAQ](./docs/faq.md) for the distinction between acceptance and merge readiness.
 
-```bash
-npx skills@latest update plan-acceptance
-```
+## Detailed docs
 
-If you installed `acceptance-contract`, `review-contract`, or `repair-proof`,
-install `plan-acceptance`, `review-implementation`, and `repair-gaps` as
-applicable, then remove the old copies using your installer's normal removal
-mechanism.
+New here? Start with the [HOW-TO](./docs/how-to.md) to choose and run a delivery
+path. For questions about issues, slicing, review, and proof, read the
+[FAQ](./docs/faq.md).
+
+The [detailed workflow](./docs/promise-to-proof.md) includes examples and
+recovery paths. The [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
+sets the rules for revisions, candidate identity, evidence, and durable handoffs.
+Each skill returns a result for an explicit next invocation; the skills do not
+call one another automatically.
 
 ## Repository structure
 
