@@ -8,21 +8,24 @@ recoverable candidate content into a remote review subject; it does not change
 the implementation, establish acceptance, assess merge readiness, approve, or
 merge the pull request.
 
+Model invocation may prepare the read-only `DRAFT` preview only. It never grants
+authority to create a commit, push a branch, or create or change a pull request;
+those effects require the exact explicit authorization defined below.
+
 Before acting, read the [acceptance contract protocol](references/acceptance-contract-protocol.md)
 and the repository's tracker, contribution, pull-request, and branch rules.
 
 ## Establish the publication subject
 
-Accept a saved final handoff, or a recoverable candidate with saved full
-`REVIEWED` and `PROVEN` reports. Resolve the source, canonical contract and exact
-text identity, candidate snapshot or full commit, fixed review base, reports,
-repository, remote, and proposed target branch. Mutable names such as a local
-branch or `HEAD` do not identify the candidate.
+Accept a recoverable candidate handoff with saved full `REVIEWED` and `PROVEN`
+reports. Resolve the source, canonical contract and exact text identity,
+candidate snapshot or full commit, fixed review base, reports, repository,
+remote, and proposed target branch. Mutable names such as a local branch or
+`HEAD` do not identify the candidate.
 
-Use either invocation shape:
+Use this invocation shape:
 
 ```text
-/publish-pr <saved final handoff>; target <branch>; draft only
 /publish-pr <candidate handoff>; review <saved report>; proof <saved report>; target <branch>; draft only
 ```
 
@@ -52,8 +55,11 @@ or broaden the requested effects.
 Inspect the remote, default and proposed target branches, current target tip,
 existing local and remote refs, open and closed pull requests, pull-request
 template, and applicable repository conventions. Resolve the target branch and
-record its observed full commit. Do not guess when the intended target or remote
-is ambiguous.
+record its observed full commit. Require that tip to equal the review report's
+fixed comparison base so the reviewed change set matches the proposed PR change
+set. A different tip requires a fresh full `/review-implementation` against that
+tip before a new preview. Do not guess when the intended target or remote is
+ambiguous.
 
 Choose a repository-conforming head branch that identifies the work without
 embedding credentials or sensitive data. Prepare a concise title and complete
@@ -122,8 +128,9 @@ identities, message, and signing and timestamp policy. The resulting SHA need
 not be reproducible from a different machine's implicit Git configuration.
 Persist and reread the created commit and snapshot-to-commit mapping before any
 remote effect. A resumed publication reuses that retained commit. If the mapping
-is unavailable or conflicts, return `PARTIAL` rather than creating another
-publication commit.
+is unavailable or conflicts after commit creation, return `PARTIAL` rather than
+creating another publication commit. This is an incomplete authorized local
+publication effect, even when no remote write began.
 
 After commit creation, compare every selected path, byte, mode, symlink, deletion,
 and explicitly included fixture with the candidate manifest. Also confirm the
@@ -172,7 +179,7 @@ Return one status:
 |---|---|
 | `DRAFT` | The exact publication is prepared; no write was authorized or performed. |
 | `PUBLISHED` | One matching remote branch and pull request were confirmed by readback. |
-| `PARTIAL` | An authorized effect may have occurred, but complete remote state cannot be established. |
+| `PARTIAL` | An authorized publication effect occurred or may have occurred, but its required mapping, completion, or readback cannot be established. |
 | `BLOCKED` | Required identity, evidence, authority, destination, permission, policy, or capability is missing or conflicting. |
 
 For every status, report the source, agreement, candidate, review and proof

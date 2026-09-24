@@ -106,8 +106,10 @@ preview, then explicitly authorize its complete effects:
 
 The skill uses a matching commit or creates one in an isolated publication
 workspace, verifies that its complete tree preserves the candidate content,
-pushes without force, and rereads the draft PR. It does not change the candidate
-or assess merge readiness.
+requires the target tip to match the review comparison base, pushes without
+force, and rereads the draft PR. It does not change the candidate or assess merge
+readiness. The model may prepare the read-only preview on its own; publication
+effects still require exact authorization.
 
 After the PR is confirmed, invoke `/merge-readiness <PR URL>` with the saved
 review and proof reports near the merge decision. It checks that the PR's current

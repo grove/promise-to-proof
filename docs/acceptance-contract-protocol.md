@@ -268,6 +268,16 @@ reports, destination, target and head refs, commit inputs, title, body, and
 authorized commit, push, and pull-request effects. Changed inputs require a new
 preview. Publication does not grant merge readiness or merge authority.
 
+The model may invoke `publish-pr` to prepare its read-only `DRAFT` preview after
+matching review and proof exist. Model invocation grants no publication effect;
+commit creation, push, and pull-request creation require the exact authority
+bound by that preview.
+
+The proposed target tip must equal the review report's fixed comparison base.
+This keeps the reviewed change set and proposed pull-request change set aligned.
+A different target tip requires fresh full review against that tip before
+publication; merge readiness remains a later, separate check.
+
 The stable publication identity uses the candidate key to which review and proof
 bind: `git:<full-object-id>` for a commit or
 `snapshot:sha256:<64-lowercase-hex>` for a snapshot. Contract publication
@@ -282,7 +292,11 @@ review and proof; any byte, path, mode, symlink, deletion, or included-fixture
 mismatch is a changed candidate and cannot be published under those reports.
 Persist and reread the created commit and mapping before remote effects. Resume
 uses that retained commit; missing or conflicting mapping state blocks creating
-a different publication commit from implicit Git metadata.
+a different publication commit from implicit Git metadata. If commit creation
+already occurred but that required mapping cannot be established, publication is
+`PARTIAL` even when no remote write began. `PARTIAL` consistently means an
+authorized local or remote publication effect lacks required completion or
+readback.
 
 Push without force to one approved head branch and confirm the remote SHA before
 creating a draft pull request. Use stable identity markers and readback to reuse

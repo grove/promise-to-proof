@@ -50,11 +50,13 @@ reread before push.
 
 Input: separately provide a proof for an older candidate, a review covering only
 selected requirements, reports for different contract bytes at the same revision,
-and a digest whose candidate content cannot be retrieved.
+and a digest whose candidate content cannot be retrieved. Also target a branch
+whose current tip differs from the review report's fixed comparison base.
 
 Pass when every case is `BLOCKED` before publication and names the required
-fresh review, proof, agreement reconciliation, or recoverable content. Green CI,
-a matching branch name, and report prose do not repair identity mismatches.
+fresh review against the target tip, proof, agreement reconciliation, or
+recoverable content. Green CI, a matching branch name, and report prose do not
+repair identity mismatches.
 
 ## 5. Reject changed commit content
 
@@ -100,7 +102,9 @@ returns `PARTIAL` without repeating the write or deleting successful effects.
 Repeat a snapshot publication from an environment with different implicit Git
 author or timestamp configuration. Pass when it reuses the retained publication
 commit and mapping. If those records are unavailable, it returns `PARTIAL`
-instead of manufacturing another commit SHA for the same candidate.
+instead of manufacturing another commit SHA for the same candidate. This local
+recovery case and uncertain remote writes use the same `PARTIAL` definition:
+an authorized publication effect lacks required completion or readback.
 
 ## 9. Stop on target drift and readback mismatch
 
