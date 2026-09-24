@@ -74,6 +74,7 @@ call one another automatically.
 ## Use a skill
 
 ```text
+/triage-issue #123
 /critique <idea, document path, or GitHub issue reference>
 /interrogate Walk me through your proposal so I can question it.
 /plan-acceptance #123
