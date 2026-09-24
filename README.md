@@ -21,6 +21,12 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 
 ## Choose a skill
 
+### Create the source issue
+
+| Skill | Use it when | It gives you |
+|---|---|---|
+| [`create-parent-issue`](./skills/productivity/create-parent-issue/SKILL.md) | A local specification needs one originating GitHub issue | One source issue with a durable reference to the exact spec |
+
 ### Shape the work
 
 | Skill | Use it when | It gives you |
@@ -110,6 +116,7 @@ mechanism.
 
 ```text
 skills/productivity/
+├── create-parent-issue/
 ├── plan-acceptance/
 ├── critique/
 ├── fix-pr/

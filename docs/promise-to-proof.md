@@ -82,8 +82,10 @@ settled, turn the conversation into a durable specification:
 /to-spec
 ```
 
-Existing tickets from `/to-tickets` or another planning workflow remain valid
-inputs. To divide an agreed parent contract, use the optional
+If an external workflow such as `/to-tickets` has already created tickets, they
+remain valid inputs. For a local spec in this repository that needs one
+originating issue, use `/create-parent-issue`; `/to-tickets` is not the parent
+issue creation path. To divide an agreed parent contract, use the optional
 [slicing step](#divide-large-work-without-changing-the-agreement).
 
 Use `/wayfinder` before `/to-spec` when the work is too large or uncertain for

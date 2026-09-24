@@ -17,7 +17,8 @@ issues and specifications in GitHub Issues.
 ```text
 Existing, coherent issue  → plan-acceptance → implement-contract → review and prove
 Existing, large issue     → plan-acceptance → slice-contract → child workflows
-Local specification       → plan-acceptance → direct path or approved slicing
+Local spec in this repo   → create-parent-issue → plan-acceptance → direct or sliced path
+Other project's local spec → plan-acceptance → direct path or approved slicing
 ```
 
 If your source is still an idea, settle the outcome before planning acceptance.
@@ -83,11 +84,27 @@ into parent proof.
 
 ## Create an originating issue when you need one
 
-For work **in this repository**, create the source GitHub issue with
-`gh issue create` before starting the tracked workflow. Put the agreed outcome and
-boundaries in that issue; `plan-acceptance` turns them into a contract. Keep the
-contract on the originating issue or link it directly from that issue. Do not
-create a second issue merely to store the contract.
+For work **in this repository** that starts from a local specification, use
+`create-parent-issue` to draft exactly one originating GitHub issue. Review its
+summary and durable spec reference, then explicitly authorize publication. The
+skill does not split the specification into tickets or write the acceptance
+contract.
+
+```text
+/create-parent-issue path/to/spec.md; draft only
+/create-parent-issue path/to/spec.md; publish the approved single issue to GitHub
+/plan-acceptance #123
+```
+
+The spec must be retrievable from an immutable reference, such as a
+commit-pinned GitHub file URL. The skill will not commit or push it for you.
+`plan-acceptance` turns the issue and exact source spec into the contract. Keep
+that contract on the originating issue or link it directly from the issue; do
+not create a second issue merely to store it.
+
+For a small agreed outcome without a local spec, create one source issue with
+`gh issue create` before starting the tracked workflow. Put the outcome and
+boundaries in the issue, then run `plan-acceptance` on it.
 
 ```bash
 gh issue create --title "Retry failed uploads" --body "Users can retry a failed upload after restarting the app."
