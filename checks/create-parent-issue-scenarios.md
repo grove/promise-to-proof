@@ -53,3 +53,19 @@ identity, reports `PUBLISHED`, and leaves the issue count unchanged. The changed
 preview must stop for reconciliation, not create another issue. An incomplete
 search or ambiguous match must block creation; an unresolved write reports
 `PARTIAL` without retrying.
+
+## 6. Update one existing source issue
+
+Attach a contract or contract link and an unrelated label to the issue from
+scenario 2. Publish a new retrievable revision of that spec at the same path.
+Preview the revised title, complete body, source identity, and labels. First
+withhold update authorization, then authorize that exact update to the existing
+issue. Separately, simulate an issue edit between preview and write.
+
+Pass when withholding authorization changes nothing. An approved update changes
+only the identified issue, preserves its contract or link, marker, and unrelated
+label, and rereads the updated fields before reporting `PUBLISHED`. It hands
+changed source promises to `plan-acceptance` for reconciliation without editing
+the contract. A change detected at the pre-edit reread stops the update pending
+a new preview; an uncertain write reports `PARTIAL` without retrying. No second
+issue is created.

@@ -102,6 +102,13 @@ commit-pinned GitHub file URL. The skill will not commit or push it for you.
 that contract on the originating issue or link it directly from the issue; do
 not create a second issue merely to store it.
 
+When the source spec changes, use the same path and destination. The skill finds
+the existing issue and previews an update; approve that update separately from
+the original publication. It preserves the issue's contract or contract link
+and unrelated labels. If the source promises changed, run `plan-acceptance` on
+the same issue to reconcile its contract before continuing. An uncertain match
+or a change detected before editing stops the update for another review.
+
 For a small agreed outcome without a local spec, create one source issue with
 `gh issue create` before starting the tracked workflow. Put the outcome and
 boundaries in the issue, then run `plan-acceptance` on it.
