@@ -63,6 +63,17 @@ title, body, labels, and source identity match the approved preview; otherwise
 stop for reconciliation. If uniqueness or search completeness is uncertain,
 block creation. A new spec revision does not authorize a second source issue.
 
+To reconcile a single matching issue, show its current title, body, labels, and
+source identity alongside the proposed changes. Preserve any existing contract,
+contract link, and unrelated labels in the complete updated preview. Require
+explicit authorization to update that identified issue with that exact preview;
+authorization to create an issue is not authorization to edit one. Reread the
+issue immediately before editing and stop if it has changed since the preview.
+Edit only that issue, then reread its title, body, labels, marker, and source
+reference. If the edit result or readback remains uncertain, report `PARTIAL`
+without retrying the write. If the source promises changed, hand the revised source to
+`plan-acceptance` for contract reconciliation; do not rewrite the contract here.
+
 If no issue exists, create one using the repository's configured tracker
 instructions. Read the issue back and confirm its title, body, labels, marker,
 and source reference. After an uncertain write, repeat the identity check before
@@ -73,7 +84,7 @@ Return one status:
 | Status | Meaning |
 |---|---|
 | `DRAFT` | One issue is prepared; publication was not authorized or is pending. |
-| `PUBLISHED` | One matching issue was created or reused and reread successfully. |
+| `PUBLISHED` | One matching issue was created, updated, or reused and reread successfully. |
 | `PARTIAL` | A write may have occurred, but its result or readback is uncertain. |
 | `BLOCKED` | A required source, decision, destination, permission, or capability is missing. |
 
