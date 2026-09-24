@@ -17,8 +17,9 @@ The acceptance contract defines the spec envelope. Implementation fills it.
 Proof establishes that one exact candidate satisfies one exact contract revision.
 
 ```text
-source → plan-acceptance → optional audit-acceptance → approval and saved contract
-       → implement-contract → captured candidate → review-implementation → prove
+source → plan-acceptance → optional audit-acceptance → any required approval
+       → saved contract → implement-contract → captured candidate
+       → review-implementation + prove → optional publish-pr → merge-readiness
 ```
 
 The sequence is not a ceremony. Each skill answers a different question.
@@ -59,6 +60,7 @@ The delivery path uses explicit phases:
 /implement-contract    -> save the report and capture the candidate
 /review-implementation -> save findings for that candidate and comparison base
 /prove                 -> save the proof and requirement evidence
+/publish-pr            -> preview or publish the exact candidate as a draft PR
 ```
 
 Review and proof may run in either order against the same fixed candidate.
@@ -569,6 +571,8 @@ For a straightforward ticket with a settled design, use the compact path:
 
 ```text
 /plan-acceptance #124
+# Optionally audit the exact proposal before any required approval and saving.
+/audit-acceptance <exact proposed contract> against <source>
 /implement-contract #124
 /review-implementation <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>

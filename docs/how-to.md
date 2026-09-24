@@ -15,7 +15,8 @@ is not a prerequisite for those inputs, though this repository records its own
 issues and specifications in GitHub Issues.
 
 ```text
-Existing, coherent issue  → plan-acceptance → implement-contract → review and prove
+Existing, coherent issue  → plan-acceptance → optional audit-acceptance
+						  → implement-contract → review and prove → optional publish-pr
 Existing, large issue     → plan-acceptance → slice-contract → child workflows
 Local spec in this repo   → create-parent-issue → plan-acceptance → direct or sliced path
 Other project's local spec → plan-acceptance → direct path or approved slicing

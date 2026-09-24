@@ -18,26 +18,36 @@ proves the promised behavior on one exact candidate.
 ```mermaid
 flowchart LR
   promise["1. Start with a promise<br/>Issue, spec, or agreed outcome"]
-  plan["2. Define what success means<br/>/plan-acceptance"]
-  contract["Acceptance contract<br/>What must be true + what evidence will prove it"]
+  plan["2. Propose what success means<br/>/plan-acceptance"]
+  audit["Optional independent check<br/>/audit-acceptance"]
+  contract["Saved acceptance contract<br/>What must be true + what evidence will prove it"]
   implement["3. Build exactly that<br/>/implement-contract"]
   candidate["Exact implementation candidate<br/>Commit or reproducible snapshot"]
   review["4a. Review: Is the implementation sound?<br/>/review-implementation"]
   prove["4b. Proof: Does the promised behavior actually hold?<br/>/prove"]
   done["5. The promise is backed by evidence<br/>Review + proof match this exact contract and candidate"]
+  publish["6. Optional publication<br/>/publish-pr previews, then publishes with explicit authorization"]
 
-  promise --> plan --> contract --> implement --> candidate
+  promise --> plan
+  plan --> audit
+  audit -->|Changes needed| plan
+  audit -->|Ready; obtain any required approval| contract
+  plan -->|No audit needed; obtain any required approval| contract
+  contract --> implement --> candidate
   candidate --> review --> done
   candidate --> prove --> done
+  done --> publish
 ```
 
 Each stage answers a different question:
 
 - **Promise:** What are we agreeing to deliver?
 - **Plan acceptance:** What exactly would make that promise true?
+- **Audit acceptance:** Is the exact proposal complete and fit for an approval decision?
 - **Implementation:** Did we build what we agreed?
 - **Review:** Is the implementation sound, faithful to the contract, and in scope?
 - **Proof:** Does the promised behavior actually hold, with evidence for every outcome?
+- **Publication:** Does the draft PR preserve the exact reviewed and proven candidate?
 
 Save and pass each result before invoking the next skill; skills do not invoke
 one another. Capture the candidate as a commit or reproducible snapshot so the
@@ -140,7 +150,8 @@ flowchart TD
 
   core --> problem{"Problem found?"}
   parent --> problem
-  problem -->|No| ready["Continue to repository merge checks"]
+  problem -->|No| pr["Use the existing PR or publish the exact candidate<br/>/publish-pr"]
+  pr --> ready["Check the current PR<br/>/merge-readiness"]
   problem -->|Review finding| fix["Implement the finding"]
   problem -->|Proof gap| repair["Repair the named gap<br/>/repair-gaps"]
   fix --> rerun["New candidate -> review + prove again"]
@@ -159,8 +170,10 @@ contains shared integration code. After any repair, capture the changed candidat
 and refresh review and proof. `/fix-pr` addresses failed CI. If a promise changes,
 reconcile the authorized amendment through `/plan-acceptance` before continuing.
 
-For an existing PR near merge, `/merge-readiness` checks the current review,
-proof, CI, and repository merge conditions without merging the PR. Read the
+After matching review and proof, `/publish-pr` prepares a read-only preview and,
+with exact authorization, publishes that candidate as a draft PR. For an existing
+PR near merge, `/merge-readiness` checks the current review, proof, CI, and
+repository merge conditions without merging the PR. Read the
 [FAQ](./docs/faq.md) for the distinction between acceptance and merge readiness.
 
 ## Detailed docs
