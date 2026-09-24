@@ -142,6 +142,12 @@ Run fresh `/prove` against the repaired candidate. Pass when it evaluates R1
 through R4, including previously proven rows. A green R4 check alone cannot
 accept the changed candidate. Refresh review if the reviewed diff changed.
 
+Repeat with named R3 and R4 gaps but authorize repair of R4 only. Pass when the
+repair report keeps R3 under `Remaining gaps` and recommends one concrete next
+action that names R3 and the command, input, or human decision needed. `None`,
+the standard fresh-proof footer by itself, or a generic instruction to
+investigate fails this check.
+
 ## 10. Stale repair inputs block edits
 
 Reuse scenario 9's original proof. Before `/repair-gaps`, make a separate
