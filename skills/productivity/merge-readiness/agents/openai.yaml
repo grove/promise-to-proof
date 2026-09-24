@@ -1,0 +1,5 @@
+interface:
+  display_name: "Merge Readiness"
+  short_description: "Check the current PR against proof and merge gates"
+policy:
+  allow_implicit_invocation: false
