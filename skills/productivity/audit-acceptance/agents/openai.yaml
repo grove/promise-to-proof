@@ -1,0 +1,5 @@
+interface:
+  display_name: "Audit Acceptance"
+  short_description: "Audit a proposed contract before human approval"
+policy:
+  allow_implicit_invocation: false

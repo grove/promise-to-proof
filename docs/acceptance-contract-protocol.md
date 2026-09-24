@@ -74,6 +74,20 @@ before implementation, review, proof, or repair. Report missing or conflicting i
 instead of reconstructing an agreement from memory. The location finds the
 contract; proof still captures its exact text under the identity rules below.
 
+## Pre-approval audit
+
+`audit-acceptance` may independently inspect an exact proposed contract before
+human approval. It reconciles every material source promise and contract row,
+checks stable identities and revisions, and examines whether seams, oracles, and
+evidence plans can establish the stated outcomes. An honestly marked evidence
+gap may remain when the outcome is settled; an unresolved outcome decision does
+not pass the audit.
+
+The audit is read-only and candidate-independent. `READY_FOR_APPROVAL` means the
+exact proposal is fit for a human approval decision, not that approval was
+granted. Findings return to `plan-acceptance`, the sole contract author. The
+auditor does not revise, save, approve, publish, implement, or prove the contract.
+
 ## Requirements and revisions
 
 Each independently falsifiable promise has a stable ID such as `R1`. Input

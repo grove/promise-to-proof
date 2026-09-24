@@ -74,8 +74,15 @@ next phase; it does not call the next skill for you.
 /prove <saved contract>; candidate <saved implementation handoff>
 ```
 
-After `plan-acceptance`, save and reread the acceptance contract at its canonical
-location. Pass its location, revision, and exact text identity to implementation.
+After `plan-acceptance`, optionally run
+`/audit-acceptance <exact proposed contract> against <source>` before any
+required approval.
+The audit checks source coverage, scope, stable requirements, and evidence plans
+without changing or approving the proposal. Return `CHANGES_NEEDED` findings to
+`plan-acceptance`; resolve a `BLOCKED` decision or identity before continuing.
+
+After any required approval, save and reread the acceptance contract at its
+canonical location. Pass its location, revision, and exact text identity to implementation.
 After `implement-contract`, save the report and capture the candidate as a full
 commit SHA or a reproducible snapshot that includes relevant uncommitted files.
 Give review a fixed comparison base. Save the review and proof reports outside
@@ -246,6 +253,7 @@ describe the required identities.
 |---|---|
 | `/triage-issue` | Recommend the next action for an existing issue; apply only approved label or closure changes. |
 | `/plan-acceptance` | Define and revise the acceptance contract. |
+| `/audit-acceptance` | Independently audit an exact proposed contract before human approval. |
 | `/slice-contract` | Draft a breakdown and publish approved child tickets. |
 | `/implement-contract` | Build the agreed scope or correct review findings. |
 | `/review-implementation` | Inspect a fixed candidate against a comparison base. |
