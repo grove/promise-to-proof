@@ -26,6 +26,42 @@ Use `interrogate` when you want to question a proposed approach, or request
 `critique` when you want an independent assessment. Neither skill creates a
 ticket or an acceptance contract.
 
+For an existing issue that still needs a next action or owner, start with
+[triage](#triage-an-existing-issue).
+
+## Triage an existing issue
+
+When an issue needs a next owner or action, run triage before the delivery path:
+
+```text
+/triage-issue #123
+```
+
+The default result is a recommendation, not a tracker update. It shows the
+issue's state, evidence and open questions, one next action, and a preview of
+any label or state change. Check the proposed role against the repository's
+[triage labels](./agents/triage-labels.md). Missing reporter facts lead to a
+specific question (`needs-info`); a maintainer decision or investigation stays
+`needs-triage`. A saved, retrievable contract, required approvals, and confirmed
+prerequisite outcomes are needed before recommending `ready-for-agent`. Work
+that needs human access or judgment goes to `ready-for-human`.
+
+To apply the preview, explicitly approve the label change for that issue. To
+decline and close an issue, a maintainer must decide to decline; approve the
+`wontfix` label and closure separately, including any closing comment. Triage
+preserves unrelated labels and rereads the issue before and after an approved
+change. If the issue changed after the preview, review a new recommendation
+before approving it. An uncertain write is reported as `PARTIAL`, not retried
+automatically.
+
+An unchanged or unapproved recommendation is `DRAFT`; a confirmed update is
+`APPLIED`. If the issue or tracker cannot be resolved, the result is `BLOCKED`.
+
+If the issue is clear but has no saved acceptance contract, the next action is
+`/plan-acceptance #123`. Save and reread that contract before considering the
+issue ready for implementation. Triage does not create a contract or implement
+the request.
+
 ## Complete a GitHub issue
 
 Run these commands as separate invocations. Each skill returns a handoff for the
@@ -202,6 +238,7 @@ describe the required identities.
 
 | Command | Use it to |
 |---|---|
+| `/triage-issue` | Recommend the next action for an existing issue; apply only approved label or closure changes. |
 | `/plan-acceptance` | Define and revise the acceptance contract. |
 | `/slice-contract` | Draft a breakdown and publish approved child tickets. |
 | `/implement-contract` | Build the agreed scope or correct review findings. |
