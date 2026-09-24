@@ -68,48 +68,31 @@ review findings from proof gaps, or acceptance from CI and merge readiness.
 
 ```mermaid
 flowchart TD
-	source["Issue, agreed outcome, or other project's specification"] --> plan["plan-acceptance"]
-	localSpec["Local spec in this repo"] -->|No originating issue yet| create["create-parent-issue"]
-	create -->|Approved publication| plan
-	needsTriage["Issue needs a next action"] --> triage["triage-issue"]
-	triage -->|Ready to plan; contract missing| plan
-
+	source["Issue, specification, or agreed outcome"] --> plan["plan-acceptance"]
 	plan --> contract["Save and reread contract"]
-	contract --> split{"Large work?"}
-	split -->|No| implement["implement-contract"]
-	split -->|Yes| slice["slice-contract<br/>Approve before publication"]
-	slice -->|NO SPLIT| implement
-	slice -->|PUBLISHED| children["Plan, implement, review, and prove each child"]
-	children --> integrate["Integrate candidate"]
-	integrate --> parentProof["prove full parent contract"]
-	parentProof -->|Repairable NOT PROVEN gaps| parentRepair["repair-gaps for parent"]
-	parentRepair --> parentRepaired["Capture repaired integrated candidate"]
-	parentRepaired --> parentProof
-
+	contract --> implement["implement-contract"]
 	implement --> candidate["Capture exact candidate"]
-	candidate --> review["review-implementation"]
-	candidate --> prove["prove"]
-	review -->|Finding to fix| implement
-	prove -->|Repairable NOT PROVEN gaps| repair["repair-gaps"]
-	repair --> repaired["Capture repaired candidate"]
-	repaired --> review
-	repaired --> prove
-
-	review --> reports["Current review and proof reports"]
-	prove --> reports
-	parentProof --> reports
-	integrate -->|If changed or shared integration code| parentReview["review integrated candidate"]
-	parentRepaired --> parentReview
-	parentReview --> reports
+	candidate --> verify["review-implementation + prove<br/>Separate invocations, either order"]
+	verify --> reports["Both current reports<br/>Same contract and candidate"]
 	reports -->|PR near merge| readiness["merge-readiness"]
 	readiness --> gate["Readiness report; repository controls merge"]
 ```
 
-Each arrow is an explicit handoff: save and pass the result, then invoke the
-next skill. Skills do not invoke one another. `critique` and `interrogate` can
-help shape a proposal before planning; `fix-pr` addresses failed CI and a
-changed candidate needs fresh review and proof. If a promise must change, reconcile
-the authorized amendment through `plan-acceptance` before continuing.
+Save and pass each result before invoking the next skill; skills do not invoke
+one another. The chart shows the direct path. When another route applies:
+
+- Before planning, use `triage-issue` for an issue needing a next action, or
+  `create-parent-issue` for a local spec in this repo needing an originating issue.
+  `critique` and `interrogate` can help settle a proposal first.
+- For a large parent contract, use `slice-contract` after saving it. If the split
+  is published, plan, implement, review, and prove each child; then prove the
+  full parent contract on the integrated candidate. Review that candidate if
+  it differs from the reviewed child candidates or contains shared integration
+  code. A `NO SPLIT` result follows the direct path.
+- For a review finding, return to `implement-contract`; for repairable
+  `NOT PROVEN` gaps, use `repair-gaps`. Capture the changed candidate and refresh
+  review and proof. `fix-pr` addresses failed CI. If a promise changes, reconcile
+  the authorized amendment through `plan-acceptance` before continuing.
 
 The [detailed workflow](./docs/promise-to-proof.md) includes examples and
 recovery paths. The [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
