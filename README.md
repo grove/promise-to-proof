@@ -94,6 +94,7 @@ Start with these four skills in order:
 | [`/interrogate`](./skills/productivity/interrogate/SKILL.md) | You want to question the agent's proposal and reasoning | Evidence-backed answers, a revised approach, and explicit unknowns |
 | [`/slice-contract`](./skills/productivity/slice-contract/SKILL.md) | A parent contract is too large for one coherent task | A traceable breakdown and, when authorized, published child tickets |
 | [`/repair-gaps`](./skills/productivity/repair-gaps/SKILL.md) | Proof found specific repairable gaps | A scoped repair report; fresh proof is still required |
+| [`/publish-pr`](./skills/productivity/publish-pr/SKILL.md) | A reviewed and proven candidate should become a draft PR | An exact preview or a content-verified remote PR |
 | [`/merge-readiness`](./skills/productivity/merge-readiness/SKILL.md) | An existing PR is near a merge decision | Read-only readiness or specific blockers for the current PR state |
 | [`/fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
 
@@ -115,6 +116,7 @@ Start with these four skills in order:
 /interrogate Walk me through your proposal so I can question it.
 /audit-acceptance <exact proposed contract> against <source>
 /slice-contract #123; draft only
+/publish-pr <verified candidate and reports>; target <branch>; draft only
 /merge-readiness <PR URL>; review <saved report>; proof <saved report>
 /repair-gaps <matching proof report>; candidate <saved candidate handoff>; requirements <IDs>
 /fix-pr #456
@@ -186,6 +188,7 @@ skills/productivity/
 ├── interrogate/
 ├── merge-readiness/
 ├── prove/
+├── publish-pr/
 ├── repair-gaps/
 ├── review-implementation/
 ├── slice-contract/

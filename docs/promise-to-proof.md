@@ -508,13 +508,27 @@ Proof checks whether the ticket's promises hold. Review examines contract fideli
 scope, and engineering quality. Keep both results tied to the repaired candidate;
 you may run them in either order.
 
-## Repair failed GitHub Actions without weakening the check
+## Publish the exact candidate as a draft pull request
 
-When separately authorized, open the pull request after the candidate is proven
-and reviewed according to the repository's process. Before merge, confirm that
-the PR head SHA is the captured commit. If the candidate was a snapshot, record
-an exact content match between it and the content at the PR head SHA. If neither
-condition holds, run review and proof again on the PR head.
+After the candidate has matching full review and proof, prepare publication
+without changing local or remote state:
+
+```text
+/publish-pr <saved candidate, review, and proof handoff>; target <branch>; draft only
+```
+
+Review the exact destination, target tip, head branch, candidate-to-commit plan,
+title, body, and requested effects. Then explicitly authorize that unchanged
+preview. `publish-pr` uses a matching commit or creates one in an isolated
+workspace, verifies its complete tree against the captured candidate, pushes
+without force, creates one draft pull request, and rereads the remote state.
+
+A content-equivalent commit preserves the candidate-bound reports because the
+skill records the exact mapping. A mismatch blocks publication rather than
+silently adopting new bytes. `PUBLISHED` still leaves CI, repository approval,
+and merge policy to `/merge-readiness`.
+
+## Repair failed GitHub Actions without weakening the check
 
 If a required GitHub Actions workflow fails, invoke `fix-pr` with the pull
 request or the failed workflow run:
@@ -558,8 +572,9 @@ For a straightforward ticket with a settled design, use the compact path:
 /implement-contract #124
 /review-implementation <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
-open the pull request when authorized
-confirm the PR head matches the captured candidate
+/publish-pr <saved candidate and reports>; target <branch>; draft only
+# Approve the exact publication preview.
+/publish-pr <approved preview>; publish the draft PR
 ```
 
 For a feature that starts as an idea, optionally add external planning tools:
@@ -578,7 +593,8 @@ For a feature that starts as an idea, optionally add external planning tools:
 /implement-contract #124
 /review-implementation <saved child handoff> against <child comparison base>
 /prove <saved child contract>; candidate <saved child handoff>
-open the pull request when authorized
+/publish-pr <saved child candidate and reports>; target <branch>; draft only
+# Approve and publish the exact preview when a child PR is required.
 
 # On the final integrated candidate:
 /review-implementation <saved integrated handoff> against <parent comparison base>
