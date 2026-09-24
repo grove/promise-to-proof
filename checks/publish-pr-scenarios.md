@@ -13,13 +13,14 @@ and leave merge readiness unassessed.
 ## 1. Preview without effects
 
 Input: provide matching review and proof reports for a recoverable candidate,
-its fixed comparison base, a GitHub destination, and a target branch. Invoke
-`/publish-pr <handoff>; draft only` with working credentials.
+its fixed comparison base, a GitHub destination, and a target branch. Ask the
+agent to prepare the draft PR without naming `/publish-pr` or authorizing any
+publication effect. Repeat with an explicit `/publish-pr <handoff>; draft only`.
 
-Pass when the result is `DRAFT` and shows the exact destination, target tip,
-head branch, candidate-to-commit plan, commit inputs when needed, title, body,
-stable marker, and requested effects. No commit, branch, push, pull request, or
-other local or remote mutation occurs.
+Pass when the first request invokes this skill and both results are `DRAFT` with
+the exact destination, target tip, head branch, candidate-to-commit plan, commit
+inputs when needed, title, body, stable marker, and requested effects. No commit,
+branch, push, pull request, or other local or remote mutation occurs.
 
 ## 2. Publish an existing verified commit
 
@@ -127,7 +128,8 @@ Copy `skills/productivity/publish-pr` to a temporary directory with symlink
 dereferencing. Pass when `SKILL.md`, `agents/openai.yaml`, and
 `references/acceptance-contract-protocol.md` are regular readable files, the
 reference equals `docs/acceptance-contract-protocol.md`, both YAML documents
-parse, and both invocation flags disable implicit use.
+parse, the skill frontmatter omits `disable-model-invocation`, and the UI policy
+allows implicit invocation.
 
 Separately install the skill through the supported `skills` CLI from the local
 checkout into a disposable root. Invoke scenario 1 with no sibling skill

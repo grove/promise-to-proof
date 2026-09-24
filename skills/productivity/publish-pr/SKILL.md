@@ -1,7 +1,6 @@
 ---
 name: publish-pr
-description: Prepare and explicitly publish one exact reviewed and proven candidate as a GitHub draft pull request without changing its content.
-disable-model-invocation: true
+description: Use after one exact candidate has matching full REVIEWED and PROVEN reports to prepare a GitHub draft PR preview; commit, push, and PR creation require explicit exact authorization.
 ---
 
 Publish one exact verified candidate as one draft pull request. This skill turns
