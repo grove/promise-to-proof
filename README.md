@@ -21,11 +21,12 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 
 ## Choose a skill
 
-### Create the source issue
+### Start with an issue
 
 | Skill | Use it when | It gives you |
 |---|---|---|
 | [`create-parent-issue`](./skills/productivity/create-parent-issue/SKILL.md) | A local specification needs one originating GitHub issue | One source issue with a durable reference to the exact spec |
+| [`triage-issue`](./skills/productivity/triage-issue/SKILL.md) | An existing issue needs a next action or triage label | A recommendation and, when explicitly approved, a verified issue update |
 
 ### Shape the work
 
@@ -125,7 +126,8 @@ skills/productivity/
 ├── prove/
 ├── repair-gaps/
 ├── review-implementation/
-└── slice-contract/
+├── slice-contract/
+└── triage-issue/
 ```
 
 Each skill has a `SKILL.md`. Some also have an `agents/openai.yaml` display
