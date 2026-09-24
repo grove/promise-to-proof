@@ -25,38 +25,38 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 
 | Skill | Use it when | It gives you |
 |---|---|---|
-| [`create-parent-issue`](./skills/productivity/create-parent-issue/SKILL.md) | A local specification needs one originating GitHub issue | One source issue with a durable reference to the exact spec |
-| [`triage-issue`](./skills/productivity/triage-issue/SKILL.md) | An existing issue needs a next action or triage label | A recommendation and, when explicitly approved, a verified issue update |
+| [`/create-parent-issue`](./skills/productivity/create-parent-issue/SKILL.md) | A local specification needs one originating GitHub issue | One source issue with a durable reference to the exact spec |
+| [`/triage-issue`](./skills/productivity/triage-issue/SKILL.md) | An existing issue needs a next action or triage label | A recommendation and, when explicitly approved, a verified issue update |
 
 ### Shape the work
 
 | Skill | Use it when | It gives you |
 |---|---|---|
-| [`critique`](./skills/productivity/critique/SKILL.md) | You explicitly request an independent review of a proposal against its intended outcome | Evidence-backed advice and a recommendation |
-| [`interrogate`](./skills/productivity/interrogate/SKILL.md) | You want to question the agent's proposal and reasoning | Evidence-backed answers, a revised approach, and explicit unknowns |
+| [`/critique`](./skills/productivity/critique/SKILL.md) | You explicitly request an independent review of a proposal against its intended outcome | Evidence-backed advice and a recommendation |
+| [`/interrogate`](./skills/productivity/interrogate/SKILL.md) | You want to question the agent's proposal and reasoning | Evidence-backed answers, a revised approach, and explicit unknowns |
 
 ### Plan and divide
 
 | Skill | Use it when | It gives you |
 |---|---|---|
-| [`plan-acceptance`](./skills/productivity/plan-acceptance/SKILL.md) | A ticket needs clear acceptance criteria | A candidate-independent revision with stable requirement IDs and evidence plans |
-| [`slice-contract`](./skills/productivity/slice-contract/SKILL.md) | A parent contract is too large for one coherent task | A traceable breakdown and, when authorized, published child tickets |
+| [`/plan-acceptance`](./skills/productivity/plan-acceptance/SKILL.md) | A ticket needs clear acceptance criteria | A candidate-independent revision with stable requirement IDs and evidence plans |
+| [`/slice-contract`](./skills/productivity/slice-contract/SKILL.md) | A parent contract is too large for one coherent task | A traceable breakdown and, when authorized, published child tickets |
 
 ### Implement and verify
 
 | Skill | Use it when | It gives you |
 |---|---|---|
-| [`implement-contract`](./skills/productivity/implement-contract/SKILL.md) | An agreed contract is ready to implement | Scoped implementation, development checks, and a recoverable candidate handoff |
-| [`review-implementation`](./skills/productivity/review-implementation/SKILL.md) | A captured implementation is ready to inspect | Findings on contract fidelity, scope, and engineering quality |
-| [`prove`](./skills/productivity/prove/SKILL.md) | Implementation is ready to verify | `PROVEN` or `NOT PROVEN` with evidence |
-| [`merge-readiness`](./skills/productivity/merge-readiness/SKILL.md) | An existing PR is near a merge decision | Read-only readiness or specific blockers for the current PR state |
+| [`/implement-contract`](./skills/productivity/implement-contract/SKILL.md) | An agreed contract is ready to implement | Scoped implementation, development checks, and a recoverable candidate handoff |
+| [`/review-implementation`](./skills/productivity/review-implementation/SKILL.md) | A captured implementation is ready to inspect | Findings on contract fidelity, scope, and engineering quality |
+| [`/prove`](./skills/productivity/prove/SKILL.md) | Implementation is ready to verify | `PROVEN` or `NOT PROVEN` with evidence |
+| [`/merge-readiness`](./skills/productivity/merge-readiness/SKILL.md) | An existing PR is near a merge decision | Read-only readiness or specific blockers for the current PR state |
 
 ### Recover
 
 | Skill | Use it when | It gives you |
 |---|---|---|
-| [`repair-gaps`](./skills/productivity/repair-gaps/SKILL.md) | Proof found specific repairable gaps | A scoped repair report; fresh proof is still required |
-| [`fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
+| [`/repair-gaps`](./skills/productivity/repair-gaps/SKILL.md) | Proof found specific repairable gaps | A scoped repair report; fresh proof is still required |
+| [`/fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
 
 ## Follow the workflow
 
@@ -68,31 +68,40 @@ review findings from proof gaps, or acceptance from CI and merge readiness.
 
 ```mermaid
 flowchart TD
-	source["Issue, specification, or agreed outcome"] --> plan["plan-acceptance"]
+  source["Issue, specification, or agreed outcome"] --> plan["/plan-acceptance"]
 	plan --> contract["Save and reread contract"]
-	contract --> implement["implement-contract"]
+  contract --> split{"Independent child outcomes?"}
+  split -->|No| implement["/implement-contract"]
+  split -->|Yes| slice["/slice-contract<br/>Approve before publication"]
+  slice -->|NO SPLIT| implement
+  slice -->|PUBLISHED| children["Run the direct path for each child"]
+  children --> integrate["Capture integrated candidate"]
+  integrate --> parent["/prove full parent contract<br/>/review-implementation if needed"]
+  parent -->|Repairable NOT PROVEN gaps| parentRepair["/repair-gaps<br/>Capture repaired integrated candidate"]
+  parentRepair --> parent
+  parent -->|Current review + PROVEN| reports
+
 	implement --> candidate["Capture exact candidate"]
-	candidate --> verify["review-implementation + prove<br/>Separate invocations, either order"]
-	verify --> reports["Both current reports<br/>Same contract and candidate"]
-	reports -->|PR near merge| readiness["merge-readiness"]
+  candidate --> verify["/review-implementation + /prove<br/>Separate invocations, either order"]
+  verify -->|Review finding| implement
+  verify -->|Repairable NOT PROVEN gaps| repair["/repair-gaps"]
+  repair --> candidate
+  verify -->|Current REVIEWED + PROVEN| reports["Both current reports<br/>Same contract and exact candidate"]
+  reports -->|PR near merge| readiness["/merge-readiness"]
 	readiness --> gate["Readiness report; repository controls merge"]
 ```
 
 Save and pass each result before invoking the next skill; skills do not invoke
-one another. The chart shows the direct path. When another route applies:
+one another. Before planning, use `/triage-issue` for an issue needing a next
+action, or `/create-parent-issue` for a local spec in this repo needing an
+originating issue. `/critique` and `/interrogate` can help settle a proposal first.
 
-- Before planning, use `triage-issue` for an issue needing a next action, or
-  `create-parent-issue` for a local spec in this repo needing an originating issue.
-  `critique` and `interrogate` can help settle a proposal first.
-- For a large parent contract, use `slice-contract` after saving it. If the split
-  is published, plan, implement, review, and prove each child; then prove the
-  full parent contract on the integrated candidate. Review that candidate if
-  it differs from the reviewed child candidates or contains shared integration
-  code. A `NO SPLIT` result follows the direct path.
-- For a review finding, return to `implement-contract`; for repairable
-  `NOT PROVEN` gaps, use `repair-gaps`. Capture the changed candidate and refresh
-  review and proof. `fix-pr` addresses failed CI. If a promise changes, reconcile
-  the authorized amendment through `plan-acceptance` before continuing.
+For published child issues, save a contract and run the direct path for each
+child. Child proof does not replace `/prove` for the integrated parent. Review
+the integrated candidate if it differs from the reviewed child candidates or
+contains shared integration code. After any repair, capture the changed candidate
+and refresh review and proof. `/fix-pr` addresses failed CI. If a promise changes,
+reconcile the authorized amendment through `/plan-acceptance` before continuing.
 
 The [detailed workflow](./docs/promise-to-proof.md) includes examples and
 recovery paths. The [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
