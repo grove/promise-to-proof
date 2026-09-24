@@ -78,7 +78,8 @@ flowchart TD
 	contract --> split{"Large work?"}
 	split -->|No| implement["implement-contract"]
 	split -->|Yes| slice["slice-contract<br/>Approve before publication"]
-	slice --> children["Plan, implement, review, and prove each child"]
+	slice -->|NO SPLIT| implement
+	slice -->|PUBLISHED| children["Plan, implement, review, and prove each child"]
 	children --> integrate["Integrate candidate"]
 	integrate --> parentProof["prove full parent contract"]
 	parentProof -->|Repairable NOT PROVEN gaps| parentRepair["repair-gaps for parent"]
