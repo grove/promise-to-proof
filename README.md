@@ -58,43 +58,66 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 | [`/repair-gaps`](./skills/productivity/repair-gaps/SKILL.md) | Proof found specific repairable gaps | A scoped repair report; fresh proof is still required |
 | [`/fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
 
-## Follow the workflow
+## How Promise to Proof works
 
-Start with the [HOW-TO](./docs/how-to.md) for a GitHub issue, a local
-specification, a large parent contract, a review finding, or failed proof. It
-names the saved contract, candidate, and reports each phase needs. Read the
-[FAQ](./docs/faq.md) when you need to distinguish child proof from parent proof,
-review findings from proof gaps, or acceptance from CI and merge readiness.
+Promise to Proof turns an agreed outcome into a precise acceptance contract,
+builds against that contract, then independently reviews the implementation and
+proves the promised behavior on one exact candidate.
+
+```mermaid
+flowchart LR
+  promise["1. Start with a promise<br/>Issue, spec, or agreed outcome"]
+  plan["2. Define what success means<br/>/plan-acceptance"]
+  contract["Acceptance contract<br/>What must be true + how to verify it"]
+  implement["3. Build exactly that<br/>/implement-contract"]
+  candidate["Exact candidate<br/>Commit or reproducible snapshot"]
+  review["4a. Review the implementation<br/>/review-implementation"]
+  prove["4b. Prove the promised outcomes<br/>/prove"]
+  done["5. Review + proof are current<br/>for the same contract and candidate"]
+
+  promise --> plan --> contract --> implement --> candidate
+  candidate --> review --> done
+  candidate --> prove --> done
+```
+
+Each stage answers a different question:
+
+- **Promise:** What are we agreeing to deliver?
+- **Plan acceptance:** What exactly would make that promise true?
+- **Implementation:** Did we build what we agreed?
+- **Review:** Is the implementation faithful, scoped, and sound?
+- **Proof:** Can we demonstrate that every promised outcome holds?
+
+Save and pass each result before invoking the next skill; skills do not invoke
+one another. Capture the candidate as a commit or reproducible snapshot so the
+independent review and proof reports refer to the same exact implementation and
+contract. Review and proof can run in either order. Start with the
+[HOW-TO](./docs/how-to.md) for the saved artifacts and commands.
+
+### What if the direct path isn't enough?
 
 ```mermaid
 flowchart TD
-  source["Issue, specification, or agreed outcome"] --> plan["/plan-acceptance"]
-	plan --> contract["Save and reread contract"]
-  contract --> split{"Independent child outcomes?"}
-  split -->|No| implement["/implement-contract"]
-  split -->|Yes| slice["/slice-contract<br/>Approve before publication"]
-  slice -->|NO SPLIT| implement
-  slice -->|PUBLISHED| children["Run the direct path for each child"]
-  children --> integrate["Capture integrated candidate"]
-  integrate --> parent["/prove full parent contract<br/>/review-implementation if needed"]
-  parent -->|Repairable NOT PROVEN gaps| parentRepair["/repair-gaps<br/>Capture repaired integrated candidate"]
-  parentRepair --> parent
-  parent -->|Current review + PROVEN| reports
+  contract["Acceptance contract"] --> large{"Too large for one coherent task?"}
+  large -->|No| core["Follow the core workflow"]
+  large -->|Yes| slice["Slice into independent outcomes<br/>/slice-contract"]
+  slice --> children["Run the core workflow for each child"]
+  children --> integrated["Create one exact integrated candidate"]
+  integrated --> parent["Prove the full parent promise<br/>Review integration if needed"]
 
-	implement --> candidate["Capture exact candidate"]
-  candidate --> verify["/review-implementation + /prove<br/>Separate invocations, either order"]
-  verify -->|Review finding| implement
-  verify -->|Repairable NOT PROVEN gaps| repair["/repair-gaps"]
-  repair --> candidate
-  verify -->|Current REVIEWED + PROVEN| reports["Both current reports<br/>Same contract and exact candidate"]
-  reports -->|PR near merge| readiness["/merge-readiness"]
-	readiness --> gate["Readiness report; repository controls merge"]
+  core --> result{"Review or proof finds a problem?"}
+  parent --> result
+  result -->|No| ready["Ready for repository merge checks"]
+  result -->|Review finding| fix["Implement the finding<br/>/implement-contract"]
+  result -->|Repairable proof gap| repair["Repair the proven gap<br/>/repair-gaps"]
+  fix --> refresh["Capture new candidate<br/>Review + prove again"]
+  repair --> refresh
+  refresh --> result
 ```
 
-Save and pass each result before invoking the next skill; skills do not invoke
-one another. Before planning, use `/triage-issue` for an issue needing a next
-action, or `/create-parent-issue` for a local spec in this repo needing an
-originating issue. `/critique` and `/interrogate` can help settle a proposal first.
+Before planning, use `/triage-issue` for an issue needing a next action, or
+`/create-parent-issue` for a local spec in this repo needing an originating
+issue. `/critique` and `/interrogate` can help settle a proposal first.
 
 For published child issues, save a contract and run the direct path for each
 child. Child proof does not replace `/prove` for the integrated parent. Review
@@ -102,6 +125,10 @@ the integrated candidate if it differs from the reviewed child candidates or
 contains shared integration code. After any repair, capture the changed candidate
 and refresh review and proof. `/fix-pr` addresses failed CI. If a promise changes,
 reconcile the authorized amendment through `/plan-acceptance` before continuing.
+
+For an existing PR near merge, `/merge-readiness` checks the current review,
+proof, CI, and repository merge conditions without merging the PR. Read the
+[FAQ](./docs/faq.md) for the distinction between acceptance and merge readiness.
 
 The [detailed workflow](./docs/promise-to-proof.md) includes examples and
 recovery paths. The [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
