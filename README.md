@@ -49,6 +49,7 @@ Issues and specifications for this repository live in [GitHub Issues](https://gi
 | [`implement-contract`](./skills/productivity/implement-contract/SKILL.md) | An agreed contract is ready to implement | Scoped implementation, development checks, and a recoverable candidate handoff |
 | [`review-implementation`](./skills/productivity/review-implementation/SKILL.md) | A captured implementation is ready to inspect | Findings on contract fidelity, scope, and engineering quality |
 | [`prove`](./skills/productivity/prove/SKILL.md) | Implementation is ready to verify | `PROVEN` or `NOT PROVEN` with evidence |
+| [`merge-readiness`](./skills/productivity/merge-readiness/SKILL.md) | An existing PR is near a merge decision | Read-only readiness or specific blockers for the current PR state |
 
 ### Recover
 
@@ -82,6 +83,7 @@ call one another automatically.
 /implement-contract #123
 /review-implementation <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
+/merge-readiness <PR URL>; review <saved report>; proof <saved report>
 /repair-gaps <matching proof report>; candidate <saved candidate handoff>; requirements <IDs>
 /fix-pr #456
 ```

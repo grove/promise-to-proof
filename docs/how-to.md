@@ -89,6 +89,12 @@ checks every promised outcome against observed evidence. A `REVIEWED` result
 does not stand in for `PROVEN`, and neither result replaces required CI or the
 repository's review gate.
 
+After an authorized PR exists, invoke `/merge-readiness <PR URL>` with the saved
+review and proof reports near the merge decision. It checks that the PR's current
+candidate has matching evidence, required CI, and repository approval and merge
+conditions. It reports blockers without merging or replacing the repository's
+approval process. Changes after the check require a new readiness assessment.
+
 ## Divide a large issue
 
 Save the parent contract before asking for a split. A draft shows the proposed
