@@ -87,6 +87,7 @@ Start with these four skills in order:
 
 | Skill | Use it when | It gives you |
 |---|---|---|
+| [`/audit-acceptance`](./skills/productivity/audit-acceptance/SKILL.md) | A proposed contract needs an independent check before human approval | Read-only source, scope, identity, and evidence-plan findings |
 | [`/create-parent-issue`](./skills/productivity/create-parent-issue/SKILL.md) | A local specification needs one originating GitHub issue | One source issue with a durable reference to the exact spec |
 | [`/triage-issue`](./skills/productivity/triage-issue/SKILL.md) | An existing issue needs a next action or triage label | A recommendation and, when explicitly approved, a verified issue update |
 | [`/critique`](./skills/productivity/critique/SKILL.md) | You explicitly request an independent review of a proposal against its intended outcome | Evidence-backed advice and a recommendation |
@@ -112,6 +113,7 @@ Start with these four skills in order:
 /triage-issue #123
 /critique <idea, document path, or GitHub issue reference>
 /interrogate Walk me through your proposal so I can question it.
+/audit-acceptance <exact proposed contract> against <source>
 /slice-contract #123; draft only
 /merge-readiness <PR URL>; review <saved report>; proof <saved report>
 /repair-gaps <matching proof report>; candidate <saved candidate handoff>; requirements <IDs>
@@ -175,6 +177,7 @@ call one another automatically.
 
 ```text
 skills/productivity/
+├── audit-acceptance/
 ├── create-parent-issue/
 ├── plan-acceptance/
 ├── critique/

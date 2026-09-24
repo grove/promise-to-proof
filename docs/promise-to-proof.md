@@ -17,7 +17,7 @@ The acceptance contract defines the spec envelope. Implementation fills it.
 Proof establishes that one exact candidate satisfies one exact contract revision.
 
 ```text
-source → plan-acceptance → saved canonical acceptance contract
+source → plan-acceptance → optional audit-acceptance → approval and saved contract
        → implement-contract → captured candidate → review-implementation → prove
 ```
 
@@ -54,7 +54,8 @@ rg --files skills -g SKILL.md | sort
 The delivery path uses explicit phases:
 
 ```text
-/plan-acceptance       -> save and reread the contract
+/plan-acceptance       -> propose the contract
+/audit-acceptance      -> optionally check the exact proposal before approval
 /implement-contract    -> save the report and capture the candidate
 /review-implementation -> save findings for that candidate and comparison base
 /prove                 -> save the proof and requirement evidence
@@ -172,8 +173,20 @@ implementation that loses retry state on restart.
 Reconcile GitHub checkboxes with the contract. A checked box is a completion
 claim to verify, not evidence. Resolve a mismatch before claiming acceptance.
 
-Save the returned contract before handing the work to a fresh session. The
-workflow invoking `plan-acceptance` owns this step under existing authority.
+For an independent check before approval, run:
+
+```text
+/audit-acceptance <exact proposed contract> against <source>
+```
+
+`READY_FOR_APPROVAL` is advice about that exact proposal, not approval.
+`CHANGES_NEEDED` returns audit findings to `plan-acceptance`; `BLOCKED` requires
+the missing source, identity, authority, parent context, or outcome decision.
+The audit does not revise or save the proposal and does not inspect a candidate.
+
+After any required approval, save the returned contract before handing the work
+to a fresh session. The workflow invoking `plan-acceptance` owns this step under
+existing authority.
 Follow the protocol's [durable handoff convention](./acceptance-contract-protocol.md#durable-contract-handoff):
 attach the contract or its direct reference to the originating ticket. Without
 a tracker, use `docs/acceptance-contracts/<work-id>.md` unless the repository
