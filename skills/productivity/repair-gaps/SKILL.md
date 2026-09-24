@@ -37,8 +37,11 @@ complete in depth.
    requirements, when editing is authorized. Preserve authorization already given.
 4. Run the focused check and inspect the resulting diff.
 5. Recheck the contract and report the candidate before and after, changed files,
-   addressed requirements, changed evidence, and remaining gaps. The candidate
-   may change only in the scoped repair; the acceptance requirements stay intact.
+   addressed requirements, changed evidence, and remaining gaps. When gaps remain,
+   recommend one smallest concrete next action. Name the affected IDs and the exact
+   command, missing input, or human decision needed; `None` is valid only when no
+   gaps remain. The candidate may change only in the scoped repair; the acceptance
+   requirements stay intact.
 6. Hand off the changed candidate for separate `/review-implementation` and fresh proof.
    End with: **Fresh `/prove` required before acceptance.**
 
@@ -65,6 +68,7 @@ Changed files: <files or None>
 Changed evidence: <assertions/artifacts and affected IDs, or None>
 Focused checks: <observations and assertions>
 Remaining gaps: <IDs and reasons, or None>
+Recommended next action: <one concrete action for the remaining IDs, or None>
 
 Fresh `/prove` required before acceptance.
 ```
