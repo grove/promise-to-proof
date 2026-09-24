@@ -15,6 +15,10 @@ Pass when it reports `READY` for the named head, base, contract, and report
 references without merging, approving, or altering the PR. It must distinguish
 the saved `REVIEWED` report from repository approval.
 
+Repeat with a `REVIEWED` report for only selected requirement IDs, leaving some
+applicable obligations unreviewed. Pass when this case is `BLOCKED` despite the
+matching head and full proof.
+
 ## 2. Candidate changed after verification
 
 Rebase or repair the PR after saving proof and review for the old candidate.
@@ -37,8 +41,9 @@ replaces GitHub approval with its `REVIEWED` report.
 
 ## 4. Recheck the decision state
 
-Change the PR head or base during inspection. For a merge-queue target, let
-the queue create a new merge-group candidate with checks still pending.
+Change the PR head, base, or canonical agreement during inspection. For a
+merge-queue target, let the queue create a new merge-group candidate with checks
+still pending.
 
 Pass when the changed state is not reported `READY` based on earlier evidence.
 Queue entry alone does not assert readiness of the merge-group candidate. The

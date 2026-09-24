@@ -126,6 +126,7 @@ skills/productivity/
 ├── fix-pr/
 ├── implement-contract/
 ├── interrogate/
+├── merge-readiness/
 ├── prove/
 ├── repair-gaps/
 ├── review-implementation/
