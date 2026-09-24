@@ -74,9 +74,9 @@ install `plan-acceptance`, `review-implementation`, and `repair-gaps` as
 applicable, then remove the old copies using your installer's normal removal
 mechanism.
 
-## Choose a skill
+## Start with the core workflow
 
-**New users: start with these four:**
+Start with these four skills in order:
 
 [`/plan-acceptance`](./skills/productivity/plan-acceptance/SKILL.md) →
 [`/implement-contract`](./skills/productivity/implement-contract/SKILL.md) →
@@ -99,18 +99,26 @@ mechanism.
 ## Use a skill
 
 ```text
-/triage-issue #123
-/critique <idea, document path, or GitHub issue reference>
-/interrogate Walk me through your proposal so I can question it.
 /plan-acceptance #123
-/slice-contract #123; draft only
 /implement-contract #123
 /review-implementation <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
+```
+
+<details>
+<summary>Other commands</summary>
+
+```text
+/triage-issue #123
+/critique <idea, document path, or GitHub issue reference>
+/interrogate Walk me through your proposal so I can question it.
+/slice-contract #123; draft only
 /merge-readiness <PR URL>; review <saved report>; proof <saved report>
 /repair-gaps <matching proof report>; candidate <saved candidate handoff>; requirements <IDs>
 /fix-pr #456
 ```
+
+</details>
 
 The skills also accept direct ticket URLs or a specification when their skill
 instructions describe that input.
