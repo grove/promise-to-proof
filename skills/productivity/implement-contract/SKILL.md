@@ -193,3 +193,9 @@ Report storage: <retrievable destination, or proposed destination; storage pendi
 
 Implementation report only; independent acceptance requires /prove.
 ```
+
+After the report, end with `Next step:` in plain language. For `IMPLEMENTED`,
+tell the user to save the report and give its exact candidate to separate
+`/review-implementation <saved handoff> against <comparison base>` and
+`/prove <saved contract>; candidate <saved handoff>` runs. For `PARTIAL` or
+`BLOCKED`, name the check, decision, or input needed before that handoff.

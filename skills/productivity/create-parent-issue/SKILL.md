@@ -92,3 +92,8 @@ For `PUBLISHED`, report the issue URL, source identity, and readback result.
 Hand off to `/plan-acceptance <issue-reference>` and tell it to read the exact
 linked specification. Do not invoke it automatically. Issue creation is not
 acceptance planning, implementation readiness, or approval to split the work.
+
+End with `Next step:` in plain language. For `PUBLISHED`, give
+`/plan-acceptance <issue URL>` and name the linked specification. For `DRAFT`,
+ask for approval of the exact publication preview; for `PARTIAL` or `BLOCKED`,
+name the identity check or missing input that must be resolved first.

@@ -182,3 +182,11 @@ Report storage: <retrievable destination, or proposed destination; storage pendi
 
 Review only; acceptance proof and merge readiness are separate.
 ```
+
+After the report, end with `Next step:` in plain language. For `REVIEWED`,
+tell the user to save the review and run `/prove` on the same candidate if
+proof is still needed; if matching proof already exists, suggest a
+`/publish-pr` preview with both saved reports. For `CHANGES NEEDED`, give
+`/implement-contract` the saved in-scope findings, or hand a missing or changed
+agreement to `/plan-acceptance`. For `BLOCKED`, name the missing input or
+decision first. Do not invoke the next skill.

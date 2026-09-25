@@ -60,3 +60,8 @@ established. Name the smallest next action for each blocker, such as `/prove`,
 head and base identities, contract revision, saved report references, required
 check and approval status, and the time of the observation. `READY` is advice
 about that state, not merge authorization; a later PR change needs another check.
+
+End with `Next step:` in plain language. For `READY`, tell the user to seek
+separate merge authorization under the repository's process for this PR state.
+For `BLOCKED` or `UNKNOWN`, give the smallest specific action, its required
+reference (such as a stale report or failing check), and who must do it.

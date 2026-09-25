@@ -86,3 +86,9 @@ With a saved contract and implementation authority, the next step can be
 Invoking this skill authorizes discussion and investigation, not implementation.
 Preserve implementation authority already granted and act on it when the discussion
 is complete. Agreement with an explanation alone does not grant new write authority.
+
+When the user finishes the discussion, end with `Next step:` in plain language.
+Name the unresolved decision if it blocks progress; otherwise point to
+`/plan-acceptance <source and amendment>` for a changed or missing agreement,
+or `/implement-contract <saved contract>` when that agreement and authority
+already exist. Include the reference the next phase needs.

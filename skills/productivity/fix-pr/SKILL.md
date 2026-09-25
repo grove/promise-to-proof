@@ -169,3 +169,9 @@ Invoking `/fix-pr` authorizes scoped inspection, edits, commit, push, and
 workflow reruns for the target PR or workflow run. It does not authorize
 force-pushes, changes outside the target branch, or workarounds that weaken
 verification.
+
+End with `Next step:` in plain language. For `FIXED`, name the repaired SHA
+and any stale `/prove` or `/review-implementation` report to refresh before
+`/merge-readiness <PR URL>`; if both already match, name that readiness check.
+For `NOT FIXED`, name the failed or pending check and the one input or action
+needed to continue. Do not claim acceptance or merge authority.
