@@ -38,6 +38,11 @@ Record the repository, branch, starting commit or snapshot, and existing changes
 Preserve unrelated work. Continue alongside it only when ownership and scope are
 clear; otherwise stop before editing. Do not stash, reset, clean, switch branches,
 or discard user work to obtain a clean starting point.
+For a sliced child, follow the saved delivery path. If it names a different
+working branch, pause and ask the authorized enclosing workflow to prepare that
+branch; do not create or switch branches here. Keep repository-tracked contract
+and planning files in the intended candidate or a retrievable prerequisite,
+not only in another checkout's working tree.
 
 Before editing, briefly state the outcome, scope, starting identity, contract,
 and unresolved decisions. A small correction needs only a brief plan.
