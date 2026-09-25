@@ -185,6 +185,8 @@ path. For questions about issues, slicing, review, and proof, read the
 The [detailed workflow](./docs/promise-to-proof.md) includes examples and
 recovery paths. The [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
 sets the rules for revisions, candidate identity, evidence, and durable handoffs.
+The [acceptance bundle format](./docs/acceptance-bundle-v1.md) defines optional
+deterministic inspection of matching review and proof artifacts.
 Each skill returns a result for an explicit next invocation; the skills do not
 call one another automatically.
 
@@ -209,8 +211,8 @@ skills/productivity/
 ```
 
 Each skill has a `SKILL.md`. Some also have an `agents/openai.yaml` display
-metadata file. The [`checks/`](./checks/) directory contains small, human-runnable
-workflow checks.
+metadata file. The [`checks/`](./checks/) directory contains human-runnable
+workflow scenarios and the dependency-free acceptance bundle checker.
 
 Shared protocol references are symlinks to `docs/acceptance-contract-protocol.md`.
 The installer copies their contents into each selected skill, so individual

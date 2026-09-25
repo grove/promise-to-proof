@@ -259,6 +259,19 @@ acceptance. Prior proof describes only its original candidate. This includes CI
 repairs that change product behavior, acceptance evidence, or relevant tests.
 A green CI repair does not refresh proof automatically.
 
+## Deterministic bundle inspection
+
+After matching full `REVIEWED` and `PROVEN` reports exist for a reproducible
+snapshot, an invoking workflow may normalize their normative claims into an
+[acceptance bundle](./acceptance-bundle-v1.md). The checker recomputes exact
+contract and candidate identities, checks complete requirement coverage,
+resolves retained evidence, and rejects inconsistent decisions without another
+model call.
+
+The bundle is a derived inspection artifact, not another canonical contract or
+report. A valid bundle does not establish evidence authenticity, evidence
+adequacy, or merge readiness and does not create a new acceptance verdict.
+
 ## Pull-request publication handoff
 
 `publish-pr` may prepare and, under exact publication authority, publish one
@@ -288,8 +301,14 @@ snapshot key.
 When a snapshot needs a commit, create it in an isolated publication workspace
 and compare its complete Git tree with the captured candidate. Record the exact
 snapshot-to-commit mapping. A content-equivalent commit preserves candidate-bound
-review and proof; any byte, path, mode, symlink, deletion, or included-fixture
-mismatch is a changed candidate and cannot be published under those reports.
+review and proof only when behaviorally relevant build and execution inputs are
+unchanged or explicitly shown equivalent. These inputs include Git metadata when
+the candidate reads it, generated artifacts, dependency resolution, timestamps,
+signing inputs, and external build configuration. Record relevant inputs and
+produced artifact digests. If publication changes a relevant input, rerun the
+affected verification against the publishable artifact or return `BLOCKED`. Any
+byte, path, mode, symlink, deletion, or included-fixture mismatch is a changed
+candidate and cannot be published under those reports.
 Persist and reread the created commit and mapping before remote effects. Resume
 uses that retained commit; missing or conflicting mapping state blocks creating
 a different publication commit from implicit Git metadata. If commit creation

@@ -1,0 +1,173 @@
+[
+  {
+    "name": "contract digest mismatch",
+    "patch": {"contract": {"sha256": "0000000000000000000000000000000000000000000000000000000000000000"}},
+    "expected_codes": ["CONTRACT_DIGEST_MISMATCH"]
+  },
+  {
+    "name": "candidate digest mismatch",
+    "patch": {"candidate": {"key": "snapshot:sha256:0000000000000000000000000000000000000000000000000000000000000000"}},
+    "expected_codes": ["CANDIDATE_DIGEST_MISMATCH"]
+  },
+  {
+    "name": "duplicate requirement ID",
+    "patch": {
+      "contract": {
+        "content": "# Acceptance contract: #124\n\nContract revision: v1\nSource: #124\n\nIntended outcome: CLI prints hello and exits successfully.\n\n## Acceptance matrix\n\n| ID | Source | Requirement | Boundaries / counterexamples | Seam | Oracle | Planned evidence | Plan state |\n|---|---|---|---|---|---|---|---|\n| R1 | criterion 1 | The CLI prints hello. | Missing or different output. | CLI stdout | Exact text is `hello`. | Run the CLI and capture stdout. | planned |\n| R1 | criterion 2 | The CLI exits successfully. | Any nonzero exit. | CLI process | Exit status is zero. | Capture the process status. | planned |\n\n## Unresolved gaps\n\n- None\n",
+        "sha256": "052155cc97a00dc9e4066f72eab7550d89de811bd3c65adb711cda3440ca1788"
+      }
+    },
+    "expected_codes": ["DUPLICATE_REQUIREMENT"]
+  },
+  {
+    "name": "contract has unresolved gap",
+    "patch": {
+      "contract": {
+        "content": "# Acceptance contract: #124\n\nContract revision: v1\nSource: #124\n\nIntended outcome: CLI prints hello and exits successfully.\n\n## Acceptance matrix\n\n| ID | Source | Requirement | Boundaries / counterexamples | Seam | Oracle | Planned evidence | Plan state |\n|---|---|---|---|---|---|---|---|\n| R1 | criterion 1 | The CLI prints hello. | Missing or different output. | CLI stdout | Exact text is `hello`. | Run the CLI and capture stdout. | gap |\n| R2 | criterion 2 | The CLI exits successfully. | Any nonzero exit. | CLI process | Exit status is zero. | Capture the process status. | planned |\n\n## Unresolved gaps\n\n- None\n",
+        "sha256": "2d6d500564b6717d151cdb32f119ec3f086570741c3beb888ec0639661d7f740"
+      }
+    },
+    "expected_codes": ["CONTRACT_HAS_GAP"]
+  },
+  {
+    "name": "noncanonical candidate base64",
+    "patch": {
+      "candidate": {
+        "key": "snapshot:sha256:335e826d48d169b2063396a411add20919db70ec04123a71b0e95f76e59d47c8",
+        "manifest": [
+          {
+            "path": "hello.txt",
+            "type": "file",
+            "mode": "100644",
+            "content_base64": "Zh=="
+          }
+        ]
+      }
+    },
+    "expected_codes": ["NONCANONICAL_BASE64"]
+  },
+  {
+    "name": "incomplete review coverage",
+    "patch": {"review": {"coverage": ["R1"]}},
+    "expected_codes": ["REVIEW_COVERAGE_MISMATCH"]
+  },
+  {
+    "name": "incomplete proof coverage",
+    "patch": {
+      "proof": {
+        "verdicts": [
+          {"id": "R1", "verdict": "proven", "evidence": ["E1"]}
+        ]
+      }
+    },
+    "expected_codes": ["PROOF_COVERAGE_MISMATCH"]
+  },
+  {
+    "name": "contradictory proof outcome",
+    "patch": {
+      "proof": {
+        "verdicts": [
+          {"id": "R1", "verdict": "proven", "evidence": ["E1"]},
+          {"id": "R2", "verdict": "not_proven", "evidence": ["E2"]}
+        ]
+      }
+    },
+    "expected_codes": ["PROOF_STATUS_CONTRADICTION"]
+  },
+  {
+    "name": "stale proof candidate",
+    "patch": {"proof": {"stability": {"candidate": "drifted"}}},
+    "expected_codes": ["REPORT_STALE"]
+  },
+  {
+    "name": "missing evidence reference",
+    "patch": {
+      "proof": {
+        "verdicts": [
+          {"id": "R1", "verdict": "proven", "evidence": ["E1"]},
+          {"id": "R2", "verdict": "proven", "evidence": ["E9"]}
+        ]
+      }
+    },
+    "expected_codes": ["MISSING_EVIDENCE", "UNREFERENCED_EVIDENCE"]
+  },
+  {
+    "name": "proven verdict references failed evidence",
+    "patch": {
+      "proof": {
+        "evidence": [
+          {
+            "id": "E1",
+            "result": "failed",
+            "assertion": "stdout equals hello",
+            "observation": "stdout was goodbye",
+            "artifact": {
+              "content": "command: ./hello\nstdout: hello\n",
+              "sha256": "2d14c718d2033821de5658b32a5878294e30ad5fee42f80832136862dcaf419e"
+            }
+          }
+        ]
+      }
+    },
+    "expected_codes": ["EVIDENCE_NOT_PASSING"]
+  },
+  {
+    "name": "missing evidence content",
+    "patch": {
+      "proof": {
+        "evidence": [
+          {
+            "id": "E1",
+            "result": "passed",
+            "assertion": "stdout equals hello",
+            "observation": "stdout was hello",
+            "artifact": {
+              "sha256": "2d14c718d2033821de5658b32a5878294e30ad5fee42f80832136862dcaf419e"
+            }
+          },
+          {
+            "id": "E2",
+            "result": "passed",
+            "assertion": "exit status equals zero",
+            "observation": "exit status was zero",
+            "artifact": {
+              "content": "command: ./hello\nexit: 0\n",
+              "sha256": "eb20c774ed57454ab594d6931faab4ad9c701665a2185e5ada4be4f0a6b9464b"
+            }
+          }
+        ]
+      }
+    },
+    "expected_codes": ["MISSING_FIELD"]
+  },
+  {
+    "name": "evidence content digest mismatch",
+    "patch": {
+      "proof": {
+        "evidence": [
+          {
+            "id": "E1",
+            "result": "passed",
+            "assertion": "stdout equals hello",
+            "observation": "stdout was hello",
+            "artifact": {
+              "content": "command: ./hello\nstdout: goodbye\n",
+              "sha256": "2d14c718d2033821de5658b32a5878294e30ad5fee42f80832136862dcaf419e"
+            }
+          },
+          {
+            "id": "E2",
+            "result": "passed",
+            "assertion": "exit status equals zero",
+            "observation": "exit status was zero",
+            "artifact": {
+              "content": "command: ./hello\nexit: 0\n",
+              "sha256": "eb20c774ed57454ab594d6931faab4ad9c701665a2185e5ada4be4f0a6b9464b"
+            }
+          }
+        ]
+      }
+    },
+    "expected_codes": ["CONTENT_DIGEST_MISMATCH"]
+  }
+]

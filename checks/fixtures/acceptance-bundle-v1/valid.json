@@ -1,0 +1,85 @@
+{
+  "schema": "promise-to-proof/acceptance-bundle/v1",
+  "claim": "REVIEWED_AND_PROVEN",
+  "contract": {
+    "source": "#124",
+    "revision": "v1",
+    "content": "# Acceptance contract: #124\n\nContract revision: v1\nSource: #124\n\nIntended outcome: CLI prints hello and exits successfully.\n\n## Acceptance matrix\n\n| ID | Source | Requirement | Boundaries / counterexamples | Seam | Oracle | Planned evidence | Plan state |\n|---|---|---|---|---|---|---|---|\n| R1 | criterion 1 | The CLI prints hello. | Missing or different output. | CLI stdout | Exact text is `hello`. | Run the CLI and capture stdout. | planned |\n| R2 | criterion 2 | The CLI exits successfully. | Any nonzero exit. | CLI process | Exit status is zero. | Capture the process status. | planned |\n\n## Unresolved gaps\n\n- None\n",
+    "sha256": "031105f8b4b3cfdf5a1540cdda2b8e97297fd1d39daf90efc231359c46aa5217"
+  },
+  "candidate": {
+    "key": "snapshot:sha256:7e778e9e9e6853d93e6cde9922a70f5c02435c59a91c3658869a1c5fe60d3e42",
+    "manifest": [
+      {
+        "path": "hello.txt",
+        "type": "file",
+        "mode": "100644",
+        "content_base64": "aGVsbG8K"
+      }
+    ],
+    "comparison_base": "git:1111111111111111111111111111111111111111"
+  },
+  "review": {
+    "contract": {
+      "source": "#124",
+      "revision": "v1",
+      "sha256": "031105f8b4b3cfdf5a1540cdda2b8e97297fd1d39daf90efc231359c46aa5217"
+    },
+    "candidate_key": "snapshot:sha256:7e778e9e9e6853d93e6cde9922a70f5c02435c59a91c3658869a1c5fe60d3e42",
+    "comparison_base": "git:1111111111111111111111111111111111111111",
+    "coverage": ["R1", "R2"],
+    "status": "REVIEWED",
+    "stability": {
+      "contract": "unchanged",
+      "candidate": "unchanged"
+    },
+    "details": {
+      "content": "# REVIEWED: #124\n\nNo material findings.\n",
+      "sha256": "0c75e8e88ee25190cf22f91cbfe5932de004d7ab21c3d7d80501cab1b8d88a9c"
+    }
+  },
+  "proof": {
+    "contract": {
+      "source": "#124",
+      "revision": "v1",
+      "sha256": "031105f8b4b3cfdf5a1540cdda2b8e97297fd1d39daf90efc231359c46aa5217"
+    },
+    "candidate_key": "snapshot:sha256:7e778e9e9e6853d93e6cde9922a70f5c02435c59a91c3658869a1c5fe60d3e42",
+    "status": "PROVEN",
+    "stability": {
+      "contract": "unchanged",
+      "candidate": "unchanged"
+    },
+    "verification_context": "macOS; Python 3; command and observations retained with each evidence record",
+    "verdicts": [
+      {"id": "R1", "verdict": "proven", "evidence": ["E1"]},
+      {"id": "R2", "verdict": "proven", "evidence": ["E2"]}
+    ],
+    "evidence": [
+      {
+        "id": "E1",
+        "result": "passed",
+        "assertion": "stdout equals hello",
+        "observation": "stdout was hello",
+        "artifact": {
+          "content": "command: ./hello\nstdout: hello\n",
+          "sha256": "2d14c718d2033821de5658b32a5878294e30ad5fee42f80832136862dcaf419e"
+        }
+      },
+      {
+        "id": "E2",
+        "result": "passed",
+        "assertion": "exit status equals zero",
+        "observation": "exit status was zero",
+        "artifact": {
+          "content": "command: ./hello\nexit: 0\n",
+          "sha256": "eb20c774ed57454ab594d6931faab4ad9c701665a2185e5ada4be4f0a6b9464b"
+        }
+      }
+    ],
+    "details": {
+      "content": "# PROVEN: #124\n\nRequirements: 2/2\n",
+      "sha256": "b63513ed414c5423013281d314ea2cbe88a75288a2f443c0b29e18feea141b02"
+    }
+  }
+}
