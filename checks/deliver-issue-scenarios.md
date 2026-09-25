@@ -21,11 +21,12 @@ Repeat authority and drift cases in fresh contexts. Use the existing
 
 ## D1. One issue reference delivers the whole outcome
 
-Configure GitHub issue-number resolution and a supported host with separate
+Configure the disposable issue tracker and a supported host with separate
 stage invocations and isolated read-only review and proof contexts. Use one
 coherent issue for the R1-R4 fixture with settled promises and approval where
 required. Begin with `/deliver-issue #123`, no paths or commands. Inspect the
 saved contract, implementation report, candidate, review, proof, and evidence.
+Exercise GitHub-specific number resolution separately in D2.
 
 Pass when the contract preserves all four promises and exclusions, the candidate
 is recoverable including relevant uncommitted files, meaningful checks observe
@@ -80,6 +81,8 @@ Pass when unrelated work remains untouched and excluded from the delivered
 candidate, ambiguous overlap stops affected editing, and a concurrent change
 stops affected work without hiding or discarding it. Reports identify the
 actual partial state; no stash, reset, clean, or branch switch occurs.
+Compare the archived bytes of every excluded tracked file to its base version;
+listing the same file names alone cannot detect unrelated edits in a snapshot.
 
 ## D6. Recover a fixed candidate and external reports
 
