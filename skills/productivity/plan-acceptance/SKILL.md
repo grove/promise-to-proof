@@ -20,6 +20,13 @@ It defines the spec envelope, revision rules, evidence terms, and handoffs.
    prerequisites, and exact parent snapshot under the protocol's parent/child
    rules. Compare the current parent and pending amendments before planning;
    resolve material mismatches rather than silently adopting a changed parent.
+   When present, read the project's advisory learning register (by default
+   `docs/retrospective-learnings.md`). Consider relevant `active` accepted
+   learnings; record which were used with their IDs and evaluation references,
+   and why others were inapplicable. Superseded advice and an absent register
+   are not planning blockers. A learning is advice, never authority to add a
+   requirement, exclusion, standard, or revision without support from the
+   current source and its approval process.
 2. Reconcile existing acceptance criteria, including GitHub checkboxes, with
    the contract. Extract every material promise and necessary invariant. Keep
    source references so each criterion maps to its requirements without duplication.
@@ -76,6 +83,8 @@ Contribution: <decomposition reference, qualified parent obligations and precise
 Prerequisites: <references and required outcomes, or None>
 
 Intended outcome: <observable user or operator outcome>
+
+Advisory learnings: <active IDs considered and why used or inapplicable; None if no register>
 
 ## Acceptance matrix
 
