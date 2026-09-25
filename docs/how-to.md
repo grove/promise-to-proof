@@ -302,6 +302,8 @@ describe the required identities.
 
 | Command | Use it to |
 |---|---|
+| `/setup-promise-to-proof` | Configure GitHub issue, triage-label, and domain-doc pointers for a new project before tracker-writing or triage work. |
+| `/create-parent-issue` | Draft one source issue from a local spec in this repository; publish only after explicit approval. |
 | `/triage-issue` | Recommend the next action for an existing issue; apply only approved label or closure changes. |
 | `/plan-acceptance` | Define and revise the acceptance contract. |
 | `/audit-acceptance` | Independently audit an exact proposed contract before human approval. |
@@ -311,6 +313,7 @@ describe the required identities.
 | `/prove` | Check every contract promise on one exact candidate. |
 | `/repair-gaps` | Repair named gaps in a matching `NOT PROVEN` report. |
 | `/publish-pr` | Preview or explicitly publish an exact reviewed and proven candidate as a draft PR. |
+| `/merge-readiness` | Check current PR evidence, required CI, approvals, and merge conditions without merging. |
 | `/fix-pr` | Repair a failed pull request workflow. |
 | `/interrogate` | Question the agent's proposal and reasoning. |
 | `/critique` | Request an independent assessment of a proposal. |

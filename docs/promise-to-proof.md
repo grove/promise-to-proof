@@ -72,6 +72,23 @@ invocation and any publishing. Neither review nor proof needs an open PR or
 unrelated green CI. Merge requires current proof, green required checks for the
 final candidate, and the repository's review requirements.
 
+## Start from a source issue
+
+For a local specification in this repository, run `/create-parent-issue` to
+draft one originating GitHub issue. Review the issue and its immutable,
+retrievable spec reference before explicitly authorizing publication. For a
+small agreed outcome without a local spec, create the source issue with
+`gh issue create`. Neither path writes an acceptance contract; run
+`/plan-acceptance` on the resulting issue separately.
+
+When an existing issue needs a next owner or action, run `/triage-issue #123`.
+Its default result is a recommendation, not a label change. Approve the exact
+proposed label change before it is applied; closing a declined issue also
+requires separate authorization. `ready-for-agent` requires a saved, retrievable
+contract, settled boundaries, required approvals, and confirmed prerequisites.
+See the [triage procedure](./how-to.md#triage-an-existing-issue) for the
+label roles and handoff.
+
 ## Optionally shape the work with external planning tools
 
 For a feature that begins as an idea, start with a focused conversation:
@@ -533,6 +550,16 @@ skill records the exact mapping. A mismatch blocks publication rather than
 silently adopting new bytes. `PUBLISHED` still leaves CI, repository approval,
 and merge policy to `/merge-readiness`.
 
+## Check the current pull request before merge
+
+Near the merge decision, run `/merge-readiness <PR URL>` with the saved full
+review and proof reports. It checks their exact agreement and candidate against
+the current PR head and base, required CI (including applicable merge-queue
+checks), repository approvals, and other merge conditions. `REVIEWED` is not a
+GitHub approval. The read-only result is `READY`, `BLOCKED`, or `UNKNOWN` for
+the inspected PR state; even `READY` does not merge or authorize merging. A
+changed head, base, contract, or gate state needs a new assessment.
+
 ## Repair failed GitHub Actions without weakening the check
 
 If a required GitHub Actions workflow fails, invoke `fix-pr` with the pull
@@ -589,6 +616,9 @@ For a feature that starts as an idea, optionally add external planning tools:
 ```text
 /grill-with-docs <idea>
 /to-spec
+/create-parent-issue <saved spec path>; draft only
+# Approve the single source issue and authorize publication.
+/create-parent-issue <approved issue preview>; publish to GitHub
 /plan-acceptance #123
 /slice-contract #123; draft only
 # Approve the breakdown and authorize publication.
