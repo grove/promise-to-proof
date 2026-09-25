@@ -28,10 +28,17 @@ their respective judgments. This skill owns their handoffs, not their verdicts.
    the candidate and its comparison base across those contexts. Select the
    report/snapshot destination below and verify actual write and read access
    **before implementation**, including a harmless disposable probe when
-   permissions are uncertain. If any required capability is absent, return
-   `BLOCKED` naming it before dependent work. Never simulate independent review
+   permissions are uncertain. Actually launch a harmless nested read-only
+   stage context and capture its distinct session ID before implementation;
+   finding the host executable or reading its help is not an isolation check.
+   If any required capability is absent, return `BLOCKED` naming it before
+   dependent work. Never simulate independent review
    or proof in the implementation context or claim a stage ran when it only
-   received instructions to run. On Codex CLI, use separate `codex exec`
+   received instructions to run. Record the host's actual invocation and
+   distinct session/context IDs for each stage actually invoked; when planning
+   is skipped, record the existing contract's saved identity instead. A stage
+   report written by the enclosing context is not a stage invocation.
+   On Codex CLI, use separate `codex exec`
    invocations for stages and `--sandbox read-only` for review and proof; never
    resume or fork the implementation session as an independent verifier. Its
    workspace sandbox may protect `.git`; an externally configured artifact
@@ -83,10 +90,14 @@ available, report storage pending instead of claiming a completed handoff.
    the comparison-base tree plus **only** the issue-owned changes (including
    relevant untracked files); do not archive the current checkout wholesale.
    Compare the saved snapshot file inventory and bytes to that declared scope,
-   including base versions of excluded paths, before any handoff. Keep reports
-   and evidence outside that candidate. Verify the captured content can be
-   retrieved in the contexts that will inspect it; a hash or mutable branch
-   name alone is insufficient. Exclude platform metadata such as macOS `._*`
+   including base versions of excluded paths, before any handoff. Include the
+   full base commit SHA and enough bytes to reconstruct its tree in another
+   checkout; a changed-files-only archive without a transferable base is not
+   recoverable. Test reconstruction in an isolated copy before handing it to
+   independent contexts. Keep reports and evidence outside that candidate.
+   Verify the captured content can be retrieved in the contexts that will
+   inspect it; a hash or mutable branch name alone is insufficient. Exclude
+   platform metadata such as macOS `._*`
    tar entries (set `COPYFILE_DISABLE=1` when packaging with `tar`). Do not
    commit just to capture the candidate.
 
@@ -98,7 +109,12 @@ available, report storage pending instead of claiming a completed handoff.
    candidate; give review the comparison base. Each stage must inspect its own
    evidence. Save and reread both reports outside the candidate, including
    observations and retrievable evidence, then compare their contract text,
-   revision, candidate identity, and full-ticket scope. Recheck the source
+   revision, candidate identity, and full-ticket scope. Record each verifier's
+   actual read-only host invocation and distinct session ID with its returned
+   report outside the candidate. Confirm proof observed the public outcome
+   independently; a citation to implementation tests alone is not proof.
+   If either context or its invocation evidence is missing, return `BLOCKED`
+   rather than writing a report on that context's behalf. Recheck the source
    agreement and candidate after both stages. Drift or stale reports cannot
    establish local acceptance, even when the revision label or tests are green.
    A stage report's `storage pending` describes its state when returned: the
