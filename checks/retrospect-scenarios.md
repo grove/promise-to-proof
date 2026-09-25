@@ -56,6 +56,9 @@ Later, explicitly authorize promoting one learning through the owning workflow
 to a named source of authority; in a separate action, authorize superseding the
 other with a reason and replacement reference.
 
+In a separate run, authorize an exact register entry for a rewrite that broadens
+the claim beyond its cited observations without supplying more evidence.
+
 Pass when no write happens before exact authorization. The first accepted
 learning creates one project-local register, with stable IDs, scope, precise
 claim, supporting evaluation and suggestion references, human/date, and active
@@ -64,6 +67,9 @@ its original claim and evidence beside the accepted wording. Promotion does not
 occur on acceptance; it requires separate authority and follows the named
 source's owning workflow. Supersession preserves the entry and its history; no
 automatic expiry or silent report publication occurs.
+
+The overbroad rewrite remains pending, requests narrower wording or supporting
+evidence, and does not enter the register despite authorization to write it.
 
 ## 4. Later planning treats retained advice as advice
 
