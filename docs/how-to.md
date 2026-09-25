@@ -158,6 +158,28 @@ candidate has matching evidence, required CI, and repository approval and merge
 conditions. It reports blockers without merging or replacing the repository's
 approval process. Changes after the check require a new readiness assessment.
 
+## Learn from an accepted delivery (optional)
+
+After a full `PROVEN` result, use [`/retrospect`](../skills/productivity/retrospect/SKILL.md)
+with the saved proof, exact candidate and contract references, and retrievable
+use or maintenance observations. A matching review is useful when available,
+but no PR or green unrelated CI is required. The skill proposes an evaluation
+report outside the evaluated candidate; give it an authorized destination and
+reread it from a fresh session. No learning is a valid outcome.
+
+```text
+/retrospect <saved PROVEN proof>; candidate <exact proven candidate>; experience <retrievable observations>
+```
+
+Review each suggested learning and explicitly authorize the exact disposition:
+accept, reject, or rewrite then accept. Accepted advice goes in one project-local
+register (by default `docs/retrospective-learnings.md`), created on the first
+authorized acceptance. Future `/plan-acceptance` runs consider relevant active
+advice and cite what they used; the current source still determines the contract.
+Promoting advice to a binding rule is a separate human-authorized change through
+the source's owning workflow. If a later candidate is evaluated retrospectively,
+it needs its own proof and evaluation; an old report stays historical.
+
 ## Divide a large issue
 
 Save the parent contract before asking for a split. A draft shows the proposed

@@ -36,6 +36,7 @@ flowchart LR
   prove["4b. Proof: Does the promised behavior actually hold?<br/>/prove"]
   done["5. The promise is backed by evidence<br/>Review + proof match this exact contract and candidate"]
   publish["6. Optional publication<br/>/publish-pr previews, then publishes with explicit authorization"]
+  retrospect["Optional after acceptance<br/>/retrospect evaluates and proposes advisory learnings"]
 
   promise --> plan
   plan --> audit
@@ -46,6 +47,7 @@ flowchart LR
   candidate --> review --> done
   candidate --> prove --> done
   done --> publish
+  prove --> retrospect
 ```
 
 Each stage answers a different question:
@@ -57,6 +59,7 @@ Each stage answers a different question:
 - **Review:** Is the implementation sound, faithful to the contract, and in scope?
 - **Proof:** Does the promised behavior actually hold, with evidence for every outcome?
 - **Publication:** Does the draft PR preserve the exact reviewed and proven candidate?
+- **Retrospective (optional):** What did the accepted delivery teach us for later work?
 
 Save and pass each result before invoking the next skill; skills do not invoke
 one another. Capture the candidate as a commit or reproducible snapshot so the
@@ -123,6 +126,7 @@ Start with these four skills in order:
 | [`/interrogate`](./skills/productivity/interrogate/SKILL.md) | You want to question the agent's proposal and reasoning | Evidence-backed answers, a revised approach, and explicit unknowns |
 | [`/slice-contract`](./skills/productivity/slice-contract/SKILL.md) | A parent contract is too large for one coherent task | A traceable breakdown and, when authorized, published child tickets |
 | [`/repair-gaps`](./skills/productivity/repair-gaps/SKILL.md) | Proof found specific repairable gaps | A scoped repair report; fresh proof is still required |
+| [`/retrospect`](./skills/productivity/retrospect/SKILL.md) | A proven delivery has concrete post-acceptance experience worth examining | A historical evaluation and optional human-accepted advice for future planning |
 | [`/publish-pr`](./skills/productivity/publish-pr/SKILL.md) | A reviewed and proven candidate should become a draft PR | An exact preview or a content-verified remote PR |
 | [`/merge-readiness`](./skills/productivity/merge-readiness/SKILL.md) | An existing PR is near a merge decision | Read-only readiness or specific blockers for the current PR state |
 | [`/fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
@@ -149,6 +153,7 @@ Start with these four skills in order:
 /publish-pr <verified candidate and reports>; target <branch>; draft only
 /merge-readiness <PR URL>; review <saved report>; proof <saved report>
 /repair-gaps <matching proof report>; candidate <saved candidate handoff>; requirements <IDs>
+/retrospect <saved PROVEN proof>; candidate <exact proven candidate>; experience <retrievable observations>
 /fix-pr #456
 ```
 
@@ -225,6 +230,7 @@ skills/productivity/
 ├── prove/
 ├── publish-pr/
 ├── repair-gaps/
+├── retrospect/
 ├── review-implementation/
 ├── slice-contract/
 ├── setup-promise-to-proof/

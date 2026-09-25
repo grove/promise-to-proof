@@ -1,0 +1,5 @@
+interface:
+  display_name: "Retrospect"
+  short_description: "Evaluate a proven delivery and propose advisory learnings"
+policy:
+  allow_implicit_invocation: false
