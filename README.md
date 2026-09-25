@@ -97,8 +97,10 @@ For a new project using GitHub issues, run
 [`/setup-promise-to-proof`](./skills/productivity/setup-promise-to-proof/SKILL.md)
 before tracker-writing or triage work. It proposes issue-tracker, triage-label,
 and domain-doc pointers for your approval; it does not create GitHub labels,
-issues, or domain documents. Skip it if those pointers are already configured.
-The core workflow can start from a local specification without this setup.
+issues, or domain documents. Skip it if compatible `docs/agents/` files already
+exist for your GitHub repository and labels, for example after running Matt
+Pocock's `/setup-matt-pocock-skills`. The core workflow can start from a local
+specification without this setup.
 
 ## Start with the core workflow
 
