@@ -146,11 +146,17 @@ Fresh `/prove` is required after any repair.
 Refresh `/review-implementation` for the changed candidate as a separate phase.
 ```
 
-After the report, end with `Next step:` in plain language. For `PROVEN`,
-tell the user to save the proof and run `/review-implementation` on the same
-candidate if review is still needed; with matching review, suggest a
-`/publish-pr` preview using both saved reports. For `NOT PROVEN`, name the
-specific blocker: use `/repair-gaps <saved proof>` for scoped repairs or
-`/plan-acceptance <source>` for a missing or changed agreement; for uncertain
-identity or evidence, name the check or input needed before rerunning proof.
-Do not invoke it.
+After the report, end with `Next step:` and one copy-ready action. For
+`PROVEN`, if review is missing give `/review-implementation <saved candidate>
+against <comparison base>`. When matching review exists, give this publication
+preview invocation with the saved references:
+
+```text
+/publish-pr <candidate handoff>; review <saved review>; proof <saved proof>; target <branch>; draft only
+```
+
+For `NOT PROVEN`, give
+`/repair-gaps <saved proof>` for scoped repair or
+`/plan-acceptance <source>` for a missing or changed agreement. If candidate
+identity or evidence is uncertain, state the exact identity/evidence needed;
+when rerunning a check, include its recorded command and expected result.

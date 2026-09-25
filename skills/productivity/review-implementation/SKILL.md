@@ -183,10 +183,17 @@ Report storage: <retrievable destination, or proposed destination; storage pendi
 Review only; acceptance proof and merge readiness are separate.
 ```
 
-After the report, end with `Next step:` in plain language. For `REVIEWED`,
-tell the user to save the review and run `/prove` on the same candidate if
-proof is still needed; if matching proof already exists, suggest a
-`/publish-pr` preview with both saved reports. For `CHANGES NEEDED`, give
-`/implement-contract` the saved in-scope findings, or hand a missing or changed
-agreement to `/plan-acceptance`. For `BLOCKED`, name the missing input or
-decision first. Do not invoke the next skill.
+After the report, end with `Next step:` and one copy-ready action. For
+`REVIEWED`, if proof is missing give
+`/prove <saved contract>; candidate <exact candidate>`. If matching proof
+exists, give this publication preview invocation:
+
+```text
+/publish-pr <candidate handoff>; review <saved review>; proof <saved proof>; target <branch>; draft only
+```
+
+For `CHANGES NEEDED`, give
+`/implement-contract <source or contract>; findings <saved review report>` for
+in-scope fixes, or `/plan-acceptance <source>; amendment <saved review report>`
+for an agreement change. For `BLOCKED`, give the exact missing input or
+configured command and its expected result.

@@ -170,8 +170,15 @@ workflow reruns for the target PR or workflow run. It does not authorize
 force-pushes, changes outside the target branch, or workarounds that weaken
 verification.
 
-End with `Next step:` in plain language. For `FIXED`, name the repaired SHA
-and any stale `/prove` or `/review-implementation` report to refresh before
-`/merge-readiness <PR URL>`; if both already match, name that readiness check.
-For `NOT FIXED`, name the failed or pending check and the one input or action
-needed to continue. Do not claim acceptance or merge authority.
+End with `Next step:` and one copy-ready action. For `FIXED`, refresh stale
+reports with the applicable invocation below; when both match, give
+`/merge-readiness <PR URL>` with the saved report references.
+
+```text
+/prove <saved contract>; candidate <repaired SHA>
+/review-implementation <repaired candidate> against <comparison base>
+```
+
+For `NOT FIXED`, give the exact failed check command from the workflow and its
+observed failure, or name the specific missing input or human decision. Do not
+claim acceptance or merge authority.

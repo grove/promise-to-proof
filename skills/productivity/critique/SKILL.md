@@ -123,10 +123,11 @@ optional next steps, not automatic invocations. `prove` verifies implementation;
 `review-implementation` reviews implementation. This critique neither grants
 implementation authority nor declares acceptance.
 
-When the critique ends, finish with `Next step:` in plain language. Name one
-action tied to the result: revise the proposal for `correct` or `rethink`,
-run the named check for `insufficient evidence`, or use
-`/plan-acceptance <source>` for `proceed` when acceptance planning is needed.
-If the agreement is saved, name `/implement-contract <saved contract>` when
-authorized; otherwise ask for implementation authority. Do not start the next
-phase.
+When the critique ends, finish with `Next step:` and one copy-ready action.
+For `adjust` or `rethink`, give `/interrogate <proposal reference>` when the
+revision needs discussion; otherwise name the precise proposal change. For
+`insufficient evidence`, give the exact command from the report or repository
+configuration and the expected result, or ask for the specific missing input.
+For `proceed`, give `/plan-acceptance <source>` when acceptance planning is
+needed, or `/implement-contract <saved contract>` when the agreement is saved.
+Do not start the next phase.

@@ -71,8 +71,14 @@ Always give the reason, the actual versus proposed labels and state, and the
 next handoff. Name `/plan-acceptance` for missing acceptance, or the appropriate
 human/agent work when ready; do not invoke downstream skills automatically.
 
-End with `Next step:` in plain language. Give one action and the issue reference:
-request approval of the exact label preview if needed, run
-`/plan-acceptance <issue>` if acceptance is missing, or name the ready owner
-and task. For `PARTIAL` or `BLOCKED`, name the state to verify or input to get
-before recommending further work.
+End with `Next step:` and one copy-ready action. Ask for approval of the exact
+label preview when a write is pending. For missing acceptance, give
+`/plan-acceptance <issue URL>`; for an issue ready for implementation, give
+`/implement-contract <issue URL>` with the saved contract reference. For
+`needs-info`, state the exact reporter question; for human-owned work, name the
+owner and task. For `PARTIAL` or `BLOCKED`, give the configured tracker read
+command and fields to verify. For GitHub CLI, use
+`gh issue view <issue number> --comments`, then confirm the title, body, labels,
+state, and linked source; otherwise give the exact read command from the
+configured tracker instructions. Name the exact missing input when a readback
+cannot resolve the blocker.

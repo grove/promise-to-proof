@@ -93,7 +93,11 @@ Hand off to `/plan-acceptance <issue-reference>` and tell it to read the exact
 linked specification. Do not invoke it automatically. Issue creation is not
 acceptance planning, implementation readiness, or approval to split the work.
 
-End with `Next step:` in plain language. For `PUBLISHED`, give
-`/plan-acceptance <issue URL>` and name the linked specification. For `DRAFT`,
-ask for approval of the exact publication preview; for `PARTIAL` or `BLOCKED`,
-name the identity check or missing input that must be resolved first.
+End with `Next step:` and one copy-ready action. For `PUBLISHED`, give
+`/plan-acceptance <issue URL>` and identify the linked specification. For
+`DRAFT`, ask the user to approve the exact publication preview. For `PARTIAL`,
+give `gh issue view <issue number> --comments` to confirm the remote issue
+before any retry, then verify its title, body, labels, state, and source link.
+For `BLOCKED`, name the exact missing source, decision, or permission. If `gh`
+is not the configured tracker command, give the exact read command from
+`docs/agents/issue-tracker.md` instead.
