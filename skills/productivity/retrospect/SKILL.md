@@ -62,8 +62,11 @@ never silently rebind or overwrite it for another candidate.
 
 Each suggestion begins with disposition `pending`. Show the exact proposed
 disposition change before writing it. A developer may explicitly accept, reject,
-or rewrite and accept each suggestion. Record their identity and date, retain the
-original suggestion and evidence, and record the final wording and decision in
+or rewrite and accept each suggestion. Before acceptance, check that the final
+wording stays within the scope and evidence limits of its cited observations.
+If it does not, request narrower wording or supporting evidence and leave the
+disposition pending. Record their identity and date, retain the original
+suggestion and evidence, and record the final wording and decision in
 the evaluation report. Obtain authorization for the exact report change and,
 for acceptance, the exact register entry before writing either. If authorization
 or storage is unavailable, return the proposed changes and mark them pending;
