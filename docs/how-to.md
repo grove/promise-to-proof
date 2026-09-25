@@ -127,6 +127,11 @@ checks every promised outcome against observed evidence. A `REVIEWED` result
 does not stand in for `PROVEN`, and neither result replaces required CI or the
 repository's review gate.
 
+When matching full review and proof are saved, local acceptance needs no further
+step. For an existing PR, use `/merge-readiness` near the merge decision. If a
+new draft PR is wanted, use `/publish-pr`. Skill results number their next steps
+so a particular action can be referenced without guessing which one was meant.
+
 For a reproducible snapshot, you can normalize matching full reports into an
 [acceptance bundle](./acceptance-bundle-v1.md) and inspect it without a model:
 

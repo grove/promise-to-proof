@@ -194,7 +194,8 @@ Report storage: <retrievable destination, or proposed destination; storage pendi
 Implementation report only; independent acceptance requires /prove.
 ```
 
-After the report, end with `Next step:` and one copy-ready action. For
+After the report, end with `Next steps:` and a numbered list (`1.`, `2.`, ...)
+of applicable actions in order, so each can be referenced by number. For
 `IMPLEMENTED`, give the exact next invocation and identify the report and
 candidate references the user must supply:
 

@@ -121,7 +121,8 @@ Evaluate every requirement against this contract revision and one fixed candidat
 Record actual evidence and verdicts in a separate proof report.
 ```
 
-After the contract, end with `Next step:` and one copy-ready action. When the
+After the contract, end with `Next steps:` and a numbered list (`1.`, `2.`, ...)
+of applicable actions in order, so each can be referenced by number. When the
 contract is saved, approved, and has no blocking gaps, give
 `/implement-contract <canonical contract reference>`; the optional audit is
 `/audit-acceptance <proposed contract> against <source>`. If saving or approval

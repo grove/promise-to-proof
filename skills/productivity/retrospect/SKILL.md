@@ -120,7 +120,8 @@ Acceptance: Unchanged. This report is not a proof verdict.
 <exact authorized and reread changes, or proposed changes pending; None if no learnings>
 ```
 
-After the report, end with `Next step:` and one actionable instruction. For
+After the report, end with `Next steps:` and a numbered list (`1.`, `2.`, ...)
+of applicable actions in order, so each can be referenced by number. For
 pending suggestions, ask the user to accept, reject, or rewrite the named
 suggestion IDs. For a possible violation, give
 `/review-implementation <exact candidate> against <comparison base>` and

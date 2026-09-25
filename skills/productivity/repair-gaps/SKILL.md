@@ -73,7 +73,8 @@ Recommended next action: <one concrete action for the remaining IDs, or None>
 Fresh `/prove` required before acceptance.
 ```
 
-After the handoff, end with `Next step:` and one copy-ready action. For
+After the handoff, end with `Next steps:` and a numbered list (`1.`, `2.`, ...)
+of applicable actions in order, so each can be referenced by number. For
 `REPAIRED`, give the exact next invocation(s):
 
 ```text

@@ -175,8 +175,8 @@ flowchart TD
 
   core --> problem{"Problem found?"}
   parent --> problem
-  problem -->|No| pr["Use the existing PR or publish the exact candidate<br/>/publish-pr"]
-  pr --> ready["Check the current PR<br/>/merge-readiness"]
+  problem -->|No| pr["Local completion, existing PR, or optional publication<br/>/merge-readiness or /publish-pr when applicable"]
+  pr -->|Existing or newly published PR| ready["Check the current PR<br/>/merge-readiness"]
   problem -->|Review finding| fix["Implement the finding"]
   problem -->|Proof gap| repair["Repair the named gap<br/>/repair-gaps"]
   fix --> rerun["New candidate -> review + prove again"]
@@ -214,8 +214,9 @@ after proof. The [acceptance contract protocol](./docs/acceptance-contract-proto
 sets the rules for revisions, candidate identity, evidence, and durable handoffs.
 The [acceptance bundle format](./docs/acceptance-bundle-v1.md) defines optional
 deterministic inspection of matching review and proof artifacts.
-Each skill returns a result for an explicit next invocation; the skills do not
-call one another automatically.
+Each skill ends with numbered next steps so you can refer to a specific action.
+Some completed results need no further action; skills do not call one another
+automatically.
 
 ## Repository structure
 

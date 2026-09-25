@@ -146,10 +146,18 @@ Fresh `/prove` is required after any repair.
 Refresh `/review-implementation` for the changed candidate as a separate phase.
 ```
 
-After the report, end with `Next step:` and one copy-ready action. For
-`PROVEN`, if review is missing give `/review-implementation <saved candidate>
-against <comparison base>`. When matching review exists, give this publication
-preview invocation with the saved references:
+After the report, end with `Next steps:` and a numbered list (`1.`, `2.`, ...)
+of only the applicable actions, in order, so each can be referenced by number.
+For `PROVEN`, if review is missing give `/review-implementation <saved candidate>
+against <comparison base>`. When matching full review and proof exist, state
+that acceptance evidence is complete for this candidate. For an existing PR
+near merge, give
+`/merge-readiness <PR URL>; review <saved review>; proof <saved proof>`.
+For an existing PR not yet near merge, mention any known pending gates and
+give `/merge-readiness <PR URL>; review <saved review>; proof <saved proof>`
+for when the PR approaches a merge decision; do not assess PR gates in this proof.
+If no PR exists, say no further action is required unless publication is wanted;
+only then give this optional publication preview invocation with the saved references:
 
 ```text
 /publish-pr <candidate handoff>; review <saved review>; proof <saved proof>; target <branch>; draft only

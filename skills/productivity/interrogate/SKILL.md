@@ -87,8 +87,9 @@ Invoking this skill authorizes discussion and investigation, not implementation.
 Preserve implementation authority already granted and act on it when the discussion
 is complete. Agreement with an explanation alone does not grant new write authority.
 
-When the user finishes the discussion, end with `Next step:` and one
-copy-ready action. For a changed agreement, give
+When the user finishes the discussion, end with `Next steps:` and a numbered
+list (`1.`, `2.`, ...) of applicable actions in order, so each can be referenced
+by number. For a changed agreement, give
 `/plan-acceptance <source>; amendment <saved agreed amendment>`; for a missing
 agreement, give `/plan-acceptance <source>`. When the contract is saved and
 implementation is authorized, give `/implement-contract <saved contract>`.

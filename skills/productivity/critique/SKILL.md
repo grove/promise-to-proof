@@ -123,7 +123,8 @@ optional next steps, not automatic invocations. `prove` verifies implementation;
 `review-implementation` reviews implementation. This critique neither grants
 implementation authority nor declares acceptance.
 
-When the critique ends, finish with `Next step:` and one copy-ready action.
+When the critique ends, finish with `Next steps:` and a numbered list
+(`1.`, `2.`, ...) of applicable actions in order, so each can be referenced by number.
 For `adjust` or `rethink`, give `/interrogate <proposal reference>` when the
 revision needs discussion; otherwise name the precise proposal change. For
 `insufficient evidence`, give the exact command from the report or repository

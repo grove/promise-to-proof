@@ -177,7 +177,8 @@ Handoffs are instructions for the user or authorized enclosing workflow, not
 automatic skill calls. Missing downstream skills do not prevent valid slicing
 or authorized publication. Name the next step without simulating it.
 
-End with `Next step:` and one copy-ready action. For `PUBLISHED`, give
+End with `Next steps:` and a numbered list (`1.`, `2.`, ...) of applicable
+actions in order, so each can be referenced by number. For `PUBLISHED`, give
 `/plan-acceptance <ready child issue>`; if none is ready, name the exact
 prerequisite outcome and its reference. For `NO SPLIT`, give
 `/plan-acceptance <source>` if no saved contract exists; with an approved,
