@@ -45,13 +45,14 @@ easiest. A narrow task may need less; a large or ambiguous one may need more.
 | 5 | [`critique`](../skills/productivity/critique/SKILL.md) | Strongest | Test a proposal against its goal, alternatives, and uncertain evidence. |
 | 6 | [`prove`](../skills/productivity/prove/SKILL.md) | Capable | Establish each promise on one fixed candidate using independent evidence. |
 | 7 | [`plan-acceptance`](../skills/productivity/plan-acceptance/SKILL.md) | Capable | Extract stable, testable promises and credible evidence plans from the source. |
-| 8 | [`audit-acceptance`](../skills/productivity/audit-acceptance/SKILL.md) | Capable | Detect missing promises, scope drift, and evidence plans that cannot prove outcomes. |
-| 9 | [`publish-pr`](../skills/productivity/publish-pr/SKILL.md) | Capable | Preserve exact candidate bytes and authorization across publication steps. |
-| 10 | [`repair-gaps`](../skills/productivity/repair-gaps/SKILL.md) | Capable | Make a complete repair for named proof gaps without changing the agreement. |
-| 11 | [`merge-readiness`](../skills/productivity/merge-readiness/SKILL.md) | Mid-tier | Match the current PR to proof, review, CI, and repository approval rules. |
-| 12 | [`interrogate`](../skills/productivity/interrogate/SKILL.md) | Mid-tier | Answer challenges with evidence and revise a proposal when warranted. |
-| 13 | [`triage-issue`](../skills/productivity/triage-issue/SKILL.md) | Mid-tier | Choose a defensible next action from the issue and its prerequisites. |
-| 14 | [`create-parent-issue`](../skills/productivity/create-parent-issue/SKILL.md) | Mid-tier | Summarize a spec faithfully and check its exact source before publication. |
+| 8 | [`retrospect`](../skills/productivity/retrospect/SKILL.md) | Capable | Separate observed experience from predictions and scope advice to evidence. |
+| 9 | [`audit-acceptance`](../skills/productivity/audit-acceptance/SKILL.md) | Capable | Detect missing promises, scope drift, and evidence plans that cannot prove outcomes. |
+| 10 | [`publish-pr`](../skills/productivity/publish-pr/SKILL.md) | Capable | Preserve exact candidate bytes and authorization across publication steps. |
+| 11 | [`repair-gaps`](../skills/productivity/repair-gaps/SKILL.md) | Capable | Make a complete repair for named proof gaps without changing the agreement. |
+| 12 | [`merge-readiness`](../skills/productivity/merge-readiness/SKILL.md) | Mid-tier | Match the current PR to proof, review, CI, and repository approval rules. |
+| 13 | [`interrogate`](../skills/productivity/interrogate/SKILL.md) | Mid-tier | Answer challenges with evidence and revise a proposal when warranted. |
+| 14 | [`triage-issue`](../skills/productivity/triage-issue/SKILL.md) | Mid-tier | Choose a defensible next action from the issue and its prerequisites. |
+| 15 | [`create-parent-issue`](../skills/productivity/create-parent-issue/SKILL.md) | Mid-tier | Summarize a spec faithfully and check its exact source before publication. |
 
 Use a strong long-context model for the first five, especially on unfamiliar
 codebases or large contracts. The lower ranks still need the right tools and
@@ -171,6 +172,8 @@ reread it from a fresh session. No learning is a valid outcome.
 /retrospect <saved PROVEN proof>; candidate <exact proven candidate>; experience <retrievable observations>
 ```
 
+See the [retrospective walkthrough](./promise-to-proof.md#learn-from-a-proven-delivery-optional)
+for report storage, possible violations, and evidence-backed suggestions.
 Review each suggested learning and explicitly authorize the exact disposition:
 accept, reject, or rewrite then accept. Accepted advice goes in one project-local
 register (by default `docs/retrospective-learnings.md`), created on the first
