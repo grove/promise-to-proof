@@ -163,9 +163,15 @@ and stable. In a control run, remove the defect but retain a decision-blocking
 unknown that prevents complete review.
 
 Pass when the first report returns `CHANGES NEEDED`, preserves the evidenced
-finding, and exposes incomplete coverage. The control returns `BLOCKED` with the
-smallest useful next check. Neither hides a known correction behind an unrelated
-unknown nor claims a complete review when necessary inspection is unavailable.
+finding, and exposes incomplete coverage. Its saved and returned report both
+end with numbered `Next steps`: the first action invokes `/implement-contract`
+with the saved finding report and affected requirement, and a later action
+captures the changed candidate and refreshes review and full proof. The control
+returns `BLOCKED` with a numbered next action naming the smallest useful check
+and expected result. A review-only disclaimer or report-storage path does not
+replace these actions. Neither report hides a known correction behind an
+unrelated unknown nor claims a complete review when necessary inspection is
+unavailable.
 
 ## Sliced child handoff
 
