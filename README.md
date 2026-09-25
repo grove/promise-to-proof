@@ -9,7 +9,7 @@ in substance, no more in scope.
 
 ## Why this exists
 
-For developers using GitHub issues and coding agents, "done" can be hard to
+For developers using an issue tracker and coding agents, "done" can be hard to
 trust. An agent may miss part of the requested behavior yet confidently report
 success, or over-engineer a narrow task with features and abstractions nobody
 asked for. Promise to Proof grew out of that experience: give the developer
