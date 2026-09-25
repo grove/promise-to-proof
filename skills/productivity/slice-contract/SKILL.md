@@ -159,9 +159,16 @@ Keep the approved plan, coverage, parent identity, authority, ticket mapping, an
 outstanding actions together at one canonical plan location. Saving and retrieval
 status must be explicit. A chat draft is not a durable handoff. The report includes:
 
+- Parent location, revision, and exact snapshot reference.
+- Plan location, approval source, and authorized writes.
+- Slice ID, observable outcome, qualified contribution, blockers with reasons,
   and actual ticket reference for each slice.
+- Parent requirement, contributors, boundary allocation, and completion check
   location for each obligation.
+- Parent completion plan and its accountable ticket or parent workflow.
+- Created, reused, or updated records, relationship fallbacks, readback results,
   unresolved decisions, and pending or uncertain actions.
+- Which children can proceed to acceptance planning and prerequisites before
   implementation, with retrievable references.
 
 These outcomes establish allocation and publication only. Leave contract plan
@@ -173,9 +180,11 @@ or authorized publication. Name the next step without simulating it.
 End with `Next step:` and one copy-ready action. For `PUBLISHED`, give
 `/plan-acceptance <ready child issue>`; if none is ready, name the exact
 prerequisite outcome and its reference. For `NO SPLIT`, give
-`/implement-contract <saved parent contract>`. For `DRAFT`, ask for approval
-of the exact breakdown or give `/slice-contract <parent issue>; publish the
-approved breakdown as GitHub issues` after approval. For `PARTIAL` or
+`/plan-acceptance <source>` if no saved contract exists; with an approved,
+saved contract and no blocking gaps, give `/implement-contract <saved contract>`.
+Otherwise name the pending approval or gap. For `DRAFT`, ask for approval of
+the exact breakdown or, after approval, give `/slice-contract <parent reference>;
+publish the approved breakdown to <configured destination>`. For `PARTIAL` or
 `BLOCKED`, give the configured tracker readback command for an uncertain
 write. For GitHub CLI, use `gh issue view <issue number> --comments`, then
 verify the issue, labels, source links, and relationships against the approved

@@ -51,7 +51,8 @@ Invoke slicing with its saved contract, then separately with only the small sour
 
 Pass when the result is `NO SPLIT` and a direct delivery handoff. No new parent,
 child, or integration issues appear. No contract is manufactured merely to justify
-that decision.
+that decision. With only the source, the next step is `/plan-acceptance`; with a
+saved, approved contract and no blocking gaps, it is `/implement-contract`.
 
 ## T2. Require an established parent agreement
 
@@ -179,7 +180,8 @@ Pass when custom paths are followed, or the default uses `.scratch/<work-id>/pla
 and `.scratch/<work-id>/issues/S<n>-<slug>.md`. Each new slice has one file with
 resolvable relative links. Contract storage remains separate. Transfer artifacts
 and parent snapshot to a fresh checkout and reopen them. No setup dependency,
-automatic commit, or automatically created tracker parent is introduced.
+automatic commit, or automatically created tracker parent is introduced. A draft's
+publication handoff uses the configured local destination, not GitHub issues.
 
 ## T14. Reconcile reruns and existing tickets
 
