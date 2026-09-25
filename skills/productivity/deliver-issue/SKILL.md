@@ -28,7 +28,7 @@ their respective judgments. This skill owns their handoffs, not their verdicts.
    the candidate and its comparison base across those contexts. Select the
    report/snapshot destination below and verify actual write and read access
    **before implementation**, including a harmless disposable probe when
-   permissions are uncertain. Actually launch a harmless nested read-only
+   permissions are uncertain. Actually launch a harmless separate read-only
    stage context and capture its distinct session ID before implementation;
    finding the host executable or reading its help is not an isolation check.
    If any required capability is absent, return `BLOCKED` naming it before
@@ -97,9 +97,10 @@ available, report storage pending instead of claiming a completed handoff.
    the comparison-base tree plus **only** the issue-owned changes (including
    relevant untracked files); do not archive the current checkout wholesale or
    reuse an implementation-stage archive made from it. For Git candidates,
-   export the full base tree to a disposable directory, overlay only the
-   authorized changed files, and leave excluded paths at their base bytes.
-   Compare the saved snapshot file inventory and bytes to that declared scope,
+   export the full base tree to a disposable directory, apply only authorized
+   additions, modifications, and deletions (including modes and symlink targets),
+   and leave excluded paths at their base bytes. Compare the saved snapshot file
+   inventory, bytes, and modes to that declared scope,
    including base versions of excluded paths, before any handoff. Include the
    full base commit SHA and enough bytes to reconstruct its tree in another
    checkout; a changed-files-only archive without a transferable base is not
