@@ -7,6 +7,15 @@ It keeps the agreement, implementation, review, and proof separate so the
 promised capability does not get lost between ticket and implementation: no less
 in substance, no more in scope.
 
+## Why this exists
+
+For developers using GitHub issues and coding agents, "done" can be hard to
+trust. An agent may miss part of the requested behavior yet confidently report
+success, or over-engineer a narrow task with features and abstractions nobody
+asked for. Promise to Proof grew out of that experience: give the developer
+responsible for the result a way to check that the agreed behavior was delivered,
+without unapproved scope, on the exact code being accepted.
+
 Issues and specifications for this repository live in [GitHub Issues](https://github.com/grove/promise-to-proof/issues).
 
 ## How Promise to Proof works
