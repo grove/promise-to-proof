@@ -112,6 +112,9 @@ commit and mapping. If those records are unavailable, it returns `PARTIAL`
 instead of manufacturing another commit SHA for the same candidate. This local
 recovery case and uncertain remote writes use the same `PARTIAL` definition:
 an authorized publication effect lacks required completion or readback.
+The next step for a local-only `PARTIAL` inspects the retained local commit and
+mapping rather than querying a PR. For an uncertain push it checks the remote
+head SHA; for uncertain PR creation it checks all PR states before any retry.
 
 ## 9. Stop on target drift and readback mismatch
 

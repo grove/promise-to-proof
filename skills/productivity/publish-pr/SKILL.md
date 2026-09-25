@@ -202,13 +202,21 @@ End with `Next step:` and one copy-ready action. For `PUBLISHED`, give
 `/merge-readiness <PR URL>` and identify the saved review and proof reports.
 For `DRAFT`, ask the user to authorize the exact preview, then give
 `/publish-pr <approved exact preview>; publish the draft PR`. For `PARTIAL`,
-give the applicable readback command to verify the remote state:
+give the read-only check for the uncertain effect. For a local commit or
+snapshot-to-commit mapping, give `git -C <publication workspace> reflog --all`
+to locate the retained commit; require its approved parent, commit metadata
+inputs, and complete candidate tree before recovering the mapping. If the
+workspace or commit is unavailable, name the missing local record. For an
+uncertain push, give
+`git ls-remote <remote> refs/heads/<head branch>` and expect the approved commit
+SHA. For uncertain pull-request creation, give the applicable readback command:
 
 ```bash
 gh pr view <PR URL> --json url,headRefOid,baseRefName,title,body,isDraft
-gh pr list --head <branch> --json url,headRefOid,baseRefName,title,body,isDraft
+gh pr list --state all --head <branch> --json url,headRefOid,baseRefName,title,body,isDraft
 ```
 
 Use `gh pr view` when the URL is known and `gh pr list` when only the branch
-is known. For `BLOCKED`, name the missing reference, authority, or decision.
+is known. Do not repeat a publication write while identity or readback is
+uncertain. For `BLOCKED`, name the missing reference, authority, or decision.
 Do not perform the action here.
