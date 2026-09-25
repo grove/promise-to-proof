@@ -120,3 +120,9 @@ Capture the resulting candidate for separate /review-implementation and /prove p
 Evaluate every requirement against this contract revision and one fixed candidate.
 Record actual evidence and verdicts in a separate proof report.
 ```
+
+After the contract, end with `Next step:` in plain language.
+Name the immediate save, approval, or gap to resolve. Once ready, give the
+applicable next skill and its input (usually
+`/implement-contract <saved contract reference>`, or optional
+`/audit-acceptance <contract> against <source>`). Do not invoke it.

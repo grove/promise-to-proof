@@ -70,3 +70,9 @@ readiness evidence instead keeps the recommendation at `needs-triage`.
 Always give the reason, the actual versus proposed labels and state, and the
 next handoff. Name `/plan-acceptance` for missing acceptance, or the appropriate
 human/agent work when ready; do not invoke downstream skills automatically.
+
+End with `Next step:` in plain language. Give one action and the issue reference:
+request approval of the exact label preview if needed, run
+`/plan-acceptance <issue>` if acceptance is missing, or name the ready owner
+and task. For `PARTIAL` or `BLOCKED`, name the state to verify or input to get
+before recommending further work.

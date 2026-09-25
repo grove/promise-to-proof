@@ -119,3 +119,8 @@ Acceptance: Unchanged. This report is not a proof verdict.
 
 <exact authorized and reread changes, or proposed changes pending; None if no learnings>
 ```
+
+After the report, end with `Next step:` in plain language. Ask for a human
+disposition on named pending suggestions or the missing evidence for a possible
+violation, with fresh `/review-implementation` and `/prove` when indicated.
+If there are no open suggestions or concerns, say no further action is needed.

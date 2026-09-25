@@ -72,3 +72,9 @@ Recommended next action: <one concrete action for the remaining IDs, or None>
 
 Fresh `/prove` required before acceptance.
 ```
+
+After the handoff, end with `Next step:` in plain language. For `REPAIRED`,
+tell the user to save the changed candidate, refresh `/review-implementation`
+and run `/prove <saved contract>; candidate <changed candidate>`. For `NO CHANGE`
+or `BLOCKED`, name the missing input or decision for the remaining requirement
+IDs before another proof run.

@@ -120,3 +120,9 @@ Coverage: <material source promises and contract rows accounted for; limits>
 
 <state that the audit did not approve, save, revise, publish, implement, or prove the contract>
 ```
+
+After the report, end with `Next step:` in plain language. For
+`READY_FOR_APPROVAL`, ask for a human decision on the exact proposal before
+saving and rereading it. For `CHANGES_NEEDED`, give
+`/plan-acceptance <source>` with the findings and proposal; for `BLOCKED`,
+name the missing input or decision. Do not invoke the next skill.

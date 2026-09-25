@@ -56,3 +56,9 @@ Read back each changed file and check the pointers, destination, and all five
 label mappings. Report what was configured, any missing labels or unsupported
 tracker, and what still needs a decision. A repeat invocation with unchanged
 answers should leave the files unchanged.
+
+End with `Next step:` in plain language. If approval or configuration is
+pending, name the exact decision, missing GitHub labels, or unsupported tracker.
+Once setup is verified, point to `/triage-issue <issue>` for an existing issue
+that needs routing, or `/plan-acceptance <source>` for an agreed source ready
+to plan.

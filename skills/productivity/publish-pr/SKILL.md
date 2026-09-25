@@ -193,7 +193,13 @@ effects actually observed, and unresolved work. For `PUBLISHED`, include the
 candidate-to-commit mapping, remote branch, pull-request URL and draft state, and
 readback result.
 
-End with `Merge readiness: NOT ASSESSED`. Hand the confirmed pull request and
+State `Merge readiness: NOT ASSESSED`. Hand the confirmed pull request and
 saved reports to an explicitly invoked `/merge-readiness`; do not invoke it.
 Do not wait for CI, mark the pull request ready, request reviewers, approve,
 merge, close the source issue, or edit the contract or reports.
+
+End with `Next step:` in plain language. For `PUBLISHED`, give
+`/merge-readiness <PR URL>` with the saved review and proof references. For
+`DRAFT`, ask for approval of the exact publication preview; for `PARTIAL`,
+name the remote identity or readback to verify; for `BLOCKED`, name the missing
+input or decision. Do not perform that action here.

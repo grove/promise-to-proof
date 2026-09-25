@@ -176,3 +176,10 @@ states, acceptance verdicts, completion, and merge readiness to their owners.
 Handoffs are instructions for the user or authorized enclosing workflow, not
 automatic skill calls. Missing downstream skills do not prevent valid slicing
 or authorized publication. Name the next step without simulating it.
+
+End with `Next step:` in plain language. For `PUBLISHED`, name a child ready
+for `/plan-acceptance <child issue>`, or the prerequisite if none is ready;
+for `NO SPLIT`, give `/implement-contract <saved parent contract>` as the
+direct path. For `DRAFT`, name the approval or storage action; for `PARTIAL`
+or `BLOCKED`, name the write to confirm or decision needed. Include the
+reference the next action needs.

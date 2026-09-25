@@ -145,3 +145,12 @@ Verification context: <environment>
 Fresh `/prove` is required after any repair.
 Refresh `/review-implementation` for the changed candidate as a separate phase.
 ```
+
+After the report, end with `Next step:` in plain language. For `PROVEN`,
+tell the user to save the proof and run `/review-implementation` on the same
+candidate if review is still needed; with matching review, suggest a
+`/publish-pr` preview using both saved reports. For `NOT PROVEN`, name the
+specific blocker: use `/repair-gaps <saved proof>` for scoped repairs or
+`/plan-acceptance <source>` for a missing or changed agreement; for uncertain
+identity or evidence, name the check or input needed before rerunning proof.
+Do not invoke it.

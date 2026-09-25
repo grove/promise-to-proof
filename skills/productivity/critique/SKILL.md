@@ -122,3 +122,11 @@ When useful, suggest user-led `interrogate` for unresolved design decisions,
 optional next steps, not automatic invocations. `prove` verifies implementation;
 `review-implementation` reviews implementation. This critique neither grants
 implementation authority nor declares acceptance.
+
+When the critique ends, finish with `Next step:` in plain language. Name one
+action tied to the result: revise the proposal for `correct` or `rethink`,
+run the named check for `insufficient evidence`, or use
+`/plan-acceptance <source>` for `proceed` when acceptance planning is needed.
+If the agreement is saved, name `/implement-contract <saved contract>` when
+authorized; otherwise ask for implementation authority. Do not start the next
+phase.
