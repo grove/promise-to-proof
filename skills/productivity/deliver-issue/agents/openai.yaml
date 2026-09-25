@@ -1,0 +1,5 @@
+interface:
+  display_name: "Deliver Issue"
+  short_description: "Deliver one existing issue through saved review and proof"
+policy:
+  allow_implicit_invocation: false

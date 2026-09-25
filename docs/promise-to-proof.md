@@ -9,9 +9,11 @@ look right while one sentence from the issue never reaches a test. A test suite
 can pass while its assertions miss the promised result. A green pull request can
 hide a weakened check.
 
-Use Promise to Proof's native skills to plan acceptance, implement the agreed capability,
-review a captured candidate, and prove the result. Optional external planning and TDD
-tools can help, but the delivery path works without them.
+Use `/deliver-issue` for one coherent existing issue on a host that supports
+separate stage invocations and independent read-only review and proof contexts.
+It coordinates the native skills to plan acceptance, implement the agreed
+capability, review a captured candidate, and prove the result. Optional external
+planning and TDD tools can help, but the delivery path works without them.
 
 The acceptance contract defines the spec envelope. Implementation fills it.
 Proof establishes that one exact candidate satisfies one exact contract revision.
@@ -57,7 +59,9 @@ To list the current skills from a clone, run:
 rg --files skills -g SKILL.md | sort
 ```
 
-The delivery path uses explicit phases:
+The stage skills remain available independently, including on hosts where
+`/deliver-issue` reports that independent contexts are unavailable. The manual
+path uses explicit phases:
 
 ```text
 /plan-acceptance       -> propose the contract
@@ -70,8 +74,8 @@ The delivery path uses explicit phases:
 ```
 
 Review and proof may run in either order against the same fixed candidate.
-A handoff does not invoke the next skill. The enclosing authorized workflow owns
-invocation and any publishing. Neither review nor proof needs an open PR or
+Stage skills do not invoke the next skill. `/deliver-issue` owns their handoffs
+and invocations, but not publishing. Neither review nor proof needs an open PR or
 unrelated green CI. Merge requires current proof, green required checks for the
 final candidate, and the repository's review requirements.
 
