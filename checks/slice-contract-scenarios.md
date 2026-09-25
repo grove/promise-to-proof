@@ -285,3 +285,18 @@ proof, including browser/API racing, metadata, restart, and ownership. Exercise
 for an integrated gap. Pass when every phase retrieves its exact identities and
 parent acceptance comes only from parent proof. Missing capabilities and
 unexecuted phases remain validation gaps.
+
+## T21. Publish child implementation order in the parent description
+
+Use an approved acyclic plan where S2 depends on S1 and S3 is independent. Give the
+parent issue source, contract, and human notes outside any managed order section.
+Authorize child publication, dependency links, and planning metadata updates.
+
+Pass when the parent description has one marker-delimited sequence linking every
+created or reused child in stable topological order, with S1, S2, then S3. It says
+to finish each child's required implementation, review, and proof workflow and
+resolve it before starting the next. It lists S2's direct blocker as S1, shows no
+blocker for S1 or S3, and does not create blocker edges from sequence alone. All
+original parent text remains unchanged outside the managed section, and readback
+confirms the saved links and sequence. Repeat unchanged in a fresh session; it
+reuses the same section and tickets with zero writes.
