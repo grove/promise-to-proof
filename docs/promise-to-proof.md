@@ -34,17 +34,20 @@ Install the skills:
 npx skills@latest add grove/promise-to-proof
 ```
 
-Use the repository's existing issue-tracker and domain-document configuration.
-A local specification and saved contract do not require an external setup skill.
-If you want external planning or TDD tools, install that collection separately:
+In a new project, run `/setup-promise-to-proof` to create its issue-tracker,
+triage-label, and domain-document configuration before tracker-writing or triage
+work. Skip it if another setup skill has already created compatible
+`docs/agents/` files for your GitHub repository and labels. The core delivery
+path can start from a local specification and does not require that setup.
+External planning or TDD tools are also optional; install Matt Pocock's
+collection separately if you want them:
 
 ```bash
 npx skills@latest add mattpocock/skills
 ```
 
-The collection's optional setup skill configures its tools for your repository.
-Keep the issue tracker, triage labels, and documentation locations consistent
-with the sources it reads.
+Both collections can use the same project-local configuration when its tracker
+and label conventions match.
 
 To list the current skills from a clone, run:
 

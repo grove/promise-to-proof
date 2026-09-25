@@ -1,0 +1,5 @@
+interface:
+  display_name: "Setup Promise to Proof"
+  short_description: "Configure tracker, labels, and domain docs"
+policy:
+  allow_implicit_invocation: false
