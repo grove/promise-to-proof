@@ -61,17 +61,19 @@ Each stage answers a different question:
 - **Publication:** Does the draft PR preserve the exact reviewed and proven candidate?
 - **Retrospective (optional):** What did the accepted delivery teach us for later work?
 
-Save and pass each result before invoking the next skill; skills do not invoke
-one another. Capture the candidate as a commit or reproducible snapshot so the
-independent review and proof reports refer to the same exact implementation and
-contract. Review and proof can run in either order. Start with the
+For one coherent existing issue, `/deliver-issue` coordinates these distinct
+skills and their saved handoffs when the host supports separate stage and
+independent review/proof contexts. Each stage remains available on its own.
+Capture the candidate as a commit or reproducible snapshot so review and proof
+refer to the same exact implementation and contract. Start with the
 [HOW-TO](./docs/how-to.md) for the saved artifacts and commands.
 
 ## Install and update
 
 The skills work with agent-skill-compatible coding tools. A saved acceptance
 contract carries the source ticket's promises through implementation, review,
-and proof. The skills do not provide a workflow runtime.
+and proof. Issue-first delivery needs a host capable of separate stage invocations
+and independent read-only review and proof contexts; otherwise it reports a blocker.
 
 Install the full collection:
 
@@ -105,7 +107,16 @@ exist for your GitHub repository and labels, for example after running Matt
 Pocock's `/setup-matt-pocock-skills`. The core workflow can start from a local
 specification without this setup.
 
-## Start with the core workflow
+## Start with an issue
+
+For one coherent existing issue, run [`/deliver-issue`](./skills/productivity/deliver-issue/SKILL.md)
+with its reference (for example, `/deliver-issue #123` in a GitHub-configured
+project). It saves and rereads the agreement, captures a fixed candidate, and
+returns matching review and proof reports or a named blocker. It does not commit,
+publish, or update triage labels without separate authority. See the
+[issue-first checks](./checks/deliver-issue-scenarios.md) for test cases.
+
+## Use the stage skills
 
 Start with these four skills in order:
 
@@ -215,8 +226,8 @@ sets the rules for revisions, candidate identity, evidence, and durable handoffs
 The [acceptance bundle format](./docs/acceptance-bundle-v1.md) defines optional
 deterministic inspection of matching review and proof artifacts.
 Each skill ends with numbered next steps so you can refer to a specific action.
-Some completed results need no further action; skills do not call one another
-automatically.
+Some completed results need no further action; stage skills do not call one
+another automatically. `/deliver-issue` coordinates them for one issue.
 
 ## Repository structure
 
@@ -224,6 +235,7 @@ automatically.
 skills/productivity/
 ├── audit-acceptance/
 ├── create-parent-issue/
+├── deliver-issue/
 ├── plan-acceptance/
 ├── critique/
 ├── fix-pr/

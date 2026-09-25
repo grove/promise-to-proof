@@ -7,7 +7,12 @@ phase in depth. The [FAQ](./faq.md) answers questions about what the results mea
 
 ## Choose a starting point
 
-If you have a small, coherent GitHub issue, follow [the direct path](#complete-a-github-issue).
+If you have a small, coherent GitHub issue, start with
+[`/deliver-issue`](../skills/productivity/deliver-issue/SKILL.md) and its issue
+number. It uses the configured tracker and coordinates the direct path when
+the host supports separate stage invocations and independent read-only review
+and proof contexts. A missing capability produces a named blocker; use
+[the manual stage path](#complete-a-github-issue) when needed.
 If the issue needs several independently useful outcomes, plan its parent contract
 first and then [divide the work](#divide-a-large-issue). You can give
 `plan-acceptance` a local specification or an agreed outcome too. A GitHub issue
@@ -15,8 +20,8 @@ is not a prerequisite for those inputs, though this repository records its own
 issues and specifications in GitHub Issues.
 
 ```text
-Existing, coherent issue  → plan-acceptance → optional audit-acceptance
-						  → implement-contract → review and prove → optional publish-pr
+Existing, coherent issue  → deliver-issue (agreement → implementation → review + proof)
+						  → optional separately authorized publish-pr
 Existing, large issue     → plan-acceptance → slice-contract → child workflows
 Local spec in this repo   → create-parent-issue → plan-acceptance → direct or sliced path
 Other project's local spec → plan-acceptance → direct path or approved slicing
@@ -95,8 +100,16 @@ the request.
 
 ## Complete a GitHub issue
 
-Run these commands as separate invocations. Each skill returns a handoff for the
-next phase; it does not call the next skill for you.
+On a supported host, `/deliver-issue #123` runs the local direct path from the
+issue reference and returns the current result and saved references. It asks for
+unresolved outcome decisions and required approval of the exact proposed
+agreement. It does not imply authority to commit, push, publish, or edit triage
+labels. The [workflow scenarios](../checks/deliver-issue-scenarios.md) describe
+what to inspect in a disposable end-to-end run.
+
+For manual stage work or an unsupported host, run these commands as separate
+invocations. Each stage skill returns a handoff for the next phase; it does not
+call the next skill for you.
 
 ```text
 /plan-acceptance #123

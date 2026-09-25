@@ -171,7 +171,7 @@ import { join } from 'node:path';
 const root = await mkdtemp(join(tmpdir(), 'plan-acceptance-install-'));
 const protocol = await readFile('docs/acceptance-contract-protocol.md', 'utf8');
 try {
-	for (const name of ['plan-acceptance', 'audit-acceptance', 'slice-contract', 'implement-contract', 'review-implementation', 'prove', 'repair-gaps', 'publish-pr', 'interrogate', 'fix-pr']) {
+	for (const name of ['plan-acceptance', 'audit-acceptance', 'slice-contract', 'implement-contract', 'review-implementation', 'prove', 'repair-gaps', 'publish-pr', 'interrogate', 'fix-pr', 'deliver-issue']) {
 		const dest = join(root, name);
 		await cp(`skills/productivity/${name}`, dest, { recursive: true, dereference: true });
 		const ref = join(dest, 'references/acceptance-contract-protocol.md');
