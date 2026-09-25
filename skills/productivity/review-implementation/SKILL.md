@@ -181,10 +181,18 @@ Coverage: <selected IDs, dependencies, implementation examined; omissions or lim
 Report storage: <retrievable destination, or proposed destination; storage pending>
 
 Review only; acceptance proof and merge readiness are separate.
+
+## Next steps
+
+<Number each applicable action in order. Include the exact invocation or
+decision, the saved references it needs, and any follow-up verification after
+the immediate action. This section is required in both the saved report and
+the response.>
 ```
 
-After the report, end with `Next steps:` and a numbered list (`1.`, `2.`, ...)
-of only the applicable actions, in order, so each can be referenced by number.
+The saved report and response must both end with the numbered `Next steps`
+section. Do not end at the storage reference or the review-only note.
+Number only applicable actions in order so each can be referenced by number.
 For `REVIEWED`, if proof is missing give
 `/prove <saved contract>; candidate <exact candidate>`. When matching full
 review and proof exist, state that acceptance evidence is complete for this
@@ -203,5 +211,8 @@ only then give this optional publication preview invocation:
 For `CHANGES NEEDED`, give
 `/implement-contract <source or contract>; findings <saved review report>` for
 in-scope fixes, or `/plan-acceptance <source>; amendment <saved review report>`
-for an agreement change. For `BLOCKED`, give the exact missing input or
-configured command and its expected result.
+for an agreement change. For an in-scope fix, include a later numbered action to
+capture the changed candidate and refresh review and full proof. For an agreement
+change, say to resume implementation only after the revised contract is approved
+and saved. For `BLOCKED`, give the exact missing input or configured command and
+its expected result.
