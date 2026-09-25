@@ -61,9 +61,12 @@ set. A different tip requires a fresh full `/review-implementation` against that
 tip before a new preview. Do not guess when the intended target or remote is
 ambiguous.
 
-Choose a repository-conforming head branch that identifies the work without
-embedding credentials or sensitive data. Prepare a concise title and complete
-body containing:
+Choose a repository-conforming head branch named `issue/<number>` for the source
+issue when allowed; otherwise use a repository-conforming name that includes the
+issue number, or a stable source slug when there is no numbered issue. Keep
+credentials and sensitive data out of the name. A child PR uses its child issue
+number; one integrated parent PR uses the parent issue number. Prepare a concise
+title and complete body containing:
 
 - the source reference and exact contract identity;
 - the candidate snapshot identity and matching or proposed commit;

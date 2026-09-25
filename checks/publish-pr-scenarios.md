@@ -21,6 +21,10 @@ Pass when the first request invokes this skill and both results are `DRAFT` with
 the exact destination, target tip, head branch, candidate-to-commit plan, commit
 inputs when needed, title, body, stable marker, and requested effects. No commit,
 branch, push, pull request, or other local or remote mutation occurs.
+For a numbered child issue, the proposed head branch is `issue/<child-number>`
+when repository rules allow it; one integrated parent PR uses the parent number.
+If repository rules disallow that form, the proposed branch still includes the
+issue number. An unnumbered source uses a stable source slug.
 
 ## 2. Publish an existing verified commit
 

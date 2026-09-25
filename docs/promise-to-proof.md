@@ -671,8 +671,10 @@ For a feature that starts as an idea, optionally add external planning tools:
 /implement-contract #124
 /review-implementation <saved child handoff> against <child comparison base>
 /prove <saved child contract>; candidate <saved child handoff>
+# For independently publishable children, preview a child PR from issue/124.
 /publish-pr <saved child candidate and reports>; target <branch>; draft only
 # Approve and publish the exact preview when a child PR is required.
+# Otherwise, collect sequential child work for one parent PR from issue/123.
 
 # On the final integrated candidate:
 /review-implementation <saved integrated handoff> against <parent comparison base>

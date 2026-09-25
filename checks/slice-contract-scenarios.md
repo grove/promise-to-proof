@@ -105,6 +105,18 @@ conditions, dependencies, shared candidate requirements, and actual integration
 work. The exception needs approval before publication. No branch is created,
 CI is not weakened, and intermediate slices are not called merge-ready.
 
+## T6a. Choose delivery without creating a branch
+
+Supply a parent with two independent children and another with a child that
+needs an unmerged sibling. Request draft delivery plans and local plan storage.
+
+Pass when the independent children can use distinct issue-named child PR branches
+or one parent issue-named branch, and the dependent child uses one shared
+candidate or waits for the prerequisite to land. Each plan records the selected
+path without equating dependency order with branch choice. Saving a plan creates
+no branch, commit, or push. Neither plan promises that child proofs establish
+parent acceptance.
+
 ## T7. Distinguish coordination, prerequisites, and cycles
 
 Run separate drafts with outcomes editing the same file, browser retry requiring

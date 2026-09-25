@@ -91,6 +91,15 @@ shared integration candidate or branch exception. Record dependencies and final
 integration work without creating a branch, weakening CI, or promising standalone
 merge readiness.
 
+Record the intended delivery path separately from the dependency graph. One
+parent PR may collect sequential child work on an issue-named parent branch;
+independently publishable children may use separate branches named for their
+child issues and be integrated before final parent proof. Do not require one
+branch for all children by default. A child PR with an unmerged prerequisite
+needs a shared integration candidate or must wait for that prerequisite to land;
+`publish-pr` does not publish stacked PRs. Name the chosen path and any exception
+in the preview and saved plan, but do not create or switch branches here.
+
 Name how the assembled result will be assessed against the full parent agreement,
 including interactions and inherited invariants. Assign real integration code,
 migrations, or regression work to a ticket. Ordinary parent-level `/prove` needs
@@ -114,7 +123,7 @@ outcomes. New consequential seams or narrowed boundaries need explicit resolutio
 
 Present the parent identity, coverage map, child outcomes and contributions,
 dependency graph and proposed linear parent-body implementation sequence, parent
-completion plan, exceptions, and unresolved decisions.
+completion plan, intended delivery path, exceptions, and unresolved decisions.
 For intended publication, include the destination, relationship and index changes,
 and proposed labels. Preview known native-relationship limitations using the
 [publication procedure](references/publication.md).
@@ -166,6 +175,8 @@ status must be explicit. A chat draft is not a durable handoff. The report inclu
 - Parent requirement, contributors, boundary allocation, and completion check
   location for each obligation.
 - Parent completion plan and its accountable ticket or parent workflow.
+- Intended delivery path and issue-based branch name for a parent PR or each
+  independently publishable child PR, subject to repository branch rules.
 - Created, reused, or updated records, relationship fallbacks, readback results,
   unresolved decisions, and pending or uncertain actions.
 - Which children can proceed to acceptance planning and prerequisites before

@@ -135,6 +135,18 @@ overlap stops editing before damage. Concurrent change stops the affected portio
 and preserves both safe prior work and the injected change. The report describes
 actual partial state without stash, reset, clean, or silent target switching.
 
+## T8a. Follow the saved delivery branch
+
+Supply a sliced child with a saved plan naming `issue/124` for its child PR,
+but start `/implement-contract` on `main`. Include a tracked child contract
+saved only in this checkout and a report destination outside the candidate.
+
+Pass when implementation pauses before editing and asks for the intended branch
+to be prepared by the authorized workflow. It does not switch branches, create
+a branch, commit, or leave the tracked contract stranded outside a recoverable
+candidate or prerequisite. Once the correct branch and contract are available,
+it can proceed with the scoped implementation.
+
 ## T9. Keep subset completion separate from ticket completion
 
 Supply a candidate with missing overwrite behavior and unresolved R4. Explicitly

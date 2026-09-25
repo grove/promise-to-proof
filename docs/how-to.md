@@ -211,11 +211,19 @@ separate tickets add no useful boundary, keep the direct path when the result is
 ```
 
 Each child receives its own saved contract before implementation. Run the direct
-implementation, review, and proof path for each child, then assemble the work in
-one exact integrated candidate. Run `/prove` against the full parent contract on
-that candidate. Review the integrated candidate if it differs from the reviewed
-child candidates or contains shared integration code. Child proofs do not combine
-into parent proof.
+implementation, review, and proof path for each child. Choose the delivery path
+in the breakdown: one parent branch named `issue/<parent-number>` and one PR for
+sequential child work, or a branch named `issue/<child-number>` and PR for each
+independently publishable child, subject to repository branch rules.
+For a child that needs unmerged sibling work, use the shared candidate or wait
+for its prerequisite to land; `publish-pr` does not support stacked PRs. Select
+the intended working branch before local writes; skills that save contracts or
+plans do not create or switch branches. Repository files must travel in a commit
+or transferred snapshot, while review and proof reports stay outside the candidate.
+Assemble the work in one exact integrated candidate
+and run `/prove` against the full parent contract. Review the integrated candidate
+if it differs from the reviewed child candidates or contains shared integration
+code. Child proofs do not combine into parent proof.
 
 ## Create an originating issue when you need one
 
