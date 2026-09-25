@@ -70,8 +70,12 @@ acceptance, a completion percentage, or proof that the design will work.
 For each blocker, name the prerequisite outcome or artifact and why it is needed.
 Keep the graph acyclic. Resolve cycles by changing boundaries, exposing an actual
 prerequisite, or reporting the unresolved decision. Parent hierarchy and shared
-files alone do not create blocking order. Preserve real opportunities for parallel
-work without inventing independence or serializing everything for convenience.
+files alone do not create blocking order. Record only real blockers in the graph;
+do not add edges just to create a sequence. Separately derive a linear implementation
+sequence from the graph with a stable topological sort, choosing the lowest stable
+slice ID among currently unblocked children. This gives one engineer a deterministic
+order without turning sequence-only order into blocker relationships. Show each
+child's actual direct prerequisites separately from its place in the sequence.
 
 Reference external prerequisites and their satisfaction conditions. External work
 needs separate edit authority. State what the receiving session must confirm,
@@ -109,7 +113,8 @@ obligations. Preserve applicable constraints without requiring unrelated sibling
 outcomes. New consequential seams or narrowed boundaries need explicit resolution.
 
 Present the parent identity, coverage map, child outcomes and contributions,
-dependency graph, parent completion plan, exceptions, and unresolved decisions.
+dependency graph and proposed linear parent-body implementation sequence, parent
+completion plan, exceptions, and unresolved decisions.
 For intended publication, include the destination, relationship and index changes,
 and proposed labels. Preview known native-relationship limitations using the
 [publication procedure](references/publication.md).

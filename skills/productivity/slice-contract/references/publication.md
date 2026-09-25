@@ -61,6 +61,34 @@ tracker parent can use a durable source and plan link. Creating a tracker parent
 needs explicit approval. Paths inaccessible from the receiving checkout are not
 durable references.
 
+When publishing child issues under a tracker parent, also show the approved
+linear implementation sequence in a separately managed section of the parent
+issue description. Preview the section before publication. Keep the canonical
+plan as the source of truth; this section is its linked, readable projection,
+not another index or a new dependency relationship. Use this marker pair:
+
+```markdown
+<!-- grove:slice-contract-order parent=grove/project#123 -->
+## Implement and resolve child issues in this order
+
+Complete each child issue's required implementation, review, and proof workflow,
+then resolve it under repository conventions before starting the next. This is a
+one-engineer sequence; sequence alone does not make an issue a blocker.
+
+1. [S1: <observable outcome>](<issue URL>)
+	Blocked by: none.
+2. [S2: <observable outcome>](<issue URL>)
+	Blocked by: S1.
+<!-- /grove:slice-contract-order -->
+```
+
+Include every approved child, new or reused, exactly once, in the stable
+topological sequence from the plan. Show actual direct child blockers separately;
+do not infer them from sequence. Preserve all parent text outside the unique
+marker pair; on reruns update only the managed section and reread it. Multiple or
+mismatched marker pairs need reconciliation. If the section cannot be safely
+written and read back, do not report complete publication.
+
 For local publication, follow the configured layout. If none exists and local
 publication was explicitly selected, use `.scratch/<work-id>/plan.md` and
 `.scratch/<work-id>/issues/S<n>-<slug>.md`. Resolve relative links from the saved
