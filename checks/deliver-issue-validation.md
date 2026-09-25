@@ -29,8 +29,9 @@ disposable Git repository at base commit
 contract was `docs/acceptance-contracts/123.md` v1, SHA-256
 `0706a5f05d048a3fa817d98c0b839963e51a8f5e10a298d431e363b427b9afe6`.
 The developer gave the issue reference, not report paths or stage commands.
-The host used `codex exec` with separate read-only review and proof sessions;
-the enclosing context saved and reread their reports in
+The host was instructed to use separate read-only review and proof sessions;
+their distinct invocation records were not retained. The enclosing context
+saved and reread the returned reports in
 `/tmp/p2p-issue23-artifacts/710a1eb61b495108da7e7ec534b14e49fdbb4aab44540ac6ac2764194e1b0776/`.
 
 Observed sequence: the first run implemented `save_report` and passed two
@@ -60,8 +61,9 @@ directories, so it used non-mutating diagnostics instead. The stage report's
 original `storage pending` statement remained untouched after the enclosing
 workflow saved and reread it.
 
-This validates issue-reference resume, isolation, storage, exact identities,
-and the final local result. Because the first invocation blocked and later
+This validates issue-reference resume, storage, exact identities, and the
+returned local result, but not independent stage execution. Because the first
+invocation blocked and later
 resumes received corrective instructions, the stricter uninterrupted D1 case
 remains **partial** until a fresh one-reference run completes without handoffs.
 
@@ -70,3 +72,36 @@ only an unrelated tracker configuration edit and a writable external artifact
 directory from the start. Its sole task input was `#123`. The host saved a
 candidate and implementation report, but its terminal execution was interrupted
 before review and proof. No success verdict was recorded for that attempt.
+
+A second clean run used `/tmp/p2p-issue23-clean2` and the same `#123` input.
+It returned `REVIEWED` and `PROVEN`, saving an implementation report, candidate,
+review, and proof under `/tmp/p2p-issue23-clean2-artifacts/123/`. Its contract
+SHA-256 remained `0706a5f05d048a3fa817d98c0b839963e51a8f5e10a298d431e363b427b9afe6`;
+its candidate archive SHA-256 was
+`8f9d560d0255afd40caa1c62a63dcac52e27a6da2a42ad8ca48f3293686e41d6`.
+Readback **rejected** this claimed success: the archive contained only `app.py`
+and `test_save_report.py`, and the reports gave only `c6abd07` for the base,
+without a transferable full base tree. Neither saved verifier report recorded
+a distinct read-only host invocation or session ID, and proof cited the
+implementation test run without a retrievable independent observation. The
+reports and candidate hashes matched, but those facts alone do not establish
+recoverability or independent verification. D1 remains **partial**, not passed.
+
+A subsequent `#123` resume rejected those reports. Attempting a nested
+`codex exec` read-only verifier failed at app-server initialization with
+`Operation not permitted`; the workflow returned `BLOCKED` with the missing
+independent contexts, preserved the artifacts, and requested a capable host.
+This observes the unavailable-host branch of D10, not its untrusted-issue or
+storage cases. The earlier top-level read-only Codex probes establish only
+that separate CLI sessions can run from the caller, not that this enclosing
+agent can spawn them. The preflight now requires a real nested read-only
+invocation before implementation.
+
+In a fresh `/tmp/p2p-issue23-gate` run, the required preflight initially failed
+with `Operation not permitted`, then succeeded after host permission in nested
+session `01a0d9c9-192f-7261-901d-a4c4b8ad8453`. The separate implementation
+session `01a0d9ca-17aa-7c82-88e5-bc83473e3335` completed R1-R4 checks and
+saved a snapshot. The terminal was interrupted during independent review and
+proof dispatch, so no matching full reports or D1 pass were recorded. This
+demonstrates the pre-implementation isolation check and separate implementation
+invocation, not a successful end-to-end handoff.
