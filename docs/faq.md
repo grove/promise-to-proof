@@ -127,6 +127,23 @@ between the reported candidate and the pull request head remain separate gates.
 Green CI alone also does not prove an issue, because the configured checks may
 miss one of its promises.
 
+### Can a retrospective change acceptance or become a project rule?
+
+No. Optional `/retrospect` evaluates a saved `PROVEN` delivery and concrete
+experience against that exact candidate and contract. A missing or mismatched
+proof prevents evaluation; a matching review is useful but not required. The
+report leaves acceptance unchanged, including when it finds a possible broken
+promise. That discovery calls for fresh review and proof on the applicable
+candidate, or an issue follow-up, not a rewrite of the historical verdict.
+
+Suggested learnings start pending. A developer explicitly accepts, rejects, or
+rewrites each one; only accepted, evidence-backed advice enters the project-local
+register. Later planning can cite relevant active advice, but a rule or contract
+change needs separate authorization through its owning workflow. Neither the
+evaluation nor the register is a publication or merge gate. See the
+[retrospective walkthrough](./promise-to-proof.md#learn-from-a-proven-delivery-optional)
+for the inputs and disposition steps.
+
 ### Why run full proof again after a candidate change?
 
 The old report describes the old content. A repair for one requirement can

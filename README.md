@@ -208,7 +208,9 @@ path. For questions about issues, slicing, review, and proof, read the
 [FAQ](./docs/faq.md).
 
 The [detailed workflow](./docs/promise-to-proof.md) includes examples and
-recovery paths. The [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
+recovery paths, including an optional
+[retrospective walkthrough](./docs/promise-to-proof.md#learn-from-a-proven-delivery-optional)
+after proof. The [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
 sets the rules for revisions, candidate identity, evidence, and durable handoffs.
 The [acceptance bundle format](./docs/acceptance-bundle-v1.md) defines optional
 deterministic inspection of matching review and proof artifacts.

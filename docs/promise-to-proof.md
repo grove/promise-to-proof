@@ -25,6 +25,8 @@ source → plan-acceptance → optional audit-acceptance → any required approv
 The sequence is not a ceremony. Each skill answers a different question.
 Skip optional planning, slicing, and repair steps when they do not apply.
 Merge still requires current proof for the final candidate.
+After a proven delivery, `/retrospect` can separately evaluate experience for
+future work; it is not part of publication or merge readiness.
 
 ## Install the skills
 
@@ -64,6 +66,7 @@ The delivery path uses explicit phases:
 /review-implementation -> save findings for that candidate and comparison base
 /prove                 -> save the proof and requirement evidence
 /publish-pr            -> preview or publish the exact candidate as a draft PR
+/retrospect             -> optionally evaluate a proven delivery for future advice
 ```
 
 Review and proof may run in either order against the same fixed candidate.
@@ -594,6 +597,44 @@ the repaired candidate, especially after product, acceptance evidence, or
 relevant test changes. A contract revision can remain unchanged while its
 candidate needs fresh proof. Refresh `/review-implementation` for the changed candidate
 as well.
+
+## Learn from a proven delivery (optional)
+
+Use `/retrospect` when concrete use or maintenance experience reveals something
+worth considering in future work. It is not a second review or proof run, and it
+does not depend on a PR, unrelated green CI, or a merge. Start with a saved full
+`PROVEN` report, the exact candidate it covers, and the canonical contract's
+revision and recoverable text. Bring retrievable observations, such as a support
+record or attributed team feedback, and a saved matching review if available:
+
+```text
+/retrospect <saved PROVEN proof>; candidate <exact proven candidate>; experience <retrievable observations>
+```
+
+The evaluation names each observation's source, effect, limits, and consequence.
+For example, repeated maintenance reports about brittle tests may support
+advice to specify a user-visible outcome next time; they do not change what
+the old contract required. A suspected broken promise instead goes to a fresh
+review and proof for the applicable exact candidate, or a normal issue
+follow-up. The historical `PROVEN` report stays unchanged. With weak evidence
+or nothing useful to learn, the report can have no suggestions.
+
+Save the evaluation outside the evaluated candidate at an authorized destination
+and confirm that another session can retrieve it and its cited evidence. Without
+a destination or write authority, keep storage pending; a chat reply is not a
+saved report. Review each suggestion separately. Accept, reject, or rewrite it
+only after seeing the exact proposed change; acceptance of a rewrite requires
+wording supported by the observation. Authorize the report edit and any accepted
+entry in the project-local advisory register before either is written. The
+default register is `docs/retrospective-learnings.md`, created only on the first
+authorized accepted learning. Rejected suggestions remain in the evaluation report.
+
+Later `/plan-acceptance` runs consider relevant active register entries as
+advice, with a citation and reason. Advice cannot add a requirement or change an
+agreement by itself: promotion to a rule or contract revision needs separate
+human authorization through the owning workflow. To evaluate a later candidate,
+obtain its own proof and run a separate retrospective; neither the earlier report
+nor its disposition becomes a merge gate.
 
 ## Choose the shortest workflow that covers the risk
 
