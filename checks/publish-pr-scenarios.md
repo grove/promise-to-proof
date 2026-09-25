@@ -42,9 +42,16 @@ and pull-request content.
 Pass when the resulting commit tree exactly represents every captured byte,
 mode, symlink, deletion, and included fixture. The report records the snapshot
 identity and new full commit SHA. Review and proof remain current only because
-that equivalence was established; no formatting or implementation change is
+that equivalence was established and all behaviorally relevant build and
+execution inputs remained equivalent; no formatting or implementation change is
 made in the operator's checkout. The created commit and mapping are saved and
 reread before push.
+
+Repeat with unchanged source that reads `git rev-parse HEAD` or `git describe`
+during a required check. Pass when publication treats the new commit identity as
+a changed behavioral input and reruns the affected verification against the
+publishable artifact, or returns `BLOCKED`. Tree equality alone must not preserve
+the prior proof in this case.
 
 ## 4. Reject stale or incomplete verification
 

@@ -138,7 +138,12 @@ commit parent and approved metadata inputs. A mismatch is `BLOCKED`: retain the
 diagnostic, do not push, and do not recapture the changed tree as the candidate.
 When complete content equivalence is established, record the snapshot-to-commit
 mapping. Commit metadata alone does not stale review or proof for unchanged
-candidate content.
+candidate content only when Git metadata is not a behaviorally relevant build or
+execution input. Confirm that all relevant inputs remain unchanged or are shown
+equivalent, including generated artifacts, dependency resolution, timestamps,
+signing inputs, and external build configuration. Record relevant inputs and
+produced artifact digests. If publication changes a relevant input, rerun the
+affected verification against the publishable artifact or return `BLOCKED`.
 
 Do not amend, rebase, merge, cherry-pick, squash, sign with an unavailable key,
 run implementation tools, or modify code to make publication succeed. A target

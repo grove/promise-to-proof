@@ -97,6 +97,17 @@ checks every promised outcome against observed evidence. A `REVIEWED` result
 does not stand in for `PROVEN`, and neither result replaces required CI or the
 repository's review gate.
 
+For a reproducible snapshot, you can normalize matching full reports into an
+[acceptance bundle](./acceptance-bundle-v1.md) and inspect it without a model:
+
+```bash
+python3 checks/verify_acceptance_bundle.py path/to/bundle.json
+```
+
+The bundle is derived from the canonical contract and retained reports. A valid
+bundle checks identity, coverage, evidence resolution, and decision consistency;
+it does not replace the reports or judge whether the evidence proves the promise.
+
 To publish that exact reviewed and proven candidate, first inspect a read-only
 preview, then explicitly authorize its complete effects:
 
