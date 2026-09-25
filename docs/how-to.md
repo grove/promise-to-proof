@@ -238,12 +238,36 @@ candidate as well.
 
 ## Reconcile a changed requirement
 
-When implementation, review, or proof finds that the agreed promise must change,
-record the proposed amendment with its affected requirement IDs and source
-authorization. Return to `plan-acceptance` before dependent work continues.
-Save and reread the new contract revision, then give subsequent skills that exact
-revision and text. Do not edit a requirement to match behavior that happens to
-be implemented.
+When implementation, review, or proof reveals that the agreement must change,
+pause work that depends on it. Do not edit a requirement to match behavior that
+happens to be implemented. Record the proposal on the originating issue (or in
+the source specification), or link it directly from there. For example:
+
+```text
+Proposed amendment to v1:R2
+Previous agreement: One retry is allowed after a failed upload.
+Proposed agreement: Two retries are allowed after a failed upload.
+Reason: The agreed recovery flow needs a second attempt.
+Authorization: Pending owner decision.
+```
+
+Name every affected requirement ID, the old and proposed agreement, the reason
+for the change, and who authorized it. If authorization is pending, keep the
+proposal visible but do not proceed with work that depends on it. Once the
+owner approves the change, record that decision on the source and run
+`/plan-acceptance #123` on the same source. Only `plan-acceptance` revises the
+contract; a comment proposing or approving a change is not itself the new
+contract.
+
+Save and reread the returned contract at its canonical location. A material
+change increments the revision (for example, v1 to v2) and keeps v1 available
+as history. A new test path, more evidence, or clearer wording with the same
+meaning does not increment it. If the issue points to a specific older revision,
+update its current-contract link to the newly saved revision; if it points to a
+stable location, confirm that the location now resolves to the new text. Keep
+older revisions retrievable, and reread the issue link before handing off the
+current location, revision, and exact text. A changed promise needs fresh proof
+against the new contract and an exact candidate.
 
 ## Repair failing CI
 

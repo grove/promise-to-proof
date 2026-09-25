@@ -66,6 +66,13 @@ ticket without creating a separate issue. Reread the saved destination before
 handing off its location and revision. If saving is unavailable, return the
 proposed destination and mark storage pending. A chat response alone is not a
 completed durable handoff.
+
+If the ticket's current-contract reference names an older revision, update it
+to the newly saved revision under existing authorization and reread the ticket.
+Keep earlier revisions retrievable as history, but make the current one clear
+at the source. If the reference cannot be updated, report the handoff as pending
+instead of directing consumers to the old agreement.
+
 Repository files must travel with the work in a commit or transferred snapshot
 when the next session uses another checkout.
 
