@@ -93,6 +93,13 @@ install `plan-acceptance`, `review-implementation`, and `repair-gaps` as
 applicable, then remove the old copies using your installer's normal removal
 mechanism.
 
+For a new project using GitHub issues, run
+[`/setup-promise-to-proof`](./skills/productivity/setup-promise-to-proof/SKILL.md)
+before tracker-writing or triage work. It proposes issue-tracker, triage-label,
+and domain-doc pointers for your approval; it does not create GitHub labels,
+issues, or domain documents. Skip it if those pointers are already configured.
+The core workflow can start from a local specification without this setup.
+
 ## Start with the core workflow
 
 Start with these four skills in order:
@@ -106,6 +113,7 @@ Start with these four skills in order:
 
 | Skill | Use it when | It gives you |
 |---|---|---|
+| [`/setup-promise-to-proof`](./skills/productivity/setup-promise-to-proof/SKILL.md) | A new project's GitHub issue and domain-doc pointers need configuring | An approved local configuration for tracker, triage labels, and domain docs |
 | [`/audit-acceptance`](./skills/productivity/audit-acceptance/SKILL.md) | A proposed contract needs an independent check before human approval | Read-only source, scope, identity, and evidence-plan findings |
 | [`/create-parent-issue`](./skills/productivity/create-parent-issue/SKILL.md) | A local specification needs one originating GitHub issue | One source issue with a durable reference to the exact spec |
 | [`/triage-issue`](./skills/productivity/triage-issue/SKILL.md) | An existing issue needs a next action or triage label | A recommendation and, when explicitly approved, a verified issue update |
@@ -130,6 +138,7 @@ Start with these four skills in order:
 <summary>Other commands</summary>
 
 ```text
+/setup-promise-to-proof
 /triage-issue #123
 /critique <idea, document path, or GitHub issue reference>
 /interrogate Walk me through your proposal so I can question it.
@@ -216,6 +225,7 @@ skills/productivity/
 ├── repair-gaps/
 ├── review-implementation/
 ├── slice-contract/
+├── setup-promise-to-proof/
 └── triage-issue/
 ```
 
