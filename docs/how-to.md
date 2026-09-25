@@ -30,6 +30,35 @@ ticket or an acceptance contract.
 For an existing issue that still needs a next action or owner, start with
 [triage](#triage-an-existing-issue).
 
+## Choose a model
+
+The skills do not prescribe models or minimum parameter counts. This ranking
+estimates the reasoning needed for a typical full-scope run, from hardest to
+easiest. A narrow task may need less; a large or ambiguous one may need more.
+
+| Rank | Skill | Suggested capability | What makes it demanding |
+|---:|---|---|---|
+| 1 | [`slice-contract`](../skills/productivity/slice-contract/SKILL.md) | Strongest | Allocate every parent promise across useful child outcomes and dependencies. |
+| 2 | [`implement-contract`](../skills/productivity/implement-contract/SKILL.md) | Strongest | Deliver complete behavior and meaningful checks within the agreed scope. |
+| 3 | [`review-implementation`](../skills/productivity/review-implementation/SKILL.md) | Strongest | Judge contract fidelity, scope, and engineering quality independently. |
+| 4 | [`fix-pr`](../skills/productivity/fix-pr/SKILL.md) | Strongest | Diagnose causal CI failures and verify a repair without weakening checks. |
+| 5 | [`critique`](../skills/productivity/critique/SKILL.md) | Strongest | Test a proposal against its goal, alternatives, and uncertain evidence. |
+| 6 | [`prove`](../skills/productivity/prove/SKILL.md) | Capable | Establish each promise on one fixed candidate using independent evidence. |
+| 7 | [`plan-acceptance`](../skills/productivity/plan-acceptance/SKILL.md) | Capable | Extract stable, testable promises and credible evidence plans from the source. |
+| 8 | [`audit-acceptance`](../skills/productivity/audit-acceptance/SKILL.md) | Capable | Detect missing promises, scope drift, and evidence plans that cannot prove outcomes. |
+| 9 | [`publish-pr`](../skills/productivity/publish-pr/SKILL.md) | Capable | Preserve exact candidate bytes and authorization across publication steps. |
+| 10 | [`repair-gaps`](../skills/productivity/repair-gaps/SKILL.md) | Capable | Make a complete repair for named proof gaps without changing the agreement. |
+| 11 | [`merge-readiness`](../skills/productivity/merge-readiness/SKILL.md) | Mid-tier | Match the current PR to proof, review, CI, and repository approval rules. |
+| 12 | [`interrogate`](../skills/productivity/interrogate/SKILL.md) | Mid-tier | Answer challenges with evidence and revise a proposal when warranted. |
+| 13 | [`triage-issue`](../skills/productivity/triage-issue/SKILL.md) | Mid-tier | Choose a defensible next action from the issue and its prerequisites. |
+| 14 | [`create-parent-issue`](../skills/productivity/create-parent-issue/SKILL.md) | Mid-tier | Summarize a spec faithfully and check its exact source before publication. |
+
+Use a strong long-context model for the first five, especially on unfamiliar
+codebases or large contracts. The lower ranks still need the right tools and
+permissions: model capability cannot replace access to source issues, tests,
+CI results, or an exact candidate. `publish-pr` in particular has a demanding
+identity and authorization procedure even though its reasoning is more bounded.
+
 ## Triage an existing issue
 
 When an issue needs a next owner or action, run triage before the delivery path:
