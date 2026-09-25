@@ -10,12 +10,14 @@ use the [acceptance contract protocol](./acceptance-contract-protocol.md).
 
 ### Who creates the original GitHub issue?
 
-For work in this repository, the person or authorized workflow starting the work
-creates the source GitHub issue. Promise to Proof has no dedicated originating-issue skill;
-use `gh issue create` under this repository's
-[issue tracker instructions](./agents/issue-tracker.md). `plan-acceptance` reads a
-source and returns a contract for the invoking workflow to save. `slice-contract`
-publishes an approved breakdown. Neither silently creates an originating issue.
+For work in this repository that starts from a local specification, use
+`create-parent-issue` to draft one source GitHub issue with a retrievable reference
+to that spec. Explicitly authorize publication after reviewing the draft. For a
+small agreed outcome without a local spec, create the source issue with
+`gh issue create` under this repository's
+[issue tracker instructions](./agents/issue-tracker.md). `plan-acceptance` reads
+the source and returns a contract for the invoking workflow to save. Neither
+`plan-acceptance` nor `slice-contract` silently creates an originating issue.
 
 Projects using these skills may keep a local specification as the source.
 `plan-acceptance` accepts a specification or agreed outcome without a GitHub
