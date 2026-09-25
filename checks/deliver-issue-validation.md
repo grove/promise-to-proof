@@ -1,11 +1,10 @@
-# Issue-first host capability probe
+# Issue-first delivery validation
 
 Date: 2026-09-25. Host: Codex CLI v0.157.0 on macOS. Repository:
-`grove/promise-to-proof`, branch `main`. This probe checks context isolation,
-not the issue-first delivery outcome. See the disposable issue run below for
-observed D1 behavior. D2-D10 in
-[the workflow scenarios](./deliver-issue-scenarios.md) remain **unexecuted**
-as complete cases.
+`grove/promise-to-proof`, branch `main`. The final VS Code-hosted disposable
+tracker run below **passes local D1**. GitHub-specific number resolution in D2
+and D3-D10 in [the workflow scenarios](./deliver-issue-scenarios.md) remain
+**unexecuted** as complete cases. Earlier failures remain recorded below.
 
 Three separate `codex exec --ephemeral --sandbox read-only -C "$PWD"`
 invocations used independent sessions:
@@ -21,7 +20,7 @@ The CLI printed `sandbox: read-only` and a distinct session ID on each run.
 edits; `git diff --check` passed after the probes. These sessions alone do not
 establish a delivery verdict.
 
-## Disposable issue-reference run
+## Earlier attempts
 
 Source: local read-only tracker `#123` in `/tmp/p2p-issue23-fixture`, on a
 disposable Git repository at base commit
@@ -61,11 +60,11 @@ directories, so it used non-mutating diagnostics instead. The stage report's
 original `storage pending` statement remained untouched after the enclosing
 workflow saved and reread it.
 
-This validates issue-reference resume, storage, exact identities, and the
+That attempt validated issue-reference resume, storage, exact identities, and the
 returned local result, but not independent stage execution. Because the first
 invocation blocked and later
 resumes received corrective instructions, the stricter uninterrupted D1 case
-remains **partial** until a fresh one-reference run completes without handoffs.
+was **partial** at that point.
 
 An additional clean attempt used `/tmp/p2p-issue23-fresh` at the same base with
 only an unrelated tracker configuration edit and a writable external artifact
@@ -85,7 +84,7 @@ without a transferable full base tree. Neither saved verifier report recorded
 a distinct read-only host invocation or session ID, and proof cited the
 implementation test run without a retrievable independent observation. The
 reports and candidate hashes matched, but those facts alone do not establish
-recoverability or independent verification. D1 remains **partial**, not passed.
+recoverability or independent verification. D1 was still **partial**.
 
 A subsequent `#123` resume rejected those reports. Attempting a nested
 `codex exec` read-only verifier failed at app-server initialization with
@@ -105,3 +104,61 @@ saved a snapshot. The terminal was interrupted during independent review and
 proof dispatch, so no matching full reports or D1 pass were recorded. This
 demonstrates the pre-implementation isolation check and separate implementation
 invocation, not a successful end-to-end handoff.
+
+## VS Code host-native D1
+
+Request: one issue reference, `#123`, in a fresh disposable checkout at base
+`c6abd074856fcc3d33a6f5f19a37a565fc02a5e0`. The configured local tracker
+resolved `issues/123.md` and its approved `docs/acceptance-contracts/123.md`
+v1. Its exact SHA-256 was
+`0706a5f05d048a3fa817d98c0b839963e51a8f5e10a298d431e363b427b9afe6`.
+The developer supplied no stage commands or artifact paths. The VS Code host
+ran Codex stages directly in separate contexts, rather than requiring a Codex
+session to spawn nested sessions. No tracker edit, commit, push, PR, or label
+change occurred.
+
+Implementation began with `app.py` SHA-256
+`397a9b42caff7f945d905dc338ce1ddeda04a4bdab56bf9fd13bb02a90142761`
+and produced `24fb92868567a9d3fdd302f6c48b8797aa4ffb49a7b07bdcefd34630973f95b3`.
+It passed `python3 -m unittest -v test_app.py` (2 tests). Readback caught its
+first archive including an unrelated tracker configuration edit. The enclosing
+workflow retained that archive as history and built a new full snapshot from
+the base tree plus only `app.py` and `test_app.py`. Archive member bytes were
+checked against either the base commit or the issue-owned files; the tracker
+member equals the base, while the dirty checkout edit stayed untouched. The
+candidate `123-candidate-v2.tar` SHA-256 was
+`3973f4e4428a8c24d8d701bab7c736ba7fef3757150f4724786e267b8c1d2b04`.
+
+The corrected implementation handoff reported `IMPLEMENTED`, `Changes: none`
+(session `01a0d9dd-3b11-7060-b4cf-a54482bc2750`). Independent read-only review
+returned `REVIEWED` (session `01a0d9d7-e088-7720-8119-f6e030bd3631`), and a
+different read-only proof context returned `PROVEN` for R1-R4 (session
+`01a0d9da-513d-7a80-8fc4-c19ddbaf390a`). Proof's saved host log records
+`independent_public_seam: PASS (R1,R2,R3,R4)` with exit code 0, a second
+2-test `OK` run, and unchanged full contract/candidate digests. Its earlier
+temporary-directory and quoting failures remained visible, not counted as
+evidence. The final verifier reread the three reports and host logs outside
+the candidate and checked all three distinct session IDs and full digests.
+
+Artifacts in `/tmp/p2p-issue23-vscode-1-artifacts/` are retrievable in this
+environment: `123-implementation-final.md`, `123-review-v2.md`,
+`123-proof-v2.md`, `123-acceptance-v2.log`, and each stage's matching `.jsonl`
+host log. Report SHA-256 values respectively:
+`732fd0313fb2c0bc101859f842d01a8d6b35da015464ddef97216a89fedc3203`,
+`d50eb2a7bf470d652d15e2fc6498803122db2195a13847a1b39ab73c107be8bb`,
+and `72bb655920bfc9d9669f203197480a920b638e1fc22a47eeea4e9758bf78859d`.
+The acceptance log SHA-256 is
+`2d138bc78817c70109b79b35be2e560a052b8434ef8a439dafa88f9c256edc79`.
+Implementation, review, and proof `.jsonl` host-log SHA-256 values respectively:
+`1a24046d68cf09c1c16b7b3d2988e59312d68fd68bac131a348c8f839935ad92`,
+`56520e0e32644dc2dfb325a0e30525c6c87016c2b6e9e545ffab05dc1b7c35de`,
+and `a8f2e29851bc1acee20bf09c90e5c2bfd182fdd2344880dc68ad1635dc0c91e0`.
+This is a local configured-tracker result. It does not establish live GitHub
+tracker integration or the separate D2-D10 cases.
+
+A separate checkout at `/tmp/p2p-issue23-vscode-resume` started from the exact
+base commit. Transferring and extracting `123-candidate-v2.tar` reconstructed
+the full candidate, with the tracker file matching the base and `app.py`
+carrying the issue change. It reread the saved contract and three reports and
+matched their full digests. This observes normal candidate recovery for D6;
+missing artifacts and interrupted storage remain unexecuted D6 variants.

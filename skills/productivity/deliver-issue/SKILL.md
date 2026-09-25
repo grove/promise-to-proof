@@ -38,12 +38,19 @@ their respective judgments. This skill owns their handoffs, not their verdicts.
    distinct session/context IDs for each stage actually invoked; when planning
    is skipped, record the existing contract's saved identity instead. A stage
    report written by the enclosing context is not a stage invocation.
-   On Codex CLI, use separate `codex exec`
-   invocations for stages and `--sandbox read-only` for review and proof; never
-   resume or fork the implementation session as an independent verifier. Its
-   workspace sandbox may protect `.git`; an externally configured artifact
-   directory must be granted to the host (for example with `--add-dir`) before
-   starting delivery if that default is unwritable.
+   When the enclosing host exposes separate agent or terminal invocations,
+   launch stages directly through those host tools and retain their distinct
+   invocation IDs; do not start a nested CLI process just to obtain isolation.
+   On Codex CLI without such host tools, prove nested execution with a harmless
+   `codex exec --sandbox read-only -C <candidate checkout> <read-only probe>`
+   launched **from the enclosing session**; retain its exit status and distinct
+   session ID. Obtain host permission for the nested process if required; if it
+   remains unavailable, stop before implementation. Use fresh `codex exec`
+   invocations for each stage, with `--sandbox read-only` for review and proof;
+   retain their invocation output alongside the reports. Never resume or fork
+   the implementation session as an independent verifier. The workspace
+   sandbox may protect `.git`; grant an external artifact directory to the host
+   (for example with `--add-dir`) before starting if that default is unwritable.
 3. Record the issue, repository, branch, starting commit, and existing tracked
    and untracked work. Preserve unrelated work. When ownership of overlapping
    edits is unclear, stop before changing them. Do not stash, reset, clean, or
@@ -88,7 +95,10 @@ available, report storage pending instead of claiming a completed handoff.
    Record the exact contract text and revision, comparison base, and included
    working-tree scope. If unrelated dirty files exist, build the snapshot from
    the comparison-base tree plus **only** the issue-owned changes (including
-   relevant untracked files); do not archive the current checkout wholesale.
+   relevant untracked files); do not archive the current checkout wholesale or
+   reuse an implementation-stage archive made from it. For Git candidates,
+   export the full base tree to a disposable directory, overlay only the
+   authorized changed files, and leave excluded paths at their base bytes.
    Compare the saved snapshot file inventory and bytes to that declared scope,
    including base versions of excluded paths, before any handoff. Include the
    full base commit SHA and enough bytes to reconstruct its tree in another
