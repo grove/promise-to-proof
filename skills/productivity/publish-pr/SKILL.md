@@ -198,8 +198,17 @@ saved reports to an explicitly invoked `/merge-readiness`; do not invoke it.
 Do not wait for CI, mark the pull request ready, request reviewers, approve,
 merge, close the source issue, or edit the contract or reports.
 
-End with `Next step:` in plain language. For `PUBLISHED`, give
-`/merge-readiness <PR URL>` with the saved review and proof references. For
-`DRAFT`, ask for approval of the exact publication preview; for `PARTIAL`,
-name the remote identity or readback to verify; for `BLOCKED`, name the missing
-input or decision. Do not perform that action here.
+End with `Next step:` and one copy-ready action. For `PUBLISHED`, give
+`/merge-readiness <PR URL>` and identify the saved review and proof reports.
+For `DRAFT`, ask the user to authorize the exact preview, then give
+`/publish-pr <approved exact preview>; publish the draft PR`. For `PARTIAL`,
+give the applicable readback command to verify the remote state:
+
+```bash
+gh pr view <PR URL> --json url,headRefOid,baseRefName,title,body,isDraft
+gh pr list --head <branch> --json url,headRefOid,baseRefName,title,body,isDraft
+```
+
+Use `gh pr view` when the URL is known and `gh pr list` when only the branch
+is known. For `BLOCKED`, name the missing reference, authority, or decision.
+Do not perform the action here.

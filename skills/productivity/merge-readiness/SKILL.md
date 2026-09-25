@@ -61,7 +61,12 @@ head and base identities, contract revision, saved report references, required
 check and approval status, and the time of the observation. `READY` is advice
 about that state, not merge authorization; a later PR change needs another check.
 
-End with `Next step:` in plain language. For `READY`, tell the user to seek
-separate merge authorization under the repository's process for this PR state.
-For `BLOCKED` or `UNKNOWN`, give the smallest specific action, its required
-reference (such as a stale report or failing check), and who must do it.
+End with `Next step:` and one actionable instruction. For `READY`, ask for
+separate human merge authorization for this exact PR head; after authorization,
+name the repository's configured merge command (for example,
+`gh pr merge <PR URL>` only when direct GitHub CLI merge is the configured
+path) or the exact merge-queue action. For `BLOCKED` or `UNKNOWN`, give the
+full invocation and references for `/prove <contract>; candidate <candidate>`,
+`/review-implementation <candidate> against <base>`, or
+`/fix-pr <PR URL>` as applicable. For a shell check, give its exact command
+and expected result.

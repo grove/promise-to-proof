@@ -57,8 +57,9 @@ label mappings. Report what was configured, any missing labels or unsupported
 tracker, and what still needs a decision. A repeat invocation with unchanged
 answers should leave the files unchanged.
 
-End with `Next step:` in plain language. If approval or configuration is
-pending, name the exact decision, missing GitHub labels, or unsupported tracker.
-Once setup is verified, point to `/triage-issue <issue>` for an existing issue
-that needs routing, or `/plan-acceptance <source>` for an agreed source ready
-to plan.
+End with `Next step:` and one actionable instruction. If approval is pending,
+name the exact files and decision. For each missing GitHub label, give
+`gh label create "<label>" --repo <owner/repo>`. For an unsupported tracker,
+name that tracker and the setup capability it lacks. Once setup is verified,
+give `/triage-issue <issue URL>` for an existing issue or
+`/plan-acceptance <source reference>` for an agreed source ready to plan.

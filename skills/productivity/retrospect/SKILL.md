@@ -120,7 +120,10 @@ Acceptance: Unchanged. This report is not a proof verdict.
 <exact authorized and reread changes, or proposed changes pending; None if no learnings>
 ```
 
-After the report, end with `Next step:` in plain language. Ask for a human
-disposition on named pending suggestions or the missing evidence for a possible
-violation, with fresh `/review-implementation` and `/prove` when indicated.
-If there are no open suggestions or concerns, say no further action is needed.
+After the report, end with `Next step:` and one actionable instruction. For
+pending suggestions, ask the user to accept, reject, or rewrite the named
+suggestion IDs. For a possible violation, give
+`/review-implementation <exact candidate> against <comparison base>` and
+`/prove <saved contract>; candidate <exact candidate>`. If more evidence is
+needed, give its exact command and expected result. If nothing remains open,
+say no further action is needed.

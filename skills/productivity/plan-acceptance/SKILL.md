@@ -121,8 +121,10 @@ Evaluate every requirement against this contract revision and one fixed candidat
 Record actual evidence and verdicts in a separate proof report.
 ```
 
-After the contract, end with `Next step:` in plain language.
-Name the immediate save, approval, or gap to resolve. Once ready, give the
-applicable next skill and its input (usually
-`/implement-contract <saved contract reference>`, or optional
-`/audit-acceptance <contract> against <source>`). Do not invoke it.
+After the contract, end with `Next step:` and one copy-ready action. When the
+contract is saved, approved, and has no blocking gaps, give
+`/implement-contract <canonical contract reference>`; the optional audit is
+`/audit-acceptance <proposed contract> against <source>`. If saving or approval
+is pending, name the exact destination or proposal needing approval. If a row
+is `gap`, state its missing seam, oracle, or evidence input and do not direct
+the user to implementation until it is resolved. Do not invoke the next skill.
