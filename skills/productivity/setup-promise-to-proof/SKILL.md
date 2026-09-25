@@ -57,7 +57,8 @@ label mappings. Report what was configured, any missing labels or unsupported
 tracker, and what still needs a decision. A repeat invocation with unchanged
 answers should leave the files unchanged.
 
-End with `Next step:` and one actionable instruction. If approval is pending,
+End with `Next steps:` and a numbered list (`1.`, `2.`, ...) of applicable
+actions in order, so each can be referenced by number. If approval is pending,
 name the exact files and decision. For each missing GitHub label, give
 `gh label create "<label>" --repo <owner/repo>`. For an unsupported tracker,
 name that tracker and the setup capability it lacks. Once setup is verified,

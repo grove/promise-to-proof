@@ -183,10 +183,18 @@ Report storage: <retrievable destination, or proposed destination; storage pendi
 Review only; acceptance proof and merge readiness are separate.
 ```
 
-After the report, end with `Next step:` and one copy-ready action. For
-`REVIEWED`, if proof is missing give
-`/prove <saved contract>; candidate <exact candidate>`. If matching proof
-exists, give this publication preview invocation:
+After the report, end with `Next steps:` and a numbered list (`1.`, `2.`, ...)
+of only the applicable actions, in order, so each can be referenced by number.
+For `REVIEWED`, if proof is missing give
+`/prove <saved contract>; candidate <exact candidate>`. When matching full
+review and proof exist, state that acceptance evidence is complete for this
+candidate. For an existing PR near merge, give
+`/merge-readiness <PR URL>; review <saved review>; proof <saved proof>`.
+For an existing PR not yet near merge, mention any known pending gates and
+give `/merge-readiness <PR URL>; review <saved review>; proof <saved proof>`
+for when the PR approaches a merge decision; do not assess PR gates in this review.
+If no PR exists, say no further action is required unless publication is wanted;
+only then give this optional publication preview invocation:
 
 ```text
 /publish-pr <candidate handoff>; review <saved review>; proof <saved proof>; target <branch>; draft only

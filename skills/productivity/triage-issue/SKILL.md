@@ -71,8 +71,9 @@ Always give the reason, the actual versus proposed labels and state, and the
 next handoff. Name `/plan-acceptance` for missing acceptance, or the appropriate
 human/agent work when ready; do not invoke downstream skills automatically.
 
-End with `Next step:` and one copy-ready action. Ask for approval of the exact
-label preview when a write is pending. For missing acceptance, give
+End with `Next steps:` and a numbered list (`1.`, `2.`, ...) of applicable
+actions in order, so each can be referenced by number. Ask for approval of the
+exact label preview when a write is pending. For missing acceptance, give
 `/plan-acceptance <issue URL>`; for an issue ready for implementation, give
 `/implement-contract <issue URL>` with the saved contract reference. For
 `needs-info`, state the exact reporter question; for human-owned work, name the

@@ -93,7 +93,8 @@ Hand off to `/plan-acceptance <issue-reference>` and tell it to read the exact
 linked specification. Do not invoke it automatically. Issue creation is not
 acceptance planning, implementation readiness, or approval to split the work.
 
-End with `Next step:` and one copy-ready action. For `PUBLISHED`, give
+End with `Next steps:` and a numbered list (`1.`, `2.`, ...) of applicable
+actions in order, so each can be referenced by number. For `PUBLISHED`, give
 `/plan-acceptance <issue URL>` and identify the linked specification. For
 `DRAFT`, ask the user to approve the exact publication preview. For `PARTIAL`,
 give `gh issue view <issue number> --comments` to confirm the remote issue

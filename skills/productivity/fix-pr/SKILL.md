@@ -170,7 +170,8 @@ workflow reruns for the target PR or workflow run. It does not authorize
 force-pushes, changes outside the target branch, or workarounds that weaken
 verification.
 
-End with `Next step:` and one copy-ready action. For `FIXED`, refresh stale
+End with `Next steps:` and a numbered list (`1.`, `2.`, ...) of applicable
+actions in order, so each can be referenced by number. For `FIXED`, refresh stale
 reports with the applicable invocation below; when both match, give
 `/merge-readiness <PR URL>` with the saved report references.
 

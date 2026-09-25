@@ -61,7 +61,8 @@ head and base identities, contract revision, saved report references, required
 check and approval status, and the time of the observation. `READY` is advice
 about that state, not merge authorization; a later PR change needs another check.
 
-End with `Next step:` and one actionable instruction. For `READY`, ask for
+End with `Next steps:` and a numbered list (`1.`, `2.`, ...) of applicable
+actions in order, so each can be referenced by number. For `READY`, ask for
 separate human merge authorization for this exact PR head; after authorization,
 name the repository's configured merge command (for example,
 `gh pr merge <PR URL>` only when direct GitHub CLI merge is the configured

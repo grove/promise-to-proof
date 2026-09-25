@@ -121,7 +121,8 @@ Coverage: <material source promises and contract rows accounted for; limits>
 <state that the audit did not approve, save, revise, publish, implement, or prove the contract>
 ```
 
-After the report, end with `Next step:` and one copy-ready action. For
+After the report, end with `Next steps:` and a numbered list (`1.`, `2.`, ...)
+of applicable actions in order, so each can be referenced by number. For
 `READY_FOR_APPROVAL`, ask the user to approve the exact proposal by its source,
 revision, and text identity; after it is saved and reread, give
 `/implement-contract <saved contract reference>`. For `CHANGES_NEEDED`, give

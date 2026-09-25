@@ -198,8 +198,10 @@ saved reports to an explicitly invoked `/merge-readiness`; do not invoke it.
 Do not wait for CI, mark the pull request ready, request reviewers, approve,
 merge, close the source issue, or edit the contract or reports.
 
-End with `Next step:` and one copy-ready action. For `PUBLISHED`, give
-`/merge-readiness <PR URL>` and identify the saved review and proof reports.
+End with `Next steps:` and a numbered list (`1.`, `2.`, ...) of applicable
+actions in order, so each can be referenced by number. For `PUBLISHED`, give
+`/merge-readiness <PR URL>; review <saved review>; proof <saved proof>` for when
+the PR approaches a merge decision; name any known pending checks or approvals.
 For `DRAFT`, ask the user to authorize the exact preview, then give
 `/publish-pr <approved exact preview>; publish the draft PR`. For `PARTIAL`,
 give the read-only check for the uncertain effect. For a local commit or

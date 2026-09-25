@@ -267,6 +267,16 @@ invoke it. Use [acceptance case 12](./plan-acceptance-scenarios.md#12-check-stan
 to check bundled references and record the actual installation. Keep live tracker
 and CI cases separate and mark them unexecuted unless actually exercised.
 
+Repeat the successful review and proof in both invocation orders and inspect their
+numbered `Next steps:` lists. With no PR and no publication requested, pass when
+the result says no further action is required. When a new PR is requested, pass
+when it gives the optional `/publish-pr` preview. With a matching existing PR
+near merge, pass when it gives `/merge-readiness` with the saved reports instead
+of publication. With an existing PR still awaiting a check or approval, pass
+when it mentions any known pending gate and says when to run readiness without
+assessing PR gates itself. Each applicable action must have a number the user
+can refer to; none invokes the next skill.
+
 ## 15. Prove and repair the correct child or parent agreement
 
 Use the upload parent and two children from [slicing T20](./slice-contract-scenarios.md#t20-install-alone-and-preserve-the-two-child-delivery-chain).
