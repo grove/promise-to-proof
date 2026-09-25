@@ -16,6 +16,27 @@ asked for. Promise to Proof grew out of that experience: give the developer
 responsible for the result a way to check that the agreed behavior was delivered,
 without unapproved scope, on the exact code being accepted.
 
+## Where we want to go
+
+The ambition is to automate the entire Promise to Proof process, from the
+acceptance contract through implementation, review, proof, and repair, and to
+verify that the automation cannot claim success on stale evidence or take
+unauthorized actions. `/deliver-issue` coordinates these steps today, but the
+workflow is not yet formally verified or fully automated.
+
+A first step is to model the `/deliver-issue` lifecycle in
+[FizzBee](https://fizzbee.io/design/tutorials/getting-started/). Its state-machine
+model could check that review and proof refer to the same contract and candidate,
+that stale proof never yields success, and that blocked or repairable paths do
+not silently become done. It could also check for deadlocks and whether delivery
+can make progress. FizzBee's
+[model-based testing](https://fizzbee.io/testing/tutorials/quick-start/) could
+then exercise a deterministic orchestration layer against paths from the model.
+That integration still needs to be built: verifying a model does not prove that
+the running workflow follows it. TLA+ offers a more mature path to mechanically
+checked proofs, but a maintained FizzBee model connected to executable tests is
+the first goal here.
+
 Issues and specifications for this repository live in [GitHub Issues](https://github.com/grove/promise-to-proof/issues).
 
 ## How Promise to Proof works
