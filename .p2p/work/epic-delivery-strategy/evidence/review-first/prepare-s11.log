@@ -1,0 +1,6 @@
+{
+  "repo": "/private/tmp/p2p-review-epic-delivery/s11-interaction/repo",
+  "request": "/private/tmp/p2p-review-epic-delivery/s11-interaction/request.md",
+  "oracle_withhold": "/private/tmp/p2p-review-epic-delivery/s11-interaction/oracle.json",
+  "tracker_log": "/private/tmp/p2p-review-epic-delivery/s11-interaction/calls.jsonl"
+}

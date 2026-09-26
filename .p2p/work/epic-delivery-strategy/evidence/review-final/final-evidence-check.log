@@ -1,0 +1,13 @@
+final retention entries verified 180
+S9-post-effect one base-only effect, later readback, preserved PR fields, exact plan 89c07679eeb571d6fddf1a85067c69c24571efd4d503845851d4fb1048725575
+S9-interrupted one base-only effect, later readback, preserved PR fields, exact plan b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2
+capture capture: PASS
+lookup lookup: PASS
+summary summary: PASS
+parent exit 1 Traceback (most recent call last):
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/repair-final-supplement/S11-parent-only/repo/check.py", line 13, in <module>
+    assert greet('Ada') == 'Welcome Ada'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+S11 actual checks, child/parent report separation and zero-effects gates match

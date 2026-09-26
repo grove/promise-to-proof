@@ -315,3 +315,13 @@ blocker for S1 or S3, and does not create blocker edges from sequence alone. All
 original parent text remains unchanged outside the managed section, and readback
 confirms the saved links and sequence. Repeat unchanged in a fresh session; it
 reuses the same section and tickets with zero writes.
+
+## Epic delivery strategy scenarios
+
+S1–S5, S7–S10, S13–S14: recommend and retain destinations, revise strategy while preserving work and authority, and recover approved plans.
+
+Use the [disposable epic fixtures](./epic-delivery-scenarios.md) and its fresh
+installed-skill invocation procedure. Keep its oracle out of actor input. Inspect
+saved plan/report identities, actual Git refs, and controlled tracker call logs
+as well as the response. Follow the listed variants and positive verification
+phases; a baseline blocker alone does not execute the whole source scenario.

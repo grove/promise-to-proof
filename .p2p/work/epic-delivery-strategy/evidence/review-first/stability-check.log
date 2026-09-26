@@ -1,0 +1,25 @@
+{
+  "candidate_manifest": {
+    "entries": 130,
+    "complete_inventory_bytes_modes_symlinks": "unchanged"
+  },
+  "base_manifest": {
+    "entries": 127,
+    "complete_inventory_bytes_modes_symlinks": "unchanged"
+  },
+  "candidate": "snapshot:sha256:8ff16e4594d451c80b5c1cb7225874bb89b4190a6448dba86ee146e025ab0dd8",
+  "base": "5e369c1b45ba817b8add6b20a9b7b1c97898fa12",
+  "contract": "78cad1d7f85183100214da15fdc8418ed2220ce1af80764d648e139fdd899895",
+  "binding_inputs": [
+    {
+      "path": "plans/epic-delivery-strategy-spec.md",
+      "sha256": "7a231d84f739a459f770870d23038fbc4946c759f04241c87f2a6322d9a1645e"
+    }
+  ],
+  "protocol_copies": {
+    "count": 17,
+    "sha256": "c916e48be9de29f423716518dc290a64b9c667bdf42b40da87dc346853957b43",
+    "all_match": true
+  },
+  "base_manifest_record_sha256": "2b4320ec8d952a8e02cad14c4ee2d7d0a6a0409a1011b33a6c247a5d8f68b030"
+}

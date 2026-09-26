@@ -1,0 +1,76 @@
+{
+  "label": "Development checks, not independent acceptance or live GitHub validation",
+  "contract": {
+    "path": "work/epic-delivery-strategy.md",
+    "revision": "v1",
+    "sha256": "78cad1d7f85183100214da15fdc8418ed2220ce1af80764d648e139fdd899895"
+  },
+  "comparison_base": "5e369c1b45ba817b8add6b20a9b7b1c97898fa12",
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s checks -p 'test_*.py'",
+      "outcome": "passed, 29 tests in 139.274s; P2P filesystem checks passed",
+      "evidence": "repository-unittest.log",
+      "qualification": "Final routing_records historical-link/binary guard subsequently checked by focused transfer test"
+    },
+    {
+      "command": "python3 -m unittest discover -s checks -p 'test_p2p_delivery.py' -k child_routing_transfers_plan",
+      "outcome": "passed, 1 test in 11.365s",
+      "evidence": "routing-history-test.log"
+    },
+    {
+      "command": "python3 checks/test_p2p_delivery.py",
+      "outcome": "passed, expanded 25 tests in 156.872s before final history-link guard; all final affected behavior covered by focused rerun"
+    },
+    {
+      "command": "python3 checks/epic_delivery_fixture.py self-check",
+      "outcome": "PASS: persisted edit, lost response, readback, exact effect count, concurrent change",
+      "qualification": "controlled tracker plumbing, not agent behavior"
+    },
+    {
+      "command": "git diff --check",
+      "outcome": "passed"
+    },
+    {
+      "command": "Compare every skills/**/references/acceptance-contract-protocol.md resolved bytes with docs/acceptance-contract-protocol.md",
+      "outcome": "all 17 paths match",
+      "sha256": "c916e48be9de29f423716518dc290a64b9c667bdf42b40da87dc346853957b43"
+    }
+  ],
+  "regression": {
+    "test": "DeliveryTests.test_child_starting_tree_is_target_not_unrelated_head",
+    "prior_controller": "git show 5e369c1b45ba817b8add6b20a9b7b1c97898fa12:skills/productivity/deliver-issue/scripts/p2p_delivery.py",
+    "method": "Load new test module, compile prior controller into its d module, run that one unittest with fake transport.",
+    "observed_failure": "AssertionError: 'sibling.txt' unexpectedly found in ['.gitignore', 'greet.py', 'sibling.txt', 'spec.txt', 'work/parent.md', 'work/tiny.md']",
+    "meaning": "The original controller imported unrelated committed HEAD content instead of starting from the approved destination."
+  },
+  "files": {
+    "README.md": "33a95c3d7fc3917ef13fa779c9cc874d335fb9e63f1a01ab93a8c5e852e5c2a0",
+    "checks/deliver-issue-scenarios.md": "f851f29e9e926e6f190afff05dca3918053242ef0d56dec0e3506ce3cc8d8685",
+    "checks/epic-delivery-scenarios.md": "5262eed09ccea2035534e137ff97d5c04c791b539950453989d8aa920bc48ea7",
+    "checks/epic_delivery_fixture.py": "935f65f0ca1ef5a7010bdd76b6681760062c0768498f28df72cc8ff15c926499",
+    "checks/implement-contract-scenarios.md": "c983eadc25cfd763b206ce0233caa15c065f15ca23bf51058e997a7430cdee6d",
+    "checks/merge-readiness-scenarios.md": "1cb448dccbfb00f53d557a1910f19fa8b86a961494a3bc93dd78e6b834a363f3",
+    "checks/publish-pr-scenarios.md": "d88b542a2774a23b4dbfdb40e033b9cb2044aed70afe129305457b658f00dfb8",
+    "checks/review-implementation-scenarios.md": "1f77b65b0ea81e8261fbb6e147ef7792a7db70ef344f5171b2f720cc1e7a911d",
+    "checks/slice-contract-scenarios.md": "ec9604fb5270ab255df2ad11e4aafd07cc99b181f5aaaa521a9b7cf9604d6ef9",
+    "checks/test_p2p_delivery.py": "382aea75d5f39abb571669d2488cf2dfd193225fbe851887cdf915cba58947e3",
+    "docs/acceptance-contract-protocol.md": "c916e48be9de29f423716518dc290a64b9c667bdf42b40da87dc346853957b43",
+    "docs/faq.md": "2255a81bb61d344bce74c5ccbd053b240561a89c00ee56abb61b0373c06087fa",
+    "docs/how-to.md": "3b9e3fef057d65011f14bfbd18dec1373f61f1989f04272c1fd829bd4a7076ec",
+    "docs/p2p-delivery-controller.md": "950c96adf321602e00206ec3cdea79ff1c3e8c923681a45efd202d827c9adfff",
+    "skills/productivity/deliver-issue/SKILL.md": "94bc54a55394cb9ccd742969d8490bc4e4ce4571ed42f7177fcbff483e43d824",
+    "skills/productivity/deliver-issue/scripts/p2p_delivery.py": "fe25bd3a3199877fb861086b603a239afa948cad99cf41f5aab5309db6ca5e18",
+    "skills/productivity/implement-contract/SKILL.md": "c66733017ad8c36f1ef44ef34155b920e5c6dc3142ce339c744a4d5bb4f5d9ca",
+    "skills/productivity/merge-readiness/SKILL.md": "3a850ef664fe403dd6879c9a4f174d42d44b98bee2ade528c6d6fe70f4f3569d",
+    "skills/productivity/prove/SKILL.md": "5318975b96357bb6faa2c77f8ddf418cb4920fce9af5453e298b678fcb53f158",
+    "skills/productivity/publish-pr/SKILL.md": "cf9dcc91fe43e0ff75967b316abacdb02503e2d0f49f67c1ad54ccac869aabb0",
+    "skills/productivity/review-implementation/SKILL.md": "eabc51ad2ec4cb31aee379cc89a10b200f186cff730cc62ec25568a895a9b5ca",
+    "skills/productivity/slice-contract/SKILL.md": "72c3aa33935bf36af16e6a03f546e4cd44ccafd376014df37bd30bf290b6087a"
+  },
+  "limitations": [
+    "Actual installed-skill S1\u2013S14 observations are owned by the enclosing delivery and remain separate from these tests.",
+    "No live GitHub mutation or compatibility validation executed.",
+    "No source-repository commit, branch change, push, PR, issue, merge, or deployment effect."
+  ]
+}

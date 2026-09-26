@@ -1,0 +1,145 @@
+Actual setup invocation: python3 ../setup-run.py. It completed local branch creation, one non-force push, both readback assertions, and helper save/readback of delivery.md before failing at recovery resume (missing --base; exit 2). First-run stdout was captured in process memory and lost on exception; no fabricated raw output is supplied. Exact executed setup script follows:
+from pathlib import Path
+import subprocess,hashlib,re
+root=Path.cwd(); case=root.parent; helper=case/'installed/deliver-issue/scripts/p2p_filesystem.py'; sha='99faa2ff62394a0d48d13f45d29a5edffb1f8069'; ref='refs/heads/epic/example'; origin=str(case/'origin.git'); log=['Earlier preflight assertion failed before effects: section extraction omitted final newline; corrected to exact heading-to-next-heading bytes.']
+def run(*args,ok=(0,)):
+ p=subprocess.run(args,cwd=root,text=True,capture_output=True); log.append('$ '+' '.join(args)+'\nexit='+str(p.returncode)+'\n'+p.stdout+p.stderr); assert p.returncode in ok,log[-1]; return p.stdout.strip()
+def plan():
+ s=re.search(rb'^## Approved delivery plan\n.*?(?=^## |\Z)',(root/'.p2p/work/parent/slicing.md').read_bytes(),re.M|re.S).group(); assert hashlib.sha256(s).hexdigest()=='5e7f311257d42bc1e336a7cb1318dff9c65e2d2114a4e9ece793fa888ff148a6'; log.append('EXACT APPROVED PLAN\n'+s.decode()); log.append('GRANT\n'+(case/'evaluator-setup-grant.md').read_text())
+def save(name,text):
+ tmp=case/'setup-stage.tmp'; tmp.write_text(text); run('python3',str(helper),'--repo',str(root),'save','work/lookup.md',name,'--from',str(tmp)); assert (root/'.p2p/work/lookup'/name).read_text()==text; tmp.unlink()
+plan(); branch=run('git','branch','--show-current'); head=run('git','rev-parse','HEAD'); status=run('git','status','--porcelain'); assert run('git','remote','get-url','--push','origin')==origin; assert run('git','rev-parse',sha+'^{commit}')==sha
+assert not run('git','show-ref','--verify','--hash',ref,ok=(0,1,128)); assert not run('git','ls-remote',origin,ref)
+plan(); run('git','branch','epic/example',sha); assert run('git','rev-parse',ref)==sha
+plan(); assert not run('git','ls-remote',origin,ref); run('git','push','origin',ref+':'+ref); assert run('git','ls-remote',origin,ref)==sha+'\t'+ref; assert run('git','rev-parse',ref)==sha
+identities='\n'.join(str(p)+' sha256:'+hashlib.sha256((root/p).read_bytes()).hexdigest() for p in map(Path,['work/lookup.md','work/parent.md','specs/registry.md']))
+report=f'''# Setup complete; delivery stages pending
+Agent context: /root/scenario_setup_application
+Repository: {root}
+Branch: {branch}; unchanged HEAD: {head}
+Initial status: {status!r}
+Contract revision: v1
+{identities}
+Active plan: .p2p/work/parent/slicing.md v1 sha256:5e7f311257d42bc1e336a7cb1318dff9c65e2d2114a4e9ece793fa888ff148a6
+Destination: epic/example; final destination: trunk.
+Approved integration start, actual local/remote target, comparison base: {sha}
+Existing candidate record: git:{sha}; no new candidate captured.
+Explicit authority: ../evaluator-setup-grant.md; exact grant and approved section retained in setup-command-evidence.txt.
+Actual effects: one local refs/heads/epic/example created, one non-force push to {origin}; both full SHAs read back successfully. No branch switch, commit, merge, tracker request, live network, or product edit.
+Capture prerequisite: inspected registry.py at HEAD, capture returns lower-case key and original value. This is inspection, not independent proof.
+Installed helper resolve succeeded. Optional p2p_delivery.py --help failed because {case.parent}/checks/verify_acceptance_bundle.py is missing; setup follows installed SKILL.md directly. No controller admission claimed.
+No implementation/review/proof stage invoked or acceptance claimed. Prior blocked handoff retained through installed helper save history.
+Next steps:
+1. Resume deliver-issue work/lookup.md for required host-isolation check and delivery stages; setup-only grant requires stopping here.
+'''
+save('delivery.md',report)
+log.append('REPEAT SETUP/RECOVERY UNDER UNCHANGED GRANT'); plan(); run('python3',str(helper),'--repo',str(root),'resume','work/lookup.md'); assert run('git','rev-parse',ref)==sha; assert run('git','ls-remote',origin,ref)==sha+'\t'+ref; assert run('git','rev-parse','HEAD')==head; assert run('git','branch','--show-current')==branch; assert run('git','status','--porcelain')==status
+report+='\nRepeat outcome: both exact refs already existed and were reused after readback. Zero duplicate creation or push commands. First-run report preserved in helper history. Setup/recovery complete.\n'
+save('delivery.md',report); save('setup-actor-report.md',report); save('setup-command-evidence.txt','\n'.join(log)); (case/'setup-actor-report.md').write_text(report); (case/'setup-command-evidence.txt').write_text('\n'.join(log)); print(report)
+
+## Approved delivery plan
+Plan revision: v1
+Approval source: Fixture owner approved these exact destinations and parent completion conditions in setup receipt approval.md. Strategy authority only; no ref or PR effects.
+Parent: work/parent.md
+Final destination: trunk
+Integration branch: epic/example
+Integration start: 99faa2ff62394a0d48d13f45d29a5edffb1f8069
+Default choice: grouped
+
+| Child | Choice | Destination | Reason | State |
+|---|---|---|---|---|
+| work/capture.md | grouped | epic/example | Must ship with the parent | remaining |
+| work/lookup.md | grouped | epic/example | Must ship with the parent | remaining |
+| work/summary.md | grouped | epic/example | Must ship with the parent | remaining |
+
+Parent completion: All parent requirements, including R4 composition, need review and proof on one exact assembled candidate. Grouped parent publication also requires full matching parent reports.
+Pending actions: Create epic/example at 99faa2ff62394a0d48d13f45d29a5edffb1f8069 only under branch setup authority.
+
+
+# Disposable fixture setup authority
+The evaluator authorizes the consuming deliver-issue workflow to create local refs/heads/epic/example at exactly 99faa2ff62394a0d48d13f45d29a5edffb1f8069, then push that same ref without force only to this fixture's local bare origin /private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/origin.git. Recheck the approved plan and starting object before effects. If a ref already exists, inspect it without overwrite. Read back both refs and record actual effects. This grant covers repeat/recovery inspection but never duplicate or conflicting creation. No merge, product change, real network, or tracker mutation is authorized. Stop after setup/recovery and hand off the delivery stages.
+
+$ python3 /private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/installed/deliver-issue/scripts/p2p_filesystem.py --repo /private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/repo resume work/lookup.md --base 99faa2ff62394a0d48d13f45d29a5edffb1f8069
+exit=0
+{
+  "candidate": {
+    "commit": "99faa2ff62394a0d48d13f45d29a5edffb1f8069",
+    "comparison_base": "99faa2ff62394a0d48d13f45d29a5edffb1f8069",
+    "work_item": "work/lookup.md",
+    "work_item_sha256": "fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9",
+    "binding_inputs": [
+      {
+        "path": "specs/registry.md",
+        "sha256": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9"
+      },
+      {
+        "path": "work/parent.md",
+        "sha256": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada"
+      }
+    ]
+  },
+  "work_item": "work/lookup.md",
+  "artifact_directory": ".p2p/work/lookup",
+  "binding_inputs": [
+    {
+      "path": "specs/registry.md",
+      "sha256": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9"
+    },
+    {
+      "path": "work/parent.md",
+      "sha256": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada"
+    }
+  ],
+  "children": [],
+  "artifacts": [
+    ".p2p/work/lookup/candidate.json",
+    ".p2p/work/lookup/delivery.md",
+    ".p2p/work/lookup/evidence/scenario-command-evidence.txt",
+    ".p2p/work/lookup/history/5e420a6811b98408729b73b000ac562e6f4c0c1c5cddeb3ea517afc14578c297/delivery.md",
+    ".p2p/work/lookup/history/b6d4cdd69b1a9b741fe64c32e500ff6ab1c68243fa6f036d4eee202d3337832b/delivery.md",
+    ".p2p/work/lookup/implementation.md",
+    ".p2p/work/lookup/publication.md"
+  ]
+}
+
+Recovery inspection pass 1; no ref mutation
+$ git rev-parse refs/heads/epic/example
+exit=0
+99faa2ff62394a0d48d13f45d29a5edffb1f8069
+
+$ git ls-remote /private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/origin.git refs/heads/epic/example
+exit=0
+99faa2ff62394a0d48d13f45d29a5edffb1f8069	refs/heads/epic/example
+
+Recovery inspection pass 2; no ref mutation
+$ git rev-parse refs/heads/epic/example
+exit=0
+99faa2ff62394a0d48d13f45d29a5edffb1f8069
+
+$ git ls-remote /private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/origin.git refs/heads/epic/example
+exit=0
+99faa2ff62394a0d48d13f45d29a5edffb1f8069	refs/heads/epic/example
+
+$ git rev-parse HEAD
+exit=0
+99faa2ff62394a0d48d13f45d29a5edffb1f8069
+
+$ git branch --show-current
+exit=0
+trunk
+
+$ git status --porcelain
+exit=0
+?? .p2p/
+
+$ python3 /private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/installed/deliver-issue/scripts/p2p_filesystem.py --repo /private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/repo save work/lookup.md delivery.md --from /private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/setup-stage.tmp
+exit=0
+{
+  "saved": ".p2p/work/lookup/delivery.md"
+}
+
+$ python3 /private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/installed/deliver-issue/scripts/p2p_filesystem.py --repo /private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/repo save work/lookup.md setup-actor-report.md --from /private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/setup-stage.tmp
+exit=0
+{
+  "saved": ".p2p/work/lookup/setup-actor-report.md"
+}

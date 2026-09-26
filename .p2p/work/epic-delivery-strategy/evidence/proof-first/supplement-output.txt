@@ -1,0 +1,8 @@
+Supplement retained files exact hashes: 336
+S9-default effects 1 final base epic/example
+Exact one base edit persisted despite exit 1; body preserved; successful subsequent readback; no duplicate
+S9-stale-plan effects 0 final base trunk
+S9-concurrent-body effects 0 final base trunk
+S9-after-effect effects 0 final base trunk
+COUNTEREXAMPLE S9-default exact b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2 reported b67b46a4cba48649504916d2b2e873fdc0fc642d0f7fdfa7a32b41fd27cf79cd
+COUNTEREXAMPLE S12-default exact 6ddc21b5453e16b607299bb1789e3ad93a137c9442ddb373b1665302d16e25f5 reported 39b3fe1ae2b4f26df4b9e1eed5e4741e151b23a2b8424ff0aa4e404a1bc6b6eb

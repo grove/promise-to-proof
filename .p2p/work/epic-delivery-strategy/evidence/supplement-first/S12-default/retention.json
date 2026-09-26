@@ -1,0 +1,127 @@
+{
+  "phase": "Supplement after strategy activation, retarget retry and publication/readiness scenarios; before repair",
+  "case": "/private/tmp/p2p-epic-behavior-myclau41/S12-default",
+  "files": [
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/actor-report.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/actor-report.md",
+      "sha256": "dfe91db8c2d02e344a0334fdfd168e06a6117638065e230cf04aafd9607f1d4f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/calls.jsonl",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/calls.jsonl",
+      "sha256": "36804008b366ae4453e2b140428bc886e0f70e06129f690c70fca0ea70158a6e"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/fixture.bundle",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/fixture.bundle",
+      "sha256": "5e94af9c878e5707b24afd9baea707f834de96964513395be24cdc8455f26386"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/gate-actor-report.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/gate-actor-report.md",
+      "sha256": "637e179b71dca9baf91b60b5eee20fefc62bc53a276ca2e7ce616f7de59a4997"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/gate-command-log.jsonl",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/gate-command-log.jsonl",
+      "sha256": "98aecf5f1fb2c2b7466ff3271955f8363758bcae1e175f0d9b9f0ea54370e05a"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/gate-publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/gate-publication.md",
+      "sha256": "8037630bfff8871b7fb50d2972f7799b673e7c9bdeca1bbcd0bd42f7760cb4e0"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/gate-review.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/gate-review.md",
+      "sha256": "6b52851864c28e604e6a3625b17b672069f853c73da5501657491881f37d863c"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/oracle.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/oracle.json",
+      "sha256": "0e7cb8d6621afcc9cf6aa51aa4ea665c2a8468abecf34c92e3c88159dec5c4d4"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/repo/.p2p/work/lookup/candidate.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/repo/.p2p/work/lookup/candidate.json",
+      "sha256": "a1e23fd52bac98b4333f5b5b9fdfc4262800350b8e4784a4476ba6c73ca3c89b"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/repo/.p2p/work/lookup/implementation.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/repo/.p2p/work/lookup/implementation.md",
+      "sha256": "6aa1e2c79e802e55c2b127ecac9fbe08e7ceca04108cfd69b11cc34fa0f910ce"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/repo/.p2p/work/lookup/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/repo/.p2p/work/lookup/publication.md",
+      "sha256": "4ca7514ac9c1f964801e10dd54d50de6da26e0ec0225d54a7a0e713e79d015ff"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/repo/.p2p/work/parent/approval.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/repo/.p2p/work/parent/approval.md",
+      "sha256": "7b14282140fcc3f4926cb8a6b78a179b82a90ed1310116ac1bcd486884dfcddd"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/repo/.p2p/work/parent/candidate.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/repo/.p2p/work/parent/candidate.json",
+      "sha256": "2e24590e4c9aa36beb6912d9ef3d438dad3cbbe5d966b54219e68d3999927684"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/repo/.p2p/work/parent/evidence/commands.txt",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/repo/.p2p/work/parent/evidence/commands.txt",
+      "sha256": "5bd29274627752973b844453f25c7f29ce3e8c17d576e8690169d7788fa6033e"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/repo/.p2p/work/parent/evidence/gate-command-log.jsonl",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/repo/.p2p/work/parent/evidence/gate-command-log.jsonl",
+      "sha256": "c7165f20f43a9edfc4831e819d1246875dc520378bce3570ee2c37e95400dd6f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/repo/.p2p/work/parent/implementation.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/repo/.p2p/work/parent/implementation.md",
+      "sha256": "e1b5d9a564fc0421b67e379cc0b204fc68f319f1214d71ade3adb44daf2c621a"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/repo/.p2p/work/parent/proof.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/repo/.p2p/work/parent/proof.md",
+      "sha256": "ef267ca938ad63326849aa1c18602f44a55b1c1a254fe261c23bce38252ed62d"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/repo/.p2p/work/parent/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/repo/.p2p/work/parent/publication.md",
+      "sha256": "8037630bfff8871b7fb50d2972f7799b673e7c9bdeca1bbcd0bd42f7760cb4e0"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/repo/.p2p/work/parent/review.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/repo/.p2p/work/parent/review.md",
+      "sha256": "6b52851864c28e604e6a3625b17b672069f853c73da5501657491881f37d863c"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/repo/.p2p/work/parent/slicing.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/repo/.p2p/work/parent/slicing.md",
+      "sha256": "cf51505215ced589ee0bd5798c21c5d1ccd95c1e4f2352a79d97273cea474dc6"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/request.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/request.md",
+      "sha256": "51e4b96ceedc34fa5b76a28a3125cc9f53b94097b2399fd2e9ea3e13dfc335f0"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/supplement-fixture.bundle",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/supplement-fixture.bundle",
+      "sha256": "5e94af9c878e5707b24afd9baea707f834de96964513395be24cdc8455f26386"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/tracker.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/tracker.json",
+      "sha256": "d2e6d6281631636c0ed673c947088e665d1e36bcbb9d2ecd86b60c0ebf228615"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-behavior-myclau41/S12-default/tracker.py",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S12-default/tracker.py",
+      "sha256": "935f65f0ca1ef5a7010bdd76b6681760062c0768498f28df72cc8ff15c926499"
+    }
+  ],
+  "limits": "S9-after-effect injection occurred BEFORE edit; it proves stale rejection only. S11 child checks are weakened and do not prove individually complete children. Actor IDs reside in actor reports. Simulated tracker only."
+}

@@ -1,0 +1,32 @@
+{
+  "case": "/private/tmp/p2p-epic-valid-v1isv6j3/S7-default",
+  "files": [
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S7-default/continuation-actor-report.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S7-unaffected/continuation-actor-report.md",
+      "sha256": "b91ca0888c2e20c8af296ee63f670113be919bbdc78d4104a5480e10aae3629e"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S7-default/handoff-command-evidence.jsonl",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S7-unaffected/handoff-command-evidence.jsonl",
+      "sha256": "eecd679c6d0d1c5ca0a36343b1bc28c04c259763bba748b5c79d8deb1893955f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S7-default/repo/.p2p/work/capture/implementation.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S7-unaffected/repo/.p2p/work/capture/implementation.md",
+      "sha256": "cc26be57b4bdfd3b0a980fecf281d0b9850d4c1230c7c3f3aef50a7c8a1a1cce"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S7-default/repo/.p2p/work/capture/candidate.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S7-unaffected/repo/.p2p/work/capture/candidate.json",
+      "sha256": "8d1e1a33f02818f96ecc9d216fa2e5fc2ac88cb8b568ac9060fa1efc8e76aa5c"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S7-default/repo/.p2p/work/capture/history/0cfce7673eb3bb6872a11690600f250ced7972e82b01bb323111c022ac473e74/implementation.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S7-unaffected/repo/.p2p/work/capture/history/0cfce7673eb3bb6872a11690600f250ced7972e82b01bb323111c022ac473e74/implementation.md",
+      "sha256": "0cfce7673eb3bb6872a11690600f250ced7972e82b01bb323111c022ac473e74"
+    }
+  ],
+  "base_records": "evidence/supplement-first/S7-default and supplement-notes",
+  "note": "Unaffected capture child continuation actual actor /root/scenario_remaining_handoffs; no product/ref/tracker edits"
+}

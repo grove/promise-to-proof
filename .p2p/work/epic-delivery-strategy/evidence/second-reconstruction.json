@@ -1,0 +1,14 @@
+{
+  "candidate": {
+    "entries": 130,
+    "sha256": "7e5c54fa4183651c94b4f6b83bea7cc841b2722a5693047c5c8be8faaf8f41e8"
+  },
+  "base": {
+    "entries": 127,
+    "sha256": "60b794847ee5831aba43cbd702b15e4ba8938930a244a14b19f5f43a27a8d416"
+  },
+  "candidate_key": "snapshot:sha256:7e5c54fa4183651c94b4f6b83bea7cc841b2722a5693047c5c8be8faaf8f41e8",
+  "base_commit": "5e369c1b45ba817b8add6b20a9b7b1c97898fa12",
+  "contract_sha256": "78cad1d7f85183100214da15fdc8418ed2220ce1af80764d648e139fdd899895",
+  "method": "Materialized complete manifests, checked inventory, exact bytes, modes and literal symlinks; no .p2p product entries."
+}

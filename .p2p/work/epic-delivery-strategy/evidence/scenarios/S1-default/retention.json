@@ -1,0 +1,130 @@
+{
+  "actor": "/root/scenario_routing_batch",
+  "case": "S1-default",
+  "original_root": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default",
+  "assertion": "no-effects",
+  "assertion_exit": 0,
+  "assertion_output": "PASS: no-effects effect assertions; separately inspect skill verdicts and identities\n",
+  "retained_files": [
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/tracker.json",
+      "retained": "evidence/scenarios/S1-default/tracker.json",
+      "sha256": "6c0356699061380c40dc3dbe555e1b535f383ad70f40439fbe7d7a37fa74b897"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/actor-context.txt",
+      "retained": "evidence/scenarios/S1-default/actor-context.txt",
+      "sha256": "b28b5c1ac084cc38874d90a69c814f1935ed7e92fe6e9f30582cf70e86f53b28"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/oracle.json",
+      "retained": "evidence/scenarios/S1-default/oracle.json",
+      "sha256": "1f445016a6491da4bf4fcdacffd7ca0358acad0541b59f81da628d01a4ad2fdc"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/command-evidence.txt",
+      "retained": "evidence/scenarios/S1-default/command-evidence.txt",
+      "sha256": "8163a8e39588cd6b27a09ebe7ad64e1331c6a22e599714b6af208c5c0bf6d55a"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/actor-report.md",
+      "retained": "evidence/scenarios/S1-default/actor-report.md",
+      "sha256": "a52073ff7c580eddfb969d79509ac478aee12f08fa28631e80d1e64b235b6cb9"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/stage-inspection.md",
+      "retained": "evidence/scenarios/S1-default/stage-inspection.md",
+      "sha256": "cbd3b5045a5764a393158e38e5c26c1f2667b508718f7145a8a0e45688f5a3d2"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/tracker.py",
+      "retained": "evidence/scenarios/S1-default/tracker.py",
+      "sha256": "8ca955a03ceafd32088bc6cd2f83ec2cd7b17bb638124e3edbe9e60c61ac0ac6"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/candidate-validation.json",
+      "retained": "evidence/scenarios/S1-default/candidate-validation.json",
+      "sha256": "85a93895d27394b91d176a890b2baa5202f0928fd83b77638f7f740c28934433"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/request.md",
+      "retained": "evidence/scenarios/S1-default/request.md",
+      "sha256": "76464e56375aae6eff4ddbfbe16ac23d585771d35f2eebbe51b238c9348c491d"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/calls.jsonl",
+      "retained": "evidence/scenarios/S1-default/calls.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/stage-slicing-draft.md",
+      "retained": "evidence/scenarios/S1-default/stage-slicing-draft.md",
+      "sha256": "444687908a5f82a443510ef1b5e3ea1889927ce31d571e71227f4bd7ffb8c420"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/fixture.bundle",
+      "retained": "evidence/scenarios/S1-default/fixture.bundle",
+      "sha256": "c1855a1b3882eeab9c3d1857de6c68635da6cb3b6a1ea12d31f64ebf493054b9"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/repo/.p2p/work/lookup/publication.md",
+      "retained": "evidence/scenarios/S1-default/repo/.p2p/work/lookup/publication.md",
+      "sha256": "d89736f8e9a1a4fc86235e12f12b6d3ff0fd31d0f23a9c57e1eed0b5c1ac60ed"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/repo/.p2p/work/lookup/implementation.md",
+      "retained": "evidence/scenarios/S1-default/repo/.p2p/work/lookup/implementation.md",
+      "sha256": "18bb43da143d392ef3bb73a3ea19a7ddb431c96d7385aae2ada2ec710499b9a9"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/repo/.p2p/work/lookup/candidate.json",
+      "retained": "evidence/scenarios/S1-default/repo/.p2p/work/lookup/candidate.json",
+      "sha256": "6f60c374051299c3f83e6951cad4e6d0ce3676c6e64e1726d880b4d1677554ae"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/repo/.p2p/work/solo/inspection.md",
+      "retained": "evidence/scenarios/S1-default/repo/.p2p/work/solo/inspection.md",
+      "sha256": "cbd3b5045a5764a393158e38e5c26c1f2667b508718f7145a8a0e45688f5a3d2"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/repo/.p2p/work/parent/slicing-draft.md",
+      "retained": "evidence/scenarios/S1-default/repo/.p2p/work/parent/slicing-draft.md",
+      "sha256": "444687908a5f82a443510ef1b5e3ea1889927ce31d571e71227f4bd7ffb8c420"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/repo/.p2p/work/parent/implementation.md",
+      "retained": "evidence/scenarios/S1-default/repo/.p2p/work/parent/implementation.md",
+      "sha256": "a68754c721200a16b38a94ea5094ddfeb4f2a4b07bb01bdccd84af0fd397dd1f"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/repo/.p2p/work/parent/approval.md",
+      "retained": "evidence/scenarios/S1-default/repo/.p2p/work/parent/approval.md",
+      "sha256": "7b14282140fcc3f4926cb8a6b78a179b82a90ed1310116ac1bcd486884dfcddd"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/repo/.p2p/work/parent/candidate.json",
+      "retained": "evidence/scenarios/S1-default/repo/.p2p/work/parent/candidate.json",
+      "sha256": "eab92961661f473a99f213478dda56471fc5b8676a12e4f263f3b712f789f00a"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/repo/.p2p/work/parent/slicing.md",
+      "retained": "evidence/scenarios/S1-default/repo/.p2p/work/parent/slicing.md",
+      "sha256": "cf51505215ced589ee0bd5798c21c5d1ccd95c1e4f2352a79d97273cea474dc6"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/repo/.p2p/work/parent/evidence/scenario-command-evidence.txt",
+      "retained": "evidence/scenarios/S1-default/repo/.p2p/work/parent/evidence/scenario-command-evidence.txt",
+      "sha256": "8163a8e39588cd6b27a09ebe7ad64e1331c6a22e599714b6af208c5c0bf6d55a"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/repo/.p2p/work/parent/history/08981c1b34481447cd2354ad9e0836eb6d4ca2afd0f8a6d6ac5c39ec5a8966f7/slicing-draft.md",
+      "retained": "evidence/scenarios/S1-default/repo/.p2p/work/parent/history/08981c1b34481447cd2354ad9e0836eb6d4ca2afd0f8a6d6ac5c39ec5a8966f7/slicing-draft.md",
+      "sha256": "08981c1b34481447cd2354ad9e0836eb6d4ca2afd0f8a6d6ac5c39ec5a8966f7"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default/repo/.p2p/work/solo/history/9744cef8747760af0e18801ba4e32d9e5fcc9ff6440b9c3e56256e8b83b0c8de/inspection.md",
+      "retained": "evidence/scenarios/S1-default/repo/.p2p/work/solo/history/9744cef8747760af0e18801ba4e32d9e5fcc9ff6440b9c3e56256e8b83b0c8de/inspection.md",
+      "sha256": "9744cef8747760af0e18801ba4e32d9e5fcc9ff6440b9c3e56256e8b83b0c8de"
+    }
+  ]
+}

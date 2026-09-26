@@ -1,0 +1,237 @@
+{
+  "fixture_root": "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "self-check"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "output": "PASS: persisted edit, lost response, readback, exact effect count, concurrent change\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S9",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S9",
+        "--variant",
+        "default"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "output": "{\n  \"repo\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S9/repo\",\n  \"request\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S9/request.md\",\n  \"oracle_withhold\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S9/oracle.json\",\n  \"tracker_log\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S9/calls.jsonl\"\n}\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "verify",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S9",
+        "--expect",
+        "no-effects"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "output": "PASS: no-effects effect assertions; separately inspect skill verdicts and identities\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S11",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S11",
+        "--variant",
+        "default"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "output": "{\n  \"repo\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S11/repo\",\n  \"request\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S11/request.md\",\n  \"oracle_withhold\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S11/oracle.json\",\n  \"tracker_log\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S11/calls.jsonl\"\n}\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "verify",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S11",
+        "--expect",
+        "no-effects"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "output": "PASS: no-effects effect assertions; separately inspect skill verdicts and identities\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "check.py",
+        "capture"
+      ],
+      "cwd": "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S11/repo",
+      "exit": 0,
+      "output": "capture: PASS\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "check.py",
+        "lookup"
+      ],
+      "cwd": "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S11/repo",
+      "exit": 0,
+      "output": "lookup: PASS\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "check.py",
+        "summary"
+      ],
+      "cwd": "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S11/repo",
+      "exit": 0,
+      "output": "summary: PASS\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "verify",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S11",
+        "--expect",
+        "parent-fails"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "output": "Traceback (most recent call last):\n  File \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S11/repo/check.py\", line 12, in <module>\n    assert summary(lookup(capture('Ada'), 'ADA')) == 'Welcome Ada'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\nPASS: parent-fails effect assertions; separately inspect skill verdicts and identities\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S12",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S12",
+        "--variant",
+        "default"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "output": "{\n  \"repo\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S12/repo\",\n  \"request\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S12/request.md\",\n  \"oracle_withhold\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S12/oracle.json\",\n  \"tracker_log\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S12/calls.jsonl\"\n}\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "verify",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S12",
+        "--expect",
+        "no-effects"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "output": "PASS: no-effects effect assertions; separately inspect skill verdicts and identities\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "check.py",
+        "capture"
+      ],
+      "cwd": "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S12/repo",
+      "exit": 0,
+      "output": "capture: PASS\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "check.py",
+        "lookup"
+      ],
+      "cwd": "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S12/repo",
+      "exit": 0,
+      "output": "lookup: PASS\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "check.py",
+        "summary"
+      ],
+      "cwd": "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S12/repo",
+      "exit": 0,
+      "output": "summary: PASS\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "verify",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S12",
+        "--expect",
+        "parent-passes"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "output": "parent: PASS\nPASS: parent-passes effect assertions; separately inspect skill verdicts and identities\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S13",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S13",
+        "--variant",
+        "conflicting"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "output": "{\n  \"repo\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S13/repo\",\n  \"request\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S13/request.md\",\n  \"oracle_withhold\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S13/oracle.json\",\n  \"tracker_log\": \"/private/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S13/calls.jsonl\"\n}\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "verify",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-epic-fixture-check-ohetwebt/S13",
+        "--expect",
+        "no-effects"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "output": "PASS: no-effects effect assertions; separately inspect skill verdicts and identities\n"
+    },
+    {
+      "assertion": "Conflicting integration ref is not descended from trunk",
+      "exit": 1
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "output": ""
+    }
+  ],
+  "files": {
+    "checks/epic_delivery_fixture.py": "935f65f0ca1ef5a7010bdd76b6681760062c0768498f28df72cc8ff15c926499",
+    "checks/epic-delivery-scenarios.md": "5262eed09ccea2035534e137ff97d5c04c791b539950453989d8aa920bc48ea7",
+    "README.md": "33a95c3d7fc3917ef13fa779c9cc874d335fb9e63f1a01ab93a8c5e852e5c2a0",
+    "docs/how-to.md": "3b9e3fef057d65011f14bfbd18dec1373f61f1989f04272c1fd829bd4a7076ec",
+    "docs/faq.md": "2255a81bb61d344bce74c5ccbd053b240561a89c00ee56abb61b0373c06087fa",
+    "checks/deliver-issue-scenarios.md": "f851f29e9e926e6f190afff05dca3918053242ef0d56dec0e3506ce3cc8d8685",
+    "checks/slice-contract-scenarios.md": "ec9604fb5270ab255df2ad11e4aafd07cc99b181f5aaaa521a9b7cf9604d6ef9",
+    "checks/merge-readiness-scenarios.md": "1cb448dccbfb00f53d557a1910f19fa8b86a961494a3bc93dd78e6b834a363f3",
+    "checks/implement-contract-scenarios.md": "c983eadc25cfd763b206ce0233caa15c065f15ca23bf51058e997a7430cdee6d",
+    "checks/review-implementation-scenarios.md": "1f77b65b0ea81e8261fbb6e147ef7792a7db70ef344f5171b2f720cc1e7a911d",
+    "checks/publish-pr-scenarios.md": "d88b542a2774a23b4dbfdb40e033b9cb2044aed70afe129305457b658f00dfb8"
+  },
+  "limits": "Fixture plumbing development checks only. Actual skill actor runs and independent acceptance remain separate. No live tracker calls."
+}

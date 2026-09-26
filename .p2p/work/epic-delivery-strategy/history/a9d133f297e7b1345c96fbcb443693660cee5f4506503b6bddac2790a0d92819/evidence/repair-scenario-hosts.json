@@ -1,0 +1,82 @@
+{
+  "host_tool": "collaboration.spawn_agent / followup_task",
+  "fork_turns": "none",
+  "permissions": "default sandbox; own disposable fixtures/scratch only; no live network or real GitHub; no delegation",
+  "actors": [
+    {
+      "context_id": "/root/scenario_scope_extraction",
+      "status": "completed",
+      "stage": "implement-contract",
+      "cases": [
+        "S8-clean"
+      ],
+      "authority": "remove unrelated sibling file from working candidate only; no refs"
+    },
+    {
+      "context_id": "/root/scenario_remaining_handoffs",
+      "status": "completed",
+      "stage": "actual installed slicing/review/publication/implementation",
+      "cases": [
+        "S1-ambiguous",
+        "S1-release",
+        "S7-unknown",
+        "S10-base-only",
+        "S10-candidate-change",
+        "S10-promise-change",
+        "S7-unaffected"
+      ]
+    },
+    {
+      "context_id": "/root/scenario_child_verification",
+      "status": "completed",
+      "stage": "actual installed review/prove/publish-pr",
+      "cases": [
+        "S2-shared",
+        "S2-incomplete",
+        "S3-publication",
+        "S8-clean"
+      ]
+    },
+    {
+      "context_id": "/root/scenario_transfer_readiness",
+      "status": "completed",
+      "stage": "actual installed implement/deliver setup/publish/readiness",
+      "cases": [
+        "S4-transfer",
+        "S4-legacy-transfer",
+        "S13-setup",
+        "S12-parent-ci",
+        "S12-parent-approval",
+        "S9-hash-gates"
+      ],
+      "authority": "Only S13 exact local ref + local-bare-origin nonforce push; all others no effects"
+    },
+    {
+      "context_id": "/root/scenario_post_effect_preview",
+      "status": "completed",
+      "stage": "actual installed publish preview then authorized fixture effect",
+      "cases": [
+        "S9-post-effect",
+        "S9-interrupted"
+      ],
+      "authority": "Each exact preview SHA bound in repair-effect-grant.md, one base-only simulated PR17 edit; second interrupted after edit response"
+    },
+    {
+      "context_id": "/root/scenario_post_effect_resume",
+      "status": "running",
+      "stage": "actual installed publish-pr fresh resume",
+      "cases": [
+        "S9-post-effect",
+        "S9-interrupted"
+      ]
+    },
+    {
+      "context_id": "/root/scenario_parent_repaired",
+      "status": "running",
+      "stage": "actual installed child proofs/full parent review+proof/publish+readiness",
+      "cases": [
+        "S11-parent-only"
+      ]
+    }
+  ]
+}

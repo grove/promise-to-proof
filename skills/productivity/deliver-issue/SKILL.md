@@ -23,6 +23,26 @@ pass `--repo <root>` rather than relying on the caller's working directory.
 For unrelated dirty work, capture in the isolated authorized-scope checkout
 specified below, then retain its recoverable records under the work item.
 
+## Resolve the delivery destination
+
+Before selecting a starting point or comparison base, follow the protocol's Epic
+delivery plans rules. From a child path recover its parent's active approved plan
+and history; for an assembled parent use its own plan's final destination.
+Unsliced work needs none. Normalize explicit approved legacy routing locally,
+preserving its approval evidence. Missing or conflicting decisions return to
+`/slice-contract <parent>`; a pending proposal leaves the active plan applicable.
+State the destination and any unavailable prerequisite outcomes. Confirm those
+outcomes in the actual candidate, not ticket status. Retain the approved plan
+section and hash separately from the product snapshot and transfer its history.
+
+Use the intended target tip as the full comparison-base SHA and starting tree.
+Do not import unrelated work from the current branch. If branch setup is needed,
+show the exact approved starting SHA and local or remote refs. Perform setup only
+under covering authority, preserve conflicts, and verify refs by readback. The
+local controller cannot create destination refs; resolve setup before admission.
+An advanced target needs a fresh comparison base and review. A plan change during
+execution invalidates affected routing and requires reconciliation before resume.
+
 ## Establish the work item and host
 
 1. Resolve the local work item and its linked specification, parent, children,

@@ -205,3 +205,13 @@ Record remote cases as unexecuted without an authorized disposable tracker.
 Repeat with approval given only in the planning conversation and no transferred
 receipt. Delivery must identify missing approval evidence. Transfer the receipt
 and repeat: matching evidence preserves approval without another approval request.
+
+## Epic delivery strategy scenarios
+
+S1–S5, S13–S14: recover destinations from a child path, admit the correct starting base, block missing decisions/prerequisites, and prepare exact authorized integration setup.
+
+Use the [disposable epic fixtures](./epic-delivery-scenarios.md) and its fresh
+installed-skill invocation procedure. Keep its oracle out of actor input. Inspect
+saved plan/report identities, actual Git refs, and controlled tracker call logs
+as well as the response. Follow the listed variants and positive verification
+phases; a baseline blocker alone does not execute the whole source scenario.

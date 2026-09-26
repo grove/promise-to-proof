@@ -1,0 +1,93 @@
+{
+  "actor": "/root/scenario_parent_outcomes",
+  "scope": "actual installed prove skill on fixed disposable fixture",
+  "candidate_under_test": "parent fixture, not the delivery product verdict",
+  "original_root": "/private/tmp/p2p-epic-behavior-myclau41/S11-default",
+  "retained_files": [
+    {
+      "original_path": "/private/tmp/p2p-epic-behavior-myclau41/S11-default/tracker.json",
+      "retained": "evidence/scenarios/S11-default/tracker.json",
+      "sha256": "b4ad890bb1a1ab732afe8b3bbf5b9abb5f92bf9016790e87b461eb28b3f273cf"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-behavior-myclau41/S11-default/oracle.json",
+      "retained": "evidence/scenarios/S11-default/oracle.json",
+      "sha256": "6fab1d2575c2abe60b6211078e8839f975706d056157b9e36b719b5773ceda12"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-behavior-myclau41/S11-default/actor-report.md",
+      "retained": "evidence/scenarios/S11-default/actor-report.md",
+      "sha256": "167e5215a7bc7dfed7595a039974f0cd5c53bf691c6fff0ccba6371be4e807cf"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-behavior-myclau41/S11-default/tracker.py",
+      "retained": "evidence/scenarios/S11-default/tracker.py",
+      "sha256": "935f65f0ca1ef5a7010bdd76b6681760062c0768498f28df72cc8ff15c926499"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-behavior-myclau41/S11-default/request.md",
+      "retained": "evidence/scenarios/S11-default/request.md",
+      "sha256": "a4ec380fbb75c02f1a74b19c2bdb88242748c39bd5869b9e86d6fe8b0efbe0c4"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-behavior-myclau41/S11-default/calls.jsonl",
+      "retained": "evidence/scenarios/S11-default/calls.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-behavior-myclau41/S11-default/fixture.bundle",
+      "retained": "evidence/scenarios/S11-default/fixture.bundle",
+      "sha256": "b17d1740547003a8e7bd717212c9c21fd45f73ecc913b944b1aa4673eb06db5c"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-behavior-myclau41/S11-default/repo/.p2p/work/parent/implementation.md",
+      "retained": "evidence/scenarios/S11-default/repo/.p2p/work/parent/implementation.md",
+      "sha256": "2d7283bd20760d69e632f8788a8d2f0de072cd59836d642e4b802951bf588bbf"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-behavior-myclau41/S11-default/repo/.p2p/work/parent/proof.md",
+      "retained": "evidence/scenarios/S11-default/repo/.p2p/work/parent/proof.md",
+      "sha256": "6a9821b8e3b1c00e906a0ee16ecce6ece4146746fc87ce96fbdc5f32e5a5905f"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-behavior-myclau41/S11-default/repo/.p2p/work/parent/approval.md",
+      "retained": "evidence/scenarios/S11-default/repo/.p2p/work/parent/approval.md",
+      "sha256": "7b14282140fcc3f4926cb8a6b78a179b82a90ed1310116ac1bcd486884dfcddd"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-behavior-myclau41/S11-default/repo/.p2p/work/parent/candidate.json",
+      "retained": "evidence/scenarios/S11-default/repo/.p2p/work/parent/candidate.json",
+      "sha256": "954a81c1dfbb3d63ebf8bed7f4134abaf6d96645360fbbc8055fd2ef6902b9a9"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-behavior-myclau41/S11-default/repo/.p2p/work/parent/slicing.md",
+      "retained": "evidence/scenarios/S11-default/repo/.p2p/work/parent/slicing.md",
+      "sha256": "c20fac04cb8da898a2bc4bb249c6c16b106a6adcddbe35fd3b53f9d8739423ca"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-behavior-myclau41/S11-default/repo/.p2p/work/parent/evidence/commands.txt",
+      "retained": "evidence/scenarios/S11-default/repo/.p2p/work/parent/evidence/commands.txt",
+      "sha256": "e76049fb10be36e3425359ba66186ca8bf9b5041e3932a32ddee7526d37540c2"
+    }
+  ],
+  "observations": {
+    "case": "S11",
+    "variant": "default",
+    "changed_input_paths": [],
+    "refs_before": "49fe63e3dd9a23776f2d7aba5b8f3152c3c2700c refs/heads/child/lookup\n49fe63e3dd9a23776f2d7aba5b8f3152c3c2700c refs/heads/epic/example\n159b5f50400479e1e5429b26b6c75e6d5f45682f refs/heads/trunk\n49fe63e3dd9a23776f2d7aba5b8f3152c3c2700c refs/remotes/origin/child/lookup\n49fe63e3dd9a23776f2d7aba5b8f3152c3c2700c refs/remotes/origin/epic/example\n159b5f50400479e1e5429b26b6c75e6d5f45682f refs/remotes/origin/trunk",
+    "refs_after": "49fe63e3dd9a23776f2d7aba5b8f3152c3c2700c refs/heads/child/lookup\n49fe63e3dd9a23776f2d7aba5b8f3152c3c2700c refs/heads/epic/example\n159b5f50400479e1e5429b26b6c75e6d5f45682f refs/heads/trunk\n49fe63e3dd9a23776f2d7aba5b8f3152c3c2700c refs/remotes/origin/child/lookup\n49fe63e3dd9a23776f2d7aba5b8f3152c3c2700c refs/remotes/origin/epic/example\n159b5f50400479e1e5429b26b6c75e6d5f45682f refs/remotes/origin/trunk",
+    "tracker_effects": [],
+    "tracker_calls": 0,
+    "reports": [
+      ".p2p/work/lookup/publication.md",
+      ".p2p/work/lookup/implementation.md",
+      ".p2p/work/parent/implementation.md",
+      ".p2p/work/parent/proof.md",
+      ".p2p/work/parent/approval.md",
+      ".p2p/work/parent/slicing.md"
+    ]
+  },
+  "assertion_command": "python3 checks/epic_delivery_fixture.py verify /private/tmp/p2p-epic-behavior-myclau41/S11-default --expect parent-fails",
+  "assertion_exit": 0,
+  "assertion_output": "Traceback (most recent call last):\n  File \"/private/tmp/p2p-epic-behavior-myclau41/S11-default/repo/check.py\", line 12, in <module>\n    assert summary(lookup(capture('Ada'), 'ADA')) == 'Welcome Ada'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\nPASS: parent-fails effect assertions; separately inspect skill verdicts and identities\n"
+}

@@ -1,0 +1,537 @@
+{
+  "root": "/private/tmp/p2p-epic-valid-v1isv6j3",
+  "index": "/private/tmp/p2p-epic-valid-v1isv6j3/index.json",
+  "builder_sha256": "8ca955a03ceafd32088bc6cd2f83ec2cd7b17bb638124e3edbe9e60c61ac0ac6",
+  "records": [
+    {
+      "case": "S1",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S1",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S1-default"
+      ],
+      "output": "PASS: S1/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S2",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S2",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default"
+      ],
+      "output": "PASS: S2/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S3",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S3-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S3",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S3-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S3-default"
+      ],
+      "output": "PASS: S3/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S5",
+      "variant": "missing",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S5-missing",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S5",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S5-missing",
+        "--variant",
+        "missing"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S5-missing"
+      ],
+      "output": "PASS: S5/missing candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S5",
+      "variant": "conflicting",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S5-conflicting",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S5",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S5-conflicting",
+        "--variant",
+        "conflicting"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S5-conflicting"
+      ],
+      "output": "PASS: S5/conflicting candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S5",
+      "variant": "proposed-only",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S5-proposed-only",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S5",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S5-proposed-only",
+        "--variant",
+        "proposed-only"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S5-proposed-only"
+      ],
+      "output": "PASS: S5/proposed-only candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S5",
+      "variant": "pending",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S5-pending",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S5",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S5-pending",
+        "--variant",
+        "pending"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S5-pending"
+      ],
+      "output": "PASS: S5/pending candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S6",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S6-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S6",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S6-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S6-default"
+      ],
+      "output": "PASS: S6/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S7",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S7-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S7",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S7-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S7-default"
+      ],
+      "output": "PASS: S7/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S8",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S8-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S8",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S8-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S8-default"
+      ],
+      "output": "PASS: S8/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S9",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S9",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S9-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S9-default"
+      ],
+      "output": "PASS: S9/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S10",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S10-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S10",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S10-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S10-default"
+      ],
+      "output": "PASS: S10/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S11",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S11-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S11",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S11-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S11-default"
+      ],
+      "output": "PASS: S11/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S12",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S12-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S12",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S12-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S12-default"
+      ],
+      "output": "PASS: S12/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S13",
+      "variant": "missing",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S13",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing",
+        "--variant",
+        "missing"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing"
+      ],
+      "output": "PASS: S13/missing candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S13",
+      "variant": "advanced",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-advanced",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S13",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S13-advanced",
+        "--variant",
+        "advanced"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S13-advanced"
+      ],
+      "output": "PASS: S13/advanced candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S13",
+      "variant": "conflicting",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-conflicting",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S13",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S13-conflicting",
+        "--variant",
+        "conflicting"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S13-conflicting"
+      ],
+      "output": "PASS: S13/conflicting candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S14",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S14-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S14",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S14-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S14-default"
+      ],
+      "output": "PASS: S14/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S14",
+      "variant": "present",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S14-present",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S14",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S14-present",
+        "--variant",
+        "present"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S14-present"
+      ],
+      "output": "PASS: S14/present candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S4",
+      "variant": "legacy",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S4-legacy",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S4",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S4-legacy",
+        "--variant",
+        "legacy"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S4-legacy"
+      ],
+      "output": "PASS: S4/legacy candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S4",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S4-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S4",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S4-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S4-default"
+      ],
+      "output": "PASS: S4/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S5",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S5-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S5",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S5-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S5-default"
+      ],
+      "output": "PASS: S5/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    },
+    {
+      "case": "S13",
+      "variant": "default",
+      "path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-default",
+      "exit": 0,
+      "prepare_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "prepare",
+        "S13",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S13-default",
+        "--variant",
+        "default"
+      ],
+      "check_command": [
+        "python3",
+        "checks/epic_delivery_fixture.py",
+        "check-candidates",
+        "/private/tmp/p2p-epic-valid-v1isv6j3/S13-default"
+      ],
+      "output": "PASS: S13/default candidate metadata; intentional drift recorded separately\n",
+      "error": null
+    }
+  ],
+  "note": "Installed helper validates canonical metadata on all baselines and 20 scenario variants. S7 deliberately preserves uncommitted human work outside historical candidate. Changed integration tips separately produce comparison base changed. Earlier actor fixtures remain untouched."
+}

@@ -40,11 +40,23 @@ Record the repository, branch, starting commit or snapshot, and existing changes
 Preserve unrelated work. Continue alongside it only when ownership and scope are
 clear; otherwise stop before editing. Do not stash, reset, clean, switch branches,
 or discard user work to obtain a clean starting point.
-For a sliced child, follow the saved delivery path. If it names a different
-working branch, pause and ask the authorized enclosing workflow to prepare that
-branch; do not create or switch branches here. Keep repository-tracked contract
-and planning files in the intended candidate or a retrievable prerequisite,
-not only in another checkout's working tree.
+Before choosing the starting point and comparison base, resolve the active
+approved delivery plan through the parent/decomposition links under the
+protocol's Epic delivery plans rules. An assembled parent uses its final
+destination; unsliced work needs no plan. State the resolved destination, exact
+target-tip base, and unavailable prerequisite outcomes. Confirm prerequisites in
+the actual candidate. Preserve the plan text identity and history with the
+handoff, separately from product identity. Normalize explicit approved legacy
+routing with its retained approval, without a repeated strategy question.
+Missing/conflicting routing returns to `/slice-contract <parent>`.
+
+If the intended branch is missing, return the exact starting-SHA and ref setup
+handoff to the authorized enclosing workflow. Do not create or switch branches
+here or start from an unrelated convenient branch. Existing local work survives
+strategy changes: reassess scope and prerequisites against the new target, and
+extract or repair only the intended contribution when sibling payload is present.
+Keep repository-tracked agreement inputs and required plan records retrievable
+with the candidate, not only in another checkout's working tree.
 
 Before editing, briefly state the outcome, scope, starting identity, contract,
 and unresolved decisions. A small correction needs only a brief plan.

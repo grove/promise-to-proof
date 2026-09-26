@@ -1,0 +1,24 @@
+WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+..WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+..WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+......WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+..WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+.....
+----------------------------------------------------------------------
+Ran 30 tests in 135.901s
+
+OK
+P2P filesystem checks passed

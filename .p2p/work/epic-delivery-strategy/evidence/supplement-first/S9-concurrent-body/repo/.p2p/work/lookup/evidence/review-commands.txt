@@ -1,0 +1,139 @@
+Environment: PYTHONDONTWRITEBYTECODE=1; EPIC_TRACKER_ROOT=/private/tmp/p2p-epic-valid-v1isv6j3/S9-default; PATH=/private/tmp/p2p-epic-valid-v1isv6j3/S9-default/bin:$PATH
+
+$ git rev-parse HEAD
+c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f
+exit: 0
+$ git rev-parse epic/example
+c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f
+exit: 0
+$ git merge-base c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f
+c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f
+exit: 0
+$ git diff c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f -- . ':(exclude).p2p'
+exit: 0
+$ git ls-files --others --exclude-standard -- . ':(exclude).p2p'
+exit: 0
+$ git diff c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f -- . ':(exclude).p2p'
+exit: 0
+work/lookup.md sha256:fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9
+specs/registry.md sha256:64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9
+work/parent.md sha256:38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada
+$ cat AGENTS.md
+# Disposable epic fixture
+Read the applicable installed skill and its bundled protocol. Contracts are in work/.
+Durable records are in .p2p/work/. Final destination is trunk.
+Tracker is a controlled simulation. Use only the gh executable on the supplied PATH.
+It supports pr view/list/edit/create/checks, issue view, and repo view with --json.
+Do not use real network, other gh installations, or mutate tracker.json directly.
+Git origin is a local bare fixture repository. No merge authority is granted.
+Record commands, outputs, and changed paths in your durable stage report.
+exit: 0
+$ cat registry.py
+EXPERIMENTAL = True
+
+def capture(name):
+    return {name.lower(): name}
+
+def lookup(items, key):
+    return items.get(key.lower())
+
+def summary(name):
+    return "Welcome " + name
+exit: 0
+$ cat check.py
+import sys
+from registry import capture, lookup, summary
+case = sys.argv[1]
+if case == 'capture':
+    assert capture('Ada') == {'ada': 'Ada'}
+elif case == 'lookup':
+    assert lookup({'ada': 'Ada'}, 'ADA') == 'Ada'
+    assert lookup({}, 'ADA') is None
+elif case == 'summary':
+    assert summary('Ada') == 'Welcome Ada'
+elif case == 'parent':
+    assert summary(lookup(capture('Ada'), 'ADA')) == 'Welcome Ada'
+else:
+    raise ValueError(case)
+print(case + ': PASS')
+exit: 0
+$ cat work/lookup.md
+# Acceptance contract: lookup
+Contract revision: v1
+Source: [Parent contract](parent.md)
+Parent: [Parent contract](parent.md) v1 sha256:38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada; exact text remains at the canonical parent path.
+Decomposition: [.p2p/work/parent/slicing.md](../.p2p/work/parent/slicing.md)
+Prerequisites: Capture outcome must exist in the actual candidate; issue 101 state alone is insufficient.
+Inherited constraints: ASCII names; no persistence, network, or automatic merge.
+
+| ID | Source | Requirement | Boundaries | Seam | Oracle | Planned evidence | Plan state |
+|---|---|---|---|---|---|---|---|
+| R1 | work/parent.md v1:R2 | Lookup a captured name using any case of its key; a missing key returns None. | Parent constraints apply. | registry.lookup | Literal examples in check.py. | python3 check.py lookup | planned |
+
+Parent R4 composition remains part of final parent verification.
+exit: 0
+$ cat work/parent.md
+# Acceptance contract: Name registry
+Contract revision: v1
+Source: [Registry specification](../specs/registry.md)
+Parent: None
+Prerequisites: None
+
+| ID | Source | Requirement | Boundaries | Seam | Oracle | Planned evidence | Plan state |
+|---|---|---|---|---|---|---|---|
+| R1 | Registry specification | Capture maps a name to a lower-case dictionary key and its original value. | ASCII names; no persistence or network. | registry.capture | Ada becomes {ada: Ada}. | python3 check.py capture | planned |
+| R2 | Registry specification | Lookup returns the original captured name for any case of its key. | Missing names return None. | registry.lookup | Captured Ada can be read as ADA. | python3 check.py lookup | planned |
+| R3 | Registry specification | Summary prefixes a supplied name with Welcome and one space. | Plain text only. | registry.summary | Ada becomes Welcome Ada. | python3 check.py summary | planned |
+| R4 | Registry specification | Capture then lookup then summary preserves Ada as Welcome Ada. | The same candidate supplies all functions. | public function composition | Literal Welcome Ada. | python3 check.py parent | planned |
+exit: 0
+$ cat specs/registry.md
+# Registry specification
+Capture names under lower-case keys, read them without case sensitivity, and display Welcome followed by the original name. Preserve the original case through the combined workflow. ASCII only. No network or persistence.
+exit: 0
+$ cat .p2p/work/parent/slicing.md
+# Registry decomposition
+
+## Approved delivery plan
+Plan revision: v1
+Approval source: Fixture owner approved these exact destinations and parent completion conditions in setup receipt approval.md. Strategy authority only; no ref or PR effects.
+Parent: work/parent.md
+Final destination: trunk
+Integration branch: epic/example
+Integration start: c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f
+Default choice: grouped
+
+| Child | Choice | Destination | Reason | State |
+|---|---|---|---|---|
+| work/capture.md | grouped | epic/example | Must ship with the parent | remaining |
+| work/lookup.md | grouped | epic/example | Must ship with the parent | remaining |
+| work/summary.md | grouped | epic/example | Must ship with the parent | remaining |
+
+Parent completion: All parent requirements, including R4 composition, need review and proof on one exact assembled candidate. Grouped parent publication also requires full matching parent reports.
+Pending actions: None.
+
+## Contributions
+Capture contributes R1, lookup R2, summary R3; full R4 is verified on the assembled parent. Lookup requires actual capture behavior. Parent text sha256:38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada.
+exit: 0
+$ cat .p2p/work/parent/approval.md
+Fixture owner approves the approved delivery plan section exactly as captured in slicing.md at fixture preparation. This covers strategy and local record retention only. No ref, PR, publication, or merge effects are authorized.
+exit: 0
+$ python3 --version
+Python 3.9.6
+exit: 0
+$ python3 -B check.py capture
+capture: PASS
+exit: 0
+$ python3 -B check.py lookup
+lookup: PASS
+exit: 0
+$ gh pr view 17 --json number,url,headRefName,headRefOid,baseRefName,isDraft,state
+{
+  "number": 17,
+  "url": "https://fixture.invalid/epic/pull/17",
+  "headRefName": "child/lookup",
+  "headRefOid": "c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f",
+  "baseRefName": "trunk",
+  "isDraft": true,
+  "state": "OPEN"
+}
+exit: 0

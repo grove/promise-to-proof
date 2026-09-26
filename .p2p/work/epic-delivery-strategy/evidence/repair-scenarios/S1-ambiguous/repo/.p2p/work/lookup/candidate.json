@@ -1,0 +1,16 @@
+{
+  "commit": "f6c7de0de6d6ee25d8d9c4d2ce0c4e8c6999e04c",
+  "comparison_base": "f6c7de0de6d6ee25d8d9c4d2ce0c4e8c6999e04c",
+  "work_item": "work/lookup.md",
+  "work_item_sha256": "fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9",
+  "binding_inputs": [
+    {
+      "path": "specs/registry.md",
+      "sha256": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9"
+    },
+    {
+      "path": "work/parent.md",
+      "sha256": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada"
+    }
+  ]
+}

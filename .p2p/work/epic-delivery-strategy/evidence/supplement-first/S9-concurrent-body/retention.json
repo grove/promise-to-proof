@@ -1,0 +1,162 @@
+{
+  "phase": "Supplement after strategy activation, retarget retry and publication/readiness scenarios; before repair",
+  "case": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body",
+  "files": [
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/calls.jsonl",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/calls.jsonl",
+      "sha256": "e7cc5a7d248dc642da3122a53a120deabc07b7f6902ab23ee0bed4f57bc5acc4"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/candidate-validation.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/candidate-validation.json",
+      "sha256": "a1735646c366d802781326228fa18b6a29a37df1479e062d8414eccc68e67253"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/evaluator-effect-grant.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/evaluator-effect-grant.md",
+      "sha256": "420a81affe1027daf53ddce561423e3ec53344e7fa09fbb8cf17d58ddb51ca0f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/oracle.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/oracle.json",
+      "sha256": "16367ab0d23eab66372b603b44c2381a3fda72f24610df4774a41e798193900a"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/publication-actor-report.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/publication-actor-report.md",
+      "sha256": "07e4f0f78cf0521c1bd939f533d6505746ac1b8357042ca0b24cf170e0ef1963"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/publication-draft.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/publication-draft.md",
+      "sha256": "6101aecfb5a9d96570c178d75af992ff45d931151e24dde820a2846dd2244b7f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/candidate.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/candidate.json",
+      "sha256": "b0cd299b9b80d0d792cf373cccbb1b53dc21b67d4aed43fc5c7dbac82cc306bb"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/evidence/approved-plan.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/evidence/approved-plan.md",
+      "sha256": "b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/evidence/common-identity.txt",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/evidence/common-identity.txt",
+      "sha256": "c047ac1703e5a2244f3495b15b9d4eefafbb67bb05dbdee248bf2c93420d0bb7"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/evidence/proof-commands.txt",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/evidence/proof-commands.txt",
+      "sha256": "221489aac2e13cdb1f072620322d8288912d512fbeac56f5d272880ddfb3e291"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/evidence/publication-inspection.txt",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/evidence/publication-inspection.txt",
+      "sha256": "0cb3fa4e696406c4d4c74752aa54d1d6cceccd6109a488c7c866e2aba4368242"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/evidence/retarget-preview.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/evidence/retarget-preview.json",
+      "sha256": "2db3b2bbd545f144f87974d9f0aa70411efae90f883749b91369a53ded2e98e2"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/evidence/retry-command-log.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/evidence/retry-command-log.json",
+      "sha256": "1031c0963d94e99fa444f2de7806e697c6be006c00a7e54527691127c21cf08b"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/evidence/review-commands.txt",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/evidence/review-commands.txt",
+      "sha256": "5ba667a692599ef25236872c7f6fe396aa0c9978a9aabd891e9114148d080fda"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/history/6101aecfb5a9d96570c178d75af992ff45d931151e24dde820a2846dd2244b7f/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/history/6101aecfb5a9d96570c178d75af992ff45d931151e24dde820a2846dd2244b7f/publication.md",
+      "sha256": "6101aecfb5a9d96570c178d75af992ff45d931151e24dde820a2846dd2244b7f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/history/999ebe002c1ce7bb6767ee587234f948a9987dcd8e6bffcea946a20ca8888401/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/history/999ebe002c1ce7bb6767ee587234f948a9987dcd8e6bffcea946a20ca8888401/publication.md",
+      "sha256": "999ebe002c1ce7bb6767ee587234f948a9987dcd8e6bffcea946a20ca8888401"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/implementation.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/implementation.md",
+      "sha256": "880d02464af80dbe99ad90470c9bc52855698b3fac72f93036a68a12a36b7daf"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/proof.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/proof.md",
+      "sha256": "1b2f31d7bd4444bcb1beca9c4ee37296320a9bb5507297f78fe42b59936c9afa"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/publication.md",
+      "sha256": "dcc06525940357283ffde291a1d2852d433ac70afef6bf41d4961a10cca999a1"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/lookup/review.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/lookup/review.md",
+      "sha256": "cfd128e974196ba5b9f9820306ebe27eb74b306b10428b09e64db9397e109af2"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/parent/approval.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/parent/approval.md",
+      "sha256": "7b14282140fcc3f4926cb8a6b78a179b82a90ed1310116ac1bcd486884dfcddd"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/parent/candidate.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/parent/candidate.json",
+      "sha256": "0126bfc8ac6977613b8457f85844fea99b418e9b88460b8ab443bf6ed7cb9495"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/parent/implementation.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/parent/implementation.md",
+      "sha256": "afd33903cbdb344a0ba5de2f9d285021e20b3e3a469d5c1481493c6ad7bf0a79"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/repo/.p2p/work/parent/slicing.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/repo/.p2p/work/parent/slicing.md",
+      "sha256": "64ff1e1837c2600fe816fff70614377a3aa63dd7113d252c584d2e8de9718597"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/request.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/request.md",
+      "sha256": "961ed55b993534c2a7f24799075427e79b02b6c32e1a54964743855e09a34532"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/retry-actor-report.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/retry-actor-report.md",
+      "sha256": "dcc06525940357283ffde291a1d2852d433ac70afef6bf41d4961a10cca999a1"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/retry-command-log.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/retry-command-log.json",
+      "sha256": "1031c0963d94e99fa444f2de7806e697c6be006c00a7e54527691127c21cf08b"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/supplement-fixture.bundle",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/supplement-fixture.bundle",
+      "sha256": "bbd18b750a4a182f8ff6600d29fc51de5baf77ac62439f20a86b43b4bca8c845"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/tracker.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/tracker.json",
+      "sha256": "7871175814ea1798c8482be83220184c892879674edbf482e8c8e7994d6d509f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/tracker.py",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/tracker.py",
+      "sha256": "8ca955a03ceafd32088bc6cd2f83ec2cd7b17bb638124e3edbe9e60c61ac0ac6"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/verification-actor-report.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/supplement-first/S9-concurrent-body/verification-actor-report.md",
+      "sha256": "275d39aefe21d984b6666229906466f5c8537c26c68faaa40d530adb73387233"
+    }
+  ],
+  "limits": "S9-after-effect injection occurred BEFORE edit; it proves stale rejection only. S11 child checks are weakened and do not prove individually complete children. Actor IDs reside in actor reports. Simulated tracker only."
+}

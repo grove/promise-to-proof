@@ -1,0 +1,11 @@
+installed repaired package identities 70 match exact candidate
+S2-incomplete current plan saved byte-exact a7f70fc11fc26bd176526c63c3fd344a62da1d15dfcb14e05b0992c3ff6eeeb9 publication # BLOCKED: work/lookup.md publication
+S2-shared current plan saved byte-exact 547bb750f97a1f45b97700d7d234ceeac3b6c740fc7155e37f2738df4b176cec publication # DRAFT: work/lookup.md publication
+S3-publication current plan saved byte-exact f97a0dda89221fcb76d436094a5cccc88b931ba77c0b8da35c2efaec49e6f304 publication # DRAFT: work/lookup.md publication
+S8-clean current plan saved byte-exact 84caa0deb7504a3ec804a18c1b98c5ac0699d228a09663814e077e8da70bab06 publication # BLOCKED: work/lookup.md publication
+S4-transfer retained local approval/history reachable; actor request supplies only child path and new fixture location
+S4-legacy-transfer retained local approval/history reachable; actor request supplies only child path and new fixture location
+S9-default actual total effects 1
+S9-concurrent-body actual total effects 0
+S9-stale-plan actual total effects 0
+saved-state and effect assertions PASS

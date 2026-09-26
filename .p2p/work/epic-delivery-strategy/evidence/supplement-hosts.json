@@ -1,0 +1,35 @@
+{
+  "host_tool": "collaboration.spawn_agent",
+  "fork_turns": "none",
+  "reasoning_effort": "medium",
+  "permissions": "default sandbox, own disposable fixture and scratch only; no live network or real GitHub; no delegation; only explicit fixture effects",
+  "actors": [
+    {
+      "context_id": "/root/scenario_publication_gates",
+      "status": "completed",
+      "cases": [
+        "S9-default",
+        "S11-default",
+        "S12-default",
+        "S1-default"
+      ],
+      "observations": "Publication/readiness and full standalone/parent review/proof reports retained. Proof identified exact approved-section hash errors; reports are historical observations, not acceptance."
+    },
+    {
+      "context_id": "/root/scenario_setup_application",
+      "status": "completed",
+      "cases": [
+        "S13-missing"
+      ],
+      "observations": "Created local and local-bare-origin integration ref once under exact fixture grant. Repeat readbacks retained, first command-output loss disclosed."
+    },
+    {
+      "context_id": "/root/scenario_scope_extraction",
+      "status": "running",
+      "cases": [
+        "S8-clean"
+      ],
+      "observations": "Actual implement-contract extracting local candidate; no ref or tracker effects authorized."
+    }
+  ]
+}
