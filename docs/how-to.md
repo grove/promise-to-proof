@@ -91,6 +91,25 @@ If the issue is clear but has no saved acceptance contract, the next action is
 issue ready for implementation. Triage does not create a contract or implement
 the request.
 
+## Plan on an issue before delivery
+
+Run `/plan-acceptance <issue>` to save a local proposal and post its exact text
+on the existing issue for review. This direct invocation authorizes the proposal
+comment; add `local-only` or `draft-only` to keep it local. The comment includes
+the intended work path, revision, text hash, and retrievable binding inputs.
+Approve the specific proposal on the issue, identifying its comment and hash.
+If you approve only in conversation, transfer the saved approval receipt to the
+delivery checkout as well.
+
+Later, in the same or another checkout, run `/deliver-issue <issue>`. Delivery
+imports the approved text into `work/<slug>.md` and retains its approval when
+the text and binding inputs match. Changed or conflicting agreements require
+reconciliation. The local contract then follows the normal delivery workflow
+and travels with the implementation PR. No preliminary planning PR is needed.
+
+Calling `deliver-issue` directly still plans locally as part of delivery. Its
+nested planning step does not post a proposal comment automatically.
+
 ## Complete a local work item
 
 On a supported host, `/deliver-issue work/retry-safe-uploads.md` runs the direct

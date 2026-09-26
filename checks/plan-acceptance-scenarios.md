@@ -8,7 +8,8 @@ contract or report, observed actions, and file hashes before and after each run.
 Judge behavior rather than exact wording.
 
 Use the [shared protocol](../docs/acceptance-contract-protocol.md) as the
-reference. Planning must not implement, run proof, or publish. Store proof
+reference. Planning must not implement or run proof. Only a directly invoked
+issue planning handoff may publish under the protocol's scoped authority. Store proof
 evidence outside the candidate. The [proof and repair checks](./proof-repair-scenarios.md)
 cover candidate identity and repair handoffs in more detail.
 
@@ -268,3 +269,23 @@ that same file, preserves IDs and promises, and creates no competing contract.
 Repeat from an optional `specs/foo-bar.md`; the work item links its source.
 An unrelated existing slug must not be overwritten. No Git or tracker write
 is authorized by local file creation.
+
+## Standalone issue planning handoff
+
+In an authorized disposable tracker, invoke `/plan-acceptance <issue>` directly
+on an existing issue. Include a binding source or parent that is not on the
+default branch. Pass when planning saves the local proposal, posts one comment
+with its exact recoverable text, work path, revision, hash, and retrievable
+binding inputs, and verifies readback. The issue body and labels stay unchanged.
+It requests approval of that proposal and creates no commit or PR.
+
+Repeat the same invocation. Pass when an identical handoff is reused. Simulate
+a lost write response; readback must establish the outcome before another write.
+Supply a revision: the previous proposal and its approval remain historical,
+and approval is not inferred for the new proposal.
+
+Repeat with `draft-only`, with `local-only`, with a local work path, and through
+`deliver-issue`'s nested planner. Each stays local without separate publication
+authority. Missing tracker access or unavailable binding content must identify
+the incomplete issue handoff while preserving the local proposal. Record these
+tracker cases as unexecuted when no authorized test tracker is available.
