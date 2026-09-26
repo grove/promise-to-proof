@@ -1,0 +1,14 @@
+MAX = 3
+role Counter:
+    action Init:
+        self.value = 0
+    atomic action Inc:
+        self.value = min(self.value + 1, MAX)
+    atomic action Get:
+        return self.value
+    atomic action Dec:
+        self.value = max(self.value - 1, 0)
+action Init:
+    counter = Counter()
+always assertion WithinRange:
+    return counter.value in range(0, MAX+1)

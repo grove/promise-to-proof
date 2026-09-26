@@ -1,0 +1,27 @@
+{
+  "binding_inputs": [
+    {
+      "path": "docs/acceptance-contract-protocol.md",
+      "sha256": "bec3503abc6ebc40356e662ca0b279be73a4da482eb1616a5c5b435509184351"
+    },
+    {
+      "path": "specs/delivery-model-conformance-source.md",
+      "sha256": "7162a965fa53322a8805582756ea6137a847d72798e057dd751cc2e46c98f65a"
+    }
+  ],
+  "comparison_base": "a38045968c8d4d551a9e3a1f8bf14fed8bd4b481",
+  "planner_session_id": "01a0de31-2084-7462-8236-3b2391ee1b5c",
+  "requirements": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5",
+    "R6",
+    "R7",
+    "R8"
+  ],
+  "revision": "v1",
+  "sha256": "0751249534a5cf5f21d8f97250e95e4c91a3c5b27ec578f45fc5c21624167237",
+  "work_item": "work/delivery-model-conformance.md"
+}

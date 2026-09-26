@@ -1,0 +1,7 @@
+{
+  "context": "same independent review session",
+  "previous_invocation": "host/review-recheck",
+  "purpose": "Review counterevidence about the contract runtime; no product correction or report rewrite by enclosing context.",
+  "result": "Owner withdrew F1 and returned full REVIEWED report; original retained.",
+  "session_id": "01a0de75-50c1-73d0-b916-c51856d1a086"
+}

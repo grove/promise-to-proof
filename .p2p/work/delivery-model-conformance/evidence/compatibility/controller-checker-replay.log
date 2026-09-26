@@ -1,0 +1,17 @@
+Model checking controller.json
+configFileName: fizz.yaml
+fizz.yaml not found. Using default options
+StateSpaceOptions: options:{max_actions:100 max_concurrent_actions:2}
+Nodes: 2, queued: 0, elapsed: 232.542µs
+Time taken for model checking: 243.166µs
+Writen graph dotfile: /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/controller-graph/graph.dot
+To generate svg, run: 
+dot -Tsvg /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/controller-graph/graph.dot -o graph.svg && open graph.svg
+Writen communication diagram dotfile: /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/controller-graph/communication.dot
+To generate svg, run: 
+dot -Tsvg /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/controller-graph/communication.dot -o communication.svg && open communication.svg
+Valid Nodes: 2 Unique states: 2
+IsLive: true
+Time taken to check liveness: 307.417µs
+PASSED: Model checker completed successfully
+Writen 1 node files and 1 link files to dir /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/controller-graph

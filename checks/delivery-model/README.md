@@ -161,3 +161,170 @@ child work, and cross-candidate evidence reuse remain outside this increment.
 The repair allowance belongs to the same invocation across restart under both
 the issue's requirement and the current delivery rule. No existing workflow
 instructions or acceptance verdicts change.
+
+## Controller conformance, Phase 3
+
+`conformance.fizz` refines the original model at observable boundaries of the
+serial delivery controller. Each MBT trace owns one disposable source repository
+and one delivery invocation. Actions share its saved records. Every enabled CLI
+operation starts a fresh Python process and invokes the production `main` entry
+point with public CLI arguments. `FakeTransport` supplies worker replies and
+fixture session identifiers. It does not establish host isolation or provenance.
+The controller has no test mode and this suite does not change its API.
+
+The compatibility checkpoint chose TypeScript after FizzBee drove the real
+`status` operation and rejected a deliberately wrong observation. The retained
+checkpoint is under `.p2p/work/delivery-model-conformance/evidence/compatibility/`.
+The tool combination is FizzBee 0.5.3, FizzBee MBT 0.2.0, and `@fizzbee/mbt` 0.1.2.
+`package-lock.json` pins the TypeScript dependencies. The runner checks the same
+FizzBee executable hashes as `check.py` and these MBT macOS arm64 hashes:
+
+| Executable | SHA-256 |
+|---|---|
+| `fizzbee-mbt-server` | `767f8b192d0e5d3e098064ef2afe99aac7ccdf25ca8ff45c8e6231d0cecd4d1a` |
+| `fizzbee-mbt-runner` | `7e4ca5e3f1e8183d3d335f5878128f6c5cbb01398bbbc377166afc3fa7464c65` |
+
+Download the MBT 0.2.0 macOS arm64 release from
+[the official release](https://github.com/fizzbee-io/fizzbee-mbt-releases/releases/tag/v0.2.0).
+The release archive SHA-256 is
+`ae9296700d3b22aa67510cb5d3fe9e4f2b2cc2ecaa688cf14168cb5721888102`.
+Keep each release directory intact. Python 3.11 or newer, Git, Node, npm, the
+installed delivery stage skills, and the supported macOS Codex executable must
+be available. The tests substitute transport, so they do not launch agents.
+The MBT server needs permission to bind localhost port 50051.
+
+Run from the repository root, using a new output directory:
+
+```sh
+export FIZZBEE=/path/to/fizzbee-v0.5.3-macos_arm/fizz
+export FIZZBEE_MBT=/path/to/fizzbee-mbt-0.2.0-macos_arm
+python3 checks/delivery-model/conformance.py \
+  --output-dir /tmp/delivery-conformance-new --all-mutations
+```
+
+The runner generates the official TypeScript interfaces and registry in the
+output directory, installs dependencies there with `npm ci --ignore-scripts`,
+and compiles the adapter there. It writes no generated content into the checked
+candidate. `--node-modules /path/to/node_modules` reuses an installation after
+checking the direct package versions. Omitting that option uses the lockfile.
+`--fizz` and `--mbt` override the environment variables. Use a separate process
+and port availability window for each suite invocation.
+
+### Operation mapping and oracles
+
+| FizzBee action | Actual operation on the shared fixture | Observations compared with the model |
+|---|---|---|
+| `Start` | `run`, with the requested admission fault, then process exit immediately before review reservation | Public result or exit 77, saved status, three initial attempts, completed implementation, candidate generation |
+| `Review` | `resume`, process exit before proof reservation | One new full review against the current candidate, no proof yet |
+| `Proof` | `resume`, process exit after the controller saves the proof host completion but before it consumes the receipt | One reserved proof, no accepted proof report yet |
+| `Corrupt` | Change the saved pending report, receipt, candidate bytes, or retained base manifest | Immediate saved-state projection, followed by the real rejection on `Restart` |
+| `Restart` | Fresh-process `resume` against the same invocation | Receipt reconciliation, report storage, completion or blocker, persistent repair consumption, and both verifier reports after repair |
+| `Inspect` | Read-only `status` between stages | Returned result and unchanged saved state |
+| `Resume` | Two more fresh-process `resume` calls at the terminal boundary | Same attempts and repair count, no duplicate dispatch, same completion or rejection |
+| `Overlap` | Hold one actual `resume` process inside `run` after lock acquisition, start another `resume`, then release the first | Losing process reports the lock blocker and changes no saved state. Winning process advances exactly one review |
+
+The return projection contains the process exit, saved status, attempt count,
+completed-attempt count, report names, repair count, candidate generation,
+review generation, proof generation, and current-candidate equality. The Python
+bridge reads actual JSON reports and candidate bytes. Passing verifier
+generations require the full fixture requirement, the exact candidate identity,
+and the required REVIEWED or PROVEN status with no gaps. No expected result is
+computed from controller branches. The FizzBee model declares the expected
+transitions independently.
+
+The original `Launch`, `Return`, `Save`, and `ReadBack` actions remain in
+`delivery.fizz`. This refinement groups their successful serial executions into
+public operations. The proof receipt pause separates durable host return from
+report acceptance. The storage fault interrupts the canonical proof report
+write after its attempt report exists. Restart must consume that exact saved
+return without another worker dispatch. `CurrentCandidate`, full independent
+stages, durable reports and evidence, and `RepairBound` are checked at these
+boundaries. This suite does not replace the original 43 model checks or claim
+that it observes every internal write interleaving.
+
+FizzBee MBT 0.2 proposes action names globally. The model and adapter explicitly
+return `DISABLED` when a proposal is outside the fixture's current pause point.
+Such proposals perform no controller operation. Adapter scheduling metadata
+contains only pause points and injected-fault progress, never expected controller
+values. The model checks every enabled return and every disabled return.
+The runner rejects adapter execution errors, unmatched model links, missing
+required actions, and unexpected enabled action counts. A successful driver
+exit alone is insufficient. The 256-proposal seed-42 run must reach every
+required transition. Finite model exploration separately rejects its action
+cutoff. Seeds select where `Inspect` interleaves with stage progression.
+
+### Cases, mutations, and replay
+
+`conformance.py --help` lists all 17 named cases. `successful-delivery`,
+`known-result-restart`, and `repeated-resume` share the successful lifecycle.
+`blocked-failure` and `repair-restart-exhaustion` fail both proof rounds and
+require the second restart to preserve the consumed repair allowance.
+`successful-repair` requires two full verifier rounds for different candidates.
+`uncertain-launch-restart` leaves a reservation without a completion receipt and
+must never dispatch that stage again.
+
+The other cases cover unauthorized admission, contested dirty-file preservation,
+a stale earlier candidate identity after implementation drift, malformed
+identity JSON, candidate mutation after verifier launch, incomplete retained
+comparison-base content, interrupted report storage, a receipt from another
+attempt, a conflicting duplicate report, and overlapping resume processes.
+The incomplete-archive case removes the authoritative base manifest content.
+The redundant `base.bundle` alone is not treated as the recoverability oracle.
+Candidate mutation blocks both acceptance and reuse. Successful repair separately
+checks that a changed candidate receives fresh full review and proof reports.
+
+`--all-mutations` edits copies of the actual production controller, leaving the
+model and adapter unchanged. It removes stale-report rejection, duplicate-report
+rejection, late-receipt rejection, both repair checks, and local-stage authority
+rejection. Each mutant must produce an actual MBT return-value mismatch.
+For stale-report rejection, the final completion guard can still block the
+claim, but the saved proof report is already wrong. The projection must catch
+that persisted difference too.
+
+Each run retains `conformance.fizz`, model and MBT logs, `observation.json`, and
+`fixture/actions.jsonl`. Every enabled action record includes its exact command,
+returned JSON, and before/after delivery state. The fixture directory retains
+actual source and runtime records, including report files and host-shaped
+fixture receipts. Mutation copies retain their exact edit in `mutation.json`.
+Replay a saved failure with its case, seed, and mutation name:
+
+```sh
+python3 checks/delivery-model/conformance.py --case stale-identity --seed 42 \
+  --mutation stale-report-guard-removed --output-dir /tmp/stale-replay-new
+```
+
+Use the same tool environment as the full run. The command succeeds only when
+the deliberate controller defect causes the expected MBT mismatch. Run the same
+case without `--mutation` to require a conforming result. The seed reproduces
+operation order and normalized observations. UUIDs, timestamps, scratch paths,
+and disposable Git commit identities can differ.
+
+### Evidence limits
+
+Keep three evidence classes separate:
+
+- `check.py` produces finite model evidence, with no controller execution.
+- `conformance.py` and `test_p2p_delivery.py` execute controller behavior with
+  substitute worker replies. Fixture session IDs are not host provenance.
+- `check_p2p_delivery_host.py` executes the supported live host and retains real
+  host-issued session events, completion receipts, output, and state.
+
+Run the existing live check separately against the fixed candidate:
+
+```sh
+python3 checks/check_p2p_delivery_host.py --output-dir /tmp/live-delivery-new
+```
+
+The overlap fixture establishes CLI lock admission for concurrent processes on
+the supported OS. The live check establishes actual host receipts and isolation
+for a serial delivery. It does not claim concurrent agent execution. Unavailable
+live-host checks remain an evidence gap.
+
+Bounds are one work item, one invocation per trace, two serial verifier stages,
+one automatic repair, at most one corruption family, one optional status read,
+and two terminal resumes. The model uses candidate generations rather than
+cryptographic collision analysis. Fixture judgments cover one requirement and
+do not assess agent judgment quality. The suite does not model arbitrary
+same-user tampering, simultaneous independent fault families, all filesystem
+crash points, other hosts, or every possible action sequence. Full exploration
+of this finite refinement is not proof of all controller executions.

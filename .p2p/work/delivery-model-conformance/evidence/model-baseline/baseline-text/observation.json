@@ -1,0 +1,40 @@
+{
+  "kind": "baseline",
+  "name": "text",
+  "scenario": "text",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-akapvr8m/baseline-text",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-akapvr8m/baseline-text.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 2.624,
+  "model_sha256": "0cf19d362ccfc1fe194f94bb3a263f0d18e77cddfeab38c7c369efd19d726778",
+  "nodes": 7281,
+  "max_actions_observed": 16,
+  "outcomes": [
+    "complete",
+    "evidence-absent",
+    "evidence-read",
+    "evidence-save",
+    "identity",
+    "missing-stage",
+    "report-read",
+    "report-save",
+    "running",
+    "text"
+  ],
+  "actions": [
+    "Complete",
+    "Environment",
+    "Implement",
+    "Launch",
+    "ReadBack",
+    "Restart",
+    "Return",
+    "Save"
+  ],
+  "result": "complete finite safety exploration"
+}

@@ -1,0 +1,4 @@
+{"type": "thread.started", "thread_id": "fixture-33f80344eb5f4f1bb5901edf04e62d1e"}
+{"type": "item.completed", "item": {"type": "command_execution", "command": "FIXTURE python3 greet.py", "aggregated_output": "hello\n", "exit_code": 0}}
+{"type": "item.completed", "item": {"type": "agent_message", "text": "{\"status\": \"PROVEN\", \"input_identity_json\": \"{not-json\", \"requirements\": [{\"id\": \"R1\", \"verdict\": \"proven\", \"observation\": \"Fixture observes hello newline and exit zero.\", \"evidence\": [{\"assertion\": \"stdout equals hello newline and status zero\", \"observation\": \"fixture output hello newline, status zero\", \"artifact\": \"FIXTURE command python3 greet.py; stdout hello\\\\n; exit 0\"}]}], \"details\": \"# PROVEN\\n\\nFIXTURE ONLY; full R1 observation retained.\", \"gaps\": []}"}}
+{"type": "turn.completed", "usage": {"input_tokens": 7, "output_tokens": 3}}

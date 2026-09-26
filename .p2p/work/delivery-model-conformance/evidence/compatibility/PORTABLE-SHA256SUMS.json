@@ -1,0 +1,22 @@
+{
+  "portable-controller-adapters.ts": "6d49e557c02459b73190b9e88477fdec5de7f64ed4bb6172a96c0e3aaed893c6",
+  "PORTABLE-README.md": "c4e8d82a542b5ad3eca319286903fa17e7b94ffb615fd99aad662dbc129a1bec",
+  "portable-replay.py": "9b7fda9816093f430b2d22af8b6ca987260333ff68e67ac27445da1458f3da27",
+  "portable-results/fixture.json": "7498fc661a1b0b1780f5105de3c8b3d3d87c4781281fc9a584963e2bd70351e3",
+  "portable-results/artifact-hashes.json": "5519bfe76c01157119efe28dafeabbb63a641f56ddab35d641d44821ec85db1e",
+  "portable-results/bad.log": "37f188465bcbb132435786ce19b6338cc0c27ac3c088a42c8802382f8c6e9b55",
+  "portable-results/result.json": "d034a29c239f4bdd2ca9205dadb647e11cdf3da84713055004e54c257eb85842",
+  "portable-results/node-version.log": "799e56f47d63dd45bce8d6100ba203d4df531f5bd6b8b37322272b53e204b819",
+  "portable-results/npm-ci.log": "205973a0e0414afba2fee9dd3a67e5877c97d0b5fbfddd7090c89b0960b6376a",
+  "portable-results/npm-version.log": "acb90e420303a6e949fec90f74faf64cc372894b3964e310a261689b898f41b0",
+  "portable-results/controller.json": "0187eb743fb617f06a2d3ba3edec239fafb57a4a74813201e76f6c702c48a6af",
+  "portable-results/commands.json": "27c595211612efa70065023fbdc8187e421cd8279623e76cd6c2e7ab507ee642",
+  "portable-results/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "portable-results/package-lock.json": "636d9e4cd80297565ee99102309e1970a45ca4bbd5747383940ffce903d412dd",
+  "portable-results/package.json": "0284b6bfedeb539ad5f6ad22f96966a230ecb38481d33d2c8b2edc82ab94725e",
+  "portable-results/checker.log": "f337b7be730a4d881697d7a5d70c1e013857e8dca31047e22fd8505d43339684",
+  "portable-results/portable-execution.log": "4d872f97c6f0701408fa9bd8688d475f487095cbe5968986eadf2341809a0dcf",
+  "portable-results/replay.log": "c6922540052e20db0c711106727ff521b72ead2bf0a6b11ce077c7bb6292048c",
+  "portable-results/good.log": "fdd56a3c4c5ae70a27b8465d382d6c255f5ef0314d294bef910a7dff36eef2cf",
+  "portable-results/server.log": "6d4962726faf342c3ef3542d2c40575967389a6946036305c748bee4744131e5"
+}

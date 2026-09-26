@@ -1,0 +1,36 @@
+{
+  "case": "late-stage-result",
+  "seed": 42,
+  "mutation": "late-receipt-guard-removed",
+  "evidence_class": "substitute-backed actual controller CLI",
+  "command": [
+    "node",
+    "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+  ],
+  "server_command": [
+    "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+    "--states_file",
+    "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/late-stage-result-42-late-receipt-guard-removed/graph"
+  ],
+  "environment": {
+    "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/controller-late-receipt-guard-removed",
+    "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/late-stage-result-42-late-receipt-guard-removed/fixture",
+    "P2P_MBT_CASE": "late-stage-result",
+    "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+    "FIZZBEE_MBT_SEQ_SEED": "42"
+  },
+  "exit": 1,
+  "model_nodes": 121,
+  "model_max_depth": 9,
+  "actions": {
+    "Start": 1,
+    "Inspect": 1,
+    "Review": 1,
+    "Proof": 1,
+    "Corrupt": 1,
+    "Restart": 1,
+    "Resume": 2
+  },
+  "trace": "fixture/actions.jsonl",
+  "replay": "python3 checks/delivery-model/conformance.py --case late-stage-result --seed 42 --mutation late-receipt-guard-removed --output-dir NEW_DIRECTORY"
+}

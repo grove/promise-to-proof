@@ -1,0 +1,158 @@
+---
+options:
+  max_actions: 256
+  max_concurrent_actions: 1
+deadlock_detection: false
+---
+# The runner substitutes only CASE. Expected transitions are protocol rules,
+# never values read from the controller or the Python fixture.
+CASE = "interrupted-report-storage"
+FAULTS = ["stale-identity", "mistyped-identity", "candidate-mutated-during-verification", "incomplete-archive", "late-stage-result", "duplicate-report-write"]
+
+role Controller:
+    action Init:
+        self.phase = "new"
+        self.attempts = 0
+        self.saved = 0
+        self.reports = ""
+        self.repair = 0
+        self.generation = 0
+        self.status = "ABSENT"
+        self.fault = False
+        self.repeats = 0
+        self.inspected = False
+        self.review = 0
+        self.proof = 0
+        self.current = 1
+
+    func Projection(code):
+        return str(code) + "|" + self.status + "|" + str(self.attempts) + "|" + str(self.saved) + "|" + self.reports + "|" + str(self.repair) + "|" + str(self.generation) + "|" + str(self.review) + "|" + str(self.proof) + "|" + str(self.current)
+
+    atomic action Start:
+        if not (self.phase == "new"):
+            return "DISABLED"
+        if CASE in ["unauthorized-before-dispatch", "contested-dirty-file"]:
+            self.phase = "terminal"
+            value = self.Projection(1)
+            return value
+        self.attempts = 3
+        self.status = "RUNNING"
+        self.generation = 1
+        if CASE == "uncertain-launch-restart":
+            self.saved = 2
+            self.generation = 0
+            self.status = "BLOCKED"
+            self.phase = "uncertain"
+            value = self.Projection(1)
+            return value
+        self.saved = 3
+        self.reports = "implementation"
+        self.phase = "review"
+        value = self.Projection(77)
+        return value
+
+    atomic action Review:
+        if not (self.phase == "review" and CASE != "concurrent-resume"):
+            return "DISABLED"
+        self.attempts += 1
+        self.saved += 1
+        self.reports = "implementation,review" if self.repair == 0 else "implementation,repair,review"
+        self.phase = "proof"
+        self.review = self.generation
+        value = self.Projection(77)
+        return value
+
+    atomic action Proof:
+        if not (self.phase == "proof"):
+            return "DISABLED"
+        self.attempts += 1
+        self.phase = "pending"
+        value = self.Projection(77)
+        return value
+
+    atomic action Corrupt:
+        if not (self.phase == "pending" and not self.fault and CASE in FAULTS):
+            return "DISABLED"
+        self.fault = True
+        if CASE == "candidate-mutated-during-verification":
+            self.current = 0
+        value = self.Projection(0)
+        return value
+
+    atomic action Restart:
+        if not (self.phase in ["pending", "uncertain", "storage"]):
+            return "DISABLED"
+        if not (CASE not in FAULTS or self.fault):
+            return "DISABLED"
+        if self.phase == "uncertain" or CASE in FAULTS:
+            self.status = "BLOCKED"
+            self.phase = "terminal"
+            value = self.Projection(1)
+            return value
+        if CASE == "interrupted-report-storage" and self.phase != "storage":
+            self.status = "BLOCKED"
+            self.phase = "storage"
+            value = self.Projection(1)
+            return value
+        self.saved += 1
+        self.proof = -1 if CASE in ["repair-restart-exhaustion", "blocked-failure"] or (CASE == "successful-repair" and self.repair == 0) else self.generation
+        self.reports = "implementation,proof,review" if self.repair == 0 else "implementation,proof,repair,review"
+        if CASE in ["repair-restart-exhaustion", "successful-repair", "blocked-failure"] and self.repair == 0:
+            self.repair = 1
+            self.attempts += 1
+            self.saved += 1
+            self.generation = 2
+            self.review = 0
+            self.proof = 0
+            self.reports = "implementation,repair"
+            self.phase = "review"
+            value = self.Projection(77)
+            return value
+        self.phase = "terminal"
+        if CASE in ["repair-restart-exhaustion", "blocked-failure"]:
+            self.status = "BLOCKED"
+            value = self.Projection(1)
+            return value
+        self.status = "REVIEWED_AND_PROVEN"
+        value = self.Projection(0)
+        return value
+
+    atomic action Inspect:
+        if not (self.phase in ["review", "proof"] and not self.inspected):
+            return "DISABLED"
+        self.inspected = True
+        value = self.Projection(1)
+        return value
+
+    atomic action Resume:
+        if not (self.phase == "terminal" and self.repeats < 2):
+            return "DISABLED"
+        self.repeats += 1
+        value = self.Projection(0 if self.status == "REVIEWED_AND_PROVEN" else 1)
+        return value
+
+    atomic action Overlap:
+        if not (self.phase == "review" and CASE == "concurrent-resume" and not self.fault):
+            return "DISABLED"
+        self.fault = True
+        # The first process owns the real lock before either is released.
+        # The loser cannot reserve or persist any new attempt.
+        self.attempts += 1
+        self.saved += 1
+        self.reports = "implementation,review"
+        self.phase = "proof"
+        self.review = self.generation
+        value = self.Projection(77)
+        return value
+
+action Init:
+    controller = Controller()
+
+always assertion RepairBound:
+    return controller.repair <= 1
+always assertion IndependentFullStages:
+    return controller.status != "REVIEWED_AND_PROVEN" or (controller.saved == controller.attempts and "proof" in controller.reports and "review" in controller.reports)
+always assertion CurrentCandidate:
+    return controller.status != "REVIEWED_AND_PROVEN" or (controller.generation == 1 + controller.repair and controller.review == controller.generation and controller.proof == controller.generation and controller.current == 1)
+always assertion NoStaleCompletion:
+    return not (CASE in FAULTS and controller.fault and controller.status == "REVIEWED_AND_PROVEN")

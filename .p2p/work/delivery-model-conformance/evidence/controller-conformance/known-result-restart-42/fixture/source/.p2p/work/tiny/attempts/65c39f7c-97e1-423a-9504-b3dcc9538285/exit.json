@@ -1,0 +1,20 @@
+{
+  "attempt_id": "65c39f7c-97e1-423a-9504-b3dcc9538285",
+  "elapsed_seconds": 0.01,
+  "event_sha256": "7f0c65c7336dbf62af00ce32580f12994db289bd89d0d1a2057aae25b9fca945",
+  "exit_code": 0,
+  "finished": "2026-09-26T15:14:19.680096+00:00",
+  "inputs": {
+    "binding_inputs": [
+      {
+        "path": "spec.txt",
+        "sha256": "96bbc5690a5a4af0a7ecc91d4f9faf97034a5e420189d348f5bcdd2c81dc0ce6"
+      }
+    ],
+    "comparison_base": "d164013bd18807377cb839a8e9d79b7add0b84fa",
+    "key": "snapshot:sha256:3dff31888a7276306b993cec029cc58ccf54be43e22a6c842f3f708c756a18f3",
+    "work_item": "work/tiny.md",
+    "work_item_sha256": "5fd555eb8132a635c95dcdfb76e647d3b859b51a51539fbc38aeb067986a502a"
+  },
+  "outcome": "finished"
+}

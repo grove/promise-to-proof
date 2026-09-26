@@ -1,0 +1,10 @@
+{
+  "candidate": "snapshot:sha256:7a82e6bfc71d1e7fcf2318f9aa18473ed9a92e06c8f0d318b40b9be44dfcf912",
+  "comparison_base": "833a33647f545afb9028d03bf82d03613415ddf9",
+  "entry_count": 126,
+  "full_tree_recomputed": true,
+  "manifest_saved_bytes_sha256": "7a82e6bfc71d1e7fcf2318f9aa18473ed9a92e06c8f0d318b40b9be44dfcf912",
+  "note": "Final returned proof differs from stage scratch report only by trailing newline; both exact versions retained. Same R7 gap and identity.",
+  "product_or_binding_change": false,
+  "proof_final_sha256": "2fe7cdd2c85261406439bb86d14a0e0d35ad305bee4d20c4d0ab4f0de4481e28"
+}

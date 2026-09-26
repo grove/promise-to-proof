@@ -1,0 +1,7 @@
+{
+  "archive": "evidence/live-host-run.tar.gz",
+  "files": 152,
+  "original_directory": "evidence/live-host",
+  "purpose": "Portable copy includes fixture Git metadata and nested durable stage records, which Git cannot retain through an embedded repository directory alone.",
+  "sha256": "e7567b42717ac55d291a8a5942c7f6d9b437456d375711a7ce5c0b94ca7f024b"
+}

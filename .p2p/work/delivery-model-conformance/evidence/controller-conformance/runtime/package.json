@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@fizzbee/mbt": "0.1.2",
+    "@types/node": "26.0.0",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": "26.9.0",
+    "npm": "11.19.1"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "actual_thread_events_match_receipts": true,
+  "sessions": [
+    {
+      "attempt_id": "662d4c34-daf5-4ff7-99b2-bc9d1590a8e5",
+      "session_id": "01a0de4d-d57a-72d0-a0b9-019ff03a486a",
+      "stage": "preflight-1"
+    },
+    {
+      "attempt_id": "abc84cc4-fa49-42a4-a5fd-c7e52551a68c",
+      "session_id": "01a0de4e-5f50-7a53-9f65-7969d9159054",
+      "stage": "preflight-2"
+    },
+    {
+      "attempt_id": "3a8d28e6-a95f-4e45-914d-77568429cc10",
+      "session_id": "01a0de4e-f14c-7d53-8285-f042b0d75ad6",
+      "stage": "implementation"
+    },
+    {
+      "attempt_id": "eb17669c-bd21-49e3-959a-63b457af984b",
+      "session_id": "01a0de51-179e-71d1-bc2e-00471d6a9c14",
+      "stage": "review"
+    },
+    {
+      "attempt_id": "7c49fbc7-1e2b-4d4d-8aa3-c82aceb31708",
+      "session_id": "01a0de52-e43d-7ca3-bc12-df0b0f5ff737",
+      "stage": "proof"
+    }
+  ],
+  "state": "REVIEWED_AND_PROVEN",
+  "summary_sha256": "cb85d753aa0739a268c0fe3ce710cdc4c8c74bd6abf1a85e9b9d7c6b73f36a8a"
+}

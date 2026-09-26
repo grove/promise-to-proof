@@ -1,0 +1,20 @@
+{
+  "attempt_id": "add68f2c-7c82-474b-bd4e-40028fa5a131",
+  "elapsed_seconds": 0.01,
+  "event_sha256": "19428235f273111b4a444440bf6e2bc78fa5ad71dda9605f150bbda9d690ba3a",
+  "exit_code": 0,
+  "finished": "2026-09-26T15:15:52.206339+00:00",
+  "inputs": {
+    "binding_inputs": [
+      {
+        "path": "spec.txt",
+        "sha256": "96bbc5690a5a4af0a7ecc91d4f9faf97034a5e420189d348f5bcdd2c81dc0ce6"
+      }
+    ],
+    "comparison_base": "6c603ec938975189cdfa427763ced5236b2ad21d",
+    "key": "snapshot:sha256:3dff31888a7276306b993cec029cc58ccf54be43e22a6c842f3f708c756a18f3",
+    "work_item": "work/tiny.md",
+    "work_item_sha256": "5fd555eb8132a635c95dcdfb76e647d3b859b51a51539fbc38aeb067986a502a"
+  },
+  "outcome": "finished"
+}
