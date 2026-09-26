@@ -4,13 +4,13 @@ Requirements: 10/10
 Counterexamples tested: 14 deliberately broken variants, plus 18 reachable success/blocker witnesses and 11 finite baseline explorations.
 Contract: `work/delivery-completion-integrity.md`, v1.
 Contract snapshot: exact retained candidate manifest bytes, SHA-256 `7cfbf6558846415b06b130d4989ca88a93ea73f06cb341eb02b30e7ac4b02956`.
-Candidate: `snapshot:sha256:036ec8df3613b46dd20cb5ea20f001549f4d031f16bac1526e5a91cf19ddad52`.
-Comparison base: `5a98bbcbeed9bbddce40d1b8158e0592bb10d13f`.
+Candidate: `snapshot:sha256:be7ea1690adb91888d089ab36aa2a70f0069bb7c258e9d21bd22db9f7851ad98`.
+Comparison base: `69c02fe5a0e876b104baacca2e4075f801974d40`.
 Candidate stability: unchanged, complete inventory/bytes/modes/symlink targets validated before and after.
 Contract stability: unchanged, exact bytes rehashed before and after.
 Invocation: `/root/proof25_refresh`, independent installed `/Users/grove/.agents/skills/prove/SKILL.md` invocation.
 Verification context: macOS-26.6.2-arm64-arm-64bit; Python 3.9.6; pinned FizzBee v0.5.3 macOS arm64. Candidate, base, and records were outside writable sandbox roots; no escalation, delegation, product writes, or contract writes. All generated files were confined to `/private/tmp`.
-Storage: pending enclosing workflow retention and readback. Exact report returned at `/private/tmp/p2p-proof25-refresh.md`; fresh evidence at `/private/tmp/p2p-proof25-refresh-evidence`. Intended durable evidence root is `.p2p/work/delivery-completion-integrity/evidence/proof-refresh/`, abbreviated `E/` below. Preserve this report verbatim and record storage confirmation separately.
+Storage: pending enclosing workflow retention and readback. Exact report returned at `/private/tmp/p2p-proof25-main69.md`; fresh evidence at `/private/tmp/p2p-proof25-main69-evidence`. Intended durable evidence root is `.p2p/work/delivery-completion-integrity/evidence/proof-main69/`, abbreviated `E/` below. Preserve this report verbatim and record storage confirmation separately.
 
 ## Outcome
 
@@ -30,19 +30,21 @@ Before and after execution, an independent inventory check compared all 112 cand
 | `plans/promise_to_proof_optimization_handoff.md` | `c09ae44b02d167ae136cf173f3c8611115e4ee0eaeb295dcf2b9269e36b9a928` |
 | `skills/productivity/deliver-issue/SKILL.md` | `9ecacf205eb6f399b9f487867cd1ddf2ec55155a9fef9878c79ae2ec8a41fbf1` |
 
-The candidate/base metadata and reconciliation records were also hashed before and after; both inventories are identical. Evidence: `E/p2p-proof25-before.txt`, `E/p2p-proof25-after.txt`, and `E/p2p-proof25-identities.py`. Recoverable candidate and base metadata came from the enclosing workflow's refresh25 records, not a mutable branch name.
+The candidate/base metadata and reconciliation records were also hashed before and after; both inventories are identical. Evidence: `E/p2p-proof25-main69-before.txt`, `E/p2p-proof25-main69-after.txt`, and `E/p2p-proof25-main69-identities.py`. Recoverable candidate and base metadata came from the enclosing workflow's refresh25-main69 records, not a mutable branch name.
+
+The concurrent PR #26 merge changed only `checks/publish-pr-scenarios.md` and `skills/productivity/publish-pr/SKILL.md`. I inspected that diff and established those are the only candidate changes since the previous refresh. They concern publication and checkout disposition, outside this model agreement. Contract and binding sources are byte-identical. The planner reconciliation remains applicable to the agreement; its old proposed comparison base is historical. This report binds the new base above, independently verified against Git objects in `/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-refresh-25-ktwpyoq5/repo`. An initial base-object lookup in the operator checkout failed because that checkout lacked the new commit; no identity claim relies on that lookup. A preliminary run was superseded by the full run below after successful complete identity verification.
 
 ## Fresh execution and independent observations
 
-From `/Users/Shared/p2p-issue-24-6krj8of_/refresh25/candidate`, I executed:
+From `/Users/Shared/p2p-issue-24-6krj8of_/refresh25-main69/candidate`, I executed:
 
 ```sh
-TMPDIR=/private/tmp python3 checks/delivery-model/check.py --fizz /private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz --output-dir /private/tmp/p2p-proof25-refresh-evidence
+TMPDIR=/private/tmp python3 checks/delivery-model/check.py --fizz /private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz --output-dir /private/tmp/p2p-proof25-main69-evidence
 ```
 
-The command exited 0 and printed `PASS: 43 checks. Model evidence only; no live-agent conformance claim.` FizzBee subprocess time totaled 48.282 seconds. The runner verified all three executable pins, recorded in `E/summary.json`. The source model SHA-256 was `4ac1ae31fed4764475d582a563a294401830b99b7d844a0c45f8c14d660e6753`.
+The command exited 0 and printed `PASS: 43 checks. Model evidence only; no live-agent conformance claim.` FizzBee subprocess time totaled 49.262 seconds. The runner verified all three executable pins, recorded in `E/summary.json`. The source model SHA-256 was `4ac1ae31fed4764475d582a563a294401830b99b7d844a0c45f8c14d660e6753`.
 
-I inspected all 32 fresh ordered traces, their terminal states, model actions and mutation mechanisms. I also ran the separate `E/p2p-proof25-inspect.py` audit, which asserted completion facts against the contract, checked that repair cleared old bindings and launched/returned both fresh stages, checked each mutation's concrete violation, and confirmed that retained models differ from the candidate model only in scenario/mutation/witness constants. Its result is retained in `E/p2p-proof25-audit.txt`. No prior proof was used as an observation.
+I inspected all 32 fresh ordered traces, their terminal states, model actions and mutation mechanisms. I also ran the separate `E/p2p-proof25-main69-inspect.py` audit, which asserted completion facts against the contract, checked that repair cleared old bindings and launched/returned both fresh stages, checked each mutation's concrete violation, and confirmed that retained models differ from the candidate model only in scenario/mutation/witness constants. Its result is retained in `E/p2p-proof25-main69-audit.txt`. No prior proof was used as an observation.
 
 Each baseline returned successful finite exploration and stayed below the configured 64-action bound:
 
@@ -74,8 +76,8 @@ References below are beneath `E/`. Each named run retains its generated model, c
 | R6 | Baselines assert reports/evidence both equal `[3,3]` at completion. Named witnesses block unsaved, unread, lost, inaccessible report/evidence states and evidence absent after interrupted saving plus restart. Each corresponding mutation completes with the deficient state and fails the artifact property. Absent reports also imply missing stages. Oracle is saved, reread, retrievable content, not path existence. | `witness-report-*`, `witness-evidence-*`, `witness-missing-stage`, `mutation-report-*`, `mutation-evidence-*` | proven |
 | R7 | Restart success retains one actual/used repair and rereads saved artifacts. Repeated proof failure after repair and restart yields `repair-exhausted` with both counters 1. Resetting allowance on restart permits an actual second repair and fails `RepairBound`. | `witness-restart`, `witness-exhausted`, `mutation-repair-reset`, `baseline-exhausted` | proven |
 | R8 | Initial success ends with both reports/evidence `[3,3]`, current bindings and distinct stages. Repair success and restart success are reachable. All 15 other witnesses expose the requested specific blockers. This is observed reachability, not a declared predicate alone. | All 18 `witness-*` runs, independent audit | proven |
-| R9 | All 14 deliberate variants fail the expected named assertion with a concrete corresponding violation, never a parser error or unrelated assertion. The retained models preserve independent assertions; only operational mutation constants change. | All 14 `mutation-*` runs, `p2p-proof25-audit.txt` | proven |
-| R10 | Documented public command reproduced all checks with pinned tool and modeled repository revision. README maps properties to protocol and documents historical baseline differences, finite fault families, timing/cutoff handling, atomicity, lack of fairness, trusted stage judgments, and excluded live behavior. Actual environment, runtimes, node counts and maximum depths are retained. | README, runner, `summary.json`, baseline observations, `p2p-proof25-run.txt` | proven |
+| R9 | All 14 deliberate variants fail the expected named assertion with a concrete corresponding violation, never a parser error or unrelated assertion. The retained models preserve independent assertions; only operational mutation constants change. | All 14 `mutation-*` runs, `p2p-proof25-main69-audit.txt` | proven |
+| R10 | Documented public command reproduced all checks with pinned tool and modeled repository revision. README maps properties to protocol and documents historical baseline differences, finite fault families, timing/cutoff handling, atomicity, lack of fairness, trusted stage judgments, and excluded live behavior. Actual environment, runtimes, node counts and maximum depths are retained. | README, runner, `summary.json`, baseline observations, `p2p-proof25-main69-run.txt` | proven |
 
 ## Mutation results
 
