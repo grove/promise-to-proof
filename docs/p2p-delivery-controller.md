@@ -56,7 +56,8 @@ host JSON events, process completion receipt, and exact returned report.
 `runtime/base.bundle` retain comparison-base content and Git objects. The runtime
 workspace and its separate Git metadata remain available for recovery.
 `review.md`, `proof.md`, and `acceptance-bundle.json` expose the current completed
-reports. Replaced records retain their previous bytes under `history/`.
+reports. Replaced records use Git history when the exact old bytes are already
+committed at `HEAD`; otherwise they retain those bytes under `history/`.
 
 A reserved attempt with an unambiguous saved process completion is reconciled
 without rerunning it. Missing launch/completion evidence returns `BLOCKED` and

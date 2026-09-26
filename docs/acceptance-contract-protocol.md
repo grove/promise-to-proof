@@ -101,10 +101,15 @@ repository, local, and global ignores affecting `specs/`, `work/`, or
 Git does not retain empty directories. Setup creates them locally; their first
 real files carry them into a checkout, so placeholder files are unnecessary.
 
-Use `.p2p/tmp/` or OS temporary directories only for disposable work. Before
-handoff, copy required evidence into the work item's artifact directory or
-retain its meaningful command, assertion, observation, and environment in a
-report. Never retain secrets in reports, snapshots, history, or logs. Redact
+Run exploratory checks, generated fixtures, dependency installs, and verbose
+debug output in `.p2p/tmp/` or OS temporary directories. Before handoff, retain
+the meaningful command, assertion, observation, and environment in the report.
+Copy separate evidence only when the report cannot carry the required evidence,
+such as replayable failure traces or host receipts checked during resume.
+Retain those files selectively; do not archive entire scratch workspaces or
+keep both an archive and its extracted contents. Reuse the candidate record's
+recoverable snapshot instead of making extra stage-specific copies.
+Never retain secrets in reports, snapshots, history, or logs. Redact
 secret-bearing output before saving. For large, sensitive, or machine-specific
 evidence, retain a description, safe durable reference, SHA-256 checksum, and
 access limitations. Without a safe durable copy, mark evidence unavailable.
@@ -112,10 +117,31 @@ A checksum or inaccessible old temporary path alone is insufficient.
 
 Before replacing a report, candidate, evidence, or uncommitted agreement, retain
 its previous bytes in Git history or `.p2p/work/<slug>/history/<sha256>/<name>`.
+When the exact old bytes already exist at the same path in `HEAD`, Git supplies
+that history; do not also copy them into `history/`. Staged bytes alone do not
+qualify. Preserve uncommitted versions in `history/` before replacement.
 Retain related evidence and snapshots so historical reports remain interpretable.
 Rerunning the owning stage updates verdicts and identities. A manually edited
 verdict does not establish acceptance. Acceptance is derived from matching
 current reports, never from an authoritative `accepted: true` flag.
+
+### Archive inactive records
+
+For inactive work, bulky records may live in existing Git history instead of
+the current checkout. Keep the top-level reports, candidate record, and any
+source records directly referenced by current contracts. Before removing other
+files, verify their exact bytes and modes against a reachable commit. Preserve
+all uncommitted files and all records needed by an active or interrupted run.
+
+Save `archive.md` in the work item's directory with the full commit SHA,
+repository-relative paths, Git tree identities, recovery command, and access
+limitations. Read it before interpreting missing evidence or resuming the work.
+Recover required files from that commit before verification; a missing commit
+or failed recovery blocks reuse. Historical inspection can use a temporary
+directory. Restoration into the working tree must preserve newer records.
+Archiving changes storage, not historical verdicts or current acceptance.
+It reduces checkout size, not Git history size. See [Reduce retained work
+data](./how-to.md#reduce-retained-work-data).
 
 ## Candidate identity and resume
 
