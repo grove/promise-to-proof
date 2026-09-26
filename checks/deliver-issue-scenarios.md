@@ -182,3 +182,26 @@ and access limitation. Delete temporary storage and resume successfully.
 Secret-bearing output must be redacted or excluded. If no safe durable evidence
 location exists, the result identifies the missing evidence instead of claiming
 completion. Local saving must not stage, commit, push, or modify a tracker.
+
+## D14. Import an approved standalone plan
+
+Use the standalone issue planning scenario in a fresh checkout with no planning
+branch. Give delivery only the issue reference and a human approval identifying
+the proposal's comment and exact text hash. Pass when delivery retrieves the
+contract and binding inputs, verifies their bytes, saves the contract unchanged
+in `work/<slug>.md`, and retains approval evidence in `planning-handoff.md`.
+It proceeds without repeating approval or requiring a preliminary PR. Planning
+inside delivery remains local. Publication later includes the local contract
+and records with the implementation under its existing authority rules.
+
+Repeat with changed text at the same revision, changed binding input bytes,
+a later amendment, a conflicting local work file, ambiguous approval, and
+unavailable binding content. Each prevents dependent implementation until
+reconciled; no old approval is silently applied and no human edits are lost.
+After import, change the issue: the local agreement remains unchanged until
+explicit reconciliation. Standalone local delivery still needs no tracker.
+Record remote cases as unexecuted without an authorized disposable tracker.
+
+Repeat with approval given only in the planning conversation and no transferred
+receipt. Delivery must identify missing approval evidence. Transfer the receipt
+and repeat: matching evidence preserves approval without another approval request.

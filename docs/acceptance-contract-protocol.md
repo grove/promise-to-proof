@@ -85,6 +85,54 @@ mirror. Resolve conflicting copies before proceeding. Migration changes the
 contract location and candidate inputs, so old results remain historical until
 fresh matching review and proof establish the new handoff.
 
+### Standalone planning on an issue
+
+A direct user invocation of `plan-acceptance <issue>` authorizes posting the
+proposed contract as a comment on that existing issue, unless the user requests
+local-only or draft-only output. This authority covers the planning handoff only,
+not issue-body replacement, labels, closure, commits, or PRs. Planning invoked by
+`deliver-issue` or another workflow inherits that workflow's authority and stays
+local unless issue publication was separately authorized.
+
+Save the proposal locally first. Post its exact UTF-8 text in a fenced block,
+with the intended `work/<slug>.md` path, revision, and SHA-256 outside the block.
+End the proposal with one newline before hashing and presenting it for approval.
+Choose a fence longer than any fence in the contract. The fenced content includes
+that final newline; fence lines are excluded from the hash. Include retrievable copies
+and hashes of binding sources and parents, preserving their relative paths, so
+another checkout can recover the agreement without a planning PR. A local path
+or digest alone is insufficient. Keep the issue body and human comments intact.
+Read back the comment and verify the extracted contract bytes and binding inputs.
+Reuse an identical existing handoff on retries; preserve old proposals when
+posting revisions. An uncertain write requires readback before another attempt.
+
+The issue comment is a shared planning handoff, not a second live contract store.
+Human approval must identify the exact proposal by comment and text hash, or by
+an equally unambiguous reference to the displayed text. Posting is not approval.
+Retain the comment URL, contract revision and hash, binding-input hashes, and
+the approver and approval evidence in `.p2p/work/<slug>/planning-handoff.md`.
+This record can capture approval from the invoking conversation or the issue;
+retain the actual approval text and its source, not an inferred status or label.
+For delivery from the issue alone, the approval evidence must be retrievable
+there. If approval exists only in the planning conversation, transfer the saved
+receipt explicitly or have the approving human record approval on the issue.
+Report this transfer requirement instead of claiming an issue-only handoff is ready.
+
+On issue import, delivery reads the handoff, approval, and subsequent amendments.
+It saves the exact approved text to `work/<slug>.md`, restores and checks binding
+inputs, and rereads them before implementation. Matching text and inputs retain
+their approval without another approval request. Missing or ambiguous approval,
+changed text even at the same revision, conflicting local content, or later
+amendments require reconciliation before dependent work. Preserve prior local
+bytes and human edits. Compare existing binding files before restoring missing
+inputs; reconcile differences instead of overwriting them with the saved copies.
+Missing binding content blocks the handoff. Keep provenance
+in the report rather than adding it to the approved contract bytes.
+
+After import, the local contract remains canonical under the rules above. There
+is no automatic synchronization. The contract and reports can travel with the
+implementation PR; neither planning nor delivery requires a preliminary PR.
+
 ## Durable generated records
 
 Save work-item output under `.p2p/work/<slug>/`: `implementation.md`,

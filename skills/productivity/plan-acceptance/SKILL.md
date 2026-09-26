@@ -5,7 +5,8 @@ disable-model-invocation: true
 ---
 
 Turn source promises into a candidate-independent acceptance contract. This skill
-plans acceptance. It does not implement, verify, or publish.
+plans acceptance. It does not implement or verify. A direct issue invocation
+also publishes a planning handoff under the protocol's standalone planning rules.
 
 Before planning, read the [acceptance contract protocol](references/acceptance-contract-protocol.md).
 It defines the spec envelope, revision rules, evidence terms, and handoffs.
@@ -13,6 +14,8 @@ It defines the spec envelope, revision rules, evidence terms, and handoffs.
 ## Build the contract
 
 1. Resolve `work/<slug>.md` using the protocol's naming and collision rules.
+   For an issue input, read the configured tracker instructions and the issue's
+   body, comments, existing planning handoffs, approvals, and amendments first.
    A standalone local work item needs neither a specification nor a tracker.
    Normalize minimal acceptance bullets into the matrix below in that same file;
    preserve existing IDs and promises. Import external source promises locally
@@ -72,6 +75,13 @@ mapping. Preserve previous revisions under the protocol's history rule. If
 this context cannot write, return the exact text to the enclosing workflow to
 save and reread, and report storage pending until it confirms retrieval.
 Saving local files does not authorize staging, commits, or tracker publication.
+
+For a direct user invocation on an issue, publish and verify the shared planning
+handoff under the protocol's standalone planning rules. A local-only or draft-only
+request suppresses that write. An invocation inside delivery stays local under
+the enclosing workflow's authority. Return the comment URL and exact proposal
+needing approval; publication does not approve it. If publication or readback
+fails, retain the local proposal and report the incomplete issue handoff.
 
 For a tracked child, hand readiness reconciliation to that invoking workflow.
 After saving and rereading the contract, it checks configured triage meanings,
@@ -136,6 +146,7 @@ Record actual evidence and verdicts in a separate proof report.
 After the contract, end with `Next steps:` and a numbered list (`1.`, `2.`, ...)
 of applicable actions in order, so each can be referenced by number. When the
 contract is saved, approved, and has no blocking gaps, give
+`/deliver-issue <issue>` for a published issue handoff, otherwise
 `/implement-contract <canonical contract reference>`; the optional audit is
 `/audit-acceptance <proposed contract> against <source>`. If saving or approval
 is pending, name the exact destination or proposal needing approval. If a row

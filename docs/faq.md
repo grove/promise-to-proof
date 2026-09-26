@@ -29,6 +29,19 @@ agreement to use after the issue discussion has grown or the work has moved to a
 new checkout. The contract lives in `work/<slug>.md`. The issue can link to it, and imported
 issue changes require explicit reconciliation into that file.
 
+### Can I plan now and deliver later without a planning PR?
+
+Yes. Direct `/plan-acceptance <issue>` saves the proposal locally and posts an
+exact copy on the issue for approval. Use `local-only` or `draft-only` to suppress
+the comment. Another person can later run `/deliver-issue <issue>` to import
+the approved text and binding inputs. Delivery preserves approval when they
+match and reconciles any amendments before implementation.
+
+The issue carries the planning handoff. The imported local contract remains
+canonical during delivery and can be included in the implementation PR.
+Planning invoked inside `deliver-issue` stays local, so the combined workflow
+does not gain an extra publication or approval step.
+
 ### When is `slice-contract` useful, and what does `NO SPLIT` mean?
 
 Use it when one parent contract contains several coherent outcomes that people

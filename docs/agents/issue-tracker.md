@@ -5,6 +5,9 @@ live in `specs/`. GitHub Issues are optional import, mirror, and publication
 destinations. Local planning, slicing, delivery, and resume need no tracker.
 Use the `gh` CLI for explicitly authorized GitHub operations. Importing an issue
 does not authorize comments, labels, links, or other remote writes.
+Direct `/plan-acceptance <issue>` is the scoped exception: it posts a proposal
+comment for approval under the protocol's standalone planning rules. Local-only
+and draft-only requests suppress publication. Planning inside delivery stays local.
 
 ## Conventions
 
