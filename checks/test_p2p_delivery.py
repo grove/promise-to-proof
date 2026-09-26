@@ -81,9 +81,15 @@ class FakeTransport:
                    'evidence':[{'assertion':'stdout equals hello newline and status zero',
                                 'observation':'fixture output hello newline, status zero',
                                 'artifact':'FIXTURE command python3 greet.py; stdout hello\\n; exit 0'}]}
+            if stage == 'review': row = {'id':'R1','observation':'Fixture observes hello newline and exit zero.'}
             report = {'status':status, 'input_identity_json':json.dumps(inputs),
                       'requirements':[row], 'details':'# ' + status + '\n\nFIXTURE ONLY; full R1 observation retained.',
                       'gaps':['fixture gap'] if gap else []}
+            if stage == 'review': report['findings'] = []
+            if self.mode == 'review-proof-verdict' and stage == 'review':
+                row['verdict'] = 'proven'
+            if self.mode == 'review-conflict' and stage == 'review':
+                report['findings'] = ['F1: fixture finding contradicts REVIEWED']
             if self.mode == 'omit' and stage == 'proof': report['requirements'] = []
             if self.mode == 'stale' and stage == 'proof':
                 report['input_identity_json'] = json.dumps(dict(inputs, work_item_sha256='0'*64))
@@ -201,6 +207,20 @@ class DeliveryTests(unittest.TestCase):
         self.fake.mode='stale'
         code,value=self.cli()
         self.assertEqual(code,1);self.assertIn('stale or mistyped',value['blocker'])
+
+    def test_review_rejects_proof_verdict_at_receipt(self):
+        self.fake.mode='review-proof-verdict'
+        code,value=self.cli()
+        self.assertEqual(code,1,value)
+        self.assertIn('review report',value['blocker'])
+        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review'])
+
+    def test_reviewed_report_cannot_contain_findings(self):
+        self.fake.mode='review-conflict'
+        code,value=self.cli()
+        self.assertEqual(code,1,value)
+        self.assertIn('review report',value['blocker'])
+        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review'])
 
     def test_missing_coverage_and_evidence(self):
         self.fake.mode='omit'
