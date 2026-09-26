@@ -2,6 +2,14 @@
 
 **Implementation specification · Version 3.0 · 26 September 2026**
 
+**Status: Implemented in commit `70b27bb` on 26 September 2026.**
+
+Automated checks and a manual local delivery/fresh-checkout exercise passed.
+See the [implementation report](../.p2p/work/p2p-filesystem/implementation.md)
+for validation details and limits. This specification is retained as the source
+agreement; the report and candidate record describe the implementation before
+this status note was added.
+
 This document defines the filesystem and Git conventions for Promise to Proof. It is intentionally small: ordinary Markdown files hold specifications and work items, Git holds the durable project record, and `.p2p/` holds generated Promise to Proof records.
 
 ## 1. Mental model
