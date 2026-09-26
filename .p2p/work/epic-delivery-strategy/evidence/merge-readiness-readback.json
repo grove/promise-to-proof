@@ -1,0 +1,28 @@
+{
+  "status": "READY",
+  "description_synchronization": "confirmed",
+  "readback_at": "2026-09-26T23:22:40+00:00",
+  "pr": {
+    "baseRefName": "main",
+    "baseRefOid": "5e369c1b45ba817b8add6b20a9b7b1c97898fa12",
+    "body": "## Summary\n\nGive each child an approved destination and preserve that decision across delivery, publication, and strategy changes.\n\n```text\napproved parent plan\n├─ independent child → final destination\n└─ grouped child → integration branch → full parent verification → final destination\n```\n\nRetargeting requires exact authority and verified inputs. Transfer and retry preserve approvals, human edits, and confirmed effects. Parent acceptance still checks the assembled interaction.\n\nSource: #33. Contract: [`work/epic-delivery-strategy.md`](https://github.com/grove/promise-to-proof/blob/issue/33/work/epic-delivery-strategy.md) v1, SHA-256 `78cad1d7f85183100214da15fdc8418ed2220ce1af80764d648e139fdd899895`.\n\nCandidate: `snapshot:sha256:7e5c54fa4183651c94b4f6b83bea7cc841b2722a5693047c5c8be8faaf8f41e8`.\nPublication commit: this PR's head, created from that snapshot with parent `5e369c1b45ba817b8add6b20a9b7b1c97898fa12`. The [candidate record](https://github.com/grove/promise-to-proof/blob/issue/33/.p2p/work/epic-delivery-strategy/candidate.json) retains the original snapshot identity and recoverable content.\nTarget: `main`, observed tip and fixed review base `5e369c1b45ba817b8add6b20a9b7b1c97898fa12`.\n\n## Evidence\n\n- **Before:** Controller transfer dropped a referenced approval receipt, and the original parent-failure fixture violated a child contract. [Recorded regression](https://github.com/grove/promise-to-proof/blob/issue/33/.p2p/work/epic-delivery-strategy/evidence/repair-red.log).\n- **After:** The public CLI transfer regression passes. Complete children still cannot override a failing parent interaction. All 30 repository tests passed; S1–S14 and required recovery variants were exercised.\n- Full [REVIEWED report](https://github.com/grove/promise-to-proof/blob/issue/33/.p2p/work/epic-delivery-strategy/review.md) and [PROVEN report](https://github.com/grove/promise-to-proof/blob/issue/33/.p2p/work/epic-delivery-strategy/proof.md): all 30 requirements, one unchanged candidate. [Record manifest](https://github.com/grove/promise-to-proof/blob/issue/33/.p2p/work/epic-delivery-strategy/publication-records.json) and [recovery guide](https://github.com/grove/promise-to-proof/blob/issue/33/.p2p/work/epic-delivery-strategy/publication-recovery.md).\n- Tracker tests use controlled simulations. Live GitHub retargeting validation remains unexecuted.\n\n## Merge Danger\n\n**Door:** Two-way. The implementation and instruction changes can be reverted without a data migration.\n\n**Blast Radius:** Workflows. Slicing, delivery, review, publication, and readiness consume the saved destinations; unsliced behavior remains covered.\n\nMerge readiness: READY — observed 2026-09-26T23:21:31+00:00; head `3684dbc7cccc1bb49936b0984f205ca731c5fc15`; base `main` at `5e369c1b45ba817b8add6b20a9b7b1c97898fa12`. Full candidate, contract, REVIEWED and PROVEN identities match. No required CI checks, repository approvals, or merge queue are configured; GitHub reports MERGEABLE/CLEAN. Report: local `.p2p/work/epic-delivery-strategy/merge-readiness.md` (not published). No blockers. This assessment applies only to the observed state and does not authorize merging.\n\n<!-- grove:publish-pr repo=grove/promise-to-proof candidate=snapshot:sha256:7e5c54fa4183651c94b4f6b83bea7cc841b2722a5693047c5c8be8faaf8f41e8 contract=sha256:78cad1d7f85183100214da15fdc8418ed2220ce1af80764d648e139fdd899895 -->\n",
+    "headRefName": "issue/33",
+    "headRefOid": "3684dbc7cccc1bb49936b0984f205ca731c5fc15",
+    "isDraft": false,
+    "latestReviews": [],
+    "mergeStateStatus": "CLEAN",
+    "mergeable": "MERGEABLE",
+    "number": 34,
+    "reviewDecision": "",
+    "reviews": [],
+    "state": "OPEN",
+    "statusCheckRollup": [],
+    "title": "Support independent, grouped, and mixed epic delivery",
+    "updatedAt": "2026-09-26T23:21:57Z",
+    "url": "https://github.com/grove/promise-to-proof/pull/34"
+  },
+  "only_readiness_entry_changed": true,
+  "head_base_gates_unchanged": true,
+  "merge_authority": "not granted; separate exact-head authorization required",
+  "merge_performed": false
+}
