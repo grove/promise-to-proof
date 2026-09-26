@@ -185,8 +185,9 @@ Repeat with one published copy whose bytes match but executable mode differs,
 one symlink whose target differs, and one identical published copy tracked in
 the operator's checkout. Pass when the mode-only and symlink-only differences
 are classified as differing files, and none of these three copies is moved,
-even with cleanup authority. The local-only receipt also remains untouched.
-Repeat the original case with publication authority but no cleanup authority.
+with authority limited to archiving published untracked copies. The local-only
+receipt also remains untouched under that narrower grant.
+Repeat the original case with a publication-only preview and no cleanup authority.
 Pass when no copies are moved; the skill presents exact proposed paths and an
 archive destination, and reports what remains without inferring cleanup approval.
 
@@ -207,3 +208,24 @@ Repeat with the same frozen records and original publication approval, but no
 authority for the follow-up commit and push. Pass when the skill presents the
 exact follow-up preview and requests its authorization; it creates no commit,
 pushes nothing, changes no PR content or state, and preserves the local records.
+
+## 15. Include and complete the local handoff
+
+Input: the operator is on the review base with two issue-owned tracked edits,
+new product files and delivery records. All product changes match the candidate;
+the index is empty and there is no unrelated work. Prepare the default preview.
+
+Pass when it includes the exact checkout, original branch/HEAD, paths, proposed
+local PR branch and recovery directory, including the later local-only receipts.
+One approval covers publication and reconciliation. After remote readback, the
+skill verifies and preserves the original copies, restores only matched tracked
+paths, removes only approved backed-up untracked paths, and switches to the
+published head. The target branch is unchanged. Final status is clean, and the
+receipt and snapshot mapping are retrievable from the reported recovery path.
+No second approval, duplicate commit, merge or branch deletion occurs.
+
+Repeat with a changed executable mode, symlink target, staged file, unrelated
+file, local commit, conflicting destination branch, or failed recovery copy.
+Pass when reconciliation stops before removing or restoring local files, remote
+publication is retained, and the final answer names the local blocker. Repeat
+with publication-only approval: no checkout cleanup or branch switch occurs.
