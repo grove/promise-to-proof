@@ -29,7 +29,9 @@ and snapshot-to-commit mappings automatically in
 `.p2p/work/<slug>/publication.md`; preserve prior records under the protocol
 retention rule. Local record saving is authorized independently of publication.
 
-The exact publication preview may include durable `.p2p/work/` records. Exclude
+The exact publication preview must include the reports, evidence, and recovery
+records needed to retrieve every referenced handoff from the published commit.
+List their exact paths and byte identities. Exclude
 `.p2p/tmp/` and secrets. A later artifact commit never rebinds old reports: compare
 the complete tracked tree outside `.p2p/`, exact work-item and binding input hashes,
 and comparison base before reusing results. Retain report-bound candidate A
@@ -118,10 +120,15 @@ needed, title, complete body, and the effects requiring authorization. The
 default outcome is `DRAFT`; inspection and preview create no commit, branch,
 push, pull request, comment, label, reviewer request, or other external change.
 
+Explain in the preview that isolated publication leaves the operator's local
+copies in place. Identify which records will be committed and which publication
+receipts can only be produced afterward. Publishing the candidate does not
+silently commit those later receipts or clean the operator's checkout.
+
 ## Require exact publication authority
 
-Publish only after the user explicitly authorizes the complete preview. The
-grant must bind the candidate and agreement identities, report references,
+For initial publication, publish only after the user explicitly authorizes the
+complete preview. The grant must bind the candidate and agreement identities, report references,
 destination, target branch and observed tip, head branch, commit inputs, title,
 body, and these effects as applicable:
 
@@ -137,8 +144,9 @@ preview and requires a new one.
 
 ## Preserve candidate bytes
 
-Never publish from or alter the operator's working checkout. Use an isolated
-publication workspace reconstructed from the recoverable candidate and recorded
+Publish from an isolated workspace. Leave the operator's working checkout
+unchanged except for separately authorized reconciliation under
+"Finish the local handoff" below. Use a publication workspace reconstructed from the recoverable candidate and recorded
 base. Keep credentials and temporary output outside the commit tree. Include only
 the durable reports explicitly listed in the publication preview.
 
@@ -187,8 +195,9 @@ changing that state. A closed, merged, altered, or ambiguous match requires
 reconciliation and no new pull request.
 
 Create the remote head branch only when it is absent. If it exists at the exact
-approved commit, reuse it. If it points elsewhere, return `BLOCKED`; never update
-or force-push it. After a push, read the remote ref and require its full SHA to
+approved commit, reuse it. If it points elsewhere during initial publication, return `BLOCKED`;
+never force-push it. An explicitly authorized records-only follow-up uses the
+separate procedure under "Finish the local handoff" below. After a push, read the remote ref and require its full SHA to
 match the verified publication commit before creating the pull request.
 
 Create the pull request as a draft using the approved target, head, title, and
@@ -201,6 +210,36 @@ For an uncertain push or pull-request response, search and read back by remote
 ref, marker, and exact identities before retrying. Reuse one confirmed exact
 effect. If no unique result can be established, return `PARTIAL` and do not
 repeat the write. Never delete a successful branch or pull request as rollback.
+
+## Finish the local handoff
+
+After remote readback, compare issue-owned files in the operator's checkout with
+the published commit by path, bytes, mode, and symlink target. Report separately:
+files already published unchanged, files that differ, and local-only records.
+An untracked copy on another branch is not evidence that publication omitted it.
+
+For local-only publication records, prepare a records-only follow-up preview
+when the user wants them published. Freeze the exact paths and bytes, parent
+commit, message, destination and head. Obtain explicit authority for that commit
+and its non-force push unless the current request already grants it. This is a
+separate update of the existing PR, not permission inferred from its original
+publication. Before writing, require the remote head to equal the named parent.
+Verify that the complete product tree and original review/proof bytes are
+unchanged, retain the original report-bound candidate identity, and confirm the
+new remote SHA. Preserve the PR's current ready/draft state, title and body.
+
+Treat the frozen publication receipt as a historical record of the first
+publication. Confirm the later records commit by its Git ancestry and remote
+SHA; do not recursively create another receipt commit about each receipt commit.
+Keep the original snapshot-to-commit mapping and report the later head separately.
+
+For checkout cleanup, use the user's existing authority or present the exact
+paths and archive destination. Move only issue-owned untracked files whose
+complete content is confirmed in a retrievable remote commit. Preserve a local
+recovery copy and report its location. Leave differing, local-only or unrelated
+work untouched until it has its own safe disposition. Do not stage duplicate
+product files on the target branch merely to remove untracked status. Confirm
+`git status` after any authorized cleanup; otherwise explain what remains and why.
 
 ## Report
 
@@ -217,7 +256,8 @@ For every status, report the source, agreement, candidate, review and proof
 references, comparison base, destination, target and head state, approved effects,
 effects actually observed, and unresolved work. For `PUBLISHED`, include the
 candidate-to-commit mapping, remote branch, pull-request URL and draft state, and
-readback result.
+readback result. Include the local checkout disposition and any records still
+awaiting publication, with their exact locations.
 
 State `Merge readiness: NOT ASSESSED`. Hand the confirmed pull request and
 saved reports to an explicitly invoked `/merge-readiness`; do not invoke it.
