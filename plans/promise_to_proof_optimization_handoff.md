@@ -68,7 +68,7 @@ These are the working design directions of this handoff. They do not authorize c
 
 ## 1.3 Delivery order
 
-Deliver the completion-rule model first, then enforce the rules in a running program and test that program against the model. Next, prove the controller can use another agent host without weakening its protections. Compare speed and cost only after that foundation works. User-selectable checking levels, parallel child tasks, and automatic strategy selection come later, in that order.
+Deliver the completion-rule model first, then enforce the rules in a running program and test that program against the model. Compare speed and cost on the first supported host after that foundation works. Add another host before committing to user-selectable checking levels, then take on parallel child tasks and automatic strategy selection.
 
 [Section 19](#19-delivery-phases-in-order) defines the deliverables and completion checks. Issue #24 delivered the selected completion-integrity model. It did not deliver the whole optimization roadmap or authorize weaker checks.
 
@@ -679,9 +679,9 @@ This roadmap sets the order. It does not approve future product decisions, spend
 | 1 | An executable model of completion rules | We can find cases where the rules could wrongly allow “done” | Complete for issue #24; PRs #25–#27 merged September 26, 2026 |
 | 2 | A small program that enforces the rules | A real delivery cannot bypass the required checks | Complete for issue #28; PR #29 merged September 26, 2026 |
 | 3 | Tests that compare the program with the model | We can catch differences between the design and the running program | Next development phase; acceptance planning and FizzBee test-adapter compatibility demonstration remain |
-| 3.1 | Support for a second agent host | The same delivery rules can work with another host | After Phase 3; target host and enforceable capabilities remain to be selected |
-| 4 | A repeatable comparison of delivery strategies | We can see which choices save time or money and at what cost | After Phase 3.1 |
-| 5 | Clearly described levels of checking | Users can make an informed, authorized choice | After Phase 4 |
+| 4 | A repeatable comparison of delivery strategies | We can see which choices save time or money and at what cost | After Phase 3; results will be scoped to the first supported host |
+| 4.1 | Support for a second agent host | The same delivery rules can work with another host | After Phase 4; target host and enforceable capabilities remain to be selected |
+| 5 | Clearly described levels of checking | Users can make an informed, authorized choice | After Phase 4.1 |
 | 6 | Safe execution of several related tasks | Independent tasks can run together without losing the final combined check | After Phase 5 |
 | 7 | A limited trial of automatic strategy selection | We can test improvements on real work and turn them off safely | After Phase 6 |
 
@@ -745,9 +745,23 @@ Done when removing a real protection, such as the stale-report check, makes a te
 
 Choose the test adapter language only after demonstrating that the pinned FizzBee tools can drive it. Document which cases use a real host and which use substitutes. Extend the model if a required controller behavior is outside its current bounds. [F05]
 
-## Phase 3.1: Support another agent host
+Keep conformance checks at the controller level: define a small host-neutral capability and receipt contract, and keep Codex command construction and event parsing within one adapter. Exercise that contract through the first supported host; this phase does not add another host.
 
-After Phase 3 establishes model-to-controller conformance, make the controller usable with one additional agent host. Keep the operating system fixed at macOS for this phase so host-runtime portability is tested separately from cross-OS portability. Preserve Codex behavior as the compatibility baseline.
+## Phase 4: Find out what saves time and money
+
+Compare a few fixed ways to deliver one task while keeping the same full checking requirements. Start with review first, proof first, and both together where the host permits it. Compare agent model choices only when they meet the same permissions and checking requirements.
+
+Deliver a repeatable comparison using a small representative set of tasks. Record total elapsed time, total cost, successful completions, missed defects, and the human work needed. Include failed attempts, repairs, waiting, and the cost of the comparison itself.
+
+Done when the calculations match simple examples checked by hand, the same inputs reproduce the results, and the report clearly separates estimates from measurements. Show how the recommendation changes when costs or failure rates change. Running two checks together must count their overlapping time correctly.
+
+Label the measurements with the actual host and version; do not generalize a single-host result to other hosts.
+
+Decide the task set, who judges correctness, and what improvement would justify the added machinery before evaluating it. This phase recommends choices; it does not automatically change how live tasks run.
+
+## Phase 4.1: Support another agent host
+
+After Phase 4 establishes a measured baseline, make the controller usable with one additional agent host. Keep the operating system fixed at macOS for this phase so host-runtime portability is tested separately from cross-OS portability. Preserve Codex behavior as the compatibility baseline.
 
 Move only host-specific invocation, configuration, isolation setup, and receipt parsing behind a narrow adapter. The controller remains responsible for durable dispatch, authorization, identities, budgets, recovery, and acceptance decisions. Select a second host only after a preflight demonstrates that it can run distinct stages, protect verification inputs, provide bounded scratch access, and return trustworthy invocation and completion receipts. A prompt or worker assertion is not enforcement evidence.
 
@@ -761,16 +775,6 @@ Deliver:
 Done when both hosts pass the same controller-conformance checks, the second host completes one full delivery with matching full reports, and live evidence establishes its required isolation and invocation boundaries. Document unsupported capabilities; do not label a host supported based on fixture tests alone. Keep macOS fixed here; cross-OS support requires a separate scope and host-specific enforcement evidence.
 
 Decision before implementation: name the second host and demonstrate the required capabilities before building its adapter. Do not weaken full review, proof, authorization, identity, or evidence requirements to accommodate it.
-
-## Phase 4: Find out what saves time and money
-
-Compare a few fixed ways to deliver one task while keeping the same full checking requirements. Start with review first, proof first, and both together where the host permits it. Compare agent model choices only when they meet the same permissions and checking requirements.
-
-Deliver a repeatable comparison using a small representative set of tasks. Record total elapsed time, total cost, successful completions, missed defects, and the human work needed. Include failed attempts, repairs, waiting, and the cost of the comparison itself.
-
-Done when the calculations match simple examples checked by hand, the same inputs reproduce the results, and the report clearly separates estimates from measurements. Show how the recommendation changes when costs or failure rates change. Running two checks together must count their overlapping time correctly.
-
-Decide the task set, who judges correctness, and what improvement would justify the added machinery before evaluating it. This phase recommends choices; it does not automatically change how live tasks run.
 
 ## Phase 5: Let users choose a level of checking
 
