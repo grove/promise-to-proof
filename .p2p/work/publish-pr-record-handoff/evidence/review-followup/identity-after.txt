@@ -1,1 +1,0 @@
-PASS candidate entries 109 base entries 108 base Git object matches, candidate key, work item and all binding hashes match

@@ -111,6 +111,11 @@ deleted at any time. Required observations must already be retained in a report
 or evidence file. Sensitive or large evidence needs a safe durable reference,
 checksum, and access limitations. Unavailable evidence stays unavailable.
 
+Keep exploratory runs and generated fixtures in scratch. For inactive work,
+bulky committed records can stay in Git history with an `archive.md` recovery
+reference beside the reports. Restore required evidence before reuse. See
+[Reduce retained work data](./how-to.md#reduce-retained-work-data).
+
 ## Review, proof, and repair
 
 ### What is the difference between review and proof?

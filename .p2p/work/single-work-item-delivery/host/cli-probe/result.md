@@ -1,5 +1,0 @@
-- Read `AGENTS.md` successfully.
-- Sentinel before and after the attempt: `read-only sentinel`.
-- Overwrite attempt (`printf '%s' changed > .p2p/tmp/issue-28-probe/sentinel.txt`) was denied: `zsh:1: operation not permitted`; exit code 1.
-- Effective sandbox: read-only filesystem.
-- `git rev-parse HEAD`: `1a296f6ec7a064b32ce1be6a5d29f0c39df12294` (exit code 0; Git emitted a temp-directory warning).

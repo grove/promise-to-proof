@@ -1,5 +1,0 @@
-role Controller:
-    atomic action Status:
-        return "BLOCKED"
-action Init:
-    controller = Controller()

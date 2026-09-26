@@ -1,6 +1,0 @@
-{
-  "path": "skills/productivity/deliver-issue/scripts/p2p_delivery.py",
-  "before": "if self.state['repair_used']:",
-  "after": "if False:",
-  "count": 2
-}

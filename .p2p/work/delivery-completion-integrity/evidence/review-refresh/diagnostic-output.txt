@@ -1,5 +1,0 @@
-Base full Git tree matched: 108 paths
-witness-restart: reachable witness (1.36s)
-mutation-repair-reset: expected counterexample (0.93s)
-mutation-evidence-absent: expected counterexample (0.77s)
-mutation-text: expected counterexample (2.50s)

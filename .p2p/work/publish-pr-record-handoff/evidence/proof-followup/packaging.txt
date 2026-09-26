@@ -1,7 +1,0 @@
-readable regular file SKILL.md 16786
-readable regular file agents/openai.yaml 155
-readable regular file references/acceptance-contract-protocol.md 25838
-protocol bytes equal; YAML parsed; implicit invocation allowed; disable-model-invocation absent
-Skill is valid!
-
-packaging only; installed agent invocation not claimed

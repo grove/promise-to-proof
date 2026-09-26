@@ -1,6 +1,0 @@
-{
-  "path": "skills/productivity/deliver-issue/scripts/p2p_delivery.py",
-  "before": "if not args.authorize_local:",
-  "after": "if False:",
-  "count": 1
-}

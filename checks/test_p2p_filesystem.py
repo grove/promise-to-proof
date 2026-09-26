@@ -83,6 +83,16 @@ def run():
         subprocess.run(["git", "clone", "-q", str(root), str(clone)], check=True)
         assert p2p.validate(clone, work, base)["commit"] == base
         assert "evidence/local-run.log" in " ".join(p2p.resolve(clone, work)["artifacts"])
+        report = root / ".p2p/work/feature-api/review.md"
+        committed_report = report.read_bytes()
+        history = report.parent / "history"
+        p2p.save(root, work, "review.md", b"uncommitted report")
+        assert not (history / p2p.digest(committed_report) / "review.md").exists()
+        assert p2p.git(root, "show", "HEAD:.p2p/work/feature-api/review.md") == committed_report
+        p2p.git(root, "add", str(report))
+        p2p.save(root, work, "review.md", b"next report")
+        assert (history / p2p.digest(b"uncommitted report") / "review.md").read_bytes() == b"uncommitted report"
+        p2p.git(root, "reset", "-q", "HEAD", str(report))
         for path, expected in (("app.txt", "product candidate changed"), (work, "work item changed"),
                                ("work/parent.md", "binding inputs changed"), ("specs/feature.md", "binding inputs changed")):
             file = root / path
@@ -128,6 +138,7 @@ def run():
         (root / ".gitignore").write_text("/.p2p/tmp/\n/.p2p/work/*/history/\n")
         rejects(lambda: p2p.setup(root), "conflicting ignore")
         proof = root / ".p2p/work/feature-api/proof.md"
+        proof.write_bytes(proof.read_bytes() + b" uncommitted")
         original_proof = proof.read_bytes()
         rejects(lambda: p2p.save(root, work, "proof.md", b"replacement"), "conflicting ignore")
         assert proof.read_bytes() == original_proof

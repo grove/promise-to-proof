@@ -1,7 +1,0 @@
-{
-  "candidate": "snapshot:sha256:7a82e6bfc71d1e7fcf2318f9aa18473ed9a92e06c8f0d318b40b9be44dfcf912",
-  "entry_count": 126,
-  "both_receipts_match": true,
-  "source_and_code_preserved": true,
-  "hash_format": "SHA256(canonical JSON manifest entry), including path, type, mode and encoded content or symlink target"
-}

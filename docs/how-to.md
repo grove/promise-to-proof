@@ -347,6 +347,40 @@ validate candidate currency. This helper does not judge proof or grant approval.
 The [protocol](./acceptance-contract-protocol.md#candidate-identity-and-resume)
 defines the identity and recovery rules.
 
+## Reduce retained work data
+
+Run checks in `.p2p/tmp/` or an OS temporary directory. Save the relevant command,
+assertion, actual result, and environment in the final report. Retain separate
+files when they supply required evidence, such as replayable traces and host
+receipts. Keep one recoverable candidate snapshot; reference it from reports.
+
+To remove bulky records from an inactive work item's checkout:
+
+1. Identify the records referenced by its reports and current contracts. Keep
+   the top-level reports, candidate record, and directly referenced source files.
+2. Verify that every file to remove matches its bytes and mode in a reachable
+   Git commit. Preserve dirty, untracked, active, and interrupted-run records.
+3. Write `.p2p/work/<slug>/archive.md` with the full commit SHA, exact paths,
+   Git tree identities, and a recovery command. Check recovery in a temporary
+   directory before removing files, then commit the removals and archive record
+   when authorized. Do not rewrite Git history.
+
+For historical inspection, recover into a new temporary directory:
+
+```sh
+recovery_dir=$(mktemp -d)
+git archive FULL_COMMIT_SHA .p2p/work/SLUG | tar -x -C "$recovery_dir"
+```
+
+Use the commit and path recorded in `archive.md`. A full clone retains the
+referenced ancestor; a shallow clone or source export may need the missing Git
+history before recovery. Restore required files before verification or resume.
+Copy only the needed archived paths into the checkout after checking that this
+preserves newer records. Missing evidence still blocks reuse.
+
+This reduces the working tree size. Existing Git objects
+remain in history, so the repository's Git storage does not shrink.
+
 ## Pick a command
 
 | Command | Use it to |

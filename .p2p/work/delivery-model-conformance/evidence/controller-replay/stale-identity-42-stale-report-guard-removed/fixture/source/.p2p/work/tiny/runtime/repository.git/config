@@ -1,8 +1,0 @@
-[core]
-	repositoryformatversion = 0
-	filemode = true
-	bare = false
-	ignorecase = true
-	precomposeunicode = true
-[remote "origin"]
-	url = /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-replay/stale-identity-42-stale-report-guard-removed/fixture/source

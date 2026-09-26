@@ -1,8 +1,0 @@
-{
-  "elapsed_seconds": 336.965220999904,
-  "events_sha256": "834751212cb65360281de85fe0852a10b4b26d15b4a7734f45082370b3fb0d31",
-  "exit_code": -15,
-  "finished": "2026-09-26T14:59:09.100273+00:00",
-  "outcome": "finished",
-  "parse_error": "missing unambiguous host session/completion receipt: /Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/host/implementation/events.jsonl"
-}

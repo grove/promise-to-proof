@@ -1,7 +1,0 @@
-{
-  "base_change": "User/other session committed roadmap-only Phase 3.1 edits during preflight. Preserve new base; issue #30 uses separate exact pinned source.",
-  "comparison_base": "a38045968c8d4d551a9e3a1f8bf14fed8bd4b481",
-  "preflight_session_id": "01a0de2b-9e26-76f0-8d49-9510baa769e2",
-  "sentinel_unchanged": true,
-  "user_message": "I approve using the gh tool outside of the sandbox. I also approve sandboxed Codex CLI stages."
-}

@@ -197,12 +197,16 @@ def save(root, work, name, data):
         old = target.read_bytes()
         if old == data:
             return str(target.relative_to(root))
-        archived = safe(root, str(artifact.relative_to(root) / "history" / digest(old) / name))
-        trackable(root, [str(archived.relative_to(root))])
-        archived.parent.mkdir(parents=True, exist_ok=True)
-        if archived.exists() and archived.read_bytes() != old:
-            raise ValueError("history collision")
-        atomic_write(archived, old)
+        committed = subprocess.run(
+            ["git", "-C", str(root), "show", "HEAD:" + str(target.relative_to(root))],
+            capture_output=True)
+        if committed.returncode or committed.stdout != old:
+            archived = safe(root, str(artifact.relative_to(root) / "history" / digest(old) / name))
+            trackable(root, [str(archived.relative_to(root))])
+            archived.parent.mkdir(parents=True, exist_ok=True)
+            if archived.exists() and archived.read_bytes() != old:
+                raise ValueError("history collision")
+            atomic_write(archived, old)
     target.parent.mkdir(parents=True, exist_ok=True)
     atomic_write(target, data)
     return str(target.relative_to(root))

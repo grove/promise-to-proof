@@ -1,9 +1,0 @@
-{
-  "authority": "Preserve concurrent user roadmap commit; isolated Git metadata only; no product commit or source ref/index mutation",
-  "from": "a38045968c8d4d551a9e3a1f8bf14fed8bd4b481",
-  "only_base_changes": [
-    "plans/promise_to_proof_optimization_handoff.md"
-  ],
-  "product_change_from_alignment": "plans/promise_to_proof_optimization_handoff.md",
-  "to": "833a33647f545afb9028d03bf82d03613415ddf9"
-}

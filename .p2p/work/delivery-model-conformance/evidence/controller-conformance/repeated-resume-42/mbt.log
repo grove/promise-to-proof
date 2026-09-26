@@ -1,7 +1,0 @@
-gRPC server started on /var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/fizzbee-mbt-YgAL0x/plugin.sock
-Starting runner: /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner --plugin-addr=/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/fizzbee-mbt-YgAL0x/plugin.sock --max-seq-runs=1 --max-parallel-runs=0 --max-actions=256 --seq-seed=42
-Running 1 test with seed 42
-Sequential tests succeeded! Number of sequential runs: 1
-Parallel tests succeeded! Number of parallel runs: 0
-Runner exited successfully
-Test executor shut down gracefully
