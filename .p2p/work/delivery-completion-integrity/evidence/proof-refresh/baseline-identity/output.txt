@@ -1,0 +1,12 @@
+Model checking /private/tmp/p2p-delivery-model-run-kr2k6o4_/baseline-identity.json
+configFileName: /private/tmp/p2p-delivery-model-run-kr2k6o4_/fizz.yaml
+fizz.yaml not found. Using default options
+StateSpaceOptions: options:{max_actions:64 max_concurrent_actions:1} deadlock_detection:false
+Nodes: 3176, queued: 0, elapsed: 459.400666ms
+Time taken for model checking: 459.421042ms
+Skipping dotfile generation. Too many Nodes: 3176
+Valid Nodes: 1699 Unique states: 634
+IsLive: true
+Time taken to check liveness: 6.69525ms
+PASSED: Model checker completed successfully
+Writen 1 node files and 1 link files to dir /private/tmp/p2p-delivery-model-run-kr2k6o4_/baseline-identity

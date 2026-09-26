@@ -1,0 +1,39 @@
+{
+  "kind": "baseline",
+  "name": "report-lost",
+  "scenario": "report-lost",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/private/tmp/p2p-delivery-model-run-kr2k6o4_/baseline-report-lost",
+    "/private/tmp/p2p-delivery-model-run-kr2k6o4_/baseline-report-lost.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 1.229,
+  "model_sha256": "42f614cb88000e6ffc29cd1f130948ada2767771afd478a2073530c1f0dda84c",
+  "nodes": 2534,
+  "max_actions_observed": 16,
+  "outcomes": [
+    "complete",
+    "evidence-absent",
+    "evidence-read",
+    "evidence-save",
+    "missing-stage",
+    "report-lost",
+    "report-read",
+    "report-save",
+    "running"
+  ],
+  "actions": [
+    "Complete",
+    "Environment",
+    "Implement",
+    "Launch",
+    "ReadBack",
+    "Restart",
+    "Return",
+    "Save"
+  ],
+  "result": "complete finite safety exploration"
+}

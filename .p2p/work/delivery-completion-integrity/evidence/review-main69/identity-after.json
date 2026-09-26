@@ -1,0 +1,25 @@
+{
+  "candidate": {
+    "key": "snapshot:sha256:be7ea1690adb91888d089ab36aa2a70f0069bb7c258e9d21bd22db9f7851ad98",
+    "paths": 112,
+    "comparison_base": "69c02fe5a0e876b104baacca2e4075f801974d40",
+    "bindings": {
+      "docs/acceptance-contract-protocol.md": "bec3503abc6ebc40356e662ca0b279be73a4da482eb1616a5c5b435509184351",
+      "plans/promise_to_proof_optimization_handoff.md": "c09ae44b02d167ae136cf173f3c8611115e4ee0eaeb295dcf2b9269e36b9a928",
+      "skills/productivity/deliver-issue/SKILL.md": "9ecacf205eb6f399b9f487867cd1ddf2ec55155a9fef9878c79ae2ec8a41fbf1",
+      "work/delivery-completion-integrity.md": "7cfbf6558846415b06b130d4989ca88a93ea73f06cb341eb02b30e7ac4b02956"
+    }
+  },
+  "base": {
+    "key": "snapshot:sha256:2f82a8cb8b1ca472db38aa87dfdbddb19bace52b846cc40eb8bfc3077b720453",
+    "paths": 108,
+    "comparison_base": null,
+    "bindings": {}
+  },
+  "changed": [
+    "checks/delivery-model/README.md",
+    "checks/delivery-model/check.py",
+    "checks/delivery-model/delivery.fizz",
+    "work/delivery-completion-integrity.md"
+  ]
+}

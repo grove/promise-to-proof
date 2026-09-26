@@ -1,0 +1,18 @@
+{
+  "kind": "mutation",
+  "name": "candidate",
+  "scenario": "candidate",
+  "mutation": "candidate",
+  "command": [
+    "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/private/tmp/p2p-delivery-model-run-ayiordf4/mutation-candidate",
+    "/private/tmp/p2p-delivery-model-run-ayiordf4/mutation-candidate.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 2.813,
+  "model_sha256": "848233618ad7d20652d7c507d71bb94c5ef1ee5dae419ff26a73fd7aace38c5d",
+  "property": "CurrentCandidate",
+  "steps": 35,
+  "result": "expected counterexample"
+}

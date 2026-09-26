@@ -1,0 +1,28 @@
+{
+  "status": "COMMIT_VERIFIED",
+  "workspace": "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-publication-24-fllgjpeb/repo",
+  "commit": "3ef1651418b44c3d0ee59e81cf3aec3c22e36454",
+  "candidate": "snapshot:sha256:09373011d141a5cbc78a0ea855d257eb456b31246d2875bb32c17e436e44bb25",
+  "base": "41bebc726a8cc71c1d2f22d822ade006f4e78121",
+  "preview_sha256": "9a5e8dbb77097ef54bc607dabbbd1a56e637a3d3c788e3fc0877487c214f95c6",
+  "timestamp": "2026-09-26T09:57:23 +0000",
+  "author": "Geir Ove Gr\u00f8nmo <grove@geirove.org>",
+  "committer": "Geir Ove Gr\u00f8nmo <grove@geirove.org>",
+  "message": "Model delivery completion integrity with FizzBee (#24)",
+  "remote": "https://github.com/grove/promise-to-proof.git",
+  "head": "issue/24",
+  "target": "main",
+  "authorized_effects": [
+    "create isolated commit",
+    "push without force",
+    "create draft PR"
+  ],
+  "observed_effects": [
+    "created isolated commit"
+  ],
+  "tree": "f6e5efacb60d7de9049236f16d138b140680eb63",
+  "bundle_sha256": "b5340b25d382a29fca8097f550c7486c557359d8644e63337d00c37b4b2e5905",
+  "artifact_count": 443,
+  "product_entries": 112,
+  "verification": "Exact product manifest, approved artifact bytes/modes, inherited artifacts, parent, identities, message and unsigned policy verified; clean isolated checkout. Git metadata does not affect executable model inputs."
+}

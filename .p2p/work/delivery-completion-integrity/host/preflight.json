@@ -1,0 +1,20 @@
+{
+  "repository": "/Users/grove/projects/promise-to-proof",
+  "branch": "main",
+  "starting_commit": "41bebc726a8cc71c1d2f22d822ade006f4e78121",
+  "starting_status": "clean, git status --short empty",
+  "host": "collaboration tools",
+  "probe_agent_id": "/root/host_probe",
+  "launch": "collaboration.spawn_agent(task_name=host_probe, fork_turns=none), then followup_task for isolated input probe",
+  "completion": "completed; protocol and installed review/prove skills readable; git HEAD matched",
+  "permissions": "workspace-write; repo and temp writable, /Users/Shared outside writable roots",
+  "isolated_inputs": "/Users/Shared/p2p-issue-24-6krj8of_",
+  "boundary_observation": "Read succeeded; identical-byte write with default sandbox failed: PermissionError [Errno 1] Operation not permitted: '/Users/Shared/p2p-issue-24-6krj8of_/probe.txt'. Contents unchanged.",
+  "planning_launch": {
+    "tool": "collaboration.spawn_agent",
+    "task_name": "plan_acceptance",
+    "fork_turns": "all",
+    "agent_id": "/root/plan_acceptance",
+    "skill": "/Users/grove/.agents/skills/plan-acceptance/SKILL.md"
+  }
+}

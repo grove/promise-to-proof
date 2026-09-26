@@ -1,0 +1,18 @@
+{
+  "kind": "witness",
+  "name": "base",
+  "scenario": "base",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/private/tmp/p2p-delivery-model-run-kr2k6o4_/witness-base",
+    "/private/tmp/p2p-delivery-model-run-kr2k6o4_/witness-base.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.58,
+  "model_sha256": "a00920c93fddd6df32d74d5c2b05d421a9e678f57f3de3c57a3210081427ba3d",
+  "property": "Witness",
+  "steps": 11,
+  "result": "reachable witness"
+}

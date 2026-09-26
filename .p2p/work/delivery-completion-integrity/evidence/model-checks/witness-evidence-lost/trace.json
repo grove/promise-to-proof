@@ -1,0 +1,1831 @@
+[
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "yield",
+      "returns": "{}",
+      "roles": null,
+      "state": {
+        "base": 0,
+        "bindings": [
+          [],
+          []
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          0,
+          0
+        ],
+        "fault": false,
+        "implemented": false,
+        "outcome": "running",
+        "passed": [
+          false,
+          false
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          0,
+          0
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          0,
+          0
+        ]
+      },
+      "stats": {
+        "totalActions": 0,
+        "counts": {}
+      },
+      "threads": [],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "",
+    "Name": "Init",
+    "Labels": [],
+    "Fairness": 3,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "yield",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [],
+          []
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          0,
+          0
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          false,
+          false
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          0,
+          0
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          0,
+          0
+        ]
+      },
+      "stats": {
+        "totalActions": 1,
+        "counts": {
+          "Implement": 1
+        }
+      },
+      "threads": [],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "action",
+    "Name": "Implement",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "Launch",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [],
+          []
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          0,
+          0
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          false,
+          false
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          0,
+          0
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          0,
+          0
+        ]
+      },
+      "stats": {
+        "totalActions": 2,
+        "counts": {
+          "Implement": 1,
+          "Launch": 1
+        }
+      },
+      "threads": [
+        {
+          "id": 31,
+          "stack": [
+            {
+              "fileIndex": 0,
+              "name": "Launch",
+              "pc": "Actions[2].Block.Stmts[1]",
+              "scope": {
+                "loopRange": null,
+                "parent": {
+                  "loopRange": null,
+                  "parent": null,
+                  "skipstmts": null,
+                  "vars": "{}"
+                },
+                "skipstmts": null,
+                "vars": "{}"
+              },
+              "vars": "{}"
+            }
+          ],
+          "fairness": 1
+        }
+      ],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "action",
+    "Name": "Launch",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "yield",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          []
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          0,
+          0
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          false,
+          false
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          0,
+          0
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          1,
+          0
+        ]
+      },
+      "stats": {
+        "totalActions": 2,
+        "counts": {
+          "Implement": 1,
+          "Launch": 1
+        }
+      },
+      "threads": [],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "",
+    "Name": "Any:stage=0",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "Launch",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          []
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          0,
+          0
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          false,
+          false
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          0,
+          0
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          1,
+          0
+        ]
+      },
+      "stats": {
+        "totalActions": 3,
+        "counts": {
+          "Implement": 1,
+          "Launch": 2
+        }
+      },
+      "threads": [
+        {
+          "id": 67,
+          "stack": [
+            {
+              "fileIndex": 0,
+              "name": "Launch",
+              "pc": "Actions[2].Block.Stmts[1]",
+              "scope": {
+                "loopRange": null,
+                "parent": {
+                  "loopRange": null,
+                  "parent": null,
+                  "skipstmts": null,
+                  "vars": "{}"
+                },
+                "skipstmts": null,
+                "vars": "{}"
+              },
+              "vars": "{}"
+            }
+          ],
+          "fairness": 1
+        }
+      ],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "action",
+    "Name": "Launch",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "yield",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          0,
+          0
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          false,
+          false
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          0,
+          0
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          1,
+          1
+        ]
+      },
+      "stats": {
+        "totalActions": 3,
+        "counts": {
+          "Implement": 1,
+          "Launch": 2
+        }
+      },
+      "threads": [],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "",
+    "Name": "Any:stage=1",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "Return",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          0,
+          0
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          false,
+          false
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          0,
+          0
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          1,
+          1
+        ]
+      },
+      "stats": {
+        "totalActions": 4,
+        "counts": {
+          "Implement": 1,
+          "Launch": 2,
+          "Return": 1
+        }
+      },
+      "threads": [
+        {
+          "id": 140,
+          "stack": [
+            {
+              "fileIndex": 0,
+              "name": "Return",
+              "pc": "Actions[3].Block.Stmts[1]",
+              "scope": {
+                "loopRange": null,
+                "parent": {
+                  "loopRange": null,
+                  "parent": null,
+                  "skipstmts": null,
+                  "vars": "{}"
+                },
+                "skipstmts": null,
+                "vars": "{}"
+              },
+              "vars": "{}"
+            }
+          ],
+          "fairness": 1
+        }
+      ],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "action",
+    "Name": "Return",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "yield",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          1,
+          0
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          true,
+          false
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          1,
+          0
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          2,
+          1
+        ]
+      },
+      "stats": {
+        "totalActions": 4,
+        "counts": {
+          "Implement": 1,
+          "Launch": 2,
+          "Return": 1
+        }
+      },
+      "threads": [],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "",
+    "Name": "Any:stage=0",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "Return",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          1,
+          0
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          true,
+          false
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          1,
+          0
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          2,
+          1
+        ]
+      },
+      "stats": {
+        "totalActions": 5,
+        "counts": {
+          "Implement": 1,
+          "Launch": 2,
+          "Return": 2
+        }
+      },
+      "threads": [
+        {
+          "id": 284,
+          "stack": [
+            {
+              "fileIndex": 0,
+              "name": "Return",
+              "pc": "Actions[3].Block.Stmts[1]",
+              "scope": {
+                "loopRange": null,
+                "parent": {
+                  "loopRange": null,
+                  "parent": null,
+                  "skipstmts": null,
+                  "vars": "{}"
+                },
+                "skipstmts": null,
+                "vars": "{}"
+              },
+              "vars": "{}"
+            }
+          ],
+          "fairness": 1
+        }
+      ],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "action",
+    "Name": "Return",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "yield",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          1,
+          1
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          true,
+          true
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          1,
+          1
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          2,
+          2
+        ]
+      },
+      "stats": {
+        "totalActions": 5,
+        "counts": {
+          "Implement": 1,
+          "Launch": 2,
+          "Return": 2
+        }
+      },
+      "threads": [],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "",
+    "Name": "Any:stage=1",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "Save",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          1,
+          1
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          true,
+          true
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          1,
+          1
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          2,
+          2
+        ]
+      },
+      "stats": {
+        "totalActions": 6,
+        "counts": {
+          "Implement": 1,
+          "Launch": 2,
+          "Return": 2,
+          "Save": 1
+        }
+      },
+      "threads": [
+        {
+          "id": 537,
+          "stack": [
+            {
+              "fileIndex": 0,
+              "name": "Save",
+              "pc": "Actions[4].Block.Stmts[1]",
+              "scope": {
+                "loopRange": null,
+                "parent": {
+                  "loopRange": null,
+                  "parent": null,
+                  "skipstmts": null,
+                  "vars": "{}"
+                },
+                "skipstmts": null,
+                "vars": "{}"
+              },
+              "vars": "{}"
+            }
+          ],
+          "fairness": 1
+        }
+      ],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "action",
+    "Name": "Save",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "Any:stage=1",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          1,
+          1
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          true,
+          true
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          1,
+          1
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          2,
+          2
+        ]
+      },
+      "stats": {
+        "totalActions": 6,
+        "counts": {
+          "Implement": 1,
+          "Launch": 2,
+          "Return": 2,
+          "Save": 1
+        }
+      },
+      "threads": [
+        {
+          "id": 537,
+          "stack": [
+            {
+              "fileIndex": 0,
+              "name": "Save",
+              "pc": "Actions[4].Block.Stmts[1].AnyStmt.Block.Stmts[0]",
+              "scope": {
+                "loopRange": null,
+                "parent": {
+                  "loopRange": null,
+                  "parent": {
+                    "loopRange": null,
+                    "parent": {
+                      "loopRange": null,
+                      "parent": null,
+                      "skipstmts": null,
+                      "vars": "{\"stage\":1}"
+                    },
+                    "skipstmts": null,
+                    "vars": "{\"stage\":1}"
+                  },
+                  "skipstmts": null,
+                  "vars": "{\"stage\":1}"
+                },
+                "skipstmts": null,
+                "vars": "{\"stage\":1}"
+              },
+              "vars": "{}"
+            }
+          ],
+          "fairness": 1
+        }
+      ],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "",
+    "Name": "Any:stage=1",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "yield",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          1,
+          2
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          true,
+          true
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          1,
+          1
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          2,
+          2
+        ]
+      },
+      "stats": {
+        "totalActions": 6,
+        "counts": {
+          "Implement": 1,
+          "Launch": 2,
+          "Return": 2,
+          "Save": 1
+        }
+      },
+      "threads": [],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "",
+    "Name": "Any:kind=\"evidence\"",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "ReadBack",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          1,
+          2
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          true,
+          true
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          1,
+          1
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          2,
+          2
+        ]
+      },
+      "stats": {
+        "totalActions": 7,
+        "counts": {
+          "Implement": 1,
+          "Launch": 2,
+          "ReadBack": 1,
+          "Return": 2,
+          "Save": 1
+        }
+      },
+      "threads": [
+        {
+          "id": 1096,
+          "stack": [
+            {
+              "fileIndex": 0,
+              "name": "ReadBack",
+              "pc": "Actions[5].Block.Stmts[1]",
+              "scope": {
+                "loopRange": null,
+                "parent": {
+                  "loopRange": null,
+                  "parent": null,
+                  "skipstmts": null,
+                  "vars": "{}"
+                },
+                "skipstmts": null,
+                "vars": "{}"
+              },
+              "vars": "{}"
+            }
+          ],
+          "fairness": 1
+        }
+      ],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "action",
+    "Name": "ReadBack",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "Any:stage=1",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          1,
+          2
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          true,
+          true
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          1,
+          1
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          2,
+          2
+        ]
+      },
+      "stats": {
+        "totalActions": 7,
+        "counts": {
+          "Implement": 1,
+          "Launch": 2,
+          "ReadBack": 1,
+          "Return": 2,
+          "Save": 1
+        }
+      },
+      "threads": [
+        {
+          "id": 1096,
+          "stack": [
+            {
+              "fileIndex": 0,
+              "name": "ReadBack",
+              "pc": "Actions[5].Block.Stmts[1].AnyStmt.Block.Stmts[0]",
+              "scope": {
+                "loopRange": null,
+                "parent": {
+                  "loopRange": null,
+                  "parent": {
+                    "loopRange": null,
+                    "parent": {
+                      "loopRange": null,
+                      "parent": null,
+                      "skipstmts": null,
+                      "vars": "{\"stage\":1}"
+                    },
+                    "skipstmts": null,
+                    "vars": "{\"stage\":1}"
+                  },
+                  "skipstmts": null,
+                  "vars": "{\"stage\":1}"
+                },
+                "skipstmts": null,
+                "vars": "{\"stage\":1}"
+              },
+              "vars": "{}"
+            }
+          ],
+          "fairness": 1
+        }
+      ],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "",
+    "Name": "Any:stage=1",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "yield",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          1,
+          3
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          true,
+          true
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          1,
+          1
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          2,
+          2
+        ]
+      },
+      "stats": {
+        "totalActions": 7,
+        "counts": {
+          "Implement": 1,
+          "Launch": 2,
+          "ReadBack": 1,
+          "Return": 2,
+          "Save": 1
+        }
+      },
+      "threads": [],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "",
+    "Name": "Any:kind=\"evidence\"",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "Environment",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          1,
+          3
+        ],
+        "fault": false,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          true,
+          true
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          1,
+          1
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          2,
+          2
+        ]
+      },
+      "stats": {
+        "totalActions": 8,
+        "counts": {
+          "Environment": 1,
+          "Implement": 1,
+          "Launch": 2,
+          "ReadBack": 1,
+          "Return": 2,
+          "Save": 1
+        }
+      },
+      "threads": [
+        {
+          "id": 2159,
+          "stack": [
+            {
+              "fileIndex": 0,
+              "name": "Environment",
+              "pc": "Actions[6].Block.Stmts[2].IfStmt.Branches[3].Block.Stmts[0]",
+              "scope": {
+                "loopRange": null,
+                "parent": {
+                  "loopRange": null,
+                  "parent": {
+                    "loopRange": null,
+                    "parent": null,
+                    "skipstmts": null,
+                    "vars": "{}"
+                  },
+                  "skipstmts": null,
+                  "vars": "{}"
+                },
+                "skipstmts": null,
+                "vars": "{}"
+              },
+              "vars": "{}"
+            }
+          ],
+          "fairness": 1
+        }
+      ],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "action",
+    "Name": "Environment",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": null,
+      "name": "yield",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          1,
+          4
+        ],
+        "fault": true,
+        "implemented": true,
+        "outcome": "running",
+        "passed": [
+          true,
+          true
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          1,
+          1
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          2,
+          2
+        ]
+      },
+      "stats": {
+        "totalActions": 8,
+        "counts": {
+          "Environment": 1,
+          "Implement": 1,
+          "Launch": 2,
+          "ReadBack": 1,
+          "Return": 2,
+          "Save": 1
+        }
+      },
+      "threads": [],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "",
+    "Name": "Any:stage=1",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  },
+  {
+    "Node": {
+      "channel_messages": {},
+      "channels": {},
+      "current": 0,
+      "failedInvariants": {
+        "0": [
+          8
+        ]
+      },
+      "name": "yield",
+      "returns": "{}",
+      "roles": [],
+      "state": {
+        "base": 0,
+        "bindings": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ]
+        ],
+        "candidate": 0,
+        "contract": 0,
+        "evidence": [
+          1,
+          4
+        ],
+        "fault": true,
+        "implemented": true,
+        "outcome": "evidence-lost",
+        "passed": [
+          true,
+          true
+        ],
+        "repair_used": 0,
+        "repairs_actual": 0,
+        "reports": [
+          1,
+          1
+        ],
+        "restarted": false,
+        "revision": "v1",
+        "stages": [
+          2,
+          2
+        ]
+      },
+      "stats": {
+        "totalActions": 9,
+        "counts": {
+          "Complete": 1,
+          "Environment": 1,
+          "Implement": 1,
+          "Launch": 2,
+          "ReadBack": 1,
+          "Return": 2,
+          "Save": 1
+        }
+      },
+      "threads": [],
+      "witness": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ]
+    },
+    "Type": "action",
+    "Name": "Complete",
+    "Labels": null,
+    "Fairness": 1,
+    "ChoiceFairness": 0,
+    "Messages": null,
+    "ReqId": 0,
+    "ThreadsMap": null,
+    "FailedInvariants": null,
+    "Returns": null
+  }
+]

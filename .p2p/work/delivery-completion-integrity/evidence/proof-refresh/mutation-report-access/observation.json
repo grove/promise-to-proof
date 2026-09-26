@@ -1,0 +1,18 @@
+{
+  "kind": "mutation",
+  "name": "report-access",
+  "scenario": "report-access",
+  "mutation": "report-access",
+  "command": [
+    "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/private/tmp/p2p-delivery-model-run-kr2k6o4_/mutation-report-access",
+    "/private/tmp/p2p-delivery-model-run-kr2k6o4_/mutation-report-access.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 1.197,
+  "model_sha256": "e3a0e3de2c554d70723484544fe2cee6d15ddf7a8ece29d319b6a4427009da45",
+  "property": "DurableReports",
+  "steps": 36,
+  "result": "expected counterexample"
+}

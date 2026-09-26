@@ -1,0 +1,18 @@
+{
+  "kind": "mutation",
+  "name": "base",
+  "scenario": "base",
+  "mutation": "base",
+  "command": [
+    "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-ziq4xip2/mutation-base",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-ziq4xip2/mutation-base.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 2.463,
+  "model_sha256": "ecda03e052f031bfcfe77740978991e66ba4b7bfcb6438cf5217648e32353074",
+  "property": "ComparisonBase",
+  "steps": 35,
+  "result": "expected counterexample"
+}
