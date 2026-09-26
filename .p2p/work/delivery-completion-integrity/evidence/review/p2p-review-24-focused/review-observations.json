@@ -1,0 +1,74 @@
+[
+  {
+    "kind": "witness",
+    "name": "repair",
+    "scenario": "repair",
+    "mutation": "none",
+    "command": [
+      "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+      "--output-dir",
+      "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-review-scratch-1jv9uvgl/witness-repair",
+      "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-review-scratch-1jv9uvgl/witness-repair.fizz"
+    ],
+    "returncode": 0,
+    "seconds": 1.291,
+    "model_sha256": "310662533fcb6e1e04a16bf33b8161cdb279a6310d7693f723778dad2ee422b1",
+    "property": "Witness",
+    "steps": 43,
+    "result": "reachable witness"
+  },
+  {
+    "kind": "witness",
+    "name": "exhausted",
+    "scenario": "exhausted",
+    "mutation": "none",
+    "command": [
+      "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+      "--output-dir",
+      "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-review-scratch-1jv9uvgl/witness-exhausted",
+      "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-review-scratch-1jv9uvgl/witness-exhausted.fizz"
+    ],
+    "returncode": 0,
+    "seconds": 0.958,
+    "model_sha256": "418a1fe859b720709413b72d3a9e402373138e90edbcc0479c8ae770c5612f25",
+    "property": "Witness",
+    "steps": 20,
+    "result": "reachable witness"
+  },
+  {
+    "kind": "mutation",
+    "name": "repair-reset",
+    "scenario": "exhausted",
+    "mutation": "repair-reset",
+    "command": [
+      "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+      "--output-dir",
+      "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-review-scratch-1jv9uvgl/mutation-repair-reset",
+      "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-review-scratch-1jv9uvgl/mutation-repair-reset.fizz"
+    ],
+    "returncode": 0,
+    "seconds": 0.967,
+    "model_sha256": "cf88be1bad08cc81e75576823076371bb5dfbce4c5244a577b5831f41f3b420f",
+    "property": "RepairBound",
+    "steps": 20,
+    "result": "expected counterexample"
+  },
+  {
+    "kind": "mutation",
+    "name": "evidence-lost",
+    "scenario": "evidence-lost",
+    "mutation": "evidence-lost",
+    "command": [
+      "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+      "--output-dir",
+      "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-review-scratch-1jv9uvgl/mutation-evidence-lost",
+      "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-review-scratch-1jv9uvgl/mutation-evidence-lost.fizz"
+    ],
+    "returncode": 0,
+    "seconds": 1.299,
+    "model_sha256": "47ec55b1b0fedc6347d564e22adbf3418eef3fb43798708a2f18851f959e7bec",
+    "property": "DurableEvidence",
+    "steps": 36,
+    "result": "expected counterexample"
+  }
+]

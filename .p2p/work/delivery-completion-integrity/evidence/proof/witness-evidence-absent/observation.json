@@ -1,0 +1,18 @@
+{
+  "kind": "witness",
+  "name": "evidence-absent",
+  "scenario": "initial",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-mnlchiw4/witness-evidence-absent",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-mnlchiw4/witness-evidence-absent.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.566,
+  "model_sha256": "2f75d18fb7c708dfc4e7f23d74e0a9d81661e6d576a15d26b0cfa06c20c8c97a",
+  "property": "Witness",
+  "steps": 14,
+  "result": "reachable witness"
+}

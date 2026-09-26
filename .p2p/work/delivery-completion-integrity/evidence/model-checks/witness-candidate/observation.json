@@ -1,0 +1,18 @@
+{
+  "kind": "witness",
+  "name": "candidate",
+  "scenario": "candidate",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-ziq4xip2/witness-candidate",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-ziq4xip2/witness-candidate.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.57,
+  "model_sha256": "65d43c999e33ac860e4ae5e74650b74d8a7e21dc73488baf2ca76af41f704ac8",
+  "property": "Witness",
+  "steps": 11,
+  "result": "reachable witness"
+}
