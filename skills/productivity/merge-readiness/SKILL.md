@@ -10,6 +10,22 @@ protocol](references/acceptance-contract-protocol.md) and the repository's revie
 and merge rules. `PROVEN` and `REVIEWED`
 are evidence for a candidate, not repository approval or permanent PR status.
 
+## Local work and durable records
+
+Use the [filesystem protocol](references/acceptance-contract-protocol.md) and
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve work/<slug>.md`
+to resolve paths. Save reports with `save work/<slug>.md <report-name> --from <file>`
+to retain history before replacement.
+
+Resolve the PR's canonical `work/<slug>.md` and discover candidate, review, and
+proof under `.p2p/work/<slug>/`; manually supplied report paths are optional.
+Compare the complete tracked tree outside `.p2p/`, recheck exact work-item and
+binding parent/spec identities and the review comparison base. Artifact-only
+commits may preserve candidate content equivalence, but reports remain bound to
+the original candidate. Save the observation as
+`.p2p/work/<slug>/merge-readiness.md`, preserving prior records under the protocol
+retention rule. This local report grants no Git or remote write authority.
+
 ## Establish the target
 
 Accept a PR URL or a number in a resolved repository, with saved review and proof
@@ -45,8 +61,8 @@ merge-group candidate is ready.
 Reread the canonical contract, source-linked amendments, PR head, target, and
 relevant gate state before reporting. If the agreement or PR state changed during
 inspection, report the earlier observations as stale and withhold readiness for
-the new state. Keep the candidate, worktree, contract, reports, and external
-systems unchanged. Do not commit, push, open or edit PRs, approve, rerun checks,
+the new state. Keep the candidate, contract, prior reports, and external
+systems unchanged; save only the new local readiness record. Do not commit, push, open or edit PRs, approve, rerun checks,
 or merge.
 
 ## Report

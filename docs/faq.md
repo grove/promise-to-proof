@@ -8,22 +8,16 @@ use the [acceptance contract protocol](./acceptance-contract-protocol.md).
 
 ## Issues and slices
 
-### Who creates the original GitHub issue?
+### Do I need a GitHub issue?
 
-For work in this repository that starts from a local specification, use
-`create-parent-issue` to draft one source GitHub issue with a retrievable reference
-to that spec. Explicitly authorize publication after reviewing the draft. For a
-small agreed outcome without a local spec, create the source issue with
-`gh issue create` under this repository's
-[issue tracker instructions](./agents/issue-tracker.md). `plan-acceptance` reads
-the source and returns a contract for the invoking workflow to save. Neither
-`plan-acceptance` nor `slice-contract` silently creates an originating issue.
+No. Start with `work/<slug>.md`, a specification in `specs/`, or an agreed
+outcome for `plan-acceptance`. The work file is the canonical acceptance contract.
+`deliver-issue` accepts that path despite its historical command name.
 
-Projects using these skills may keep a local specification as the source.
-`plan-acceptance` accepts a specification or agreed outcome without a GitHub
-issue. If an approved split needs a tracker parent for that local source,
-`slice-contract` needs explicit approval to create one. It can publish approved
-child tickets without treating parent creation as an automatic step.
+Use `create-parent-issue` only when you want an optional GitHub mirror of a
+specification. `slice-contract` creates local children by default and publishes
+tracker mirrors only with explicit authority. Neither operation makes the
+tracker a second canonical contract.
 
 ### Why does a GitHub issue need an acceptance contract?
 
@@ -32,14 +26,15 @@ contract identifies each independently checkable promise, its boundaries, where
 to observe it, and how to determine the right result. It also records exclusions
 and unresolved evidence gaps. That gives implementation and proof a stable
 agreement to use after the issue discussion has grown or the work has moved to a
-new checkout. The contract lives on the originating issue or at a direct link
-from it, so it does not create another ticket to track.
+new checkout. The contract lives in `work/<slug>.md`. The issue can link to it, and imported
+issue changes require explicit reconciliation into that file.
 
 ### When is `slice-contract` useful, and what does `NO SPLIT` mean?
 
 Use it when one parent contract contains several coherent outcomes that people
-can implement and review separately. It drafts the fewest useful child tickets,
-maps their contributions to parent promises, and can publish the approved plan.
+can implement and review separately. It creates the fewest useful local child work items,
+maps their contributions to parent promises, and can mirror an approved plan
+to a tracker when requested.
 It needs a saved parent contract before a complete decomposition. `NO SPLIT`
 means separate tickets add no useful boundary, so the parent can follow the
 direct implementation, review, and proof path.
@@ -50,7 +45,7 @@ direct implementation, review, and proof path.
 They stay with the same promises across revisions. `S1`, `S2`, and later `S`
 IDs identify slices in a decomposition. A child contract has its own local `R`
 IDs and maps each row to qualified parent obligations, such as
-`grove/project#123 v2:R4`. Matching numbers across a parent, a child, and a
+`work/retry-safe-uploads.md v2:R4`. Matching numbers across a parent, a child, and a
 slice do not make those records the same requirement.
 
 ### If every child is proven, is the parent proven?
@@ -98,6 +93,23 @@ handoffs therefore use saved, retrievable records. A location finds the
 contract; the revision and captured text identify its meaning. A candidate
 digest can help verify content, but it cannot replace the content needed to
 resume work.
+
+### Why commit generated reports if they are outside the candidate?
+
+The candidate excludes `.p2p/`. Reports, retained evidence, and snapshot records
+live in `.p2p/work/<slug>/` and travel with authorized commits. If review and
+proof examined commit A, a later commit B recording those artifacts does not
+change their subject to B. Reuse requires identical content outside `.p2p/`,
+unchanged agreements, and the same comparison base. Git-dependent builds also
+need execution-input equivalence.
+
+### What happens to old reports and temporary evidence?
+
+Before replacement, retain old records in Git or the work item's `history/`
+directory. Scratch files in `.p2p/tmp/` and OS temporary directories may be
+deleted at any time. Required observations must already be retained in a report
+or evidence file. Sensitive or large evidence needs a safe durable reference,
+checksum, and access limitations. Unavailable evidence stays unavailable.
 
 ## Review, proof, and repair
 
@@ -176,8 +188,9 @@ publish or merge the PR.
 
 ### Do the skills call one another automatically?
 
-No. Each skill returns a result and a handoff. Invoke the next skill with the
-saved contract, candidate, report, and identities it needs. This lets a person
+Individual stages return a result and a handoff. `deliver-issue` coordinates
+them when the host supports independent contexts. Give it the work-item path
+to discover the saved contract, candidate, reports, and identities. This lets a person
 review decisions and lets another session resume the work without guessing.
 
 ### Do I need external planning or TDD skills?

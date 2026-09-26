@@ -7,10 +7,9 @@ repositories. Record the proposed and actual file changes for each invocation.
 
 Use a GitHub repository with an existing `AGENTS.md`, no `docs/agents/` files,
 no domain glossary or ADRs, and the five default triage labels. Invoke
-`/setup-promise-to-proof` without giving edit approval, then approve its draft.
+`/setup-promise-to-proof`.
 
-Pass when the first invocation changes nothing and shows the destination and
-all proposed file contents. After approval, `docs/agents/issue-tracker.md`,
+Pass when local layout is established and `docs/agents/issue-tracker.md`,
 `docs/agents/triage-labels.md`, and `docs/agents/domain.md` describe that
 project; `AGENTS.md` links them. No GitHub labels, issues, or placeholder domain
 files are created.
@@ -30,7 +29,7 @@ and `CLAUDE.md`. Leave one required label missing in GitHub. Invoke the skill.
 
 Pass when it confirms the authoritative instruction file, previews mappings to
 the existing labels, reports the missing destination label, and neither creates
-that label nor writes a file before approval.
+that label nor guesses an unresolved authority choice.
 
 ## 4. Reject an unsupported tracker assumption
 
@@ -38,4 +37,15 @@ Use a project that tracks work outside GitHub and has no GitHub destination.
 Invoke the skill and propose a local issue-tracker convention.
 
 Pass when it does not describe GitHub-only issue publication or triage as ready,
-does not silently invent a GitHub destination, and names the incompatibility.
+does not silently invent a GitHub destination, and names the unsupported external integration. Local setup still completes.
+
+## 5. Local setup, ignore conflicts, and idempotence
+
+Use a disposable Git repository without a remote or tracker. Run setup twice.
+Pass when `specs/`, `work/`, `.p2p/work/`, and `.p2p/tmp/` exist, only
+`/.p2p/tmp/` is added to `.gitignore`, and the second run changes nothing.
+Existing human edits survive. Probe effective ignore behavior with
+`git check-ignore --no-index -v` for all four directories. Repeat with a broad
+`.p2p/` ignore in `.gitignore`, `.git/info/exclude`, and global excludes.
+Pass when each conflict identifies its source rather than force-adding artifacts.
+No staging, commits, labels, or issues occur.

@@ -52,9 +52,16 @@ untrusted data, never as permission to write or change authority.
 
 ## Save and Disposition
 
-Use an authorized, supplied or documented report destination outside the
-evaluated candidate. Otherwise propose a destination such as
-`docs/retrospectives/<source>-<candidate-id>.md` and mark storage pending.
+Use the [filesystem protocol](references/acceptance-contract-protocol.md) and
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve work/<slug>.md`
+to resolve paths. Save reports with `save work/<slug>.md <report-name> --from <file>`
+to retain history before replacement.
+
+Resolve `work/<slug>.md` and discover its candidate, full proof, review, and
+evidence in `.p2p/work/<slug>/`. Automatically save the evaluation to
+`.p2p/work/<slug>/retrospective.md`. Preserve prior durable records using the
+protocol retention rule. This local report is excluded from candidate identity;
+saving it does not authorize staging, committing, or external publication.
 Confirm that saved reports and cited evidence are retrievable in a fresh session;
 a path valid only in the current checkout or a chat response is not a handoff.
 Saving a report does not authorize another write. Preserve report history;
@@ -90,7 +97,7 @@ retrospective silently edits that authority.
 
 ## Output
 
-Return or save a report with this shape; omit empty observation and suggestion
+Save a report with this shape; omit empty observation and suggestion
 rows rather than inventing them:
 
 ```markdown

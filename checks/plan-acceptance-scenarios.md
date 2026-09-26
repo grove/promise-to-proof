@@ -259,3 +259,12 @@ snapshot. The agent preserves the existing child and parent contracts while
 exposing the affected decision or retrieval gap. It must not silently narrow
 inherited constraints, invent parent text from its digest, or treat a slice
 marker as authority to revise the agreement.
+
+## Local work-item planning
+
+Start with `work/foo-bar.md` containing stable acceptance bullets and verification
+notes, with no tracker configured. Pass when planning saves the rich matrix in
+that same file, preserves IDs and promises, and creates no competing contract.
+Repeat from an optional `specs/foo-bar.md`; the work item links its source.
+An unrelated existing slug must not be overwritten. No Git or tracker write
+is authorized by local file creation.

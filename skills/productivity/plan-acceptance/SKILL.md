@@ -12,8 +12,15 @@ It defines the spec envelope, revision rules, evidence terms, and handoffs.
 
 ## Build the contract
 
-1. Resolve the canonical contract location using the protocol's durable handoff
-   convention. Read the source, existing contract, pending amendments, and
+1. Resolve `work/<slug>.md` using the protocol's naming and collision rules.
+   A standalone local work item needs neither a specification nor a tracker.
+   Normalize minimal acceptance bullets into the matrix below in that same file;
+   preserve existing IDs and promises. Import external source promises locally
+   when requested; the tracker remains an optional source or mirror. Retain
+   imported binding text in the work item or a linked local source file, with
+   its external URL and retrieval identity as attribution. An external URL alone
+   is not a live hashable binding input.
+   Read the source, existing contract, pending amendments, and
    applicable parent contract. If the source cannot be established, report the
    gap and stop.
    For a sliced child, retrieve its decomposition, precise contribution,
@@ -58,9 +65,13 @@ Return the contract using the shape below. Use only `planned` or `gap` for plan
 state. Move any legacy proof verdicts into a separately identified proof report
 with their original candidate and context, or flag missing provenance as a gap.
 
-Include a storage handoff naming the canonical destination and revision, and
-whether saving remains pending. The invoking workflow saves the returned text
-and confirms retrieval as the protocol requires; planning does not publish it.
+Save and reread the contract at `work/<slug>.md` before handing off. Keep a
+lasting optional specification in `specs/`, and link it with `Source`. Link a
+parent work item with `Parent` and retain its exact snapshot and contribution
+mapping. Preserve previous revisions under the protocol's history rule. If
+this context cannot write, return the exact text to the enclosing workflow to
+save and reread, and report storage pending until it confirms retrieval.
+Saving local files does not authorize staging, commits, or tracker publication.
 
 For a tracked child, hand readiness reconciliation to that invoking workflow.
 After saving and rereading the contract, it checks configured triage meanings,
@@ -76,8 +87,9 @@ prerequisite becomes available; contract creation alone does not grant readiness
 # Acceptance contract: <source>
 
 Contract revision: v1
-Source: <issue/spec and precise criterion references>
-Parent contract: <canonical location and revision, or None>
+Source: <relative Markdown link to binding local spec/source text; omit for a standalone work item>
+Source attribution: <external issue/spec URL and retrieval identity, if imported>
+Parent: <relative Markdown link to parent work item and revision, or None>
 Parent snapshot: <immutable reference or retrievable captured text and digest; omit if none>
 Contribution: <decomposition reference, qualified parent obligations and precise contribution; omit if none>
 Prerequisites: <references and required outcomes, or None>

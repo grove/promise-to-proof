@@ -1,0 +1,14 @@
+{
+  "candidate": "snapshot:sha256:6c22356c24681ef357de6e74dfbd249ddc7eb431524b700690ec51113fb73220",
+  "base": "b76eb5bd9098030a234405f5a8b3b64382b33eb7",
+  "work_item_sha256": "e1d67e548de8467406a247ea7ac98638a7b60fe71ffa1dc4c08d3afdb9ea04a0",
+  "result": "Fresh clone validates same snapshot and retains reports/evidence after original temporary repository deletion.",
+  "bundle_sha256": "1803c58838ecdf95a189d3203be5509f4d419125b00be6eac9231a8c221d504c",
+  "stage_contexts": {
+    "planning": "/root",
+    "implementation": "/root/core_skills",
+    "review": "/root/other_skills",
+    "proof": "/root"
+  },
+  "limits": "Manual independent stages; no claim of enforced host verifier sandbox. No external tracker or remote service used."
+}

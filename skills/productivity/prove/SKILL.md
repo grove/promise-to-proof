@@ -32,7 +32,7 @@ It defines the spec envelope, identities, evidence, and verdicts.
   `/fix-pr` without waiting for green checks or making it a prerequisite to proof.
 - Use a clean commit as the candidate when possible. A dirty or changing
   worktree is `NOT PROVEN` unless its exact snapshot can be established.
-- A proof run may not mutate the candidate, worktree, or contract. If any such
+- A proof run may not mutate product files, the candidate, or contract. If any such
   change occurs, return `NOT PROVEN` and discard observations from the changed
   state; the repair belongs to `/repair-gaps` and requires a fresh `/prove`.
 - Do not edit product code, tests, CI configuration, or the acceptance contract.
@@ -51,8 +51,9 @@ It defines the spec envelope, identities, evidence, and verdicts.
 
 ### 1. Establish the contract
 
-Resolve the canonical contract location using the protocol's durable handoff
-convention. Read the source, pending amendments, applicable parent constraints,
+Accept `work/<slug>.md` and discover its linked inputs, `candidate.json`, and
+reports in `.p2p/work/<slug>/` using the protocol's durable handoff convention.
+Read the source, pending amendments, applicable parent constraints,
 and exact acceptance contract revision. Preserve all requirement IDs, boundaries,
 seams, oracles, open questions, and exclusions. Report omitted, conflicting, or
 ambiguous source promises instead of editing the contract. If no versioned
@@ -74,7 +75,10 @@ proofs and closed issues are references, not an aggregated parent verdict.
 Record the full commit SHA or exact snapshot, contract source and revision,
 captured contract identity, target or base when relevant, and verification
 environment. Follow the protocol's identity rules and confirm both identities
-before checks begin. If either cannot be established, return `NOT PROVEN`.
+before checks begin. Validate the work-item hash, binding parent/spec hashes,
+and comparison-base SHA against `candidate.json`. Compare product content
+outside `.p2p/`; artifact-only commits retain the original candidate identity.
+If any identity cannot be established, return `NOT PROVEN`.
 If the candidate or contract drifts, or observations cannot be tied to them,
 return `NOT PROVEN`.
 
@@ -97,12 +101,20 @@ controlled sensitivity check only in a disposable copy; discard it afterward.
 Run the smallest high-signal checks that establish the requirements. Preserve
 durable evidence outside the candidate and tie each reference to its observation,
 assertion, command, and environment. The saved proof report may hold the evidence
-itself under the protocol's evidence rules. Check the candidate, worktree, and
-captured contract again afterward. Never fix a failure in this skill. Report
+itself under the protocol's evidence rules. Check product content outside
+`.p2p/`, the candidate, and captured contract again afterward. Never fix a failure in this skill. Report
 the smallest complete repair needed and name the affected requirement IDs for
 `/repair-gaps`.
 
 ### 6. Report
+
+Save and reread `.p2p/work/<slug>/proof.md` and safe retained evidence in
+`evidence/`, preserving prior runs under the protocol's history rule. Saving
+generated records outside the product candidate is permitted. A read-only
+stage context returns exact text for the enclosing workflow to save and reread.
+Temporary files cannot be required to resume. For unsuitable evidence, retain
+a safe durable reference, checksum, description, and access limits; without
+a safe durable copy, report that evidence unavailable.
 
 Return the intended outcome, contract reconciliation, candidate, environment,
 every requirement verdict, evidence observations, counterexamples, candidate
@@ -116,7 +128,7 @@ ID and must not hide an unmet promise.
 
 Requirements: <proven>/<total>
 Counterexamples tested: <count>
-Contract: <source and exact revision, such as #124 v3>
+Contract: <work/<slug>.md and exact revision>
 Contract snapshot: <immutable reference or captured text and digest>
 Parent context: <parent identity, snapshot, contribution mapping and prerequisites; omit if none>
 Candidate: <commit or exact snapshot>

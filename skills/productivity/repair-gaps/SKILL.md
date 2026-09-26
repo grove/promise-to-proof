@@ -31,7 +31,11 @@ complete in depth.
 
 ## Workflow
 
-1. Read the exact source contract revision and the `NOT PROVEN` proof result.
+1. Accept `work/<slug>.md` and discover its linked inputs, `candidate.json`,
+   and `proof.md` under `.p2p/work/<slug>/`; also accept an explicit proof
+   reference that resolves to the same work item. Read the exact local contract
+   revision and matching `NOT PROVEN` proof result. Recheck binding parent/spec
+   hashes and comparison base; `.p2p/`-only commits preserve candidate identity.
 2. Confirm the candidate identity and the unresolved requirement IDs.
 3. Apply the smallest complete implementation or evidence repair for the named
    requirements, when editing is authorized. Preserve authorization already given.
@@ -42,7 +46,12 @@ complete in depth.
    command, missing input, or human decision needed; `None` is valid only when no
    gaps remain. The candidate may change only in the scoped repair; the acceptance
    requirements stay intact.
-6. Hand off the changed candidate for separate `/review-implementation` and fresh proof.
+6. Save and reread `.p2p/work/<slug>/repair.md`, retained evidence, and the
+   updated `candidate.json` with recoverable content. Preserve previous reports
+   and candidate records under the protocol's history rule before replacement.
+   Exclude `.p2p/` from the candidate. Changed product or binding inputs make
+   old review/proof historical; neither accepts the repaired candidate.
+   Hand off the changed candidate for separate `/review-implementation` and fresh proof.
    End with: **Fresh `/prove` required before acceptance.**
 
 ## Outcomes

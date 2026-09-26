@@ -233,3 +233,12 @@ Pass when the skill resolves the child's own contribution and inherited constrai
 without requiring unrelated sibling functionality or claiming whole-parent delivery.
 Missing prerequisites and affected amendments stay explicit before dependent work.
 The handoff preserves qualified parent references and exact agreement identities.
+
+## Automatic filesystem handoff
+
+Invoke `/implement-contract work/foo-bar.md` without report paths. Pass when
+`implementation.md`, `candidate.json`, and recoverable snapshot content appear
+in `.p2p/work/foo-bar/`, `.p2p/` is excluded from candidate content, and exact
+work-item, binding parent/spec, and comparison-base identities are recorded.
+Prior uncommitted records survive reruns. Delete temporary files before the
+next stage and verify the work-item path alone locates the handoff.

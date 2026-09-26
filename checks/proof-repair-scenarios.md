@@ -348,3 +348,13 @@ copy check, Ruby YAML validation, and local Markdown link checks passed. The
 bundled Python validator remained unavailable because PyYAML was not installed.
 These focused checks do not establish the full scenario suite, tracker publishing,
 or integration with Matt's implementation workflow.
+
+## Local proof and repair records
+
+Invoke `/prove work/foo-bar.md` without manually supplied artifacts. Pass when
+it discovers the exact candidate and saves `.p2p/work/foo-bar/proof.md` with
+retained evidence that survives temporary-directory deletion. A read-only
+verifier returns exact text for its enclosing workflow to save and reread.
+Repair a named matching `NOT PROVEN` gap via the work-item path; save `repair.md`
+and a fresh candidate record without overwriting the only recoverable previous
+run. Old review/proof remain historical until both stages inspect the repair.

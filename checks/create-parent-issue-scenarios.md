@@ -69,3 +69,15 @@ changed source promises to `plan-acceptance` for reconciliation without editing
 the contract. A change detected at the pre-edit reread stops the update pending
 a new preview; an uncertain write reports `PARTIAL` without retrying. No second
 issue is created.
+
+
+## Filesystem handoff
+
+Use a subject linked to `work/example.md`, with source/parent links and durable
+state under `.p2p/work/example/`. Invoke the skill without a report destination.
+Pass when it discovers the local context, saves `source-publication.md` under that artifact
+directory, preserves prior records and the canonical agreement, and performs no
+unauthorized Git or external effects. Remove temporary files and resume from the
+work-item path in a fresh checkout after an authorized transfer; the saved report
+and its required evidence remain retrievable. Historical scenario run records
+above remain observations of their original versions, not claims about this run.

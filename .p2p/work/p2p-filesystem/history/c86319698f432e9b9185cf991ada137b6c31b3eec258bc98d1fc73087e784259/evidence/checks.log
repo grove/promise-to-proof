@@ -1,0 +1,10 @@
+$ python3 -m unittest discover -s checks -p 'test_*.py' -v
+test_disposable_repository (test_p2p_filesystem.FilesystemTests.test_disposable_repository) ... ok
+test_standalone_skill_packages (test_p2p_filesystem.FilesystemTests.test_standalone_skill_packages) ... ok
+test_seeded_invalid_bundles (test_verify_acceptance_bundle.AcceptanceBundleTests.test_seeded_invalid_bundles) ... ok
+test_valid_bundle (test_verify_acceptance_bundle.AcceptanceBundleTests.test_valid_bundle) ... ok
+
+Ran 4 tests in 5.037s
+OK
+P2P filesystem checks passed
+Exit: 0

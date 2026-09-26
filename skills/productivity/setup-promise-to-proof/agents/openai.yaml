@@ -1,5 +1,5 @@
 interface:
   display_name: "Setup Promise to Proof"
-  short_description: "Configure tracker, labels, and domain docs"
+  short_description: "Configure local work and evidence storage"
 policy:
   allow_implicit_invocation: false

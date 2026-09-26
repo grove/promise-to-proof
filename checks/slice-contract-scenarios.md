@@ -27,7 +27,7 @@ independent expected counts, metadata, and ownership outcomes. Use the fixture's
 actual repository or durable local parent identity. API and browser contributions
 are a possible split, not a required answer or fixed ticket count.
 
-Save this record with each evaluated case, outside implementation candidates:
+Save this record with each evaluated case under `.p2p/work/<slug>/`:
 
 ```text
 Case/status: <T ID; observed pass, observed failure, or unexecuted>
@@ -182,18 +182,19 @@ Pass when the first run records readable parent/blocker references and the
 fallback. Missing mandatory edges prevent `PUBLISHED`. No writes gives `BLOCKED`;
 started publication gives `PARTIAL`. Neither run invents API success or CLI flags.
 
-## T13. Use the configured local tracker
+## T13. Slice locally by default
 
-Configure tickets at `planning/items/` and the index at `planning/upload-plan.md`.
-Disable Matt skills and external tracker access. Authorize approved local tickets.
-Repeat without a configured layout, explicitly choosing local publication.
+Create `work/retry-safe-uploads.md` with a versioned parent contract. Disable
+external tracker access and invoke slicing with an approved breakdown.
 
-Pass when custom paths are followed, or the default uses `.scratch/<work-id>/plan.md`
-and `.scratch/<work-id>/issues/S<n>-<slug>.md`. Each new slice has one file with
-resolvable relative links. Contract storage remains separate. Transfer artifacts
-and parent snapshot to a fresh checkout and reopen them. No setup dependency,
-automatic commit, or automatically created tracker parent is introduced. A draft's
-publication handoff uses the configured local destination, not GitHub issues.
+Pass when children use `work/retry-safe-uploads-<slice>.md`, the plan is saved as
+`.p2p/work/retry-safe-uploads/slicing.md`, and parent/child relative links and
+contribution mappings resolve. No extra specs, tracker issues, or competing
+contracts appear. Child planning normalizes those same work files in place.
+Seed an unrelated colliding filename; it must survive unchanged and be reported.
+Rerun unchanged and verify no duplicate children. Transfer the files by an
+authorized commit to a fresh checkout and discover the plan from the parent path.
+No staging or committing occurs merely because slicing saved local files.
 
 ## T14. Reconcile reruns and existing tickets
 

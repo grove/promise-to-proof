@@ -1,30 +1,29 @@
-# Issue-first delivery checks
+# Local work-item delivery checks
 
 These are human-runnable scenarios, not execution results. Invoke
-`/deliver-issue <issue reference>` once per case in a disposable repository.
+`/deliver-issue work/save-report.md` once per case in a disposable repository.
 Use the public `save_report` fixture and independent R1-R4 oracles in
-[proof and repair checks](./proof-repair-scenarios.md). Configure a disposable
-tracker, or a read-only source snapshot plus an authorized local canonical
-contract destination. Start the successful case with only the issue reference;
+[proof and repair checks](./proof-repair-scenarios.md). Use a standalone `work/save-report.md` with no tracker configured.
+Start the successful case with only the work-item path;
 do not supply artifact paths or stage commands. Withhold the expectations below
 from the agent. Judge saved outcomes, not prompt wording or internal call order.
 
 For every case, keep the request, host/model and installed skill revisions,
-configured tracker and write authority, exact issue and contract text/digests,
+optional tracker and write authority, exact work-item text/digests,
 candidate commit or recoverable snapshot and comparison base, action log,
 commands and actual outputs, saved review/proof/evidence references, and
 before/after content hashes. Reread each artifact outside the candidate. Record
-`pass`, `fail`, or `unexecuted` with the observed difference; a simulated tracker
-or unavailable independent context is `unexecuted`, not a live success.
+`pass`, `fail`, or `unexecuted` with the observed difference; an unavailable independent context is `unexecuted`, not a live success.
+Record optional tracker cases separately from local-only results.
 Repeat authority and drift cases in fresh contexts. Use the existing
 [stage scenarios](./implement-contract-scenarios.md) for stage-specific checks.
 
-## D1. One issue reference delivers the whole outcome
+## D1. One work-item path delivers the whole outcome
 
-Configure the disposable issue tracker and a supported host with separate
+Configure a supported host with separate
 stage invocations and isolated read-only review and proof contexts. Use one
-coherent issue for the R1-R4 fixture with settled promises and approval where
-required. Begin with `/deliver-issue #123`, no paths or commands. Inspect the
+coherent standalone work item for the R1-R4 fixture with settled promises and approval where
+required. Begin with `/deliver-issue work/save-report.md`, no paths or commands. Inspect the
 saved contract, implementation report, candidate, review, proof, and evidence.
 Exercise GitHub-specific number resolution separately in D2.
 
@@ -62,11 +61,11 @@ dependent checks and reports are refreshed. A changed label alone is not approva
 
 ## D4. Save and reread the one canonical contract
 
-Start without a contract, then rerun the same issue after an interrupted save.
+Start with minimal acceptance bullets, then rerun the same work item after an interrupted save.
 Separately deny storage, provide conflicting current-contract references, and
-make an authorized tracker write return an uncertain result.
+make an optional authorized tracker mirror write return an uncertain result.
 
-Pass when the saved contract is retrieved through the issue and reread before
+Pass when the saved matrix remains in the original work-item file and is reread before
 implementation. Resume needs no artifact arguments. Missing, conflicting,
 unsaved, or uncertain storage returns an exact blocker; uncertain writes are
 read back and never blindly repeated. No second canonical checklist appears.
@@ -84,11 +83,12 @@ actual partial state; no stash, reset, clean, or branch switch occurs.
 Compare the archived bytes of every excluded tracked file to its base version;
 listing the same file names alone cannot detect unrelated edits in a snapshot.
 
-## D6. Recover a fixed candidate and external reports
+## D6. Recover a fixed candidate and durable local reports
 
 Include staged, unstaged, deleted, and relevant untracked files in the issue
-candidate. Supply a comparison base and storage outside its content. Resume in
-a new session with only the issue number. Separately remove the saved candidate
+candidate. Supply a comparison base; save generated output automatically in
+`.p2p/work/save-report/`. Delete OS temporary files and `.p2p/tmp/`, authorize
+a commit and transfer, then resume in a fresh checkout with only the work-item path. Separately remove the saved candidate
 or report location before resuming.
 
 Pass when review names the exact comparison and full working-tree scope,
@@ -154,7 +154,7 @@ while the candidate, comparison base, and agreement remain protected and unchang
 Repeat D1 with a dependency-free command-line tool in another language, using
 stdin, stdout, stderr, and exit status as the contract's public seam. Include
 valid, empty, and invalid inputs, with literal independent expected results.
-Start with only the configured issue reference. Keep unrelated tracked and
+Start with only the local work-item path. Keep unrelated tracked and
 untracked notes in the checkout.
 
 Pass when the unchanged delivery skill produces matching full review and proof
@@ -162,3 +162,23 @@ for that contract, captures a recoverable candidate excluding unrelated edits,
 and preserves the notes. Retain actual stage identities and independent command
 observations. A test of another function with the original fixture's promises
 does not establish this case. Record limitations separately from the result.
+
+## D12. Artifact commits and binding input drift
+
+Review and prove candidate A, then authorize commit B containing only `.p2p/`
+records. Resume from the work-item path. Pass when reports still name A and
+reuse succeeds after comparing the complete tracked tree outside `.p2p/`.
+Independently change product bytes, the work item, a linked binding parent or
+specification, and the comparison base. Each change must reject incompatible
+report reuse. Repeat a run before committing its first reports; verify the
+previous candidate, reports, and evidence remain recoverable after replacement.
+
+## D13. Retain safe evidence
+
+Produce checks in `.p2p/tmp/` and OS temporary storage. Pass when completion
+retains all necessary safe evidence in `.p2p/work/save-report/evidence/`, or
+records unsuitable evidence with a safe durable reference, checksum, description,
+and access limitation. Delete temporary storage and resume successfully.
+Secret-bearing output must be redacted or excluded. If no safe durable evidence
+location exists, the result identifies the missing evidence instead of claiming
+completion. Local saving must not stage, commit, push, or modify a tracker.
