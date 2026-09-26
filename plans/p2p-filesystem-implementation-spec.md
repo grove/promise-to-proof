@@ -1,30 +1,56 @@
-# Promise to Proof: Filesystem Model
+# Promise to Proof: Repository Filesystem Model
 
-**Implementation specification · Version 2.0 · 26 September 2026**
+**Implementation specification · Version 3.0 · 26 September 2026**
 
-This document replaces the earlier filesystem specification, including its instruction to ignore `.p2p/`. It defines the agreed implementation target; it does not claim the changes are already implemented.
+This document defines the filesystem and Git conventions for Promise to Proof. It is intentionally small: ordinary Markdown files hold specifications and work items, Git holds the durable project record, and `.p2p/` holds generated Promise to Proof records.
 
-## 1. Repository layout and Git rules
+## 1. Mental model
 
-> Commit the durable project record. Ignore temporary execution material. Never commit secrets.
+Promise to Proof uses three obvious locations:
 
 ```text
 repo/
-├── docs/
-│   ├── specs/                 # COMMIT: product specifications
-│   └── work/                  # COMMIT: work items and contracts
-├── src/                       # COMMIT: product implementation
-├── tests/                     # COMMIT: product tests
+├── specs/              # what the product/system should do
+├── work/               # what work we are doing
+└── .p2p/               # what P2P generated while doing/verifying it
+```
+
+The governing rule is:
+
+> **Commit everything durable. Ignore only explicitly temporary material.**
+
+More specifically:
+
+- `specs/` is committed.
+- `work/` is committed.
+- `.p2p/work/` is committed.
+- `.p2p/tmp/` is ignored.
+- Product code, tests, configuration and documentation follow the repository's normal Git rules.
+- Secrets are never committed.
+- Evidence that is too large, sensitive or machine-specific for Git is represented by a committed description, durable reference and checksum instead.
+
+Promise to Proof must choose the correct location automatically. Users should not have to decide file-by-file whether generated P2P output belongs in Git.
+
+## 2. Repository layout
+
+The default layout is:
+
+```text
+repo/
+├── specs/
+│   └── retry-safe-uploads.md
+├── work/
+│   ├── retry-safe-uploads.md
+│   ├── retry-safe-uploads-api.md
+│   └── retry-safe-uploads-browser.md
+├── src/
+├── tests/
 └── .p2p/
-    ├── README.md              # COMMIT: explains these rules
-    ├── work/                  # COMMIT: generated P2P records
-    │   └── retry-safe-uploads-api/
-    │       ├── implementation.md
-    │       ├── candidate.json
-    │       ├── review.md
-    │       ├── proof.md
-    │       └── evidence/
-    └── tmp/                   # IGNORE: scratch, caches, experiments
+    ├── work/
+    │   ├── retry-safe-uploads/
+    │   ├── retry-safe-uploads-api/
+    │   └── retry-safe-uploads-browser/
+    └── tmp/
 ```
 
 The P2P-specific ignore rule is:
@@ -33,37 +59,89 @@ The P2P-specific ignore rule is:
 /.p2p/tmp/
 ```
 
-Do not ignore `.p2p/` or `.p2p/work/`. Preserve unrelated repository ignore rules, but check that they do not accidentally hide durable P2P records.
+Do not ignore `.p2p/` or `.p2p/work/`.
 
-**P2P chooses the right location.** Users should not have to classify generated files one by one. Retained reports, useful logs and evidence go in `.p2p/work/`; disposable output goes in `.p2p/tmp/` or operating-system temporary storage. Product files follow the repository’s normal conventions, regardless of whether a person or an agent wrote them.
+Projects may configure different locations later if needed, but version 1 of this implementation should use these defaults and keep all skills consistent.
 
-**Safe exceptions.** Redact sensitive output before retaining it. For evidence too large or sensitive for Git, commit a safe description, a non-secret durable reference and a checksum instead. Use an approved existing storage destination; if none is available, report the evidence as unavailable. Never commit credentials or access tokens.
+## 3. Naming conventions
 
-**Commit policy is not commit permission.** Durable files belong in the next authorized commit. Creating them does not authorize staging, committing or pushing. P2P must distinguish “saved locally” from “committed” and “published”.
+Use lowercase kebab-case throughout.
 
-## 2. Specifications, work items and naming
-
-**Specifications** in `docs/specs/` describe lasting product behavior or design. **Work items** in `docs/work/` describe a particular delivery and contain its acceptance contract. A small work item can stand alone; do not require a separate specification or parent when neither adds useful information.
-
-Use lowercase kebab-case Markdown filenames: `retry-safe-uploads.md`. Keep both directories flat in this version. Names must be unique within each directory; resolve collisions explicitly, never by overwriting an unrelated file. Do not add dates, version suffixes or synthetic IDs to these names.
-
-A parent and its children use the same format. Name a child `<parent-stem>-<slice>.md`, for example `retry-safe-uploads-api.md`. A work item’s repository-relative path is its identity; its artifact directory uses exactly the filename without `.md`:
+### Specifications
 
 ```text
-docs/work/retry-safe-uploads-api.md
+specs/<descriptive-name>.md
+```
+
+Example:
+
+```text
+specs/retry-safe-uploads.md
+```
+
+### Work items
+
+```text
+work/<descriptive-name>.md
+```
+
+A child work item should normally use the parent stem plus a short slice name:
+
+```text
+work/retry-safe-uploads.md
+work/retry-safe-uploads-api.md
+work/retry-safe-uploads-browser.md
+```
+
+Do not add synthetic IDs, dates or version numbers to filenames unless the project already has a reason to do so. The repository-relative work-item path is its durable identity.
+
+### P2P artifact directory
+
+The artifact directory mirrors the work-item filename without `.md`:
+
+```text
+work/retry-safe-uploads-api.md
 .p2p/work/retry-safe-uploads-api/
 ```
 
-Keep filenames stable when titles change. A deliberate rename must update current links and move the matching artifact directory. Historical reports keep their original recorded identities. Use Markdown links relative to the containing file.
+Use predictable filenames inside it:
 
-### Minimal work-item format
+```text
+implementation.md
+candidate.json
+review.md
+proof.md
+evidence/
+```
+
+Other stages may use similarly obvious names such as `audit.md`, `repair.md`, `publication.md`, and `retrospective.md`.
+
+Evidence files use descriptive kebab-case names, for example:
+
+```text
+evidence/concurrent-retries.log
+evidence/restart-result.json
+```
+
+## 4. Specifications and work items
+
+### Specifications
+
+A specification describes lasting product or system behavior. It belongs in `specs/` when that document is useful independently of one particular delivery.
+
+A specification is optional. Small work may start directly as a work item.
+
+### Work items
+
+A work item describes one coherent delivery and contains its acceptance requirements. It replaces the workflow role previously played by a parent or child issue.
+
+A minimal work item looks like:
 
 ```markdown
 # API retry safety
 
-Source: [Upload specification](../specs/retry-safe-uploads.md)
+Source: [Retry-safe uploads](../specs/retry-safe-uploads.md)
 Parent: [Retry-safe uploads](retry-safe-uploads.md)
-Covers: Parent R1 and the API contribution to parent R3.
 
 ## Outcome
 Owners can repeat an upload request without creating duplicates.
@@ -73,140 +151,169 @@ Owners can repeat an upload request without creating duplicates.
 - R2: Concurrent retries create exactly one stored upload.
 
 ## Scope
-Includes owner checks. Excludes browser changes.
+Includes API behavior and owner checks. Excludes browser changes.
 
 ## Verification
-R1: Retry via the public API; compare IDs and stored metadata.
-R2: Race requests; assert one stored record and equal IDs.
-
-## Dependencies
-None.
+- R1: Retry through the public API and compare IDs and stored metadata.
+- R2: Race requests and assert one stored record.
 ```
 
-Omit inapplicable sections. Add boundaries, unresolved decisions and approval information when needed. Keep requirement IDs stable; child IDs are local to that child. The work-item file is the one canonical contract, not a second checklist alongside another contract file. Planning proposes or revises it; required approval remains explicit.
+Omit sections that are not useful. Requirement IDs should remain stable when downstream review, proof, repair or parent/child mapping needs them.
 
-A parent adds a `Children` section with links and each child’s contribution. Children identify their parent obligations and needed prerequisite outcomes. Splitting work does not create more specs by default. Child success does not prove the parent: the complete parent outcome still needs proof on one integrated candidate, with integration review where required.
+The work-item Markdown file is the canonical acceptance contract. Promise to Proof must not create a second competing contract file elsewhere.
 
-## 3. Generated records and their history
+### Parent and child work
 
-All retained P2P output for `docs/work/<slug>.md` goes under `.p2p/work/<slug>/`. These files are tracked in Git and normally updated by the workflow, not hand-edited to change a verdict.
+A parent work item lists its children and explains their contribution. Each child links back to its parent and states a complete child outcome.
 
-| Name | Contents |
-| --- | --- |
-| `implementation.md` | What changed, checks run, limitations and handoff. |
-| `candidate.json` | Exact candidate, comparison base and governing work-item identity. |
-| `review.md` | Review result, findings, scope and exact input identities. |
-| `proof.md` | Requirement verdicts, observations and evidence references. |
-| `evidence/` | Retained outputs needed to interpret or reproduce the result. |
-| `runs/` | Earlier local records that would otherwise be lost on replacement. |
+Example parent section:
 
-Create files only when needed. Other stages use equally predictable names, such as `audit.md`, `repair.md`, `publication.md` and `retrospective.md`. Additional evidence uses descriptive kebab-case names with the appropriate extension, such as `concurrent-retries.log`. Do not scatter reports in the repository root or unrelated documentation directories.
+```markdown
+## Children
+- [API retry safety](retry-safe-uploads-api.md) — R1 and API contribution to R3-R5
+- [Browser retry safety](retry-safe-uploads-browser.md) — R2 and browser/cross-channel contribution to R3-R5
+```
 
-### Keep the current view simple
+Slicing work does not create additional specifications by default. A child gets its own specification only when it represents a genuinely reusable product/design concept.
 
-The top-level report names are the current working view, not an assertion that they are valid for today’s code. Their recorded identities determine whether they still apply.
+Child completion does not prove the parent. The integrated parent outcome still requires parent-level proof on an exact integrated candidate.
 
-Use Git as the normal history. Before replacing a report, ensure its previous report, candidate reference and required evidence are recoverable together in Git. If they are not yet committed, preserve that set under `runs/<UTC-timestamp>/` first; for example, `runs/20260926T012400Z/`. Add `-02`, `-03`, etc. if the directory already exists. Never overwrite an existing archive.
+## 5. Generated P2P records
 
-When the candidate or agreement changes, retain the old records and remove stale reports from the current view before producing replacements. Do not silently change a report’s candidate or contract identity. There is no need for a separate event database, latest pointer or status file.
+All durable generated output for a work item goes under its matching `.p2p/work/<slug>/` directory.
 
-### Evidence must remain useful
+Example:
 
-Evidence can be embedded in a report; separate files are not mandatory. Record the command or inspection, actual observation, expected result, relevant environment and exact candidate. A command without its observed result is not evidence.
+```text
+.p2p/work/retry-safe-uploads-api/
+├── implementation.md
+├── candidate.json
+├── review.md
+├── proof.md
+└── evidence/
+```
 
-Use relative links for repository files. External evidence needs a durable reference and checksum, plus any access limitation. A checksum identifies bytes; it does not preserve them or make them accessible.
+These files are part of the durable project record and should be committed to Git.
 
-Temporary files may be deleted. Before reporting a completed handoff, copy required evidence into the retained record or preserve the relevant observations in the report. A required artifact available only in `/tmp`, a cache or `.p2p/tmp/` means the handoff is incomplete. Never delete the only recoverable evidence merely because a newer run exists.
+`.p2p/tmp/` is for scratch files, caches, disposable experiments and transient command output. Files there may be deleted at any time and must not be required to resume or understand the work.
 
-### Make the Git decision visible
+Operating-system temporary directories such as `/tmp` or `/private/tmp` are also temporary. Before a stage claims a durable handoff, anything required later must be copied into `.p2p/work/...` or summarized in a durable report.
 
-Setup creates `.p2p/README.md` with the commit/ignore rule. Each stage’s completion summary identifies its durable files to commit, ignored temporary output and any unavailable evidence. Preserve unrelated user changes; do not silently include them in the work item or a commit.
+### Large or sensitive evidence
 
-## 4. Candidate identity and acceptance
+Do not commit credentials, tokens or secrets.
 
-**Committed with the project does not mean part of the product being proved.** `.p2p/` contains workflow records. Product code, tests, specifications, work items, build settings and other product inputs remain outside it. The product must not depend on `.p2p/` contents for its build or behavior.
+If evidence is unsuitable for Git because it is large, sensitive or machine-specific, commit a small record containing:
 
-Review and proof must use a fixed candidate, never a moving branch or an assumed `HEAD`. For a committed candidate, `candidate.json` records at least:
+- what the evidence is;
+- where its durable copy is stored;
+- its checksum;
+- any access limitation needed to interpret the result.
+
+If no safe durable location exists, report the evidence as unavailable rather than pretending the handoff is complete.
+
+### Editing generated records
+
+`specs/` and `work/` are normal human-editable project files.
+
+`.p2p/work/` is primarily generated workflow state. It may be inspected and reviewed like any other committed file, but verdicts and identities should normally be changed by rerunning the relevant P2P stage rather than hand-editing them.
+
+## 6. Candidate identity
+
+Because `.p2p/work/` is committed after implementation, the current Git `HEAD` is not automatically the candidate that was reviewed or proven.
+
+Every candidate-bound report must name the exact candidate it applies to.
+
+For a committed candidate, `candidate.json` records at least:
 
 ```json
 {
   "commit": "<full candidate commit SHA>",
   "comparison_base": "<full comparison-base commit SHA>",
-  "work_item": "docs/work/retry-safe-uploads-api.md",
+  "work_item": "work/retry-safe-uploads-api.md",
   "work_item_sha256": "<SHA-256 of the exact work-item bytes>"
 }
 ```
 
-Review and proof repeat these identities and capture any governing specification or parent inputs. Required approvals must refer to the exact agreement. Unresolved source changes return to planning rather than silently changing acceptance.
+Review and proof repeat or reference these identities.
 
-For uncommitted work, reuse the existing reproducible-snapshot mechanism. It must preserve the complete selected candidate, including relevant tracked, staged, unstaged, deleted and untracked content, while excluding `.p2p/`. Retain the actual snapshot or a retrievable durable reference; a digest alone is insufficient. Preserve exact uncommitted agreement text as historical input, not a competing editable contract.
-
-Review and proof may save records under `.p2p/`, but must not change the captured product or agreement. Run potentially mutating checks in an isolated copy of the fixed candidate.
-
-### Recording proof does not prove a new commit
+Example lifecycle:
 
 ```text
-A: product candidate
-   review and proof examine A
-B: authorized commit adding the reports under .p2p/
+A  product candidate
+│  review and proof examine A
+│
+B  later commit records review/proof under .p2p/
 ```
 
-The reports still prove **A**, not B merely because B is now `HEAD`. Creating or committing the reports must not silently replace the recorded candidate.
+The reports still establish results for candidate **A**. Committing the reports does not silently make **B** the proven candidate.
 
-To use those results for publication of B, deterministically compare A and B’s complete tracked trees outside `.p2p/`, including paths, contents and file modes, and recheck the exact agreement. If identical, report B as carrying the same verified product content while retaining both commit identities. Any other change requires a new candidate and fresh review/proof. Apply the equivalent check to retained snapshots. If the build or checks depend on the commit ID or changed environment, tree equality is not sufficient; rerun the affected verification. This does not replace existing comparison-base, authorization, CI or merge-readiness checks.
+When deciding whether a later commit contains the same product candidate, compare the complete tracked tree outside `.p2p/` and recheck the exact work item. Any product or binding agreement change requires fresh candidate-bound review/proof.
 
-Referenced candidates must remain retrievable after transfer or publication. If a squash or history rewrite would lose the only copy, retain a recoverable snapshot or other approved durable reference first.
+For uncommitted work, use the existing reproducible snapshot mechanism. The snapshot must include all relevant tracked, staged, unstaged, deleted and untracked product files and must exclude `.p2p/`.
 
-### Derive acceptance, do not store a flag
+Acceptance is derived from matching current artifacts. Do not add an authoritative `accepted: true` flag.
 
-A current acceptance result requires full matching `REVIEWED` and `PROVEN` reports, complete requirement coverage and accessible evidence for the exact current agreement and candidate. Changed product or agreement inputs make old results historical, not current. A changed comparison base also requires a fresh review. A filename, issue closure or manually edited `accepted: true` field is never sufficient.
+## 7. Required skill behavior
 
-## 5. Changes to the workflow and rollout
-
-Keep the existing stage responsibilities and approval boundaries. Change their common storage and lookup rules rather than building a new workflow engine.
+The implementation should change storage and lookup conventions, not invent a new workflow engine.
 
 | Area | Required behavior |
 | --- | --- |
-| Setup | Explain the layout, write `.p2p/README.md`, ignore only P2P temporary material and check durable records are visible to Git. |
-| Work creation and planning | Create or update `docs/work/<slug>.md`; keep the approved acceptance contract in that file. No external issue is required. |
-| Slicing | Create local child work-item files, parent/child links, contribution mappings and prerequisite descriptions. |
-| Implementation and repair | Modify authorized product files; save reports in the matching artifact directory and capture the resulting candidate. |
-| Review and proof | Inspect fixed inputs, retain independent results and evidence, and reject stale or unavailable inputs. Preserve existing host-isolation requirements. |
-| Delivery and resume | Accept a local work-item path and discover its source, relationships, candidate, reports and next action without chat history or manual artifact paths. |
-| Optional integrations | Read or publish supported external references only when selected; keep existing publication and merge-readiness gates, including the candidate-equivalence check in section 4. |
+| Setup | Establish `specs/`, `work/`, `.p2p/work/` and `.p2p/tmp/`; ensure only `.p2p/tmp/` is ignored by the P2P convention. |
+| Planning | Create or update `work/<slug>.md`; keep the acceptance contract there. |
+| Slicing | Create child files in `work/`, add parent/child links and contribution mappings. External child issues are optional. |
+| Implementation | Modify authorized product files, save `implementation.md`, and capture the exact candidate. |
+| Review | Read a fixed candidate and exact work item; save `review.md` under the matching artifact directory. |
+| Proof | Read the same fixed candidate and exact work item; save `proof.md` and retained evidence under the matching artifact directory. |
+| Repair | Modify the candidate only within authorized scope, then require fresh candidate-bound review/proof as appropriate. |
+| Resume | Given a work-item path, find its spec, parent/children, candidate, reports and evidence without chat history or manually supplied artifact paths. |
+| External trackers | Optional import/mirror/publication surfaces only. They must not become a second canonical contract. |
 
-Existing issue-oriented entry points may resolve an external issue to a local work item. Store its external reference in that Markdown file and reuse it on subsequent invocations. Ambiguous matches require resolution, not duplicate files. External discussion can propose amendments, but it does not automatically rewrite the local agreement.
+Saving files locally does not authorize staging, committing, pushing, creating issues, publishing PRs, merging or deploying. Existing authority rules remain unchanged.
 
-External issues are optional links or published views, not a second canonical contract. Local delivery must work without tracker configuration. No new public command name is required just to implement this storage change.
+## 8. Implementation acceptance checks
 
-### Migrate without losing evidence
+A disposable repository must demonstrate the following:
 
-1. Update the shared protocol, installation references, setup guidance and file examples to this layout. All skills must resolve paths the same way.
-2. Inspect existing `.p2p/` content before removing a blanket ignore rule. Move disposable files to `tmp/`, redact sensitive records and flag large evidence needing external storage. Do not bulk-stage newly exposed files.
-3. Use the new convention for new work. Move active work only deliberately, preserving exact historical identities and updating current links. Keep older contracts and reports readable; do not convert the entire backlog automatically.
-4. Exercise local planning, implementation, review and proof first; then apply the same convention to slicing, resumption and existing optional integrations. Run the checks in section 6 before declaring the migration complete.
+1. **Git rules are obvious.** `specs/`, `work/` and `.p2p/work/` are trackable; `.p2p/tmp/` is ignored; conflicting ignore rules are detected.
+2. **Names are predictable.** `work/foo-bar.md` resolves to `.p2p/work/foo-bar/`; parent/child names follow the convention and collisions do not overwrite unrelated work.
+3. **Local-only workflow works.** A specification or standalone work item can be planned, implemented, reviewed and proven without an external issue tracker.
+4. **Slicing stays local by default.** A parent can create child work items with links and contribution mappings without creating tracker issues or extra specs.
+5. **Durable evidence survives temp cleanup.** Deleting `.p2p/tmp/` and OS temp files does not remove anything required to understand or resume completed work.
+6. **Secrets are not committed.** Secret-bearing output is redacted/excluded; large or unsuitable evidence uses a safe durable reference plus checksum.
+7. **Candidate identity stays exact.** Review/proof of candidate A remain explicitly bound to A after a later commit records `.p2p/` artifacts.
+8. **Stale results are rejected.** Changing product files, the work item, a binding parent/spec input or the review comparison base prevents reuse of incompatible old results.
+9. **Fresh-checkout resume works.** After an authorized commit and transfer, a fresh checkout given only `work/<slug>.md` can find the relevant durable P2P state and continue safely.
+10. **No unintended external effects occur.** Creating durable files does not itself stage, commit, push, modify trackers, publish a PR, merge or deploy.
 
-### Keep the implementation bounded
+## 9. Implementation boundary
 
-Use Markdown, normal Git history and the existing candidate-capture facilities. Add only small shared path-resolution or validation helpers where needed. This change does not require synthetic work-item IDs, metadata sidecars for every file, a database, a daemon, a generic tracker SDK, automatic synchronization or a new artifact service.
+Keep this change small.
 
-Normal Git commits and transfer carry the tracked record. A local save is not a shared handoff until the required files and referenced candidates are available to the receiving checkout. Missing storage, evidence or authority must be reported explicitly, not treated as success.
+Use Markdown, ordinary Git history and the existing candidate/snapshot mechanisms. Add only the shared path-resolution and validation helpers needed to make the conventions consistent across skills.
 
-## 6. Implementation acceptance checks
+Do **not** add, as part of this change:
 
-Demonstrate these behaviors in a disposable repository. Check actual files, Git visibility, recoverability and stage results, not just instruction wording. Existing review/proof quality and authorization checks remain applicable.
+- synthetic work-item IDs;
+- a workflow database;
+- metadata sidecars for every file;
+- a daemon;
+- a generic tracker SDK;
+- automatic cross-machine synchronization;
+- a new artifact service;
+- automatic Git commits or pushes.
 
-| ID | Required observation |
-| --- | --- |
-| AC1 — Obvious Git rules | Specs, work items, `.p2p/README.md` and durable `.p2p/work/` records are eligible for tracking. `.p2p/tmp/` is ignored. Setup detects conflicting ignore rules and explains the distinction. |
-| AC2 — Predictable names | A work-item path resolves to exactly the matching artifact directory. Parent/child filenames and links follow section 2. A collision cannot overwrite unrelated work; a deliberate rename updates current links. |
-| AC3 — Local work and slicing | A spec can become a parent and children without a tracker. Each work-item file contains its own contract and relevant mappings. No duplicate contract or unnecessary child spec is created. Child success alone does not complete the parent. |
-| AC4 — Safe durable evidence | Required observations survive deletion of temporary files. Missing external evidence prevents a complete handoff. A secret-bearing output is redacted or excluded, never committed; retained external references contain no credentials. |
-| AC5 — Exact candidate, later report commit | Review and proof name candidate A. Saving reports leaves the product unchanged. Report-only commit B is recognized as product-equivalent only after the explicit comparison; the reports are not relabeled as proof of B. |
-| AC6 — Stale results rejected | Change a product file, governing work item or binding parent/spec input: old acceptance no longer applies. Change the comparison base: old review is not reused. Editing only a success label cannot restore acceptance. |
-| AC7 — Recoverable dirty work | Capture a candidate with modified, deleted and untracked product files. Restore the exact content without `.p2p/` records and without absorbing unrelated edits. A missing or corrupted required snapshot blocks reuse. |
-| AC8 — No lost run history | Replacing a report preserves its old candidate and required evidence in Git or a non-overwritten `runs/` archive. Prior uncommitted reports are not silently lost. Current outputs do not present retired results as current. |
-| AC9 — Fresh-checkout resume | After authorized commit and transfer, a fresh checkout given only the work-item path finds its spec, relationships, exact candidate, reports and evidence without chat history. Missing inputs produce a specific blocker. |
-| AC10 — No unintended effects | Saving a local record does not stage, commit, push, create/edit external issues, publish a PR, merge or deploy without applicable authority. Completion summaries list files to commit and preserve unrelated user changes. |
+The target mental model should remain understandable from the repository tree alone:
 
-**Implementation outcome:** a developer can understand what belongs in Git from the path alone, find all work-related records from one work-item file, and tell exactly which implementation the saved review and proof establish.
+```text
+specs/          What should the product do?
+   ↓
+work/           What work are we doing?
+   ↓
+src/ + tests/   What did we build?
+   ↓
+.p2p/work/      What did P2P do, review and prove?
+
+.p2p/tmp/       Disposable scratch only
+```
