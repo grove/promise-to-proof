@@ -1,0 +1,46 @@
+Command: ["python3", "check.py", "capture"]
+Exit: 0
+stdout:
+capture: PASS
+
+stderr:
+
+Command: ["python3", "check.py", "lookup"]
+Exit: 0
+stdout:
+lookup: PASS
+
+stderr:
+
+Command: ["python3", "check.py", "summary"]
+Exit: 0
+stdout:
+summary: PASS
+
+stderr:
+
+Command: ["python3", "check.py", "parent"]
+Exit: 1
+stdout:
+
+stderr:
+Traceback (most recent call last):
+  File "/private/tmp/p2p-epic-repair-cases/S11-parent-only/repo/check.py", line 13, in <module>
+    assert greet('Ada') == 'Welcome Ada'
+AssertionError
+
+Command: ["python3", "-c", "from registry import capture,lookup,summary,greet; cases=[('',{'':''},'Welcome '),('Ada',{'ada':'Ada'},'Welcome Ada'),('aDA',{'ada':'aDA'},'Welcome aDA'),('BOB',{'bob':'BOB'},'Welcome BOB')]; [(print(repr(n),capture(n),lookup(capture(n),n.swapcase()),summary(n),greet(n)),exec('assert capture(n)==d; assert lookup(d,n.swapcase())==n; assert summary(n)==s')) for n,d,s in cases]; assert lookup({},'missing') is None; assert lookup({'ada':'Ada','bob':'Bob'},'BOB')=='Bob'; print('child boundaries PASS'); print('direct parent composition:',summary(lookup(capture('Ada'),'ADA'))); print('greet Ada expected Welcome Ada; actual:',greet('Ada')); assert greet('Ada')=='Welcome Ada'"]
+Exit: 1
+stdout:
+'' {'': ''}  Welcome  Welcome 
+'Ada' {'ada': 'Ada'} Ada Welcome Ada Welcome ADA
+'aDA' {'ada': 'aDA'} aDA Welcome aDA Welcome ADA
+'BOB' {'bob': 'BOB'} BOB Welcome BOB Welcome BOB
+child boundaries PASS
+direct parent composition: Welcome Ada
+greet Ada expected Welcome Ada; actual: Welcome ADA
+
+stderr:
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+AssertionError

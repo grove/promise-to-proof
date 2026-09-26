@@ -1,0 +1,1 @@
+Fixture owner approves concurrent v2 exactly, approved-section sha256:89c07679eeb571d6fddf1a85067c69c24571efd4d503845851d4fb1048725575. Activate only at the evaluator-controlled concurrent event. Strategy only; no additional ref or PR authority.

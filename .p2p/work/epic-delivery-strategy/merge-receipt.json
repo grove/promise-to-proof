@@ -1,0 +1,21 @@
+{
+  "status": "MERGED",
+  "authority": "User approved merging exact head 3684dbc7cccc1bb49936b0984f205ca731c5fc15 into main with a merge commit.",
+  "command": "gh pr merge https://github.com/grove/promise-to-proof/pull/34 --merge --match-head-commit 3684dbc7cccc1bb49936b0984f205ca731c5fc15",
+  "pr_readback": {
+    "baseRefName": "main",
+    "headRefOid": "3684dbc7cccc1bb49936b0984f205ca731c5fc15",
+    "mergeCommit": {
+      "oid": "ebbab4a6bf34dae1f446de47168e058540b95dd8"
+    },
+    "mergedAt": "2026-09-26T23:23:41Z",
+    "state": "MERGED",
+    "url": "https://github.com/grove/promise-to-proof/pull/34"
+  },
+  "target_readback": {
+    "name": "main",
+    "sha": "ebbab4a6bf34dae1f446de47168e058540b95dd8"
+  },
+  "local_checkout": "unchanged; issue/33",
+  "branch_deletion": false
+}

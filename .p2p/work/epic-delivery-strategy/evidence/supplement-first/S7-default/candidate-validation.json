@@ -1,0 +1,34 @@
+[
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "/private/tmp/p2p-epic-valid-v1isv6j3/S7-default/installed/implement-contract/scripts/p2p_filesystem.py",
+      "--repo",
+      "/private/tmp/p2p-epic-valid-v1isv6j3/S7-default/repo",
+      "validate",
+      "work/lookup.md",
+      "--base",
+      "bffb5b8ebba1e5bc10aa2767f70e020365e4c577"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "p2p: product candidate changed\n",
+    "intentional_difference": "Preserved uncommitted human notes are outside the historical candidate"
+  },
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "/private/tmp/p2p-epic-valid-v1isv6j3/S7-default/installed/implement-contract/scripts/p2p_filesystem.py",
+      "--repo",
+      "/private/tmp/p2p-epic-valid-v1isv6j3/S7-default/repo",
+      "validate",
+      "work/parent.md",
+      "--base",
+      "bffb5b8ebba1e5bc10aa2767f70e020365e4c577"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "p2p: product candidate changed\n",
+    "intentional_difference": "Preserved uncommitted human notes are outside the historical candidate"
+  }
+]

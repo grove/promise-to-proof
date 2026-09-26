@@ -1,0 +1,15 @@
+{
+  "stage": "review",
+  "host_tool": "collaboration.spawn_agent",
+  "context_id": "/root/review_epic_delivery",
+  "fork_turns": "none",
+  "status": "completed",
+  "candidate": "snapshot:sha256:8ff16e4594d451c80b5c1cb7225874bb89b4190a6448dba86ee146e025ab0dd8",
+  "comparison_base": "5e369c1b45ba817b8add6b20a9b7b1c97898fa12",
+  "permissions": "default workspace-write sandbox; fixed candidate/base/records outside every writable root; scratch-only diagnostics; no escalation",
+  "input_root": "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate",
+  "result": "CHANGES NEEDED",
+  "report_sha256": "2d26c4f6050867af74fcbc2195bc9711d0a12fdaee66159ff013c489b5abbe69",
+  "report_path": "review.md",
+  "evidence": "evidence/review-first/retention.json"
+}

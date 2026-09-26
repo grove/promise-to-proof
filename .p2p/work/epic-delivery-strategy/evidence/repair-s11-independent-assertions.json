@@ -1,0 +1,62 @@
+[
+  {
+    "command": [
+      "/opt/homebrew/bin/python3.14",
+      "-B",
+      "check.py",
+      "capture"
+    ],
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S11-parent-only/repo",
+    "exit_code": 0,
+    "stdout": "capture: PASS\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/opt/homebrew/bin/python3.14",
+      "-B",
+      "check.py",
+      "lookup"
+    ],
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S11-parent-only/repo",
+    "exit_code": 0,
+    "stdout": "lookup: PASS\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/opt/homebrew/bin/python3.14",
+      "-B",
+      "check.py",
+      "summary"
+    ],
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S11-parent-only/repo",
+    "exit_code": 0,
+    "stdout": "summary: PASS\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/opt/homebrew/bin/python3.14",
+      "-B",
+      "check.py",
+      "parent"
+    ],
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S11-parent-only/repo",
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/p2p-epic-repair-cases/S11-parent-only/repo/check.py\", line 13, in <module>\n    assert greet('Ada') == 'Welcome Ada'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  },
+  {
+    "command": [
+      "/opt/homebrew/bin/python3.14",
+      "-B",
+      "-c",
+      "from registry import capture,lookup,summary,greet; assert capture('Ada')=={'ada':'Ada'}; assert lookup(capture('Ada'),'ADA')=='Ada'; assert lookup({},'ADA') is None; assert summary('Ada')=='Welcome Ada'; assert greet('Ada') != 'Welcome Ada'; print('Full child literal assertions pass; parent-owned greet violates composition')"
+    ],
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S11-parent-only/repo",
+    "exit_code": 0,
+    "stdout": "Full child literal assertions pass; parent-owned greet violates composition\n",
+    "stderr": ""
+  }
+]

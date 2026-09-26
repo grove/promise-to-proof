@@ -1,0 +1,18 @@
+{
+  "candidate": "snapshot:sha256:7e5c54fa4183651c94b4f6b83bea7cc841b2722a5693047c5c8be8faaf8f41e8",
+  "head": "3684dbc7cccc1bb49936b0984f205ca731c5fc15",
+  "base": "5e369c1b45ba817b8add6b20a9b7b1c97898fa12",
+  "full_product_manifest_entries": 130,
+  "complete_product_tree_equivalent": true,
+  "agreement_and_binding_inputs_unchanged": true,
+  "source_issue_unchanged": true,
+  "full_review_and_proof_hashes_unchanged": true,
+  "reports": {
+    ".p2p/work/epic-delivery-strategy/review.md": "4d9ffb171710c49a7e259c6b1168b02ad8c18498ece7d7851e7104ea169085bd",
+    ".p2p/work/epic-delivery-strategy/proof.md": "67594d80fed89b9b64e28f932343ca86979c41ecd8f756956e28ad8e052d21af",
+    ".p2p/work/epic-delivery-strategy/implementation.md": "9691b84d1e6b9a3cf9eeb5284c91821be830140c8e4b2afc126dab3a16f1fac7",
+    ".p2p/work/epic-delivery-strategy/repair.md": "4d577b76ea24dcfc71664f9253fa246521da0c52cbb40dde021699c2abcac80d",
+    ".p2p/work/epic-delivery-strategy/planning-handoff.md": "14e7d259aa38a85be55dd6c94612c3ee744f6dbb8cc6d22a91303de061f4a80a"
+  },
+  "git_metadata_execution_equivalence": "Unchanged from verified publication mapping; no subsequent candidate build or transformation."
+}

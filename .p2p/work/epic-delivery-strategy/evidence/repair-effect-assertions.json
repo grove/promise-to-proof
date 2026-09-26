@@ -1,0 +1,32 @@
+[
+  {
+    "case": "S9-post-effect",
+    "assertions": "one exact base edit; readback after effect; human body/title/head/draft preserved; one PR; final report exact active plan identity; fresh resume did not repeat edit",
+    "effect_sequence": 4,
+    "effect": {
+      "changes": {
+        "baseRefName": "epic/example"
+      },
+      "edit": "17"
+    },
+    "injection_phase": "after_persisted_edit",
+    "final_plan_sha256": "89c07679eeb571d6fddf1a85067c69c24571efd4d503845851d4fb1048725575",
+    "final_report_sha256": "83dd35d2a8738b809a94face997f8f17de4d8e54c83975082cb4070bb171b6df",
+    "result": "PASS"
+  },
+  {
+    "case": "S9-interrupted",
+    "assertions": "one exact base edit; readback after effect; human body/title/head/draft preserved; one PR; final report exact active plan identity; fresh resume did not repeat edit",
+    "effect_sequence": 4,
+    "effect": {
+      "changes": {
+        "baseRefName": "epic/example"
+      },
+      "edit": "17"
+    },
+    "injection_phase": null,
+    "final_plan_sha256": "b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2",
+    "final_report_sha256": "10162ff539ed66200cf058da904fa929653e85b96b1678c4096e804840cba731",
+    "result": "PASS"
+  }
+]

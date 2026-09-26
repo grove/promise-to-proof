@@ -1,0 +1,80 @@
+[
+  {
+    "case": "S1-default",
+    "no_effects_exit": 0,
+    "report_exists": true,
+    "retained_files": 24
+  },
+  {
+    "case": "S2-default",
+    "no_effects_exit": 0,
+    "report_exists": true,
+    "retained_files": 21
+  },
+  {
+    "case": "S3-default",
+    "no_effects_exit": 0,
+    "report_exists": true,
+    "retained_files": 21
+  },
+  {
+    "case": "S5-missing",
+    "no_effects_exit": 0,
+    "report_exists": true,
+    "retained_files": 21
+  },
+  {
+    "case": "S5-conflicting",
+    "no_effects_exit": 0,
+    "report_exists": true,
+    "retained_files": 21
+  },
+  {
+    "case": "S5-proposed-only",
+    "no_effects_exit": 0,
+    "report_exists": true,
+    "retained_files": 21
+  },
+  {
+    "case": "S5-pending",
+    "no_effects_exit": 0,
+    "report_exists": true,
+    "retained_files": 22
+  },
+  {
+    "case": "S6-default",
+    "no_effects_exit": 0,
+    "report_exists": true,
+    "retained_files": 24
+  },
+  {
+    "case": "S13-missing",
+    "no_effects_exit": 0,
+    "report_exists": true,
+    "retained_files": 21
+  },
+  {
+    "case": "S13-conflicting",
+    "no_effects_exit": 0,
+    "report_exists": true,
+    "retained_files": 21
+  },
+  {
+    "case": "S13-advanced",
+    "no_effects_exit": 0,
+    "report_exists": true,
+    "retained_files": 21
+  },
+  {
+    "case": "S14-default",
+    "no_effects_exit": 0,
+    "report_exists": true,
+    "retained_files": 21
+  },
+  {
+    "case": "S14-present",
+    "no_effects_exit": 0,
+    "report_exists": true,
+    "retained_files": 22
+  }
+]

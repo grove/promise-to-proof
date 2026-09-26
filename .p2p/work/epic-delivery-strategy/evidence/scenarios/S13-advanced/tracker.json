@@ -1,0 +1,27 @@
+{
+  "prs": {
+    "17": {
+      "number": 17,
+      "url": "https://fixture.invalid/epic/pull/17",
+      "state": "OPEN",
+      "baseRefName": "epic/example",
+      "headRefName": "child/lookup",
+      "headRefOid": "79c7d86089e00f0f12ac1bfd0c7fc21c14201ec8",
+      "title": "Lookup names",
+      "body": "Human note: keep this sentence byte-for-byte.\n<!-- grove:publish-pr repo=fixture/epic candidate=git:79c7d86089e00f0f12ac1bfd0c7fc21c14201ec8 contract=sha256:fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9 -->\n",
+      "isDraft": true,
+      "updatedAt": "fixture-revision-0",
+      "statusCheckRollup": [
+        {
+          "name": "required-ci",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        }
+      ],
+      "reviewDecision": "APPROVED",
+      "mergeable": "MERGEABLE",
+      "baseRefOid": "0d8e40ed07939513d595c4ca774c7539b7ce10ac"
+    }
+  },
+  "calls": 0
+}

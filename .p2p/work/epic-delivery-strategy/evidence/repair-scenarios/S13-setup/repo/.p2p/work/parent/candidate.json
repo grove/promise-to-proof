@@ -1,0 +1,12 @@
+{
+  "commit": "928231303f30c9c01d93754ce5653e9b27b42399",
+  "comparison_base": "928231303f30c9c01d93754ce5653e9b27b42399",
+  "work_item": "work/parent.md",
+  "work_item_sha256": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada",
+  "binding_inputs": [
+    {
+      "path": "specs/registry.md",
+      "sha256": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+Fixture owner approves the approved delivery plan section exactly as captured in slicing.md at fixture preparation. This covers strategy and local record retention only. No ref, PR, publication, or merge effects are authorized.

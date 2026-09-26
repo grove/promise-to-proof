@@ -1,0 +1,43 @@
+{
+  "result": "REVIEWED AND PROVEN",
+  "issue": "https://github.com/grove/promise-to-proof/issues/33",
+  "contract": {
+    "path": "work/epic-delivery-strategy.md",
+    "revision": "v1",
+    "sha256": "78cad1d7f85183100214da15fdc8418ed2220ce1af80764d648e139fdd899895"
+  },
+  "binding_inputs": [
+    {
+      "path": "plans/epic-delivery-strategy-spec.md",
+      "sha256": "7a231d84f739a459f770870d23038fbc4946c759f04241c87f2a6322d9a1645e"
+    }
+  ],
+  "candidate": "snapshot:sha256:7e5c54fa4183651c94b4f6b83bea7cc841b2722a5693047c5c8be8faaf8f41e8",
+  "comparison_base": "5e369c1b45ba817b8add6b20a9b7b1c97898fa12",
+  "reports": {
+    "review.md": {
+      "status": "REVIEWED",
+      "sha256": "4d9ffb171710c49a7e259c6b1168b02ad8c18498ece7d7851e7104ea169085bd",
+      "full_scope": "R1-R30"
+    },
+    "proof.md": {
+      "status": "PROVEN",
+      "sha256": "67594d80fed89b9b64e28f932343ca86979c41ecd8f756956e28ad8e052d21af",
+      "full_scope": "R1-R30"
+    }
+  },
+  "source_issue_unchanged_after_verification": true,
+  "candidate_unchanged_after_verification": true,
+  "automatic_repair_cycles": 1,
+  "checks": "30 repository tests passed; S1-S14 and mandatory variants observed; independent public CLI, exact-byte integrity, recovered parent behavior and tracker-effect assertions passed",
+  "live_service_validation": "unexecuted; controlled tracker simulations explicitly identified",
+  "project_effects": {
+    "branch": "main",
+    "head": "5e369c1b45ba817b8add6b20a9b7b1c97898fa12",
+    "commits": 0,
+    "pushes": 0,
+    "tracker_writes": 0
+  },
+  "durable_artifacts": ".p2p/work/epic-delivery-strategy/",
+  "publication": "optional, separately authorized"
+}

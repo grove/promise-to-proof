@@ -1,0 +1,17 @@
+{
+  "stage": "repair",
+  "host_tool": "collaboration.spawn_agent",
+  "context_id": "/root/repair_epic_delivery",
+  "fork_turns": "none",
+  "reasoning_effort": "high",
+  "status": "completed",
+  "result": "REPAIRED; behavioral evidence pending",
+  "skills": [
+    "/Users/grove/.agents/skills/implement-contract/SKILL.md",
+    "/Users/grove/.agents/skills/repair-gaps/SKILL.md"
+  ],
+  "candidate_before": "snapshot:sha256:8ff16e4594d451c80b5c1cb7225874bb89b4190a6448dba86ee146e025ab0dd8",
+  "candidate_after": "snapshot:sha256:7e5c54fa4183651c94b4f6b83bea7cc841b2722a5693047c5c8be8faaf8f41e8",
+  "report_sha256": "e595431347206c6be046838fc87ecb16d9a5e614f3fc6797401122b0323eeaa0",
+  "permissions": "workspace-write default sandbox; exclusive scoped product edit ownership; no project Git or external effects; temporary test repositories authorized"
+}

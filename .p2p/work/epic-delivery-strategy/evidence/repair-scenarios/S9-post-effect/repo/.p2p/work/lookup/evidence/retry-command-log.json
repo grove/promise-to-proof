@@ -1,0 +1,182 @@
+[
+  {
+    "command": [
+      "git",
+      "remote",
+      "-v"
+    ],
+    "exit": 0,
+    "stdout": "origin\t/private/tmp/p2p-epic-valid-v1isv6j3/S9-default/origin.git (fetch)\norigin\t/private/tmp/p2p-epic-valid-v1isv6j3/S9-default/origin.git (push)\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "/private/tmp/p2p-epic-valid-v1isv6j3/S9-concurrent-body/origin.git"
+    ],
+    "exit": 0,
+    "stdout": "c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f\trefs/heads/child/lookup\nc2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f\trefs/heads/epic/example\nc2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f\trefs/heads/trunk\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "exit": 0,
+    "stdout": "?? .p2p/\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f",
+      "--",
+      ".",
+      ":(exclude).p2p"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit": 0,
+    "stdout": "c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "exit": 0,
+    "stdout": "trunk\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "gh",
+      "pr",
+      "view",
+      "17",
+      "--json",
+      "url,number,state,headRefName,headRefOid,baseRefName,baseRefOid,title,body,isDraft"
+    ],
+    "exit": 0,
+    "stdout": "{\n  \"url\": \"https://fixture.invalid/epic/pull/17\",\n  \"number\": 17,\n  \"state\": \"OPEN\",\n  \"headRefName\": \"child/lookup\",\n  \"headRefOid\": \"c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f\",\n  \"baseRefName\": \"trunk\",\n  \"baseRefOid\": \"c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f\",\n  \"title\": \"Lookup names\",\n  \"body\": \"Concurrent human edit: preserve this text.\\nHuman note: keep this sentence byte-for-byte.\\n<!-- grove:publish-pr repo=fixture/epic candidate=git:c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f contract=sha256:fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9 -->\\n\",\n  \"isDraft\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "gh",
+      "pr",
+      "list",
+      "--state",
+      "all",
+      "--head",
+      "child/lookup",
+      "--json",
+      "url,headRefOid,baseRefName,title,body,isDraft"
+    ],
+    "exit": 0,
+    "stdout": "[\n  {\n    \"url\": \"https://fixture.invalid/epic/pull/17\",\n    \"headRefOid\": \"c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f\",\n    \"baseRefName\": \"trunk\",\n    \"title\": \"Lookup names\",\n    \"body\": \"Concurrent human edit: preserve this text.\\nHuman note: keep this sentence byte-for-byte.\\n<!-- grove:publish-pr repo=fixture/epic candidate=git:c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f contract=sha256:fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9 -->\\n\",\n    \"isDraft\": true\n  }\n]\n",
+    "stderr": ""
+  },
+  {
+    "path": "work/lookup.md",
+    "expected": "fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9",
+    "actual": "fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9",
+    "historical_match": false
+  },
+  {
+    "path": "work/parent.md",
+    "expected": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada",
+    "actual": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada",
+    "historical_match": false
+  },
+  {
+    "path": "specs/registry.md",
+    "expected": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9",
+    "actual": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9",
+    "historical_match": false
+  },
+  {
+    "path": ".p2p/work/lookup/candidate.json",
+    "expected": "b0cd299b9b80d0d792cf373cccbb1b53dc21b67d4aed43fc5c7dbac82cc306bb",
+    "actual": "b0cd299b9b80d0d792cf373cccbb1b53dc21b67d4aed43fc5c7dbac82cc306bb",
+    "historical_match": false
+  },
+  {
+    "path": ".p2p/work/lookup/review.md",
+    "expected": "cfd128e974196ba5b9f9820306ebe27eb74b306b10428b09e64db9397e109af2",
+    "actual": "cfd128e974196ba5b9f9820306ebe27eb74b306b10428b09e64db9397e109af2",
+    "historical_match": false
+  },
+  {
+    "path": ".p2p/work/lookup/proof.md",
+    "expected": "1b2f31d7bd4444bcb1beca9c4ee37296320a9bb5507297f78fe42b59936c9afa",
+    "actual": "1b2f31d7bd4444bcb1beca9c4ee37296320a9bb5507297f78fe42b59936c9afa",
+    "historical_match": false
+  },
+  {
+    "path": ".p2p/work/lookup/evidence/review-commands.txt",
+    "expected": "5ba667a692599ef25236872c7f6fe396aa0c9978a9aabd891e9114148d080fda",
+    "actual": "5ba667a692599ef25236872c7f6fe396aa0c9978a9aabd891e9114148d080fda",
+    "historical_match": false
+  },
+  {
+    "path": ".p2p/work/lookup/evidence/proof-commands.txt",
+    "expected": "221489aac2e13cdb1f072620322d8288912d512fbeac56f5d272880ddfb3e291",
+    "actual": "221489aac2e13cdb1f072620322d8288912d512fbeac56f5d272880ddfb3e291",
+    "historical_match": false
+  },
+  {
+    "path": ".p2p/work/lookup/evidence/common-identity.txt",
+    "expected": "c047ac1703e5a2244f3495b15b9d4eefafbb67bb05dbdee248bf2c93420d0bb7",
+    "actual": "c047ac1703e5a2244f3495b15b9d4eefafbb67bb05dbdee248bf2c93420d0bb7",
+    "historical_match": false
+  },
+  {
+    "path": ".p2p/work/lookup/evidence/approved-plan.md",
+    "expected": "b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2",
+    "actual": "b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2",
+    "historical_match": false
+  },
+  {
+    "path": ".p2p/work/parent/slicing.md",
+    "expected": "64ff1e1837c2600fe816fff70614377a3aa63dd7113d252c584d2e8de9718597",
+    "actual": "64ff1e1837c2600fe816fff70614377a3aa63dd7113d252c584d2e8de9718597",
+    "historical_match": false
+  },
+  {
+    "path": ".p2p/work/parent/approval.md",
+    "expected": "7b14282140fcc3f4926cb8a6b78a179b82a90ed1310116ac1bcd486884dfcddd",
+    "actual": "7b14282140fcc3f4926cb8a6b78a179b82a90ed1310116ac1bcd486884dfcddd",
+    "historical_match": false
+  },
+  {
+    "path": ".p2p/work/lookup/publication.md",
+    "expected": "999ebe002c1ce7bb6767ee587234f948a9987dcd8e6bffcea946a20ca8888401",
+    "actual": "6101aecfb5a9d96570c178d75af992ff45d931151e24dde820a2846dd2244b7f",
+    "historical_match": true
+  },
+  {
+    "path": ".p2p/work/lookup/evidence/publication-inspection.txt",
+    "expected": "0cb3fa4e696406c4d4c74752aa54d1d6cceccd6109a488c7c866e2aba4368242",
+    "actual": "0cb3fa4e696406c4d4c74752aa54d1d6cceccd6109a488c7c866e2aba4368242",
+    "historical_match": false
+  },
+  {
+    "plan_sha256": "b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2",
+    "plan_text": "## Approved delivery plan\nPlan revision: v1\nApproval source: Fixture owner approved these exact destinations and parent completion conditions in setup receipt approval.md. Strategy authority only; no ref or PR effects.\nParent: work/parent.md\nFinal destination: trunk\nIntegration branch: epic/example\nIntegration start: c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f\nDefault choice: grouped\n\n| Child | Choice | Destination | Reason | State |\n|---|---|---|---|---|\n| work/capture.md | grouped | epic/example | Must ship with the parent | remaining |\n| work/lookup.md | grouped | epic/example | Must ship with the parent | remaining |\n| work/summary.md | grouped | epic/example | Must ship with the parent | remaining |\n\nParent completion: All parent requirements, including R4 composition, need review and proof on one exact assembled candidate. Grouped parent publication also requires full matching parent reports.\nPending actions: None.\n\n"
+  }
+]

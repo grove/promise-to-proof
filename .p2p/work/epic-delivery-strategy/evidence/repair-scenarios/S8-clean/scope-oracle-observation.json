@@ -1,0 +1,10 @@
+{
+  "candidate": "snapshot:sha256:ba8286deb9a2576dc2cd7587b7cd6a81f37ebadb30571e10cd76fe9817c3fb1f",
+  "base": "d4125733f93c976ce218833dc8c995b58f0cbdf4",
+  "assertions": [
+    "unfinished sibling absent from working candidate",
+    "original sibling bytes retained in integration branch",
+    "registry and check bytes match final trunk"
+  ],
+  "outcome": "PASS"
+}

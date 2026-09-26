@@ -1,0 +1,11 @@
+{
+  "inputs": [
+    {
+      "path": "/Users/grove/projects/promise-to-proof2/.p2p/work/epic-delivery-strategy/evidence/supplement-first/S4-default/supplement-fixture.bundle",
+      "sha256": "89cf451916166064c7f77871260b3e01d9e767c18a8815065eb3716681df16b4"
+    }
+  ],
+  "records_source": "/Users/grove/projects/promise-to-proof2/.p2p/work/epic-delivery-strategy/evidence/supplement-first/S4-default/repo/.p2p/work",
+  "refs": "4eff794b7d393119436349728e7fbbb283a95061 refs/heads/child/lookup\n4eff794b7d393119436349728e7fbbb283a95061 refs/heads/epic/example\n4eff794b7d393119436349728e7fbbb283a95061 refs/heads/trunk\n4eff794b7d393119436349728e7fbbb283a95061 refs/remotes/origin/HEAD\n4eff794b7d393119436349728e7fbbb283a95061 refs/remotes/origin/child/lookup\n4eff794b7d393119436349728e7fbbb283a95061 refs/remotes/origin/epic/example\n4eff794b7d393119436349728e7fbbb283a95061 refs/remotes/origin/trunk",
+  "scope": "fresh repo rebuilt only from durable bundle+records, no scratch artifacts transferred"
+}

@@ -1,0 +1,4 @@
+{"argv": ["repo", "view", "--json", "nameWithOwner,defaultBranchRef,url"], "effect": null, "exit_code": 0, "result": {"defaultBranchRef": {"name": "trunk"}, "nameWithOwner": "fixture/epic", "url": "https://fixture.invalid/epic"}, "sequence": 1}
+{"argv": ["pr", "list", "--state", "all", "--json", "number,url,headRefName,headRefOid,baseRefName,title,body,isDraft"], "effect": null, "exit_code": 0, "result": [], "sequence": 2}
+{"argv": ["repo", "view", "--json", "nameWithOwner,defaultBranchRef,url"], "effect": null, "exit_code": 0, "result": {"defaultBranchRef": {"name": "trunk"}, "nameWithOwner": "fixture/epic", "url": "https://fixture.invalid/epic"}, "sequence": 3}
+{"argv": ["pr", "list", "--state", "all", "--json", "number,url,headRefName,headRefOid,baseRefName,title,body,isDraft"], "effect": null, "exit_code": 0, "result": [], "sequence": 4}

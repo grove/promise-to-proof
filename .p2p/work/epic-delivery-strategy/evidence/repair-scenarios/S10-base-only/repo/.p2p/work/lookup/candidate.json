@@ -1,0 +1,16 @@
+{
+  "work_item": "work/lookup.md",
+  "work_item_sha256": "fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9",
+  "comparison_base": "b6fcfa6297c60b3b060c1a189c4d495f42ad7721",
+  "binding_inputs": [
+    {
+      "path": "specs/registry.md",
+      "sha256": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9"
+    },
+    {
+      "path": "work/parent.md",
+      "sha256": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada"
+    }
+  ],
+  "commit": "c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f"
+}

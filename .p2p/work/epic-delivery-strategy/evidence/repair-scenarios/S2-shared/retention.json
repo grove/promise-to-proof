@@ -1,0 +1,239 @@
+{
+  "case": "/private/tmp/p2p-epic-repair-cases/S2-shared",
+  "phase": "single repair-cycle behavioral evidence",
+  "files": [
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/calls.jsonl",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/calls.jsonl",
+      "sha256": "da80da8716064aa6691b69eb0187446be8e11fcb1cbbe4e978f42543fa9ec41a"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/child-verification-actor-report.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/child-verification-actor-report.md",
+      "sha256": "a8ce5179edb1486b18b40d6d99e0946e1d17a2fd04dd79ad111f9219c0939236"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/child-verification-check-results.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/child-verification-check-results.json",
+      "sha256": "51ff7f007e2e0686cda0a8a6f4d9c7eac888377f6ab6b140c85e84e0e1ca346f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/child-verification-command-evidence.jsonl",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/child-verification-command-evidence.jsonl",
+      "sha256": "c9667e7861318d6c86a202ceffab0bcc3f62e02e3ab1e677b4c9bf1eceedd78f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/oracle.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/oracle.json",
+      "sha256": "1ec438a156a9b70e3c20b83de60aa66c3176de9d02e51b4d46b75d6a66b9e48f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repair-request.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repair-request.md",
+      "sha256": "3b001353a84fdc62620b05c1beecfc1f3b6cde20200fc47a05222d2c1e287ee2"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repaired-package-hashes.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repaired-package-hashes.json",
+      "sha256": "7055d26b21392876fadda97475cc81cdbe5e8c2ee33a0befd36429567476d801"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.gitignore",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.gitignore",
+      "sha256": "558a311bf6e3de3bda72820da17901722974931e58dc600a0bdee4d0fddfbf0f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/capture/candidate.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/capture/candidate.json",
+      "sha256": "8e36cf3c52faa8b93bbca83183b1916ab28e0a32e6bea076f78f06c4b5a26975"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/capture/evidence/approved-plan.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/capture/evidence/approved-plan.md",
+      "sha256": "547bb750f97a1f45b97700d7d234ceeac3b6c740fc7155e37f2738df4b176cec"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/capture/evidence/child-verification-checks.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/capture/evidence/child-verification-checks.json",
+      "sha256": "c51de920ef8fa1916d71f8a9e0c1bc1a4c5bd169e95c20725fe872765c820c50"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/capture/history/6413b9c1e5c4f70128271f1b5fceb8cb9031a0b4a95e9b7ba53d0c62a322e60c/review.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/capture/history/6413b9c1e5c4f70128271f1b5fceb8cb9031a0b4a95e9b7ba53d0c62a322e60c/review.md",
+      "sha256": "6413b9c1e5c4f70128271f1b5fceb8cb9031a0b4a95e9b7ba53d0c62a322e60c"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/capture/history/cf115df214409bd0b02b4db7c460f0533b41f5f68383411094900a32af4277ad/proof.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/capture/history/cf115df214409bd0b02b4db7c460f0533b41f5f68383411094900a32af4277ad/proof.md",
+      "sha256": "cf115df214409bd0b02b4db7c460f0533b41f5f68383411094900a32af4277ad"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/capture/proof.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/capture/proof.md",
+      "sha256": "3f04e4e934bd17f1a5893a0b90559ad6963a77a5cd58b5679a79bc3ea2dc448e"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/capture/review.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/capture/review.md",
+      "sha256": "c675f53f676a4adfe5e4136b336dae75dbff1eb2d88b203811277affbfdedf5e"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/lookup/candidate.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/lookup/candidate.json",
+      "sha256": "6146ebd3edd1698af7c29279019de9f558f6c0ecf1d352d0a7aeb6157205c28a"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/lookup/evidence/approved-plan.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/lookup/evidence/approved-plan.md",
+      "sha256": "547bb750f97a1f45b97700d7d234ceeac3b6c740fc7155e37f2738df4b176cec"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/lookup/evidence/child-verification-checks.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/lookup/evidence/child-verification-checks.json",
+      "sha256": "c51de920ef8fa1916d71f8a9e0c1bc1a4c5bd169e95c20725fe872765c820c50"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/lookup/history/55b8a7bc82894a5f692a14dac5dced3192ad8dcd300d6a553915ca17d7d5d53c/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/lookup/history/55b8a7bc82894a5f692a14dac5dced3192ad8dcd300d6a553915ca17d7d5d53c/publication.md",
+      "sha256": "55b8a7bc82894a5f692a14dac5dced3192ad8dcd300d6a553915ca17d7d5d53c"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/lookup/history/5cb8ffc8d96b067a82bb7ccba5b8f22a5a8abf692fdf60a65cb898e75229e3be/review.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/lookup/history/5cb8ffc8d96b067a82bb7ccba5b8f22a5a8abf692fdf60a65cb898e75229e3be/review.md",
+      "sha256": "5cb8ffc8d96b067a82bb7ccba5b8f22a5a8abf692fdf60a65cb898e75229e3be"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/lookup/history/7651a25862392eccdf808de6156f76a7dc24257b0150b98f49e8dc35315a1b28/candidate.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/lookup/history/7651a25862392eccdf808de6156f76a7dc24257b0150b98f49e8dc35315a1b28/candidate.json",
+      "sha256": "7651a25862392eccdf808de6156f76a7dc24257b0150b98f49e8dc35315a1b28"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/lookup/history/a2b0b58d3ca7ae16215aa34b0d70ce049cab921a1d860815b1d3727c81a4d1ea/proof.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/lookup/history/a2b0b58d3ca7ae16215aa34b0d70ce049cab921a1d860815b1d3727c81a4d1ea/proof.md",
+      "sha256": "a2b0b58d3ca7ae16215aa34b0d70ce049cab921a1d860815b1d3727c81a4d1ea"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/lookup/history/a9514e631ac79c80fa03a0ee2f178d9d844bbc38c2c20f7d75ae60e3f56b7aa1/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/lookup/history/a9514e631ac79c80fa03a0ee2f178d9d844bbc38c2c20f7d75ae60e3f56b7aa1/publication.md",
+      "sha256": "a9514e631ac79c80fa03a0ee2f178d9d844bbc38c2c20f7d75ae60e3f56b7aa1"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/lookup/implementation.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/lookup/implementation.md",
+      "sha256": "22bb746db106ba420d4e30fba5addbaeef42d898926ade1ee92e6b3c6f6fc371"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/lookup/proof.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/lookup/proof.md",
+      "sha256": "5e496c778cebef46c12d844cfbd222abc407dca951c711792c1718fe3f967ac1"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/lookup/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/lookup/publication.md",
+      "sha256": "ad5369fa97d81588a0ebb1f0f9a269c677363ab6a5116dcd70a4c554ce70d27c"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/lookup/review.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/lookup/review.md",
+      "sha256": "c16daed0ede10ffb18f0e983c34dbd3e33b9651232f982a1ef454040f114f378"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/parent/approval.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/parent/approval.md",
+      "sha256": "7b14282140fcc3f4926cb8a6b78a179b82a90ed1310116ac1bcd486884dfcddd"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/parent/candidate.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/parent/candidate.json",
+      "sha256": "cda9c2e95a269ed1ccdc172cd1133cb75aa025aca6c59aaf4ebbadbbcc1c8ab1"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/parent/history/7482324dece7a1e601ace78133b66c6e4b9df93a9e7ec1dd6c8893aa8216353e/candidate.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/parent/history/7482324dece7a1e601ace78133b66c6e4b9df93a9e7ec1dd6c8893aa8216353e/candidate.json",
+      "sha256": "7482324dece7a1e601ace78133b66c6e4b9df93a9e7ec1dd6c8893aa8216353e"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/parent/implementation.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/parent/implementation.md",
+      "sha256": "24a22514e2b154dcba97efb8fe3d8d61de6eb868cbfec4ed14e859e2102675e8"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/parent/shared-candidate-approval.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/parent/shared-candidate-approval.md",
+      "sha256": "7fb72c83469b6a87b9bcfafd9694da6ddca3806ae2a7773846c3e4a05830f4ac"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/.p2p/work/parent/slicing.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/.p2p/work/parent/slicing.md",
+      "sha256": "5fe6861c9c5d2718cf742e9bf48af89beaa9fefe70fadb5531e6d63d84f76ff2"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/AGENTS.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/AGENTS.md",
+      "sha256": "cfaa83d558fa9bfc5ddf294b69b74813d0410f784546bc2b9d65c1354116c091"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/check.py",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/check.py",
+      "sha256": "c5bfa41c62e909fc0aef10ead60d7df529b943a0b347e5a2b0123c7b4daa92d7"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/registry.py",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/registry.py",
+      "sha256": "cbb96814f5e8ff7b006cab70623351f01a0833f9e0d18df7f91182557d240d6d"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/specs/registry.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/specs/registry.md",
+      "sha256": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/work/capture.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/work/capture.md",
+      "sha256": "fb7eaa80f5385b531cb598ba642eeb2ede2a32a75ce3faca2bb1c7e92c25877b"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/work/lookup.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/work/lookup.md",
+      "sha256": "fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/work/parent.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/work/parent.md",
+      "sha256": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/work/solo.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/work/solo.md",
+      "sha256": "294bc01757864083fefd58e5f95e3ffd357a4d83201394d1eac39018aaccac23"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/repo/work/summary.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/repo/work/summary.md",
+      "sha256": "9331848c629b895d42bbcc6e5e1411e4c0c983c8be3e799485b2b9e9fba57e42"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/request.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/request.md",
+      "sha256": "5728f0ba54e7a2383ac6ae840f2f5d0cef3591cab263b35dbf452cc22c52e0d6"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/retained-fixture.bundle",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/retained-fixture.bundle",
+      "sha256": "2ddae1b874f6766898f9ff8c9fda8d11ba88deaf6b12fe67ea57df2e4949707b"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/tracker.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/tracker.json",
+      "sha256": "82042cef163f35ffc08c03b8d7be7ceb0db907be6089303ee5c5226a086ade70"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S2-shared/tracker.py",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S2-shared/tracker.py",
+      "sha256": "8ca955a03ceafd32088bc6cd2f83ec2cd7b17bb638124e3edbe9e60c61ac0ac6"
+    }
+  ],
+  "simulation": "Controlled local tracker and real disposable Git; live GitHub effects unexecuted",
+  "refs": "0513bd427f1a7180afabee3bcea9ad8b037d3ae1 refs/heads/child/lookup\nae9615a7c906aa539ee205c581aeabba9c70b6d1 refs/heads/epic/example\ned877ab327a5bda784737c93017a7be40deedaee refs/heads/shared/lookup\n0513bd427f1a7180afabee3bcea9ad8b037d3ae1 refs/heads/trunk\n0513bd427f1a7180afabee3bcea9ad8b037d3ae1 refs/remotes/origin/child/lookup\nae9615a7c906aa539ee205c581aeabba9c70b6d1 refs/remotes/origin/epic/example\ned877ab327a5bda784737c93017a7be40deedaee refs/remotes/origin/shared/lookup\n0513bd427f1a7180afabee3bcea9ad8b037d3ae1 refs/remotes/origin/trunk\n",
+  "status": "?? .p2p/\n"
+}

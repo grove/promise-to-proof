@@ -1,0 +1,13 @@
+final retention 180 file hashes verified
+S9-post-effect one exact base edit; all human/identity fields retained; fresh resume zero effects; plan 89c07679eeb571d6fddf1a85067c69c24571efd4d503845851d4fb1048725575
+S9-interrupted one exact base edit; all human/identity fields retained; fresh resume zero effects; plan b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2
+S11 2a7733c6ac449ab6203d856f090c2e67173daace capture exit 0 capture: PASS
+S11 2a7733c6ac449ab6203d856f090c2e67173daace lookup exit 0 lookup: PASS
+S11 2a7733c6ac449ab6203d856f090c2e67173daace summary exit 0 summary: PASS
+S11 2a7733c6ac449ab6203d856f090c2e67173daace parent exit 1 
+S11 independent child literal oracles pass; greet Ada -> Welcome ADA violates parent-only R4
+S12 159b5f50400479e1e5429b26b6c75e6d5f45682f capture exit 0 capture: PASS
+S12 159b5f50400479e1e5429b26b6c75e6d5f45682f lookup exit 0 lookup: PASS
+S12 159b5f50400479e1e5429b26b6c75e6d5f45682f summary exit 0 summary: PASS
+S12 159b5f50400479e1e5429b26b6c75e6d5f45682f parent exit 0 parent: PASS
+behavior assertions PASS

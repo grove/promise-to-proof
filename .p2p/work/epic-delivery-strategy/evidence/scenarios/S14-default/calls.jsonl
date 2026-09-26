@@ -1,0 +1,1 @@
+{"argv": ["issue", "view", "101", "--json", "number,state,body,comments"], "effect": null, "exit_code": 0, "result": {"body": "Closed by fixture operator; inspect actual prerequisite code.", "comments": null, "number": 101, "state": "CLOSED"}, "sequence": 1}

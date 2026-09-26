@@ -1,0 +1,61 @@
+{
+  "status": "BLOCKED",
+  "blocker": "dispatch-count limit exhausted before preflight-1",
+  "invocation_id": "9455937b-1014-472c-833f-735d1b606b83",
+  "work_item": "work/child.md",
+  "comparison_base": "36ea472983748b1345a7cc65196b1e2a2676b4cd",
+  "limits": {
+    "dispatches": 0,
+    "elapsed_seconds": null
+  },
+  "repair_used": false,
+  "host": {
+    "name": "Codex CLI on macOS",
+    "executable": "/opt/homebrew/bin/codex",
+    "version": "codex-cli 0.157.1",
+    "hard_monetary_cap": "unsupported",
+    "cost": "unknown",
+    "enforced": [
+      "scratch-only verification writes",
+      "network denied",
+      "approval escalation disabled",
+      "isolated configuration",
+      "dispatch admission",
+      "one repair reservation"
+    ],
+    "elapsed_limit": "admission and process termination; provider billing may continue",
+    "trust": "controller and OS trusted; no arbitrary same-user tamper resistance"
+  },
+  "routing": {
+    "path": ".p2p/work/parent/slicing.md",
+    "parent": "work/parent.md",
+    "revision": "v1",
+    "sha256": "a9183f7d070d0ab2a67bcf001c9938f4f00ea0acee2c73446c6fd03bb3939b31",
+    "text": "## Approved delivery plan\nPlan revision: v1\nApproval source: Fixture owner approved v1 in the retained receipt approval.md.\nParent: work/parent.md\nFinal destination: trunk\nIntegration branch: epic/greeting\nIntegration start: 36ea472983748b1345a7cc65196b1e2a2676b4cd\nDefault choice: grouped\n\n| Child | Choice | Destination | Reason | State |\n|---|---|---|---|---|\n| work/child.md | default | epic/greeting | Requires parent assembly. | remaining |\n\nParent completion: Prove the combined greeting.\nPending actions: None.\n",
+    "approval_source": "Fixture owner approved v1 in the retained receipt approval.md.",
+    "destination": "epic/greeting",
+    "target_ref": "refs/heads/epic/greeting",
+    "target_tip": "36ea472983748b1345a7cc65196b1e2a2676b4cd"
+  },
+  "starting_commit": "36ea472983748b1345a7cc65196b1e2a2676b4cd",
+  "candidate": {
+    "work_item": "work/child.md",
+    "work_item_sha256": "e19994ce870510a342b8a587acdbbbfe9bdb99347c37eb9b2db33be5e6dff2e9",
+    "comparison_base": "36ea472983748b1345a7cc65196b1e2a2676b4cd",
+    "binding_inputs": [
+      {
+        "path": "spec.txt",
+        "sha256": "277a52062e7ab5ccb5b6534329d68cf9fef4a708be9a0250f0dc4e50347a26ca"
+      },
+      {
+        "path": "work/parent.md",
+        "sha256": "9aff87d75444dbb8bf1ef030320545db72fff1db541db1b140e5ee94166a54ad"
+      }
+    ],
+    "commit": "36ea472983748b1345a7cc65196b1e2a2676b4cd"
+  },
+  "reports": {},
+  "attempts": [],
+  "records": "/private/tmp/p2p-independent-proof/transfer-public-fsmz7dt3/.p2p/work/child",
+  "resume": "python3 /private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /private/tmp/p2p-independent-proof/transfer-public-fsmz7dt3 resume work/child.md"
+}

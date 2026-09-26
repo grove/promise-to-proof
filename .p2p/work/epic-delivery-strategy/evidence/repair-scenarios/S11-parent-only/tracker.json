@@ -1,0 +1,49 @@
+{
+  "prs": {
+    "17": {
+      "number": 17,
+      "url": "https://fixture.invalid/epic/pull/17",
+      "state": "OPEN",
+      "baseRefName": "epic/example",
+      "headRefName": "child/lookup",
+      "headRefOid": "2a7733c6ac449ab6203d856f090c2e67173daace",
+      "title": "Lookup names",
+      "body": "Human note: keep this sentence byte-for-byte.\n<!-- grove:publish-pr repo=fixture/epic candidate=git:2a7733c6ac449ab6203d856f090c2e67173daace contract=sha256:fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9 -->\n",
+      "isDraft": true,
+      "updatedAt": "fixture-revision-0",
+      "statusCheckRollup": [
+        {
+          "name": "required-ci",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        }
+      ],
+      "reviewDecision": "APPROVED",
+      "mergeable": "MERGEABLE",
+      "baseRefOid": "928231303f30c9c01d93754ce5653e9b27b42399"
+    },
+    "18": {
+      "number": 18,
+      "url": "https://fixture.invalid/epic/pull/18",
+      "state": "OPEN",
+      "baseRefName": "trunk",
+      "headRefName": "epic/example",
+      "headRefOid": "2a7733c6ac449ab6203d856f090c2e67173daace",
+      "title": "Parent registry",
+      "body": "Work item: work/parent.md\n<!-- grove:publish-pr repo=fixture/epic candidate=git:2a7733c6ac449ab6203d856f090c2e67173daace contract=sha256:38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada -->\n",
+      "isDraft": true,
+      "updatedAt": "fixture-revision-0",
+      "statusCheckRollup": [
+        {
+          "name": "required-ci",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        }
+      ],
+      "reviewDecision": "APPROVED",
+      "mergeable": "MERGEABLE",
+      "baseRefOid": "928231303f30c9c01d93754ce5653e9b27b42399"
+    }
+  },
+  "calls": 4
+}

@@ -1,0 +1,1 @@
+User amendment: lookup must additionally accept Unicode names and preserve Unicode case semantics. This changes the approved ASCII-only promise; treat as an unresolved requested product change, not approval of new contract bytes.

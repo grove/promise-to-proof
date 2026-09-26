@@ -1,0 +1,11 @@
+{
+  "actor": "/root/scenario_post_effect_preview",
+  "status": "DRAFT",
+  "preview": "/private/tmp/p2p-epic-repair-cases/S9-post-effect/repair-preview/retarget-preview.json",
+  "preview_sha256": "6db61e095bf68281b8feeb6ef8c120f6f32ae82da0cf67720e2bcf572252b7e1",
+  "publication": "/private/tmp/p2p-epic-repair-cases/S9-post-effect/repo/.p2p/work/lookup/publication.md",
+  "publication_sha256": "ba281bb58d792f1c0a994aaa4e7e7bb2dd89eddf38f71af2fc780520a20776d4",
+  "plan_sha256": "b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2",
+  "readback": "Exact section and hash retained and reread successfully; prior receipt preserved by helper.",
+  "writes": 0
+}

@@ -1,0 +1,7 @@
+{
+  "repo": "/private/tmp/epic-tracker-check-vmrzk0vt/s11/repo",
+  "request": "/private/tmp/epic-tracker-check-vmrzk0vt/s11/request.md",
+  "oracle_withhold": "/private/tmp/epic-tracker-check-vmrzk0vt/s11/oracle.json",
+  "tracker_log": "/private/tmp/epic-tracker-check-vmrzk0vt/s11/calls.jsonl"
+}
+PASS: persisted edit, lost response, readback, effect counts, post-edit plan change, complete children and parent-only failure

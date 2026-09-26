@@ -1,0 +1,115 @@
+{
+  "actor": "/root/scenario_routing_batch",
+  "case": "S13-missing",
+  "original_root": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing",
+  "assertion": "no-effects",
+  "assertion_exit": 0,
+  "assertion_output": "PASS: no-effects effect assertions; separately inspect skill verdicts and identities\n",
+  "retained_files": [
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/tracker.json",
+      "retained": "evidence/scenarios/S13-missing/tracker.json",
+      "sha256": "8cbbd762fb84186802ae81fe401d672e3ae7a996279128c67daa99368f13a74e"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/actor-context.txt",
+      "retained": "evidence/scenarios/S13-missing/actor-context.txt",
+      "sha256": "8049479790956401940f6efa47855af5d01f0865f91df9dbb285b18bc32b4254"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/oracle.json",
+      "retained": "evidence/scenarios/S13-missing/oracle.json",
+      "sha256": "43f8e25a7d0fceea12d9d085ce99ce7872e3c9365bc052ea3abca8ea911b60c3"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/command-evidence.txt",
+      "retained": "evidence/scenarios/S13-missing/command-evidence.txt",
+      "sha256": "595158810c60c37c0f3aa39e8ef54e54d835d2809d05deb9707b55bc323b00c7"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/actor-report.md",
+      "retained": "evidence/scenarios/S13-missing/actor-report.md",
+      "sha256": "a213e3b1a2108096608d313aa55cbbda21421549cf6039c5ca16f6b95c5e2ce2"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/stage-delivery.md",
+      "retained": "evidence/scenarios/S13-missing/stage-delivery.md",
+      "sha256": "5e420a6811b98408729b73b000ac562e6f4c0c1c5cddeb3ea517afc14578c297"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/tracker.py",
+      "retained": "evidence/scenarios/S13-missing/tracker.py",
+      "sha256": "8ca955a03ceafd32088bc6cd2f83ec2cd7b17bb638124e3edbe9e60c61ac0ac6"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/candidate-validation.json",
+      "retained": "evidence/scenarios/S13-missing/candidate-validation.json",
+      "sha256": "5f5ac4b37d8cd69471485153bf7ec9b395c605905adb59b83132217355feb1fe"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/request.md",
+      "retained": "evidence/scenarios/S13-missing/request.md",
+      "sha256": "eb583c37bb00380983de386612c19abf5de07e915800a56d413ccd5f2519b9e4"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/calls.jsonl",
+      "retained": "evidence/scenarios/S13-missing/calls.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/fixture.bundle",
+      "retained": "evidence/scenarios/S13-missing/fixture.bundle",
+      "sha256": "b05f0ae82249d5fa27cb4b6f448302b8b59076460b7499f1f0dff13e692ae1b8"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/repo/.p2p/work/lookup/publication.md",
+      "retained": "evidence/scenarios/S13-missing/repo/.p2p/work/lookup/publication.md",
+      "sha256": "fb04a039808ccfc7879978050e344be18969d0e9e5970dc53d841c927efe0415"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/repo/.p2p/work/lookup/implementation.md",
+      "retained": "evidence/scenarios/S13-missing/repo/.p2p/work/lookup/implementation.md",
+      "sha256": "422922f9f5a13685671e5c3071bf67b03c855e12a9ca5746a7f5c9450d2fd7a3"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/repo/.p2p/work/lookup/candidate.json",
+      "retained": "evidence/scenarios/S13-missing/repo/.p2p/work/lookup/candidate.json",
+      "sha256": "129bd3512deb7b57f28c78852bfae74842fc38f33edec2c1d331ffa05b5605b2"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/repo/.p2p/work/lookup/delivery.md",
+      "retained": "evidence/scenarios/S13-missing/repo/.p2p/work/lookup/delivery.md",
+      "sha256": "5e420a6811b98408729b73b000ac562e6f4c0c1c5cddeb3ea517afc14578c297"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/repo/.p2p/work/parent/implementation.md",
+      "retained": "evidence/scenarios/S13-missing/repo/.p2p/work/parent/implementation.md",
+      "sha256": "e10efef5478a4f782b92dac6285c69c280ee20eb475207e6c61f4411947f23bb"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/repo/.p2p/work/parent/approval.md",
+      "retained": "evidence/scenarios/S13-missing/repo/.p2p/work/parent/approval.md",
+      "sha256": "7b14282140fcc3f4926cb8a6b78a179b82a90ed1310116ac1bcd486884dfcddd"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/repo/.p2p/work/parent/candidate.json",
+      "retained": "evidence/scenarios/S13-missing/repo/.p2p/work/parent/candidate.json",
+      "sha256": "a02de8809911dc391916e71ae5224c1e11501ca3dee7f8809e8d222f1ed3682b"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/repo/.p2p/work/parent/slicing.md",
+      "retained": "evidence/scenarios/S13-missing/repo/.p2p/work/parent/slicing.md",
+      "sha256": "19f0a211fd6221be6ac89266b2898a795d55b2060062bb08bfbeef424802ae0b"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/repo/.p2p/work/lookup/evidence/scenario-command-evidence.txt",
+      "retained": "evidence/scenarios/S13-missing/repo/.p2p/work/lookup/evidence/scenario-command-evidence.txt",
+      "sha256": "595158810c60c37c0f3aa39e8ef54e54d835d2809d05deb9707b55bc323b00c7"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S13-missing/repo/.p2p/work/lookup/history/b6d4cdd69b1a9b741fe64c32e500ff6ab1c68243fa6f036d4eee202d3337832b/delivery.md",
+      "retained": "evidence/scenarios/S13-missing/repo/.p2p/work/lookup/history/b6d4cdd69b1a9b741fe64c32e500ff6ab1c68243fa6f036d4eee202d3337832b/delivery.md",
+      "sha256": "b6d4cdd69b1a9b741fe64c32e500ff6ab1c68243fa6f036d4eee202d3337832b"
+    }
+  ]
+}

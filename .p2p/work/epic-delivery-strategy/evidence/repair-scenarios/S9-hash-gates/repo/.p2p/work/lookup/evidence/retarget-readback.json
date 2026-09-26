@@ -1,0 +1,12 @@
+{
+  "url": "https://fixture.invalid/epic/pull/17",
+  "number": 17,
+  "state": "OPEN",
+  "headRefName": "child/lookup",
+  "headRefOid": "c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f",
+  "baseRefName": "epic/example",
+  "baseRefOid": "c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f",
+  "title": "Lookup names",
+  "body": "Human note: keep this sentence byte-for-byte.\n<!-- grove:publish-pr repo=fixture/epic candidate=git:c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f contract=sha256:fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9 -->\n",
+  "isDraft": true
+}

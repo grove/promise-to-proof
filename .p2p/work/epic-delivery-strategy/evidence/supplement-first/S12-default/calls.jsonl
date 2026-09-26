@@ -1,0 +1,2 @@
+{"argv": ["repo", "view", "--json", "nameWithOwner,defaultBranchRef"], "effect": null, "exit_code": 0, "result": {"defaultBranchRef": {"name": "trunk"}, "nameWithOwner": "fixture/epic"}, "sequence": 1}
+{"argv": ["pr", "list", "--state", "all", "--json", "number,url,headRefOid,baseRefName"], "effect": null, "exit_code": 0, "result": [{"baseRefName": "epic/example", "headRefOid": "159b5f50400479e1e5429b26b6c75e6d5f45682f", "number": 17, "url": "https://fixture.invalid/epic/pull/17"}], "sequence": 2}

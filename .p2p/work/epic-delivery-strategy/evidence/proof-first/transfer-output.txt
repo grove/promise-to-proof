@@ -1,0 +1,8 @@
+command: /opt/homebrew/opt/python@3.14/bin/python3.14 -B /private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /private/tmp/p2p-independent-proof/transfer-public-fsmz7dt3 run work/child.md --comparison-base 36ea472983748b1345a7cc65196b1e2a2676b4cd --authorize-local --max-dispatches 0
+exit: 1
+blocker: dispatch-count limit exhausted before preflight-1
+source receipt: True
+workspace plan: True
+workspace receipt: False
+attempts: 0
+CONFIRMED COUNTEREXAMPLE: approved plan transfers without its referenced receipt

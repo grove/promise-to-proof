@@ -1,0 +1,91 @@
+{
+  "observed_at": "2026-09-26T23:21:31+00:00",
+  "status": "READY",
+  "identity": {
+    "candidate": "snapshot:sha256:7e5c54fa4183651c94b4f6b83bea7cc841b2722a5693047c5c8be8faaf8f41e8",
+    "head": "3684dbc7cccc1bb49936b0984f205ca731c5fc15",
+    "base": "5e369c1b45ba817b8add6b20a9b7b1c97898fa12",
+    "full_product_manifest_entries": 130,
+    "complete_product_tree_equivalent": true,
+    "agreement_and_binding_inputs_unchanged": true,
+    "source_issue_unchanged": true,
+    "full_review_and_proof_hashes_unchanged": true,
+    "reports": {
+      ".p2p/work/epic-delivery-strategy/review.md": "4d9ffb171710c49a7e259c6b1168b02ad8c18498ece7d7851e7104ea169085bd",
+      ".p2p/work/epic-delivery-strategy/proof.md": "67594d80fed89b9b64e28f932343ca86979c41ecd8f756956e28ad8e052d21af",
+      ".p2p/work/epic-delivery-strategy/implementation.md": "9691b84d1e6b9a3cf9eeb5284c91821be830140c8e4b2afc126dab3a16f1fac7",
+      ".p2p/work/epic-delivery-strategy/repair.md": "4d577b76ea24dcfc71664f9253fa246521da0c52cbb40dde021699c2abcac80d",
+      ".p2p/work/epic-delivery-strategy/planning-handoff.md": "14e7d259aa38a85be55dd6c94612c3ee744f6dbb8cc6d22a91303de061f4a80a"
+    },
+    "git_metadata_execution_equivalence": "Unchanged from verified publication mapping; no subsequent candidate build or transformation."
+  },
+  "pr_before_write": {
+    "baseRefName": "main",
+    "baseRefOid": "5e369c1b45ba817b8add6b20a9b7b1c97898fa12",
+    "body": "## Summary\n\nGive each child an approved destination and preserve that decision across delivery, publication, and strategy changes.\n\n```text\napproved parent plan\n├─ independent child → final destination\n└─ grouped child → integration branch → full parent verification → final destination\n```\n\nRetargeting requires exact authority and verified inputs. Transfer and retry preserve approvals, human edits, and confirmed effects. Parent acceptance still checks the assembled interaction.\n\nSource: #33. Contract: [`work/epic-delivery-strategy.md`](https://github.com/grove/promise-to-proof/blob/issue/33/work/epic-delivery-strategy.md) v1, SHA-256 `78cad1d7f85183100214da15fdc8418ed2220ce1af80764d648e139fdd899895`.\n\nCandidate: `snapshot:sha256:7e5c54fa4183651c94b4f6b83bea7cc841b2722a5693047c5c8be8faaf8f41e8`.\nPublication commit: this PR's head, created from that snapshot with parent `5e369c1b45ba817b8add6b20a9b7b1c97898fa12`. The [candidate record](https://github.com/grove/promise-to-proof/blob/issue/33/.p2p/work/epic-delivery-strategy/candidate.json) retains the original snapshot identity and recoverable content.\nTarget: `main`, observed tip and fixed review base `5e369c1b45ba817b8add6b20a9b7b1c97898fa12`.\n\n## Evidence\n\n- **Before:** Controller transfer dropped a referenced approval receipt, and the original parent-failure fixture violated a child contract. [Recorded regression](https://github.com/grove/promise-to-proof/blob/issue/33/.p2p/work/epic-delivery-strategy/evidence/repair-red.log).\n- **After:** The public CLI transfer regression passes. Complete children still cannot override a failing parent interaction. All 30 repository tests passed; S1–S14 and required recovery variants were exercised.\n- Full [REVIEWED report](https://github.com/grove/promise-to-proof/blob/issue/33/.p2p/work/epic-delivery-strategy/review.md) and [PROVEN report](https://github.com/grove/promise-to-proof/blob/issue/33/.p2p/work/epic-delivery-strategy/proof.md): all 30 requirements, one unchanged candidate. [Record manifest](https://github.com/grove/promise-to-proof/blob/issue/33/.p2p/work/epic-delivery-strategy/publication-records.json) and [recovery guide](https://github.com/grove/promise-to-proof/blob/issue/33/.p2p/work/epic-delivery-strategy/publication-recovery.md).\n- Tracker tests use controlled simulations. Live GitHub retargeting validation remains unexecuted.\n\n## Merge Danger\n\n**Door:** Two-way. The implementation and instruction changes can be reverted without a data migration.\n\n**Blast Radius:** Workflows. Slicing, delivery, review, publication, and readiness consume the saved destinations; unsliced behavior remains covered.\n\nMerge readiness: NOT ASSESSED\n\n<!-- grove:publish-pr repo=grove/promise-to-proof candidate=snapshot:sha256:7e5c54fa4183651c94b4f6b83bea7cc841b2722a5693047c5c8be8faaf8f41e8 contract=sha256:78cad1d7f85183100214da15fdc8418ed2220ce1af80764d648e139fdd899895 -->\n",
+    "headRefName": "issue/33",
+    "headRefOid": "3684dbc7cccc1bb49936b0984f205ca731c5fc15",
+    "isDraft": false,
+    "latestReviews": [],
+    "mergeStateStatus": "CLEAN",
+    "mergeable": "MERGEABLE",
+    "number": 34,
+    "reviewDecision": "",
+    "reviews": [],
+    "state": "OPEN",
+    "statusCheckRollup": [],
+    "title": "Support independent, grouped, and mixed epic delivery",
+    "updatedAt": "2026-09-26T23:18:13Z",
+    "url": "https://github.com/grove/promise-to-proof/pull/34"
+  },
+  "target": {
+    "commit": {
+      "sha": "5e369c1b45ba817b8add6b20a9b7b1c97898fa12"
+    },
+    "name": "main",
+    "protected": false,
+    "protection": {
+      "enabled": false,
+      "required_status_checks": {
+        "checks": [],
+        "contexts": [],
+        "enforcement_level": "off"
+      }
+    }
+  },
+  "repository_settings": {
+    "allow_auto_merge": false,
+    "allow_merge_commit": true,
+    "allow_rebase_merge": true,
+    "allow_squash_merge": true,
+    "allow_update_branch": false,
+    "archived": false,
+    "default_branch": "main",
+    "delete_branch_on_merge": false,
+    "disabled": false,
+    "full_name": "grove/promise-to-proof",
+    "permissions": {
+      "admin": true,
+      "maintain": true,
+      "pull": true,
+      "push": true,
+      "triage": true
+    }
+  },
+  "branch_protection_response": {
+    "message": "Branch not protected",
+    "documentation_url": "https://docs.github.com/rest/branches/branch-protection#get-branch-protection",
+    "status": "404"
+  },
+  "applicable_rules": [],
+  "required_checks_command": {
+    "command": "gh pr checks 34 --repo grove/promise-to-proof --required --json name,state,bucket,link,workflow,event",
+    "exit_code": 1,
+    "stderr": "no checks reported on the 'issue/33' branch",
+    "interpretation": "No required checks configured; established using authoritative branch protection and applicable rules, not CLI exit alone."
+  },
+  "source_unchanged": true,
+  "proposed_readiness_entry": "Merge readiness: READY — observed 2026-09-26T23:21:31+00:00; head `3684dbc7cccc1bb49936b0984f205ca731c5fc15`; base `main` at `5e369c1b45ba817b8add6b20a9b7b1c97898fa12`. Full candidate, contract, REVIEWED and PROVEN identities match. No required CI checks, repository approvals, or merge queue are configured; GitHub reports MERGEABLE/CLEAN. Report: local `.p2p/work/epic-delivery-strategy/merge-readiness.md` (not published). No blockers. This assessment applies only to the observed state and does not authorize merging.",
+  "proposed_body_sha256": "b578556487749046f5046d707dc7d7a51d64e54279c7a19d90d5febde8125f48",
+  "synchronization": "pending"
+}

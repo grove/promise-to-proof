@@ -1,0 +1,74 @@
+.WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+EWARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+EWARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+E
+======================================================================
+ERROR: test_child_routing_transfers_plan_and_binds_stage_inputs (test_p2p_delivery.DeliveryTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/checks/test_p2p_delivery.py", line 158, in test_child_routing_transfers_plan_and_binds_stage_inputs
+    code, value = self.cli()
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/checks/test_p2p_delivery.py", line 119, in cli
+    with contextlib.redirect_stdout(output): code = d.main(args + list(extra))
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 853, in main
+    delivery.run()
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 663, in run
+    self.preflight()
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 514, in preflight
+    attempt, host = self.dispatch(stage, inputs, prompt)
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 451, in dispatch
+    args = command(self.state['host']['executable'], scratch, folder / 'schema.json' if schema else None)
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 251, in command
+    for key, value in host_config(scratch).items():
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 217, in host_config
+    import tomllib
+ModuleNotFoundError: No module named 'tomllib'
+
+======================================================================
+ERROR: test_child_starting_tree_is_target_not_unrelated_head (test_p2p_delivery.DeliveryTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/checks/test_p2p_delivery.py", line 208, in test_child_starting_tree_is_target_not_unrelated_head
+    code, value = self.cli()
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/checks/test_p2p_delivery.py", line 119, in cli
+    with contextlib.redirect_stdout(output): code = d.main(args + list(extra))
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 853, in main
+    delivery.run()
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 663, in run
+    self.preflight()
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 514, in preflight
+    attempt, host = self.dispatch(stage, inputs, prompt)
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 451, in dispatch
+    args = command(self.state['host']['executable'], scratch, folder / 'schema.json' if schema else None)
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 251, in command
+    for key, value in host_config(scratch).items():
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 217, in host_config
+    import tomllib
+ModuleNotFoundError: No module named 'tomllib'
+
+======================================================================
+ERROR: test_child_target_advance_and_wrong_explicit_base_block (test_p2p_delivery.DeliveryTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/checks/test_p2p_delivery.py", line 228, in test_child_target_advance_and_wrong_explicit_base_block
+    self.assertEqual(self.cli()[0], 0)
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/checks/test_p2p_delivery.py", line 119, in cli
+    with contextlib.redirect_stdout(output): code = d.main(args + list(extra))
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 853, in main
+    delivery.run()
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 663, in run
+    self.preflight()
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 514, in preflight
+    attempt, host = self.dispatch(stage, inputs, prompt)
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 451, in dispatch
+    args = command(self.state['host']['executable'], scratch, folder / 'schema.json' if schema else None)
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 251, in command
+    for key, value in host_config(scratch).items():
+  File "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py", line 217, in host_config
+    import tomllib
+ModuleNotFoundError: No module named 'tomllib'
+
+----------------------------------------------------------------------
+Ran 4 tests in 5.206s
+
+FAILED (errors=3)
