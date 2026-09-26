@@ -68,7 +68,7 @@ These are the working design directions of this handoff. They do not authorize c
 
 ## 1.3 Delivery order
 
-Deliver the completion-rule model first, then enforce the rules in a running program and test that program against the model. Compare speed and cost only after that foundation works. User-selectable checking levels, parallel child tasks, and automatic strategy selection come later, in that order.
+Deliver the completion-rule model first, then enforce the rules in a running program and test that program against the model. Next, prove the controller can use another agent host without weakening its protections. Compare speed and cost only after that foundation works. User-selectable checking levels, parallel child tasks, and automatic strategy selection come later, in that order.
 
 [Section 19](#19-delivery-phases-in-order) defines the deliverables and completion checks. Issue #24 delivered the selected completion-integrity model. It did not deliver the whole optimization roadmap or authorize weaker checks.
 
@@ -678,8 +678,9 @@ This roadmap sets the order. It does not approve future product decisions, spend
 | 0 | A recorded starting point | Everyone uses the same rules and definitions | Baseline recorded for issue #24; host capabilities and invocation semantics recorded in issue #28's delivery |
 | 1 | An executable model of completion rules | We can find cases where the rules could wrongly allow “done” | Complete for issue #24; PRs #25–#27 merged September 26, 2026 |
 | 2 | A small program that enforces the rules | A real delivery cannot bypass the required checks | Complete for issue #28; PR #29 merged September 26, 2026 |
-| 3 | Tests that compare the program with the model | We can catch differences between the design and the running program | Next development phase; acceptance planning and adapter compatibility demonstration remain |
-| 4 | A repeatable comparison of delivery strategies | We can see which choices save time or money and at what cost | After Phase 3 |
+| 3 | Tests that compare the program with the model | We can catch differences between the design and the running program | Next development phase; acceptance planning and FizzBee test-adapter compatibility demonstration remain |
+| 3.1 | Support for a second agent host | The same delivery rules can work with another host | After Phase 3; target host and enforceable capabilities remain to be selected |
+| 4 | A repeatable comparison of delivery strategies | We can see which choices save time or money and at what cost | After Phase 3.1 |
 | 5 | Clearly described levels of checking | Users can make an informed, authorized choice | After Phase 4 |
 | 6 | Safe execution of several related tasks | Independent tasks can run together without losing the final combined check | After Phase 5 |
 | 7 | A limited trial of automatic strategy selection | We can test improvements on real work and turn them off safely | After Phase 6 |
@@ -743,6 +744,23 @@ Deliver:
 Done when removing a real protection, such as the stale-report check, makes a test fail. The test must inspect the controller's returned result and saved state. Running a second copy of the model alone does not satisfy this phase.
 
 Choose the test adapter language only after demonstrating that the pinned FizzBee tools can drive it. Document which cases use a real host and which use substitutes. Extend the model if a required controller behavior is outside its current bounds. [F05]
+
+## Phase 3.1: Support another agent host
+
+After Phase 3 establishes model-to-controller conformance, make the controller usable with one additional agent host. Keep the operating system fixed at macOS for this phase so host-runtime portability is tested separately from cross-OS portability. Preserve Codex behavior as the compatibility baseline.
+
+Move only host-specific invocation, configuration, isolation setup, and receipt parsing behind a narrow adapter. The controller remains responsible for durable dispatch, authorization, identities, budgets, recovery, and acceptance decisions. Select a second host only after a preflight demonstrates that it can run distinct stages, protect verification inputs, provide bounded scratch access, and return trustworthy invocation and completion receipts. A prompt or worker assertion is not enforcement evidence.
+
+Deliver:
+
+- A minimal host-adapter boundary that leaves delivery policy and acceptance checks in the shared controller.
+- One additional host adapter, with the existing Codex path still passing Phase 3 conformance tests.
+- Live preflight and one small successful delivery on the second host, retaining actual invocation receipts and evidence of protected-input and forbidden-effect boundaries.
+- Shared conformance tests for both hosts, including rejection of missing or reused invocation identities and falsely reported host capabilities.
+
+Done when both hosts pass the same controller-conformance checks, the second host completes one full delivery with matching full reports, and live evidence establishes its required isolation and invocation boundaries. Document unsupported capabilities; do not label a host supported based on fixture tests alone. Keep macOS fixed here; cross-OS support requires a separate scope and host-specific enforcement evidence.
+
+Decision before implementation: name the second host and demonstrate the required capabilities before building its adapter. Do not weaken full review, proof, authorization, identity, or evidence requirements to accommodate it.
 
 ## Phase 4: Find out what saves time and money
 
