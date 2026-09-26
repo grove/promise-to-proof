@@ -2,14 +2,31 @@
 ## Adaptive delivery and assurance optimization
 ### Detailed technical handoff
 
-**Status:** Research and implementation proposal; not an approved acceptance contract.  
-**Prepared:** September 25, 2026.  
-**Audience:** Promise to Proof maintainers, implementing agents, formal-model authors, and evaluation owners.  
-**Repository baseline:** `grove/promise-to-proof` at `f5917ce0471d56aac01711e720426748626c99d0`.  
-**Primary scope:** `/deliver-issue`, with a later extension to `/slice-contract` dependency graphs.  
-**Companion formats:** This Markdown document and its formatted Word edition contain the same substantive handoff.
+**Status:** Delivery roadmap and supporting research; each delivery still needs its own acceptance contract.
+
+**Roadmap updated:** September 26, 2026.
+
+**Prepared:** September 25, 2026.
+
+**Audience:** Promise to Proof maintainers, implementing agents, formal-model authors, and evaluation owners.
+
+**Original research baseline:** `grove/promise-to-proof` at `f5917ce0471d56aac01711e720426748626c99d0`.
+
+**Primary scope:** `/deliver-issue`, with a later extension to `/slice-contract` dependency graphs.
+
+**Companion formats:** The Word edition contains the original research handoff. This Markdown roadmap has since been updated.
 
 > **Product direction:** Choose a delivery strategy that balances assurance, elapsed time, monetary cost, and developer attention. Model choice, verification depth, retries, decomposition, and scheduling are controls—not goals in themselves. Lower assurance can be a legitimate choice; misleading claims and unauthorized effects cannot.
+
+## Start here
+
+We want software delivery that is reliable, affordable, and easy to follow. First we check the rules. Then we make the running software enforce them. Only after that do we try to make delivery faster or cheaper.
+
+We have delivered the first executable check of the completion rules in [issue #24](https://github.com/grove/promise-to-proof/issues/24). [PR #25](https://github.com/grove/promise-to-proof/pull/25) is open and awaiting merge as of September 26, 2026. Its 43 checks include deliberately broken versions that the checker correctly rejects. This checks a simplified model; it does not establish that real agents always follow the rules.
+
+The next delivery is a small program that enforces those rules on one supported agent host. A host is the application that starts agents and controls their access to files and tools.
+
+Read [the delivery phases in order](#19-delivery-phases-in-order) for what we will build and how we will know each phase is finished. That section is the implementation order and takes precedence over earlier research suggestions about doing work in parallel. The remaining technical sections explain the background and possible designs.
 
 ## Reading guide
 
@@ -17,7 +34,7 @@ Read Sections 1–5 for the product decisions and compatibility boundaries. Sect
 
 **Evidence labels used throughout:** “Current” means supported by the inspected repository. “Direction” means an expressed user preference from this discussion. “Proposal” means a design recommendation that still needs review. “Hypothesis” means an effect to measure, not an established performance claim. Numeric examples are synthetic unless explicitly described otherwise.
 
-**Execution status:** This handoff was prepared from the conversation, a fresh repository inspection, and official FizzBee documentation. No FizzBee model, model-based test adapter, optimizer, or live policy experiment was implemented or executed for this document. No repository files, issues, permissions, or external systems were changed. Existing repository validation results are reported as repository-authored evidence, not independently reproduced results.
+**Historical execution status:** The September 25 research handoff did not implement or execute a model, controller, or optimization experiment. Section 19 now records the later issue #24 delivery separately. Claims labeled “current” in the original research describe its pinned baseline, not every later repository change.
 
 # 1. Executive handoff
 
@@ -49,11 +66,11 @@ The proposed system should present a small number of understandable options, suc
 
 These are the working design directions of this handoff. They do not authorize changing the repository protocol or issuing weaker results under existing acceptance labels.
 
-## 1.3 Recommended first deliverable
+## 1.3 Delivery order
 
-Produce a repository-pinned model of the existing single-issue `/deliver-issue` protocol, a traceability map to its scenarios, and a reproducible synthetic comparison of review-first, proof-first, and parallel verification. Keep the existing acceptance conditions unchanged in that first increment. Design the future policy vocabulary alongside it, but do not enable lower-assurance completion until its reporting and authorization semantics are approved.
+Deliver the completion-rule model first, then enforce the rules in a running program and test that program against the model. Compare speed and cost only after that foundation works. User-selectable checking levels, parallel child tasks, and automatic strategy selection come later, in that order.
 
-This order preserves the broader adjustable-assurance goal while creating a trustworthy baseline from which to change it.
+[Section 19](#19-delivery-phases-in-order) defines the deliverables and completion checks. Issue #24 delivered the selected completion-integrity model. It did not deliver the whole optimization roadmap or authorize weaker checks.
 
 # 2. Verified repository baseline
 
@@ -648,97 +665,148 @@ Vary repair probability, detection quality, startup time, queue delay, cost unce
 
 The safety view must still explore relevant failures regardless of their estimated rarity. The performance view can weight them, but a low-probability integrity violation is not made acceptable by a good expected-cost result.
 
-# 19. Phased implementation plan
+# 19. Delivery phases in order
 
-## Phase 0 — Pin the baseline and define vocabulary
+Implement these phases in order. Finish the required checks and integrate the result before starting the next dependent phase. A phase may need several small work items. Give each work item a saved acceptance contract in `work/` that says what must be true when it is finished.
 
-**Deliverables:** Repository/protocol snapshot; decision log; current versus proposed behavior matrix; definitions of episode, useful completion, assurance profile, invocation, and budget; links to existing scenarios.
+This roadmap sets the order. It does not approve future product decisions, spending, publication, or weaker verification. Resolve the decisions listed for each phase before work depends on them.
 
-**Exit criteria:** Maintainers can identify exactly which changes preserve current behavior and which need new approval. No ambiguous reuse of full-acceptance labels remains in proposed limited modes. The baseline can be rerun or its execution limitations are explicitly recorded.
+## The route at a glance
 
-## Phase 1 — Model current full delivery
-
-**Deliverables:** A small FizzBee model, assumptions/bounds, invariant traceability, reachability/progress checks, deliberate invalid variants, retained counterexamples, and reproducible commands for the pinned tool.
-
-**Exit criteria:** Intended valid and blocked paths are reachable; the tested model satisfies its specified properties under its declared configuration; targeted invalid variants fail for the intended reasons. No real-agent compliance claim is made from the model alone.
-
-## Phase 2 — Instrument and enforce a narrow runtime boundary
-
-**Deliverables:** A minimal event schema, budget ledger, artifact identity/readback checks, host provenance integration, and a small controller/adapter around an explicitly supported host.
-
-**Exit criteria:** The real adapter rejects mismatched/stale artifacts, cannot silently bypass required authorization, preserves unrelated work, and recovers from interrupted handoffs. Ordinary tests and host scenarios demonstrate the boundary, with unsupported configurations marked unexecuted.
-
-## Phase 3 — Add model-based conformance tests
-
-**Deliverables:** An adapter from model actions to controller operations, replayable failure traces, concurrent-operation tests where supported, and evidence that tests drive the actual implementation rather than duplicated model logic.
-
-**Exit criteria:** Deliberate implementation defects are detected; operation returns and retained states are checked; integration limitations and probabilistic test coverage are documented. Select an adapter language based on a demonstrated tool integration rather than assuming arbitrary-language support. [F05]
-
-## Phase 4 — Compare costs and schedules offline
-
-**Deliverables:** Versioned measured/synthetic parameter sets, baseline policies, cost/latency evaluation, uncertainty analysis, and a Pareto comparison with assurance and completion metrics.
-
-**Exit criteria:** Results can be reproduced from retained inputs. The evaluator matches simple hand-calculated cases, represents parallel wall-clock time correctly, includes failed-run cost, and distinguishes model forecasts from live observations. The analysis’s own overhead is measured.
-
-## Phase 5 — Approve and evaluate configurable assurance
-
-**Deliverables:** Explicit policy profiles; required user/repository authorization; outcome vocabulary and migration plan; held-out profile evaluation; disclosure of skipped checks and residual unknowns.
-
-**Exit criteria:** A limited profile cannot claim full baseline acceptance, override binding requirements, or silently replace an earlier policy. The user can understand and choose the tradeoff. No unexplained confidence percentage is exposed as a correctness probability.
-
-## Phase 6 — Extend to parent/child scheduling
-
-**Deliverables:** Dependency/artifact model, isolated child dispatch, resource-conflict handling, parent budget allocation, controlled integration, and final parent verification.
-
-**Exit criteria:** The scheduler exploits ready siblings without manufacturing dependencies or violating prerequisites. Integration produces an exact candidate, parent constraints remain current, and child green reports cannot substitute for parent proof. Publication remains separately authorized. [R03, R05]
-
-## Phase 7 — Controlled adaptive rollout
-
-**Deliverables:** Shadow recommendations, an opt-in pilot, per-policy monitoring, fallback, rollback, and a documented model/policy update procedure.
-
-**Exit criteria:** Measured improvements persist on held-out or controlled live workloads within approved risk tolerances. Budget and authorization boundaries continue to hold. A previous stable policy can be restored without losing artifact identity or changing historical claims.
-
-# 20. Suggested repository work breakdown
-
-This is a proposed layout, not a claim that these files already exist. Adjust it to repository conventions and avoid scaffolding empty frameworks.
-
-```text
-models/deliver_issue/
-  README.md                  # scope, assumptions, tool pin, commands
-  delivery.fizz              # current protocol model
-  fizz.yaml                  # explicit model-checking configuration
-  scenarios/                 # bounded inputs and policy variants
-  counterexamples/           # retained minimal failure traces
-
-checks/
-  ...existing scenarios and bundle checker...
-  delivery_model_traceability.md
-  delivery_controller_tests/ # only after an executable boundary exists
-
-docs/optimization/
-  decision-log.md
-  assurance-profiles.md
-  evaluation-protocol.md
-  results/                   # clearly labeled measured or synthetic reports
-
-analysis/delivery_policy/
-  schemas/
-  parameters/
-  compare_policies.py         # proposed analysis driver, not runtime authority
-```
-
-## 20.1 Initial independent workstreams
-
-| Workstream | First task | Dependencies | Acceptance evidence |
+| Phase | What we deliver | What it gives us | Position as of September 26, 2026 |
 |---|---|---|---|
-| W1: protocol model | Translate current delivery into explicit states/actions and properties. | Baseline vocabulary and pinned source. | Reproducible model run, mutation failures, and source traceability. |
-| W2: metrics | Define event and evaluation schemas without collecting sensitive content by default. | Outcome definitions and retention policy. | Example events, accounting tests, and unambiguous denominators. |
-| W3: host boundary | Identify the smallest enforceable dispatch/effect/artifact interface. | Current host and authority inspection. | Demonstrated isolation, exact provenance, and denied unauthorized effects. |
-| W4: economics | Implement synthetic bounded-policy comparisons. | W2 definitions; use fixed assumptions initially. | Hand-calculated reference cases and correctly labeled forecasts. |
-| W5: profile design | Specify limited/full/extended reporting without changing old verdicts. | Product approval and compatibility analysis. | Reviewed examples showing omitted checks and distinct outcomes. |
-| W6: graph extension | Model child readiness, resources, integration, and parent evidence. | Stable W1 model; slicing and parent rules. | Fork/join, stale prerequisite, conflict, and parent-completion tests. |
+| 0 | A recorded starting point | Everyone uses the same rules and definitions | Baseline recorded for issue #24; confirm its remaining limits before Phase 2 |
+| 1 | An executable model of completion rules | We can find cases where the rules could wrongly allow “done” | Selected scope delivered in PR #25; merge assessment remains |
+| 2 | A small program that enforces the rules | A real delivery cannot bypass the required checks | Next development phase |
+| 3 | Tests that compare the program with the model | We can catch differences between the design and the running program | After Phase 2 |
+| 4 | A repeatable comparison of delivery strategies | We can see which choices save time or money and at what cost | After Phase 3 |
+| 5 | Clearly described levels of checking | Users can make an informed, authorized choice | After Phase 4 |
+| 6 | Safe execution of several related tasks | Independent tasks can run together without losing the final combined check | After Phase 5 |
+| 7 | A limited trial of automatic strategy selection | We can test improvements on real work and turn them off safely | After Phase 6 |
 
-W1, W2, and W3 can progress in parallel after definitions are settled. W4 can use synthetic data before telemetry exists. W5 is a product/protocol decision, not an engineering shortcut. W6 should not block the useful single-issue baseline.
+## Phase 0: Agree on the starting point
+
+Record which repository version and delivery rules we are using. Define the few terms needed to judge results: one delivery attempt, a restart of that attempt, a repair, a completed task, and a blocked task.
+
+Deliver a short record linking the rules, existing checks, supported environment, and known gaps. Separate requirements that already apply from proposed changes that need approval.
+
+Done when two people can use that record to agree whether an example task is complete, blocked, or still in progress. Unknown host capabilities must be listed rather than assumed.
+
+For issue #24, the recorded baseline is `41bebc726a8cc71c1d2f22d822ade006f4e78121`. Before Phase 2, confirm the host's capabilities and the remaining definitions needed for real execution. Definitions for optional checking levels can wait until Phase 5.
+
+## Phase 1: Check whether the completion rules hold
+
+Build a small executable model of one delivery. FizzBee, the tool that explores possible sequences of events, checks the model's rules.
+
+Deliver:
+
+- A model of implementation, separate review and proof, saved reports, one repair, and restart.
+- Checks that reports refer to the same current code and requirements, with the correct comparison base.
+- Checks that missing evidence prevents completion and restarting does not reset the repair allowance.
+- Examples of successful delivery and specific blockers, plus deliberately broken rules that produce visible failures.
+- One repeatable command, a fixed tool version, and a plain statement of what the model does not cover.
+
+Done when valid examples can finish, invalid examples are rejected for the expected reason, and another person can reproduce the results.
+
+Delivered for the scope selected by issue #24: 43 checks passed, including 14 deliberately broken variants. Separate review and proof covered all ten requirements. [The delivered README](https://github.com/grove/promise-to-proof/blob/3ef1651418b44c3d0ee59e81cf3aec3c22e36454/checks/delivery-model/README.md) explains the command and limits. [The proof report](https://github.com/grove/promise-to-proof/blob/3ef1651418b44c3d0ee59e81cf3aec3c22e36454/.p2p/work/delivery-completion-integrity/proof.md) retains the observations.
+
+This model covers a limited set of failures and one restart. It assumes that the host really provides separate, protected verification runs. It does not prove that assumption. Assess PR #25 for merge before using it as the integrated foundation for Phase 2.
+
+## Phase 2: Make the running workflow enforce the rules
+
+Build the smallest program that controls one work item's delivery on one supported host. This program is the controller. It starts the required stages and checks their records before allowing the result to be called complete.
+
+Deliver the work in this order:
+
+1. Choose the first host. Demonstrate that it can run separate agents, protect the code during verification, and identify the runs it actually started. Record unsupported capabilities.
+2. Deliver one ordinary successful run. Reuse existing contract, file-storage, and identity checks. Require saved, readable review and proof for the exact current code and requirements.
+3. Add failure and restart handling. Preserve unfinished work, reject late or stale reports, and retain the one-repair allowance when the same attempt restarts.
+4. Record stage starts, finishes, failures, elapsed time, and available usage costs. Track any approved limits before starting more work. Mark unavailable costs as unknown and distinguish measured spending from an enforceable spending limit.
+
+Done when tests on the chosen host demonstrate a successful delivery and reject changed code, missing evidence, unauthorized actions, and a second repair after restart. An interrupted handoff must resume safely or explain exactly what prevents recovery. Unrelated work must remain intact.
+
+Decision before implementation: name the host and the controls it can actually enforce. Keep the existing full review and proof requirements. Do not add automatic strategy selection or support for several hosts in this phase.
+
+## Phase 3: Test the real program against the model
+
+Connect model actions to the controller's real operations. For example, a modeled restart must restart the controller and inspect what it recovered from saved records.
+
+Deliver:
+
+- Repeatable tests that drive the actual controller through success, failure, and restart sequences.
+- Tests for overlapping operations where the supported host permits them.
+- Saved failure sequences that another person can run again.
+- Deliberately introduced controller defects that these tests detect.
+
+Done when removing a real protection, such as the stale-report check, makes a test fail. The test must inspect the controller's returned result and saved state. Running a second copy of the model alone does not satisfy this phase.
+
+Choose the test adapter language only after demonstrating that the pinned FizzBee tools can drive it. Document which cases use a real host and which use substitutes. Extend the model if a required controller behavior is outside its current bounds. [F05]
+
+## Phase 4: Find out what saves time and money
+
+Compare a few fixed ways to deliver one task while keeping the same full checking requirements. Start with review first, proof first, and both together where the host permits it. Compare agent model choices only when they meet the same permissions and checking requirements.
+
+Deliver a repeatable comparison using a small representative set of tasks. Record total elapsed time, total cost, successful completions, missed defects, and the human work needed. Include failed attempts, repairs, waiting, and the cost of the comparison itself.
+
+Done when the calculations match simple examples checked by hand, the same inputs reproduce the results, and the report clearly separates estimates from measurements. Show how the recommendation changes when costs or failure rates change. Running two checks together must count their overlapping time correctly.
+
+Decide the task set, who judges correctness, and what improvement would justify the added machinery before evaluating it. This phase recommends choices; it does not automatically change how live tasks run.
+
+## Phase 5: Let users choose a level of checking
+
+Use the comparison results to define a small number of understandable choices. Each choice must say which checks run, which checks are skipped, and what can honestly be concluded.
+
+Deliver:
+
+- Examples of the result a user sees after normal, limited, and extended checking.
+- Rules for who may select each choice and which requirements can never be skipped.
+- A saved choice that survives restart and cannot silently become weaker.
+- Evaluation on tasks that were not used to design the choices.
+
+Done when users can explain the tradeoff and tests show that a partly checked task cannot receive the normal full-acceptance result. Existing meanings of `REVIEWED` and `PROVEN` must remain intact. Do not present an unsupported confidence percentage as a probability of correctness.
+
+Obtain approval for the choices and result wording before enabling them. A choice can change the amount of checking only where allowed; it cannot silently change what the task promises to deliver.
+
+## Phase 6: Run related tasks together safely
+
+Extend the working single-task system to a larger task divided into smaller tasks. Run a smaller task only when the results it needs are available. Keep simultaneous work separate until it is ready to combine.
+
+Deliver:
+
+- A record of which tasks depend on which results.
+- Rules that prevent two workers from changing the same shared resource at once.
+- Spending and time limits for the whole task, with room reserved for combining and checking the results.
+- A controlled way to combine completed work and verify the whole result.
+
+Done when independent tasks can run together, dependent tasks wait, duplicate starts are rejected, and changed prerequisite results are detected. Passing each small task separately must never replace checking the combined result. Restart must not spend the same remaining allowance twice.
+
+Agree who owns the combined result and which shared resources need exclusive access before implementation. Publishing any result remains a separate authorized action. [R03, R05]
+
+## Phase 7: Try automatic choices on real work
+
+Start by letting the system recommend a strategy while the approved normal strategy still runs. Compare its predictions with what actually happens. Then run a small, explicitly approved trial of automatic choices.
+
+Deliver a defined trial population, approved limits, monitoring of results and cost, and a switch that restores the previous strategy. Record which strategy each task used so a restart does not change the agreement.
+
+Done when measured improvements hold on new tasks within the approved limits. Demonstrate that automatic choices can be disabled without losing work or rewriting earlier results. A failed trial returns to the previous strategy rather than lowering the success criteria.
+
+Decide the trial size, stop conditions, and who can enable or stop it before launch. Expand only after reviewing the trial's evidence.
+
+# 20. How to turn each phase into deliverable work
+
+Start with the next unfinished phase in Section 19. Create the fewest work items that each deliver a useful, testable result. Complete those items in their dependency order before advancing to the next phase. Do not start the former parallel workstreams as separate projects.
+
+For each work item, record:
+
+- The outcome a user or maintainer can observe.
+- What is included and what waits for a later phase.
+- The earlier result it depends on.
+- The command or demonstration that shows it works, including a failure case.
+- Any decision or permission needed before implementation.
+
+Use the repository's existing `work/` contracts and `.p2p/work/` delivery records. Keep review and proof tied to the exact delivered version. Do not create a second checklist that competes with the acceptance contract.
+
+Phase 1's model, runner, and explanation live in `checks/delivery-model/` in PR #25. Reuse them. Choose locations for later implementation files when the relevant work begins; do not create empty frameworks for the whole roadmap.
 
 # 21. Acceptance gates and operational checks
 
@@ -805,17 +873,23 @@ Resolve these before the relevant phase, not necessarily before building the ini
 
 **Tool fit:** Does the pinned FizzBee version demonstrate the necessary model, performance, and adapter behavior? What is the fallback when its performance semantics do not represent the required parallel timing accurately?
 
-# 24. Exact next-agent assignment
+# 24. The next delivery to prepare
 
-Start by reading repository instructions, the pinned README/protocol, `/deliver-issue`, `/slice-contract`, and the referenced scenarios. Compare the current checkout with this handoff’s baseline before assuming the described behavior is unchanged. Treat this document as research/design input, not authorization to write tracker items, push code, or weaken the acceptance protocol.
+First, assess PR #25 for merge using its saved review and proof. Do not treat the model as an integrated dependency until that step is complete.
 
-Prepare a small first implementation proposal containing: the current full-delivery state machine; the first property set and traceability; assumptions and model bounds; one reproducible valid case; targeted invalid variants; a telemetry schema draft; and a synthetic verification-order comparison whose arithmetic is independently checked.
+Then prepare the first Phase 2 work item: demonstrate an enforceable delivery process on one named host. Read the current repository instructions and protocol, the delivered model's limits, and the existing filesystem helper before proposing new code.
 
-Use the existing single-issue workflow and one supported host as the boundary. Do not implement adaptive assurance, many-level model escalation, automatic slicing, speculative execution, or cross-candidate evidence reuse in the first increment. Capture those as later design decisions with explicit prerequisites.
+The proposal must answer these questions in plain language:
 
-The first result should answer four concrete questions: Does the model expose meaningful failure paths? Can an executable boundary enforce its critical decisions? Can time/money accounting distinguish complete episodes from cheap failures? Can maintainers understand and reproduce the result without relying on chat history?
+1. Which host will we support first?
+2. How will it prove that separate review and proof runs actually happened and could not change the code?
+3. Which existing file and report checks can the controller reuse?
+4. What is the smallest successful end-to-end example, and what missing or stale evidence must it reject?
+5. Which decisions remain before implementation, and what follows in the restart-handling work item?
 
-**Completion statement for the first increment:** Report exactly what was modeled, executed, checked, measured, or left unexecuted. Include the repository/tool versions, model configuration, traceability, retained artifacts, known limitations, and the next smallest unresolved decision. Do not claim that a passing formal model proves all agent behavior or that synthetic policy savings have been measured in production.
+Save the agreed scope and its concrete checks in a canonical `work/` contract. Use Phase 2's ordered steps to decide whether host support and the first successful run fit one coherent item or need two dependent items.
+
+Keep cost comparisons, optional checking levels, child-task scheduling, and automatic strategy selection in their later phases. This planning update does not create issues, authorize publication, or change the current acceptance rules.
 
 # Appendix A. Illustrative policy schema
 
