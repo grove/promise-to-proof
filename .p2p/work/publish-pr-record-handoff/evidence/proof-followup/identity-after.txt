@@ -1,0 +1,6 @@
+candidate full paths, bytes, modes, symlinks match 109
+base full paths, bytes, modes, symlinks match 108
+base manifest matches actual Git tree outside .p2p; object 69c02fe5a0e876b104baacca2e4075f801974d40
+candidate snapshot:sha256:4ad7a1d6086cc3032d3b4ad67eba7d129b2398121cefdfeb84f2ae2e374f47de contract 656b4db8958e3877a166640adbf37338c6acfee38646e30a5185030855732d5a bindings [{'path': 'docs/acceptance-contract-protocol.md', 'sha256': 'bec3503abc6ebc40356e662ca0b279be73a4da482eb1616a5c5b435509184351'}]
+changed product paths ['checks/publish-pr-scenarios.md', 'work/publish-pr-record-handoff.md']
+record hashes {'base.json': '2f82a8cb8b1ca472db38aa87dfdbddb19bace52b846cc40eb8bfc3077b720453', 'candidate.json': '825d4c983309a902d10c74eed82855c1754d44da04bdc4f0cb726de26473ee3a', 'implementation.md': 'b7d3915bff4586f50b7ac7371ad80932772ce5ee48657fec8fa8ce8977d2667b', 'planning.md': '40a867d004f4807f2b43eaa338712abfad7df26858bc652d9c4c2075ac8b6fb9'}

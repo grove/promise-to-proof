@@ -1,0 +1,146 @@
+[
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/candidate.json",
+    "sha256": "825d4c983309a902d10c74eed82855c1754d44da04bdc4f0cb726de26473ee3a"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/implementation/fixture-output.txt",
+    "sha256": "285840680f92a5fc3b7a29b104ab99212fbbff844a35aa3c27f773b39b84ae05"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/implementation/fixture.py",
+    "sha256": "b04e1a13bf03a313eff4b96e081143b33cfe75e1cb2b7eb42980e6eb0a112e62"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/proof-followup/contract.md",
+    "sha256": "656b4db8958e3877a166640adbf37338c6acfee38646e30a5185030855732d5a"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/proof-followup/fixture.py",
+    "sha256": "4270c72701fdb9f458302d26e30ae98ed759038f8529676c3ef94b949baeec61"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/proof-followup/fixture.txt",
+    "sha256": "f3f8e2a5a2bacb634b414a7e309fb4a89eb36b930dc999a90994210f7e80ba38"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/proof-followup/identity-after.txt",
+    "sha256": "df25815e10689af7e5a2d548c761d93fe4de782ed852b176858bf476698c1046"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/proof-followup/identity-before.txt",
+    "sha256": "df25815e10689af7e5a2d548c761d93fe4de782ed852b176858bf476698c1046"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/proof-followup/identity.py",
+    "sha256": "b2e3ea58b98683e3eafc2c0637201e5a9f1a36e39e6c63fa11084e9a4a203713"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/proof-followup/packaging.py",
+    "sha256": "eb9efba3f1b1ef48f6475568aae568eec7383e8dd20dbcb2804628fbbcd4efdb"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/proof-followup/packaging.txt",
+    "sha256": "dbc61c6c8c6c0738dfaad3bafd3a3bcb1d21b14d2d5b59c4e050c81b1c91851f"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/proof-followup/walkthrough.md",
+    "sha256": "375155e0f5e02dbe9e51c2d6d9b25764b84a231e8524bd8efb2331e0ecf14683"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/review/identity-after.txt",
+    "sha256": "22085e9d1a380e0501e8a813dab72792e9b49a0080f64505875633fb5c367155"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/review/identity-before.txt",
+    "sha256": "22085e9d1a380e0501e8a813dab72792e9b49a0080f64505875633fb5c367155"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/review/identity.py",
+    "sha256": "a4209941b659e46e109506753bcb55d085f20e132c7214e2027ee601c1a0a77a"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/review/packaging.py",
+    "sha256": "43fe71ff8c083627f0e8a93b7eb249ede6ff87a788b2902d2fa2e43f912e7f6b"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/review/packaging.txt",
+    "sha256": "b81dd364bb7b98298f74ed314dbcb0286c37ccc568d567812b7142c5f58a6e15"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/review-followup/identity-after.txt",
+    "sha256": "22085e9d1a380e0501e8a813dab72792e9b49a0080f64505875633fb5c367155"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/review-followup/identity-before.txt",
+    "sha256": "22085e9d1a380e0501e8a813dab72792e9b49a0080f64505875633fb5c367155"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/review-followup/identity.py",
+    "sha256": "b9909001097210556e2fc130e7a626464ab560739bc35cdc460e881147698ebb"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/review-followup/packaging.py",
+    "sha256": "b8c52bc8a99c871ec26b3e502f23dd8d4fae2f0e9e3b6726150b70dcec827ee7"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/evidence/review-followup/packaging.txt",
+    "sha256": "b81dd364bb7b98298f74ed314dbcb0286c37ccc568d567812b7142c5f58a6e15"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/history/1b2b2d94ecdfe24bc8c8604e835fdd99340c3a24a6313c7f7a9a3118131c66bf/implementation.md",
+    "sha256": "1b2b2d94ecdfe24bc8c8604e835fdd99340c3a24a6313c7f7a9a3118131c66bf"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/history/3df68512affbb417dd4905c54a068ed24bf18cebcfd10b850797694794c8af58/candidate.json",
+    "sha256": "3df68512affbb417dd4905c54a068ed24bf18cebcfd10b850797694794c8af58"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/history/5822cbd1e9820a68e8d51f7990e96e1450d3782806dde4aa586f2a31f1f8d00b/review.md",
+    "sha256": "5822cbd1e9820a68e8d51f7990e96e1450d3782806dde4aa586f2a31f1f8d00b"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/history/6ba81d3e2e9f3c7cd66a246e054902dc0f977e9ddf531d869cce700d3cb67211/candidate.json",
+    "sha256": "6ba81d3e2e9f3c7cd66a246e054902dc0f977e9ddf531d869cce700d3cb67211"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/host/followup.json",
+    "sha256": "b259b0c80453308a79ec6711357281695b7a2a77722f398ee92e005e754c207d"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/host/readiness-refresh.json",
+    "sha256": "7ac8bf4aac2de7c0ce835ccf1b63703e72dd5690335f2ecd05315231098d7c24"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/implementation.md",
+    "sha256": "b7d3915bff4586f50b7ac7371ad80932772ce5ee48657fec8fa8ce8977d2667b"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/planning.md",
+    "sha256": "40a867d004f4807f2b43eaa338712abfad7df26858bc652d9c4c2075ac8b6fb9"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/proof.md",
+    "sha256": "866232cfbd223f5b5c60e2fb5a8436415b49fa3816d41b0c780ed52c711014f6"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/publication-body.md",
+    "sha256": "993f9bd9eaa65e7afc6ffb9d1c7969bb279e195fb95a38b1ca883364dffb8c9c"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/publication.md",
+    "sha256": "db8a39708e4e5ce04a3ebff2147bc22eaab7ade001a765b43bc4efc6bbbb0e4d"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/review.md",
+    "sha256": "c76afde6e16dfd2cad22c016e27cdcbde6acdcd2b91f08bc6d1ab5d979e09803"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/snapshots/base-main-5a98bbc.json",
+    "sha256": "c01778ffe963000e7fc909bf67a0155043f302df88c9893503397f205dba714d"
+  },
+  {
+    "path": ".p2p/work/publish-pr-record-handoff/snapshots/base-main-69c02fe.json",
+    "sha256": "2f82a8cb8b1ca472db38aa87dfdbddb19bace52b846cc40eb8bfc3077b720453"
+  }
+]

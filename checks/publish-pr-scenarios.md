@@ -181,6 +181,15 @@ commit on the target branch or claim the receipt was already pushed. With cleanu
 authority, it archives only confirmed published copies, reports the recovery path
 and final status, and preserves the changed and unrelated files.
 
+Repeat with one published copy whose bytes match but executable mode differs,
+one symlink whose target differs, and one identical published copy tracked in
+the operator's checkout. Pass when the mode-only and symlink-only differences
+are classified as differing files, and none of these three copies is moved,
+even with cleanup authority. The local-only receipt also remains untouched.
+Repeat the original case with publication authority but no cleanup authority.
+Pass when no copies are moved; the skill presents exact proposed paths and an
+archive destination, and reports what remains without inferring cleanup approval.
+
 ## 14. Publish a frozen receipt without an endless commit cycle
 
 Input: provide the local-only publication records from scenario 13 and authorize
@@ -193,3 +202,8 @@ product tree and report bytes, retains the original snapshot mapping, and reads
 back the new head. PR state, title and body stay unchanged. Git ancestry and the
 remote SHA establish the follow-up commit without another receipt-about-receipt
 commit. Each conflicting case stops before push and preserves local records.
+
+Repeat with the same frozen records and original publication approval, but no
+authority for the follow-up commit and push. Pass when the skill presents the
+exact follow-up preview and requests its authorization; it creates no commit,
+pushes nothing, changes no PR content or state, and preserves the local records.

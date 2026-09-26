@@ -1,0 +1,21 @@
+{
+  "pr": 26,
+  "source_head": "78ebc4ea344db271b24355ba0455bbdc1b530fe5",
+  "comparison_base": "5a98bbcbeed9bbddce40d1b8158e0592bb10d13f",
+  "stages": [
+    {
+      "agent_id": "/root/plan_26",
+      "invocation": "collaboration.spawn_agent",
+      "status": "completed",
+      "permissions": "planning workspace-write"
+    },
+    {
+      "agent_id": "/root/review26",
+      "invocation": "collaboration.spawn_agent",
+      "status": "launched",
+      "permissions": "default sandbox read-only inputs /Users/Shared/p2p-issue-24-6krj8of_/refresh26; scratch only /private/tmp; escalation forbidden"
+    }
+  ],
+  "reconstruction": "Full candidate/base inventories bytes modes and symlink targets verified; inputs outside writable roots; product excludes .p2p",
+  "readonly_inputs": "/Users/Shared/p2p-issue-24-6krj8of_/refresh26"
+}
