@@ -525,9 +525,12 @@ Near the merge decision, run `/merge-readiness <PR URL>` with the saved full
 review and proof reports. It checks their exact agreement and candidate against
 the current PR head and base, required CI (including applicable merge-queue
 checks), repository approvals, and other merge conditions. `REVIEWED` is not a
-GitHub approval. The read-only result is `READY`, `BLOCKED`, or `UNKNOWN` for
-the inspected PR state; even `READY` does not merge or authorize merging. A
-changed head, base, contract, or gate state needs a new assessment.
+GitHub approval. The result is `READY`, `BLOCKED`, or `UNKNOWN` for
+the inspected PR state. The skill updates the PR description's readiness entry
+and confirms it by readback before the merge handoff. An explicitly read-only
+request leaves the description unchanged. Even `READY` does not merge or
+authorize merging. A changed head, base, contract, or gate state needs a new
+assessment.
 
 ## Repair failed GitHub Actions without weakening the check
 

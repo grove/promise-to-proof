@@ -12,7 +12,8 @@ reports for its exact head and agreement. Give the target green required checks
 and the approvals required by repository policy.
 
 Pass when it reports `READY` for the named head, base, contract, and report
-references without merging, approving, or altering the PR. It must distinguish
+references, updates the PR body's readiness entry, and confirms it by readback
+without merging or approving. It must distinguish
 the saved `REVIEWED` report from repository approval.
 
 Repeat with a `REVIEWED` report for only selected requirement IDs, leaving some
@@ -47,7 +48,36 @@ still pending.
 
 Pass when the changed state is not reported `READY` based on earlier evidence.
 Queue entry alone does not assert readiness of the merge-group candidate. The
-skill reports what must be rechecked and leaves prior artifacts unchanged and saves only its new readiness observation.
+skill reports what must be rechecked, preserves prior artifacts, and saves its
+new readiness observation. It must not publish `READY` for the changed state.
+
+## 5. Replace the publication placeholder before handoff
+
+Start with a PR body containing `Merge readiness: NOT ASSESSED.`, a publication
+marker, report links, and human-written text. Run the ready scenario, then repeat
+with a required check pending and with unavailable branch rules.
+
+Pass when the single readiness entry becomes `READY`, `BLOCKED`, and `UNKNOWN`
+respectively, with the observed head, base, time, and readiness report reference.
+All other body content remains byte-for-byte unchanged. The local record reports
+confirmed synchronization only after remote readback. A repeat run replaces the
+entry without duplication; a body without an entry receives one.
+
+Change the body before the write. Pass when the latest human edits survive.
+Simulate a lost write response, failed edit, or unavailable readback. Pass when
+the skill reads back before retrying and reports unresolved synchronization as
+pending before any merge handoff. Change the head during readback; pass when the
+old assessment is reported stale rather than confirmed for the new head.
+
+## 6. Read-only and historical requests
+
+Request a read-only assessment of an open PR. Separately inspect an already
+merged PR whose description still says `NOT ASSESSED`.
+
+Pass when the read-only run saves its assessment and proposed readiness entry
+without a remote write, and reports synchronization as skipped. The merged case
+remains historical, receives no body edit or merge handoff, and does not become
+`READY` merely because it was merged.
 
 ## Filesystem handoff
 
