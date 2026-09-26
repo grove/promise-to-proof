@@ -1,0 +1,154 @@
+[
+  {
+    "command": [
+      "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+      "--output-dir",
+      "graph",
+      "counter.fizz"
+    ],
+    "environment": null,
+    "output": "counter-checker-replay.log",
+    "returncode": 0,
+    "expected": 0
+  },
+  {
+    "command": [
+      "./node_modules/.bin/tsc",
+      "--target",
+      "ES2022",
+      "--module",
+      "NodeNext",
+      "--moduleResolution",
+      "NodeNext",
+      "--strict",
+      "--skipLibCheck",
+      "--outDir",
+      "dist",
+      "generated/counter_interfaces.ts",
+      "generated/counter_adapters.ts",
+      "generated/counter_test.ts"
+    ],
+    "environment": null,
+    "output": "counter-compile-replay.log",
+    "returncode": 0,
+    "expected": 0
+  },
+  {
+    "command": [
+      "node",
+      "dist/counter_test.js"
+    ],
+    "environment": {
+      "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+      "FIZZBEE_MBT_SEQ_SEED": "42",
+      "BAD_OBSERVATION": "0"
+    },
+    "output": "counter-good-verified.log",
+    "returncode": 0,
+    "expected": 0
+  },
+  {
+    "command": [
+      "node",
+      "dist/counter_test.js"
+    ],
+    "environment": {
+      "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+      "FIZZBEE_MBT_SEQ_SEED": "42",
+      "BAD_OBSERVATION": "1"
+    },
+    "output": "counter-bad-verified.log",
+    "returncode": 1,
+    "expected": 1
+  },
+  {
+    "command": [
+      "node",
+      "dist/counter_test.js"
+    ],
+    "environment": {
+      "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+      "FIZZBEE_MBT_SEQ_SEED": "42",
+      "BAD_OBSERVATION": "1"
+    },
+    "output": "counter-replay-verified.log",
+    "returncode": 1,
+    "expected": 1
+  },
+  {
+    "command": [
+      "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+      "--output-dir",
+      "controller-graph",
+      "controller.fizz"
+    ],
+    "environment": null,
+    "output": "controller-checker-replay.log",
+    "returncode": 0,
+    "expected": 0
+  },
+  {
+    "command": [
+      "./node_modules/.bin/tsc",
+      "--target",
+      "ES2022",
+      "--module",
+      "NodeNext",
+      "--moduleResolution",
+      "NodeNext",
+      "--strict",
+      "--skipLibCheck",
+      "--outDir",
+      "controller-dist",
+      "controller-generated/controller_adapters.ts",
+      "controller-generated/controller_test.ts",
+      "controller-generated/controller_interfaces.ts"
+    ],
+    "environment": null,
+    "output": "controller-compile-replay.log",
+    "returncode": 0,
+    "expected": 0
+  },
+  {
+    "command": [
+      "node",
+      "controller-dist/controller_test.js"
+    ],
+    "environment": {
+      "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+      "FIZZBEE_MBT_SEQ_SEED": "42",
+      "BAD_OBSERVATION": "0"
+    },
+    "output": "controller-good-verified.log",
+    "returncode": 0,
+    "expected": 0
+  },
+  {
+    "command": [
+      "node",
+      "controller-dist/controller_test.js"
+    ],
+    "environment": {
+      "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+      "FIZZBEE_MBT_SEQ_SEED": "42",
+      "BAD_OBSERVATION": "1"
+    },
+    "output": "controller-bad-verified.log",
+    "returncode": 1,
+    "expected": 1
+  },
+  {
+    "command": [
+      "node",
+      "controller-dist/controller_test.js"
+    ],
+    "environment": {
+      "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+      "FIZZBEE_MBT_SEQ_SEED": "42",
+      "BAD_OBSERVATION": "1"
+    },
+    "output": "controller-replay-verified.log",
+    "returncode": 1,
+    "expected": 1
+  }
+]

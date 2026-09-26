@@ -1,0 +1,172 @@
+{
+  "attempts": [
+    {
+      "cost": "unknown",
+      "elapsed_seconds": 0.01,
+      "exit_code": 0,
+      "finished": "2026-09-26T15:16:23.288937+00:00",
+      "id": "faa7e1e3-e3ad-461c-94ea-4f0e8438385c",
+      "inputs": {
+        "contract_sha256": "5fd555eb8132a635c95dcdfb76e647d3b859b51a51539fbc38aeb067986a502a",
+        "probe_sha256": "08a3d842a1537a629749a176cce190ee46f79fa40a0f575c89a860dec19a40bb"
+      },
+      "outcome": "finished",
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/concurrent-resume-42/fixture/source/.p2p/work/tiny/runtime/scratch/38d42eca-fc43-4221-9742-f9da62b0f875",
+      "session_id": "fixture-6b04262a34f0440d8294a6b19e891243",
+      "stage": "preflight-1",
+      "started": "2026-09-26T15:16:23.227849+00:00",
+      "started_epoch": 1790435783.2278779,
+      "status": "complete",
+      "usage": {
+        "input_tokens": 7,
+        "output_tokens": 3
+      }
+    },
+    {
+      "cost": "unknown",
+      "elapsed_seconds": 0.01,
+      "exit_code": 0,
+      "finished": "2026-09-26T15:16:23.613974+00:00",
+      "id": "644142f8-34bf-4dd6-8fe4-df3c965ac48a",
+      "inputs": {
+        "contract_sha256": "5fd555eb8132a635c95dcdfb76e647d3b859b51a51539fbc38aeb067986a502a",
+        "probe_sha256": "08a3d842a1537a629749a176cce190ee46f79fa40a0f575c89a860dec19a40bb"
+      },
+      "outcome": "finished",
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/concurrent-resume-42/fixture/source/.p2p/work/tiny/runtime/scratch/57d7a951-51eb-44dc-92a9-6649907f47e1",
+      "session_id": "fixture-52d64a0f9768400f8a462d056a18cfe7",
+      "stage": "preflight-2",
+      "started": "2026-09-26T15:16:23.545806+00:00",
+      "started_epoch": 1790435783.5458372,
+      "status": "complete",
+      "usage": {
+        "input_tokens": 7,
+        "output_tokens": 3
+      }
+    }
+  ],
+  "authority": {
+    "external_effects": false,
+    "local_stages": true
+  },
+  "binding_inputs": [
+    {
+      "path": "spec.txt",
+      "sha256": "96bbc5690a5a4af0a7ecc91d4f9faf97034a5e420189d348f5bcdd2c81dc0ce6"
+    }
+  ],
+  "blocker": null,
+  "candidate": {
+    "binding_inputs": [
+      {
+        "path": "spec.txt",
+        "sha256": "96bbc5690a5a4af0a7ecc91d4f9faf97034a5e420189d348f5bcdd2c81dc0ce6"
+      }
+    ],
+    "comparison_base": "c034cf50bb649aacd7959c9745c1054f51dd0879",
+    "key": "snapshot:sha256:7dd2708206e38a9f908f1bd53f3a6ff26a7245763bd43bbfa3666f73abde91d3",
+    "manifest": [
+      {
+        "content_base64": "Ly5wMnAvdG1wLwo=",
+        "mode": "100644",
+        "path": ".gitignore",
+        "type": "file"
+      },
+      {
+        "content_base64": "QSBDTEkgcHJpbnRzIGhlbGxvIGZvbGxvd2VkIGJ5IGEgbmV3bGluZSBhbmQgZXhpdHMgemVyby4K",
+        "mode": "100644",
+        "path": "spec.txt",
+        "type": "file"
+      },
+      {
+        "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiB0aW55CgpDb250cmFjdCByZXZpc2lvbjogdjEKU291cmNlOiBbU3BlY2lmaWNhdGlvbl0oLi4vc3BlYy50eHQpCgpJbnRlbmRlZCBvdXRjb21lOiBncmVldC5weSBwcmludHMgaGVsbG8uCgojIyBBY2NlcHRhbmNlIG1hdHJpeAoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyAvIGNvdW50ZXJleGFtcGxlcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgc3BlYy50eHQgfCBncmVldC5weSBwcmludHMgaGVsbG8gYW5kIGV4aXRzIHplcm8uIHwgV3JvbmcgdGV4dCBvciBmYWlsdXJlIGlzIHJlamVjdGVkLiB8IHB5dGhvbjMgZ3JlZXQucHkgfCBoZWxsbyBwbHVzIG5ld2xpbmUgYW5kIGV4aXQgemVybyB8IFJ1biBweXRob24zIGdyZWV0LnB5IGFuZCBhc3NlcnQgZXhhY3Qgb3V0cHV0IGFuZCBzdGF0dXMuIHwgcGxhbm5lZCB8CgojIyBVbnJlc29sdmVkIGdhcHMKCk5vbmUuCg==",
+        "mode": "100644",
+        "path": "work/tiny.md",
+        "type": "file"
+      }
+    ],
+    "work_item": "work/tiny.md",
+    "work_item_sha256": "5fd555eb8132a635c95dcdfb76e647d3b859b51a51539fbc38aeb067986a502a"
+  },
+  "comparison_base": "c034cf50bb649aacd7959c9745c1054f51dd0879",
+  "contract": {
+    "content": "# Acceptance contract: tiny\n\nContract revision: v1\nSource: [Specification](../spec.txt)\n\nIntended outcome: greet.py prints hello.\n\n## Acceptance matrix\n\n| ID | Source | Requirement | Boundaries / counterexamples | Seam | Oracle | Planned evidence | Plan state |\n|---|---|---|---|---|---|---|---|\n| R1 | spec.txt | greet.py prints hello and exits zero. | Wrong text or failure is rejected. | python3 greet.py | hello plus newline and exit zero | Run python3 greet.py and assert exact output and status. | planned |\n\n## Unresolved gaps\n\nNone.\n",
+    "revision": "v1",
+    "sha256": "5fd555eb8132a635c95dcdfb76e647d3b859b51a51539fbc38aeb067986a502a",
+    "source": "tiny"
+  },
+  "created": "2026-09-26T15:16:22.362759+00:00",
+  "deadline": null,
+  "excluded_dirty": [],
+  "host": {
+    "cost": "unknown",
+    "elapsed_limit": "admission and process termination; provider billing may continue",
+    "enforced": [
+      "scratch-only verification writes",
+      "network denied",
+      "approval escalation disabled",
+      "isolated configuration",
+      "dispatch admission",
+      "one repair reservation"
+    ],
+    "executable": "/opt/homebrew/bin/codex",
+    "hard_monetary_cap": "unsupported",
+    "name": "Codex CLI on macOS",
+    "trust": "controller and OS trusted; no arbitrary same-user tamper resistance",
+    "version": "codex-cli 0.157.1"
+  },
+  "invocation_id": "f7923647-f7cf-4430-aa10-1a3a2bc677bf",
+  "limits": {
+    "dispatches": null,
+    "elapsed_seconds": null
+  },
+  "policy": "macos-codex-local-v1",
+  "repair_used": false,
+  "reports": {},
+  "requirements": [
+    "R1"
+  ],
+  "schema": "promise-to-proof/delivery/v1",
+  "skills": {
+    "implementation": {
+      "path": "/Users/grove/.agents/skills/implement-contract/SKILL.md",
+      "sha256": "5d0aa2670f471a6629e0818ef46b30c4dfd7ac77d0fe8f703137aba1d039a2a7"
+    },
+    "proof": {
+      "path": "/Users/grove/.agents/skills/prove/SKILL.md",
+      "sha256": "7741259978b9cf0cc6f323d2e9e3e61b25b986dad3519acaf746816b3eefa323"
+    },
+    "repair": {
+      "path": "/Users/grove/.agents/skills/repair-gaps/SKILL.md",
+      "sha256": "640150ed87764045ba390e1abfcec2a782d68a4b959bb0eabe07ca4f97284a94"
+    },
+    "review": {
+      "path": "/Users/grove/.agents/skills/review-implementation/SKILL.md",
+      "sha256": "e5b8ade59142779914780d5ec35acafc9a087fd3087904c43d8e356ffc3005b7"
+    }
+  },
+  "source_head": "c034cf50bb649aacd7959c9745c1054f51dd0879",
+  "source_index_sha256": "e3c5d83350155f986cb3a4db7c45e8f70e62169a42207ef403c7ee5a7895ca9f",
+  "source_manifest": [
+    {
+      "content_base64": "Ly5wMnAvdG1wLwo=",
+      "mode": "100644",
+      "path": ".gitignore",
+      "type": "file"
+    },
+    {
+      "content_base64": "QSBDTEkgcHJpbnRzIGhlbGxvIGZvbGxvd2VkIGJ5IGEgbmV3bGluZSBhbmQgZXhpdHMgemVyby4K",
+      "mode": "100644",
+      "path": "spec.txt",
+      "type": "file"
+    },
+    {
+      "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiB0aW55CgpDb250cmFjdCByZXZpc2lvbjogdjEKU291cmNlOiBbU3BlY2lmaWNhdGlvbl0oLi4vc3BlYy50eHQpCgpJbnRlbmRlZCBvdXRjb21lOiBncmVldC5weSBwcmludHMgaGVsbG8uCgojIyBBY2NlcHRhbmNlIG1hdHJpeAoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyAvIGNvdW50ZXJleGFtcGxlcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgc3BlYy50eHQgfCBncmVldC5weSBwcmludHMgaGVsbG8gYW5kIGV4aXRzIHplcm8uIHwgV3JvbmcgdGV4dCBvciBmYWlsdXJlIGlzIHJlamVjdGVkLiB8IHB5dGhvbjMgZ3JlZXQucHkgfCBoZWxsbyBwbHVzIG5ld2xpbmUgYW5kIGV4aXQgemVybyB8IFJ1biBweXRob24zIGdyZWV0LnB5IGFuZCBhc3NlcnQgZXhhY3Qgb3V0cHV0IGFuZCBzdGF0dXMuIHwgcGxhbm5lZCB8CgojIyBVbnJlc29sdmVkIGdhcHMKCk5vbmUuCg==",
+      "mode": "100644",
+      "path": "work/tiny.md",
+      "type": "file"
+    }
+  ],
+  "status": "RUNNING",
+  "work_item": "work/tiny.md"
+}

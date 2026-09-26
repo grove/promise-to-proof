@@ -1,0 +1,6 @@
+{
+  "path": "skills/productivity/deliver-issue/scripts/p2p_delivery.py",
+  "before": "if end.get('attempt_id') != attempt['id'] or end.get('inputs') != attempt['inputs']:",
+  "after": "if False:",
+  "count": 1
+}

@@ -1,0 +1,126 @@
+2026/09/26 16:49:17 Loaded 8 nodes and 24 links
+2026/09/26 16:49:17 State Space Options: options:{max_actions:100 max_concurrent_actions:2 crash_on_yield:true} deadlock_detection:true
+Generated 3 unique operations
+Generated 3 operation groups
+Group: Counter#0.Dec
+  Op: role:{role_name:"Counter"} action_name:"Dec", MaxYields: 0
+Group: Counter#0.Inc
+  Op: role:{role_name:"Counter"} action_name:"Inc", MaxYields: 0
+Group: Counter#0.Get
+  Op: role:{role_name:"Counter"} action_name:"Get", MaxYields: 0
+2026/09/26 16:49:17 FizzMo server listening on :50051
+2026/09/26 16:49:31 Received StartTestRun request: 
+Received ValidateTrace request: demo-run-id
+  Request 0: role:{role_name:"Counter"} action_name:"Inc"
+  Response 0: exec_time:{start_unix_nano:105812042 end_unix_nano:148220584} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 1: role:{role_name:"Counter"} action_name:"Inc"
+  Response 1: exec_time:{start_unix_nano:149350084 end_unix_nano:189966084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 2: role:{role_name:"Counter"} action_name:"Get"
+  Response 2: return_values:{int_value:2} exec_time:{start_unix_nano:190831625 end_unix_nano:233607334} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 3: role:{role_name:"Counter"} action_name:"Dec"
+  Response 3: exec_time:{start_unix_nano:234551292 end_unix_nano:273479125} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 4: role:{role_name:"Counter"} action_name:"Inc"
+  Response 4: exec_time:{start_unix_nano:274235167 end_unix_nano:315327834} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 5: role:{role_name:"Counter"} action_name:"Get"
+  Response 5: return_values:{int_value:2} exec_time:{start_unix_nano:316132417 end_unix_nano:359173625} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 6: role:{role_name:"Counter"} action_name:"Dec"
+  Response 6: exec_time:{start_unix_nano:359891042 end_unix_nano:411078167} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 7: role:{role_name:"Counter"} action_name:"Inc"
+  Response 7: exec_time:{start_unix_nano:412200834 end_unix_nano:451969084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 8: role:{role_name:"Counter"} action_name:"Inc"
+  Response 8: exec_time:{start_unix_nano:453354542 end_unix_nano:492784459} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 9: role:{role_name:"Counter"} action_name:"Inc"
+  Response 9: exec_time:{start_unix_nano:493546459 end_unix_nano:533952750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+Validating trace for RunId: demo-run-id
+    Action Link: Counter#0.Inc
+    Found matching Source Link: dest:1 name:"Counter#0.Inc" weight:0.3333333333333333 type:"action"
+  End of Request 0, current nodeId: 1, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{} roles:[map[fields:map[value:1] name:Counter params:map[] ref:0 ref_string:Counter#0]] state:map[counter:role Counter#0] stats:map[counts:map[Counter#0.Inc:1] totalActions:1] threads:[] witness:[[false]]]
+. Expected <nil>
+. Actual [], len:0
+    Action Link: Counter#0.Inc
+    Found matching Source Link: src:1 dest:3 name:"Counter#0.Inc" weight:0.3333333333333333 type:"action"
+  End of Request 1, current nodeId: 3, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{} roles:[map[fields:map[value:2] name:Counter params:map[] ref:0 ref_string:Counter#0]] state:map[counter:role Counter#0] stats:map[counts:map[Counter#0.Inc:2] totalActions:2] threads:[] witness:[[false]]]
+. Expected <nil>
+. Actual [], len:0
+    Action Link: Counter#0.Get
+    Found matching Source Link: src:3 dest:6 name:"Counter#0.Get" weight:0.3333333333333333 type:"action" 10:"\n\rCounter#0.Get\x12\x012"
+  End of Request 2, current nodeId: 6, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Counter#0.Get":2} roles:[map[fields:map[value:2] name:Counter params:map[] ref:0 ref_string:Counter#0]] state:map[counter:role Counter#0] stats:map[counts:map[Counter#0.Get:1 Counter#0.Inc:2] totalActions:3] threads:[] witness:[[false]]]
+. Expected 2
+. Actual [int_value:2], len:1
+    Action Link: Counter#0.Dec
+    Found matching Source Link: src:6 dest:1 name:"Counter#0.Dec" weight:0.3333333333333333 type:"action"
+  End of Request 3, current nodeId: 1, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{} roles:[map[fields:map[value:1] name:Counter params:map[] ref:0 ref_string:Counter#0]] state:map[counter:role Counter#0] stats:map[counts:map[Counter#0.Inc:1] totalActions:1] threads:[] witness:[[false]]]
+. Expected <nil>
+. Actual [], len:0
+    Action Link: Counter#0.Inc
+    Found matching Source Link: src:1 dest:3 name:"Counter#0.Inc" weight:0.3333333333333333 type:"action"
+  End of Request 4, current nodeId: 3, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{} roles:[map[fields:map[value:2] name:Counter params:map[] ref:0 ref_string:Counter#0]] state:map[counter:role Counter#0] stats:map[counts:map[Counter#0.Inc:2] totalActions:2] threads:[] witness:[[false]]]
+. Expected <nil>
+. Actual [], len:0
+    Action Link: Counter#0.Get
+    Found matching Source Link: src:3 dest:6 name:"Counter#0.Get" weight:0.3333333333333333 type:"action" 10:"\n\rCounter#0.Get\x12\x012"
+  End of Request 5, current nodeId: 6, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Counter#0.Get":2} roles:[map[fields:map[value:2] name:Counter params:map[] ref:0 ref_string:Counter#0]] state:map[counter:role Counter#0] stats:map[counts:map[Counter#0.Get:1 Counter#0.Inc:2] totalActions:3] threads:[] witness:[[false]]]
+. Expected 2
+. Actual [int_value:2], len:1
+    Action Link: Counter#0.Dec
+    Found matching Source Link: src:6 dest:1 name:"Counter#0.Dec" weight:0.3333333333333333 type:"action"
+  End of Request 6, current nodeId: 1, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{} roles:[map[fields:map[value:1] name:Counter params:map[] ref:0 ref_string:Counter#0]] state:map[counter:role Counter#0] stats:map[counts:map[Counter#0.Inc:1] totalActions:1] threads:[] witness:[[false]]]
+. Expected <nil>
+. Actual [], len:0
+    Action Link: Counter#0.Inc
+    Found matching Source Link: src:1 dest:3 name:"Counter#0.Inc" weight:0.3333333333333333 type:"action"
+  End of Request 7, current nodeId: 3, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{} roles:[map[fields:map[value:2] name:Counter params:map[] ref:0 ref_string:Counter#0]] state:map[counter:role Counter#0] stats:map[counts:map[Counter#0.Inc:2] totalActions:2] threads:[] witness:[[false]]]
+. Expected <nil>
+. Actual [], len:0
+    Action Link: Counter#0.Inc
+    Found matching Source Link: src:3 dest:5 name:"Counter#0.Inc" weight:0.3333333333333333 type:"action"
+  End of Request 8, current nodeId: 5, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{} roles:[map[fields:map[value:3] name:Counter params:map[] ref:0 ref_string:Counter#0]] state:map[counter:role Counter#0] stats:map[counts:map[Counter#0.Inc:3] totalActions:3] threads:[] witness:[[false]]]
+. Expected <nil>
+. Actual [], len:0
+    Action Link: Counter#0.Inc
+    Found matching Source Link: src:5 dest:5 name:"Counter#0.Inc" weight:0.3333333333333333 type:"action"
+  End of Request 9, current nodeId: 5, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{} roles:[map[fields:map[value:3] name:Counter params:map[] ref:0 ref_string:Counter#0]] state:map[counter:role Counter#0] stats:map[counts:map[Counter#0.Inc:3] totalActions:3] threads:[] witness:[[false]]]
+. Expected <nil>
+. Actual [], len:0
+2026/09/26 16:50:06 Received StartTestRun request: 
+Received ValidateTrace request: demo-run-id
+  Request 0: role:{role_name:"Counter"} action_name:"Inc"
+  Response 0: exec_time:{start_unix_nano:85358250 end_unix_nano:120307667} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 1: role:{role_name:"Counter"} action_name:"Inc"
+  Response 1: exec_time:{start_unix_nano:121474542 end_unix_nano:157370125} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 2: role:{role_name:"Counter"} action_name:"Get"
+  Response 2: return_values:{int_value:3} exec_time:{start_unix_nano:158069792 end_unix_nano:193565292} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 3: role:{role_name:"Counter"} action_name:"Dec"
+  Response 3: exec_time:{start_unix_nano:194513167 end_unix_nano:228798208} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 4: role:{role_name:"Counter"} action_name:"Inc"
+  Response 4: exec_time:{start_unix_nano:229505667 end_unix_nano:264485333} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 5: role:{role_name:"Counter"} action_name:"Get"
+  Response 5: return_values:{int_value:3} exec_time:{start_unix_nano:265214125 end_unix_nano:301282167} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 6: role:{role_name:"Counter"} action_name:"Dec"
+  Response 6: exec_time:{start_unix_nano:302076500 end_unix_nano:337484917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 7: role:{role_name:"Counter"} action_name:"Inc"
+  Response 7: exec_time:{start_unix_nano:338216917 end_unix_nano:374226167} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 8: role:{role_name:"Counter"} action_name:"Inc"
+  Response 8: exec_time:{start_unix_nano:375008708 end_unix_nano:418153875} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+  Request 9: role:{role_name:"Counter"} action_name:"Inc"
+  Response 9: exec_time:{start_unix_nano:420116375 end_unix_nano:458752833} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Counter"}
+Validating trace for RunId: demo-run-id
+    Action Link: Counter#0.Inc
+    Found matching Source Link: dest:1 name:"Counter#0.Inc" weight:0.3333333333333333 type:"action"
+  End of Request 0, current nodeId: 1, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{} roles:[map[fields:map[value:1] name:Counter params:map[] ref:0 ref_string:Counter#0]] state:map[counter:role Counter#0] stats:map[counts:map[Counter#0.Inc:1] totalActions:1] threads:[] witness:[[false]]]
+. Expected <nil>
+. Actual [], len:0
+    Action Link: Counter#0.Inc
+    Found matching Source Link: src:1 dest:3 name:"Counter#0.Inc" weight:0.3333333333333333 type:"action"
+  End of Request 1, current nodeId: 3, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{} roles:[map[fields:map[value:2] name:Counter params:map[] ref:0 ref_string:Counter#0]] state:map[counter:role Counter#0] stats:map[counts:map[Counter#0.Inc:2] totalActions:2] threads:[] witness:[[false]]]
+. Expected <nil>
+. Actual [], len:0
+    Action Link: Counter#0.Get
+    Found matching Source Link: src:3 dest:6 name:"Counter#0.Get" weight:0.3333333333333333 type:"action" 10:"\n\rCounter#0.Get\x12\x012"
+  End of Request 2, current nodeId: 6, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Counter#0.Get":2} roles:[map[fields:map[value:2] name:Counter params:map[] ref:0 ref_string:Counter#0]] state:map[counter:role Counter#0] stats:map[counts:map[Counter#0.Get:1 Counter#0.Inc:2] totalActions:3] threads:[] witness:[[false]]]
+. Expected 2
+. Actual [int_value:3], len:1
+
+
+    Error: Found return value mismatch for Action Link: Counter#0.Get, expected: 2, actual: [int_value:3]
+

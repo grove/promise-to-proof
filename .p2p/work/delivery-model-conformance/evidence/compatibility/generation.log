@@ -1,0 +1,3881 @@
+args:  Namespace(input_spec='counter.fizz', lang='typescript', out_dir='generated', go_package=None, java_package=None, gen_adapter=True, rel_root='generated', playwright=False)
+current_dir /var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/Bazel.runfiles_7ho9v2kf/runfiles/_main/mbt/generator
+data_path /var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/Bazel.runfiles_7ho9v2kf/runfiles/_main/mbt/generator/templates
+YAML Frontmatter: 0
+
+FizzBee code: 14
+MAX = 3
+role Counter:
+    action Init:
+        self.value = 0
+    atomic action Inc:
+        self.value = min(self.value + 1, MAX)
+    atomic action Get:
+        return self.value
+    atomic action Dec:
+        self.value = max(self.value - 1, 0)
+action Init:
+    counter = Counter()
+always assertion WithinRange:
+    return counter.value in range(0, MAX+1)
+
+No YAML frontmatter found
+calling parser.root()
+reportAttemptingFullContext 127 135 {1, 4} [(145,1,[$],up=3), (154,1,[$],up=3), (556,1,[548 171 [157 $, 289 $, 372 $]],up=3), (560,1,[548 171 [157 $, 289 $, 372 $]],up=3), (564,1,[548 171 [157 $, 289 $, 372 $]],up=3), (910,1,[[766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (950,1,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (956,1,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (961,1,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (966,1,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (1057,1,[981 917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (968,1,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (969,1,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (970,1,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (1064,1,[1063 981 917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (1060,1,[981 917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (1061,1,[981 917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (974,1,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (975,1,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (920,1,[[766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (581,1,[548 171 [157 $, 289 $, 372 $]],up=3), (867,1,[807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]],up=3), (809,1,[[712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]],up=3), (726,1,[712 585 548 171 [157 $, 289 $, 372 $]],up=3), (588,1,[548 171 [157 $, 289 $, 372 $]],up=3), (615,1,[548 171 [157 $, 289 $, 372 $]],up=3), (617,1,[548 171 [157 $, 289 $, 372 $]],up=3), (618,1,[548 171 [157 $, 289 $, 372 $]],up=3), (619,1,[548 171 [157 $, 289 $, 372 $]],up=3), (620,1,[548 171 [157 $, 289 $, 372 $]],up=3), (624,1,[548 171 [157 $, 289 $, 372 $]],up=3), (1066,1,[708 548 171 [157 $, 289 $, 372 $]],up=3), (641,1,[548 171 [157 $, 289 $, 372 $]],up=3), (643,1,[548 171 [157 $, 289 $, 372 $]],up=3), (667,1,[548 171 [157 $, 289 $, 372 $]],up=3), (677,1,[548 171 [157 $, 289 $, 372 $]],up=3), (689,1,[548 171 [157 $, 289 $, 372 $]],up=3), (696,1,[548 171 [157 $, 289 $, 372 $]],up=3), (178,1,[171 [157 $, 289 $, 372 $]],up=3), (191,1,[171 [157 $, 289 $, 372 $]],up=3), (194,1,[171 [157 $, 289 $, 372 $]],up=3), (199,1,[171 [157 $, 289 $, 372 $]],up=3), (202,1,[171 [157 $, 289 $, 372 $]],up=3), (209,1,[171 [157 $, 289 $, 372 $]],up=3), (226,1,[171 [157 $, 289 $, 372 $]],up=3), (229,1,[171 [157 $, 289 $, 372 $]],up=3), (314,1,[[243 171 [157 $, 289 $, 372 $], 253 171 [157 $, 289 $, 372 $]]],up=3), (377,1,[250 171 [157 $, 289 $, 372 $]],up=3), (389,1,[250 171 [157 $, 289 $, 372 $]],up=3), (392,1,[250 171 [157 $, 289 $, 372 $]],up=3), (362,1,[283 171 [157 $, 289 $, 372 $]],up=3), (365,1,[283 171 [157 $, 289 $, 372 $]],up=3), (417,1,[[260 171 [157 $, 289 $, 372 $], 411 283 171 [157 $, 289 $, 372 $]]],up=3), (261,1,[171 [157 $, 289 $, 372 $]],up=3), (268,1,[171 [157 $, 289 $, 372 $]],up=3), (271,1,[171 [157 $, 289 $, 372 $]],up=3), (473,1,[283 171 [157 $, 289 $, 372 $]],up=3), (406,1,[283 171 [157 $, 289 $, 372 $]],up=3), (412,1,[283 171 [157 $, 289 $, 372 $]],up=3), (424,1,[283 171 [157 $, 289 $, 372 $]],up=3), (427,1,[283 171 [157 $, 289 $, 372 $]],up=3), (437,1,[283 171 [157 $, 289 $, 372 $]],up=3), (453,1,[283 171 [157 $, 289 $, 372 $]],up=3), (279,1,[171 [157 $, 289 $, 372 $]],up=3), (172,1,[171 [157 $, 289 $, 372 $]],up=3), (292,1,[$],up=3), (375,1,[$],up=3), (325,1,[184 $],up=4), (330,1,[[190 $, 219 $]],up=4), (150,1,[$],up=4), (343,1,[214 $],up=4), (334,1,[[222 $, 225 $]],up=4), (145,4,[$],up=3), (154,4,[$],up=3), (556,4,[548 171 [157 $, 289 $, 372 $]],up=3), (560,4,[548 171 [157 $, 289 $, 372 $]],up=3), (564,4,[548 171 [157 $, 289 $, 372 $]],up=3), (910,4,[[766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (950,4,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (956,4,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (961,4,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (966,4,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (1057,4,[981 917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (968,4,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (969,4,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (970,4,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (1064,4,[1063 981 917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (1060,4,[981 917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (1061,4,[981 917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (974,4,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (975,4,[917 [766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (920,4,[[766 571 548 171 [157 $, 289 $, 372 $], 884 870 807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]]],up=3), (581,4,[548 171 [157 $, 289 $, 372 $]],up=3), (867,4,[807 [712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]],up=3), (809,4,[[712 585 548 171 [157 $, 289 $, 372 $], 1040 725 585 548 171 [157 $, 289 $, 372 $]]],up=3), (726,4,[712 585 548 171 [157 $, 289 $, 372 $]],up=3), (588,4,[548 171 [157 $, 289 $, 372 $]],up=3), (615,4,[548 171 [157 $, 289 $, 372 $]],up=3), (617,4,[548 171 [157 $, 289 $, 372 $]],up=3), (618,4,[548 171 [157 $, 289 $, 372 $]],up=3), (619,4,[548 171 [157 $, 289 $, 372 $]],up=3), (620,4,[548 171 [157 $, 289 $, 372 $]],up=3), (624,4,[548 171 [157 $, 289 $, 372 $]],up=3), (1066,4,[708 548 171 [157 $, 289 $, 372 $]],up=3), (641,4,[548 171 [157 $, 289 $, 372 $]],up=3), (643,4,[548 171 [157 $, 289 $, 372 $]],up=3), (667,4,[548 171 [157 $, 289 $, 372 $]],up=3), (677,4,[548 171 [157 $, 289 $, 372 $]],up=3), (689,4,[548 171 [157 $, 289 $, 372 $]],up=3), (696,4,[548 171 [157 $, 289 $, 372 $]],up=3), (178,4,[171 [157 $, 289 $, 372 $]],up=3), (191,4,[171 [157 $, 289 $, 372 $]],up=3), (194,4,[171 [157 $, 289 $, 372 $]],up=3), (199,4,[171 [157 $, 289 $, 372 $]],up=3), (202,4,[171 [157 $, 289 $, 372 $]],up=3), (209,4,[171 [157 $, 289 $, 372 $]],up=3), (226,4,[171 [157 $, 289 $, 372 $]],up=3), (229,4,[171 [157 $, 289 $, 372 $]],up=3), (314,4,[[243 171 [157 $, 289 $, 372 $], 253 171 [157 $, 289 $, 372 $]]],up=3), (377,4,[250 171 [157 $, 289 $, 372 $]],up=3), (389,4,[250 171 [157 $, 289 $, 372 $]],up=3), (392,4,[250 171 [157 $, 289 $, 372 $]],up=3), (362,4,[283 171 [157 $, 289 $, 372 $]],up=3), (365,4,[283 171 [157 $, 289 $, 372 $]],up=3), (417,4,[[260 171 [157 $, 289 $, 372 $], 411 283 171 [157 $, 289 $, 372 $]]],up=3), (261,4,[171 [157 $, 289 $, 372 $]],up=3), (268,4,[171 [157 $, 289 $, 372 $]],up=3), (271,4,[171 [157 $, 289 $, 372 $]],up=3), (473,4,[283 171 [157 $, 289 $, 372 $]],up=3), (406,4,[283 171 [157 $, 289 $, 372 $]],up=3), (412,4,[283 171 [157 $, 289 $, 372 $]],up=3), (424,4,[283 171 [157 $, 289 $, 372 $]],up=3), (427,4,[283 171 [157 $, 289 $, 372 $]],up=3), (437,4,[283 171 [157 $, 289 $, 372 $]],up=3), (453,4,[283 171 [157 $, 289 $, 372 $]],up=3), (279,4,[171 [157 $, 289 $, 372 $]],up=3), (172,4,[171 [157 $, 289 $, 372 $]],up=3), (292,4,[$],up=3), (375,4,[$],up=3), (325,4,[184 $],up=4), (330,4,[[190 $, 219 $]],up=4), (150,4,[$],up=4), (343,4,[214 $],up=4), (334,4,[[222 $, 225 $]],up=4)],conflictingAlts={1, 4},dipsIntoOuterContext
+reportAmbiguity 127 135 False None [(556,1,[548 171 289 416 283 171 157 144 $]), (560,1,[548 171 289 416 283 171 157 144 $]), (564,1,[548 171 289 416 283 171 157 144 $]), (910,1,[[766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (950,1,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (956,1,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (961,1,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (966,1,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (1057,1,[981 917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (968,1,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (969,1,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (970,1,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (1064,1,[1063 981 917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (1060,1,[981 917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (1061,1,[981 917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (974,1,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (975,1,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (920,1,[[766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (581,1,[548 171 289 416 283 171 157 144 $]), (867,1,[807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]), (809,1,[[712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]), (726,1,[712 585 548 171 289 416 283 171 157 144 $]), (588,1,[548 171 289 416 283 171 157 144 $]), (615,1,[548 171 289 416 283 171 157 144 $]), (617,1,[548 171 289 416 283 171 157 144 $]), (618,1,[548 171 289 416 283 171 157 144 $]), (619,1,[548 171 289 416 283 171 157 144 $]), (620,1,[548 171 289 416 283 171 157 144 $]), (624,1,[548 171 289 416 283 171 157 144 $]), (1066,1,[708 548 171 289 416 283 171 157 144 $]), (641,1,[548 171 289 416 283 171 157 144 $]), (643,1,[548 171 289 416 283 171 157 144 $]), (667,1,[548 171 289 416 283 171 157 144 $]), (677,1,[548 171 289 416 283 171 157 144 $]), (689,1,[548 171 289 416 283 171 157 144 $]), (696,1,[548 171 289 416 283 171 157 144 $]), (178,1,[171 289 416 283 171 157 144 $]), (191,1,[171 289 416 283 171 157 144 $]), (194,1,[171 289 416 283 171 157 144 $]), (199,1,[171 289 416 283 171 157 144 $]), (202,1,[171 289 416 283 171 157 144 $]), (209,1,[171 289 416 283 171 157 144 $]), (226,1,[171 289 416 283 171 157 144 $]), (229,1,[171 289 416 283 171 157 144 $]), (314,1,[[243 171 289 416 283 171 157 144 $, 253 171 289 416 283 171 157 144 $]]), (377,1,[250 171 289 416 283 171 157 144 $]), (389,1,[250 171 289 416 283 171 157 144 $]), (392,1,[250 171 289 416 283 171 157 144 $]), (362,1,[283 171 289 416 283 171 157 144 $]), (365,1,[283 171 289 416 283 171 157 144 $]), (417,1,[[260 171 289 416 283 171 157 144 $, 411 283 171 289 416 283 171 157 144 $]]), (261,1,[171 289 416 283 171 157 144 $]), (268,1,[171 289 416 283 171 157 144 $]), (271,1,[171 289 416 283 171 157 144 $]), (473,1,[283 171 289 416 283 171 157 144 $]), (406,1,[283 171 289 416 283 171 157 144 $]), (412,1,[283 171 289 416 283 171 157 144 $]), (424,1,[283 171 289 416 283 171 157 144 $]), (427,1,[283 171 289 416 283 171 157 144 $]), (437,1,[283 171 289 416 283 171 157 144 $]), (453,1,[283 171 289 416 283 171 157 144 $]), (279,1,[171 289 416 283 171 157 144 $]), (172,1,[171 289 416 283 171 157 144 $]), (292,1,[416 283 171 157 144 $]), (556,4,[548 171 289 416 283 171 157 144 $]), (560,4,[548 171 289 416 283 171 157 144 $]), (564,4,[548 171 289 416 283 171 157 144 $]), (910,4,[[766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (950,4,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (956,4,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (961,4,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (966,4,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (1057,4,[981 917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (968,4,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (969,4,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (970,4,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (1064,4,[1063 981 917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (1060,4,[981 917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (1061,4,[981 917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (974,4,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (975,4,[917 [766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (920,4,[[766 571 548 171 289 416 283 171 157 144 $, 884 870 807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]]), (581,4,[548 171 289 416 283 171 157 144 $]), (867,4,[807 [712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]), (809,4,[[712 585 548 171 289 416 283 171 157 144 $, 1040 725 585 548 171 289 416 283 171 157 144 $]]), (726,4,[712 585 548 171 289 416 283 171 157 144 $]), (588,4,[548 171 289 416 283 171 157 144 $]), (615,4,[548 171 289 416 283 171 157 144 $]), (617,4,[548 171 289 416 283 171 157 144 $]), (618,4,[548 171 289 416 283 171 157 144 $]), (619,4,[548 171 289 416 283 171 157 144 $]), (620,4,[548 171 289 416 283 171 157 144 $]), (624,4,[548 171 289 416 283 171 157 144 $]), (1066,4,[708 548 171 289 416 283 171 157 144 $]), (641,4,[548 171 289 416 283 171 157 144 $]), (643,4,[548 171 289 416 283 171 157 144 $]), (667,4,[548 171 289 416 283 171 157 144 $]), (677,4,[548 171 289 416 283 171 157 144 $]), (689,4,[548 171 289 416 283 171 157 144 $]), (696,4,[548 171 289 416 283 171 157 144 $]), (178,4,[171 289 416 283 171 157 144 $]), (191,4,[171 289 416 283 171 157 144 $]), (194,4,[171 289 416 283 171 157 144 $]), (199,4,[171 289 416 283 171 157 144 $]), (202,4,[171 289 416 283 171 157 144 $]), (209,4,[171 289 416 283 171 157 144 $]), (226,4,[171 289 416 283 171 157 144 $]), (229,4,[171 289 416 283 171 157 144 $]), (314,4,[[243 171 289 416 283 171 157 144 $, 253 171 289 416 283 171 157 144 $]]), (377,4,[250 171 289 416 283 171 157 144 $]), (389,4,[250 171 289 416 283 171 157 144 $]), (392,4,[250 171 289 416 283 171 157 144 $]), (362,4,[283 171 289 416 283 171 157 144 $]), (365,4,[283 171 289 416 283 171 157 144 $]), (417,4,[[260 171 289 416 283 171 157 144 $, 411 283 171 289 416 283 171 157 144 $]]), (261,4,[171 289 416 283 171 157 144 $]), (268,4,[171 289 416 283 171 157 144 $]), (271,4,[171 289 416 283 171 157 144 $]), (473,4,[283 171 289 416 283 171 157 144 $]), (406,4,[283 171 289 416 283 171 157 144 $]), (412,4,[283 171 289 416 283 171 157 144 $]), (424,4,[283 171 289 416 283 171 157 144 $]), (427,4,[283 171 289 416 283 171 157 144 $]), (437,4,[283 171 289 416 283 171 157 144 $]), (453,4,[283 171 289 416 283 171 157 144 $]), (279,4,[171 289 416 283 171 157 144 $]), (172,4,[171 289 416 283 171 157 144 $]), (292,4,[416 283 171 157 144 $])]
+calling BuildAstVisitor() dir ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'aggregateResult', 'defaultResult', 'file_name', 'file_path', 'get_py_str', 'input_stream', 'is_list_of_type', 'log_childtree', 'log_symbol', 'shouldVisitNextChild', 'transform_code', 'visit', 'visitAction_stmt', 'visitActiondef', 'visitAny_assign_stmt', 'visitAny_stmt', 'visitArglist', 'visitArgs', 'visitArgument', 'visitArguments', 'visitAssert_stmt', 'visitAssertion_stmt', 'visitAssertiondef', 'visitAssign_part', 'visitAtom', 'visitBreak_stmt', 'visitChildren', 'visitClass_or_func_def_stmt', 'visitClassdef', 'visitComp_for', 'visitComp_iter', 'visitComparison', 'visitCompose_entry', 'visitCompose_stmt', 'visitComposedef', 'visitContinue_stmt', 'visitDecorator', 'visitDef_parameter', 'visitDef_parameters', 'visitDel_stmt', 'visitDictorsetmaker', 'visitDotted_as_name', 'visitDotted_as_names', 'visitDotted_name', 'visitElif_clause', 'visitElse_clause', 'visitErrorNode', 'visitEval_input', 'visitExcept_clause', 'visitExec_stmt', 'visitExpr', 'visitExpr_stmt', 'visitExprlist', 'visitFairness', 'visitFile_input', 'visitFinally_clause', 'visitFlow_stmt', 'visitFor_stmt', 'visitFrom_stmt', 'visitFunc_call_stmt', 'visitFuncdef', 'visitFunction_stmt', 'visitFunctiondef', 'visitGlobal_stmt', 'visitIf_stmt', 'visitImport_as_name', 'visitImport_as_names', 'visitImport_stmt', 'visitInit_stmt', 'visitInteger', 'visitInvariant_stmt', 'visitInvariants_stmt', 'visitInvariants_suite', 'visitKwargs', 'visitLabeled_stmt', 'visitLogical_test', 'visitName', 'visitNamed_parameter', 'visitNonlocal_stmt', 'visitNumber', 'visitPass_stmt', 'visitPrint_stmt', 'visitRaise_stmt', 'visitRefine_stmt', 'visitRefinedef', 'visitRequire_stmt', 'visitReturn_stmt', 'visitRole_def_stmt', 'visitRoledef', 'visitRoot', 'visitSimple_stmt', 'visitSingle_input', 'visitSliceop', 'visitStar_expr', 'visitStmt', 'visitSubscript', 'visitSubscriptlist', 'visitSuite', 'visitTerminal', 'visitTest', 'visitTestlist', 'visitTestlist_comp', 'visitTestlist_star_expr', 'visitTrailer', 'visitTry_stmt', 'visitTypedargslist', 'visitVarargs', 'visitVarargslist', 'visitVardef_parameter', 'visitVardef_parameters', 'visitVarkwargs', 'visitWhile_stmt', 'visitWith_item', 'visitWith_stmt', 'visitYield_arg', 'visitYield_expr', 'visitYield_stmt']
+
+
+visitFile_input File_inputContext
+visitFile_input MAX=3roleCounter:actionInit:self.value=0atomicactionInc:self.value=min(self.value+1,MAX)atomicactionGet:returnself.valueatomicactionDec:self.value=max(self.value-1,0)actionInit:counter=Counter()alwaysassertionWithinRange:returncounter.valueinrange(0,MAX+1)
+visitFile_input ['EMPTY', 'LINE_BREAK', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'start', 'stmt', 'stop', 'toString', 'toStringTree']
+visitFile_input children count 4
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitFile_input child index 0 MAX=3 StmtContext
+
+
+visitStmt StmtContext
+visitStmt child MAX=3
+visitExpr_stmt full text
+ MAX = 3
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+aggregate: None nextResult: source_info {
+  start {
+    line: 1
+    column: 1
+  }
+  end {
+    line: 1
+    column: 7
+  }
+}
+code: "MAX = 3"
+
+aggregate: source_info {
+  start {
+    line: 1
+    column: 1
+  }
+  end {
+    line: 1
+    column: 7
+  }
+}
+code: "MAX = 3"
+ nextResult: None
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitFile_input child index 1 roleCounter:actionInit:self.value=0atomicactionInc:self.value=min(self.value+1,MAX)atomicactionGet:returnself.valueatomicactionDec:self.value=max(self.value-1,0) StmtContext
+
+
+visitStmt StmtContext
+visitStmt child roleCounter:actionInit:self.value=0atomicactionInc:self.value=min(self.value+1,MAX)atomicactionGet:returnself.valueatomicactionDec:self.value=max(self.value-1,0)
+
+
+visitRole_def_stmt Role_def_stmtContext
+visitRole_def_stmt roleCounter:actionInit:self.value=0atomicactionInc:self.value=min(self.value+1,MAX)atomicactionGet:returnself.valueatomicactionDec:self.value=max(self.value-1,0)
+visitRole_def_stmt ['EMPTY', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'decorator', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'parentCtx', 'parser', 'removeLastChild', 'roledef', 'setAltNumber', 'start', 'stop', 'toString', 'toStringTree']
+visitRole_def_stmt children count 1
+visitRole_def_stmt full text
+ role Counter:
+    action Init:
+        self.value = 0
+    atomic action Inc:
+        self.value = min(self.value + 1, MAX)
+    atomic action Get:
+        return self.value
+    atomic action Dec:
+        self.value = max(self.value - 1, 0)
+
+
+visitRole_def_stmt child index 0 roleCounter:actionInit:self.value=0atomicactionInc:self.value=min(self.value+1,MAX)atomicactionGet:returnself.valueatomicactionDec:self.value=max(self.value-1,0)
+
+
+visitRoledef RoledefContext
+visitRoledef roleCounter:actionInit:self.value=0atomicactionInc:self.value=min(self.value+1,MAX)atomicactionGet:returnself.valueatomicactionDec:self.value=max(self.value-1,0)
+visitRoledef ['COLON', 'DEDENT', 'EMPTY', 'INDENT', 'LINE_BREAK', 'ROLE', 'SYMMETRIC', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'name', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'start', 'stmt', 'stop', 'toString', 'toStringTree']
+visitRoledef children count 10
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitRoledef child index 0 role
+log_symbol SymbolName ROLE
+log_symbol getSymbol TerminalNodeImpl [@7,8:11='role',<53>,2:0] ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'getChild', 'getChildCount', 'getParent', 'getPayload', 'getSourceInterval', 'getSymbol', 'getText', 'parentCtx', 'symbol']
+log_symbol symbol dir ['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+log_symbol symbol type 53
+
+visitRoledef child index 1 Counter
+
+visitRoledef child index 2 :
+log_symbol SymbolName COLON
+log_symbol getSymbol TerminalNodeImpl [@10,20:20=':',<66>,2:12] ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'getChild', 'getChildCount', 'getParent', 'getPayload', 'getSourceInterval', 'getSymbol', 'getText', 'parentCtx', 'symbol']
+log_symbol symbol dir ['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+log_symbol symbol type 66
+
+visitRoledef child index 3 
+
+visitRoledef child index 4 
+log_symbol SymbolName INDENT
+log_symbol getSymbol TerminalNodeImpl [@13,26:25='',<1>,3:4] ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'getChild', 'getChildCount', 'getParent', 'getPayload', 'getSourceInterval', 'getSymbol', 'getText', 'parentCtx', 'symbol']
+log_symbol symbol dir ['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+log_symbol symbol type 1
+
+visitRoledef child index 5 actionInit:self.value=0
+
+
+visitStmt StmtContext
+visitStmt child actionInit:self.value=0
+
+
+visitActiondef ActiondefContext
+visitActiondef actionInit:self.value=0
+visitActiondef ['ACTION', 'ATOMIC', 'COLON', 'EMPTY', 'ONEOF', 'PARALLEL', 'SERIAL', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'fairness', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'name', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'start', 'stop', 'suite', 'toString', 'toStringTree']
+visitActiondef children count 4
+visitActiondef full text
+ action Init:
+        self.value = 0
+    
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitActiondef child index 0 action
+
+visitActiondef child index 1 Init
+
+visitActiondef child index 2 :
+
+visitActiondef child index 3 self.value=0
+log_childtree child SuiteContext self.value=0
+log_childtree child ['DEDENT', 'EMPTY', 'INDENT', 'LINE_BREAK', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'simple_stmt', 'start', 'stmt', 'stop', 'toString', 'toStringTree']
+log_childtree child 4
+log_childtree child 7
+log_childtree child [415 275 168 370 257 168 155 141]
+log_childtree child payload [415 275 168 370 257 168 155 141]
+log_childtree child full text
+ self.value = 0
+    
+---
+
+
+visitSuite SuiteContext
+visitSuite
+ self.value=0
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitSuite child index 0 
+
+visitSuite child index 1 
+
+visitSuite child index 2 self.value=0
+log_childtree child StmtContext self.value=0
+log_childtree child ['EMPTY', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'compound_stmt', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'labeled_stmt', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'simple_stmt', 'start', 'stop', 'toString', 'toStringTree']
+log_childtree child 1
+log_childtree child 4
+log_childtree child [287 415 275 168 370 257 168 155 141]
+log_childtree child payload [287 415 275 168 370 257 168 155 141]
+log_childtree child full text
+ self.value = 0
+    
+---
+
+
+visitStmt StmtContext
+visitStmt child self.value=0
+visitExpr_stmt full text
+ self.value = 0
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+aggregate: None nextResult: source_info {
+  start {
+    line: 4
+    column: 9
+  }
+  end {
+    line: 4
+    column: 22
+  }
+}
+code: "self.value = 0"
+
+aggregate: source_info {
+  start {
+    line: 4
+    column: 9
+  }
+  end {
+    line: 4
+    column: 22
+  }
+}
+code: "self.value = 0"
+ nextResult: None
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitSuite child index 3 
+log_symbol SymbolName DEDENT
+log_symbol getSymbol TerminalNodeImpl [@32,66:65='',<2>,5:4] ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'getChild', 'getChildCount', 'getParent', 'getPayload', 'getSourceInterval', 'getSymbol', 'getText', 'parentCtx', 'symbol']
+log_symbol symbol dir ['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+log_symbol symbol type 2
+visitSuite block source_info {
+  start {
+    line: 4
+    column: 9
+  }
+  end {
+    line: 5
+    column: 4
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 4
+      column: 9
+    }
+    end {
+      line: 5
+      column: 4
+    }
+  }
+  py_stmt {
+    source_info {
+      start {
+        line: 4
+        column: 9
+      }
+      end {
+        line: 4
+        column: 22
+      }
+    }
+    code: "self.value = 0"
+  }
+}
+
+visitActiondef childProto source_info {
+  start {
+    line: 4
+    column: 9
+  }
+  end {
+    line: 5
+    column: 4
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 4
+      column: 9
+    }
+    end {
+      line: 5
+      column: 4
+    }
+  }
+  py_stmt {
+    source_info {
+      start {
+        line: 4
+        column: 9
+      }
+      end {
+        line: 4
+        column: 22
+      }
+    }
+    code: "self.value = 0"
+  }
+}
+
+action.fairness level: FAIRNESS_LEVEL_STRONG
+
+action.fairness.level 3
+action source_info {
+  start {
+    line: 3
+    column: 5
+  }
+  end {
+    line: 5
+    column: 4
+  }
+}
+name: "Init"
+flow: FLOW_ATOMIC
+fairness {
+  level: FAIRNESS_LEVEL_STRONG
+}
+block {
+  source_info {
+    start {
+      line: 4
+      column: 9
+    }
+    end {
+      line: 5
+      column: 4
+    }
+  }
+  flow: FLOW_ATOMIC
+  stmts {
+    source_info {
+      start {
+        line: 4
+        column: 9
+      }
+      end {
+        line: 5
+        column: 4
+      }
+    }
+    py_stmt {
+      source_info {
+        start {
+          line: 4
+          column: 9
+        }
+        end {
+          line: 4
+          column: 22
+        }
+      }
+      code: "self.value = 0"
+    }
+  }
+}
+
+aggregate: None nextResult: source_info {
+  start {
+    line: 3
+    column: 5
+  }
+  end {
+    line: 5
+    column: 4
+  }
+}
+name: "Init"
+flow: FLOW_ATOMIC
+fairness {
+  level: FAIRNESS_LEVEL_STRONG
+}
+block {
+  source_info {
+    start {
+      line: 4
+      column: 9
+    }
+    end {
+      line: 5
+      column: 4
+    }
+  }
+  flow: FLOW_ATOMIC
+  stmts {
+    source_info {
+      start {
+        line: 4
+        column: 9
+      }
+      end {
+        line: 5
+        column: 4
+      }
+    }
+    py_stmt {
+      source_info {
+        start {
+          line: 4
+          column: 9
+        }
+        end {
+          line: 4
+          column: 22
+        }
+      }
+      code: "self.value = 0"
+    }
+  }
+}
+
+
+visitRoledef child index 6 atomicactionInc:self.value=min(self.value+1,MAX)
+
+
+visitStmt StmtContext
+visitStmt child atomicactionInc:self.value=min(self.value+1,MAX)
+
+
+visitActiondef ActiondefContext
+visitActiondef atomicactionInc:self.value=min(self.value+1,MAX)
+visitActiondef ['ACTION', 'ATOMIC', 'COLON', 'EMPTY', 'ONEOF', 'PARALLEL', 'SERIAL', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'fairness', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'name', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'start', 'stop', 'suite', 'toString', 'toStringTree']
+visitActiondef children count 5
+visitActiondef full text
+ atomic action Inc:
+        self.value = min(self.value + 1, MAX)
+    
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitActiondef child index 0 atomic
+
+visitActiondef child index 1 action
+
+visitActiondef child index 2 Inc
+
+visitActiondef child index 3 :
+
+visitActiondef child index 4 self.value=min(self.value+1,MAX)
+log_childtree child SuiteContext self.value=min(self.value+1,MAX)
+log_childtree child ['DEDENT', 'EMPTY', 'INDENT', 'LINE_BREAK', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'simple_stmt', 'start', 'stmt', 'stop', 'toString', 'toStringTree']
+log_childtree child 4
+log_childtree child 7
+log_childtree child [415 275 168 370 257 168 155 141]
+log_childtree child payload [415 275 168 370 257 168 155 141]
+log_childtree child full text
+ self.value = min(self.value + 1, MAX)
+    
+---
+
+
+visitSuite SuiteContext
+visitSuite
+ self.value=min(self.value+1,MAX)
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitSuite child index 0 
+
+visitSuite child index 1 
+
+visitSuite child index 2 self.value=min(self.value+1,MAX)
+log_childtree child StmtContext self.value=min(self.value+1,MAX)
+log_childtree child ['EMPTY', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'compound_stmt', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'labeled_stmt', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'simple_stmt', 'start', 'stop', 'toString', 'toStringTree']
+log_childtree child 1
+log_childtree child 4
+log_childtree child [287 415 275 168 370 257 168 155 141]
+log_childtree child payload [287 415 275 168 370 257 168 155 141]
+log_childtree child full text
+ self.value = min(self.value + 1, MAX)
+    
+---
+
+
+visitStmt StmtContext
+visitStmt child self.value=min(self.value+1,MAX)
+visitExpr_stmt full text
+ self.value = min(self.value + 1, MAX)
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+aggregate: None nextResult: source_info {
+  start {
+    line: 6
+    column: 9
+  }
+  end {
+    line: 6
+    column: 45
+  }
+}
+code: "self.value = min(self.value + 1, MAX)"
+
+aggregate: source_info {
+  start {
+    line: 6
+    column: 9
+  }
+  end {
+    line: 6
+    column: 45
+  }
+}
+code: "self.value = min(self.value + 1, MAX)"
+ nextResult: None
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitSuite child index 3 
+log_symbol SymbolName DEDENT
+log_symbol getSymbol TerminalNodeImpl [@65,135:134='',<2>,7:4] ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'getChild', 'getChildCount', 'getParent', 'getPayload', 'getSourceInterval', 'getSymbol', 'getText', 'parentCtx', 'symbol']
+log_symbol symbol dir ['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+log_symbol symbol type 2
+visitSuite block source_info {
+  start {
+    line: 6
+    column: 9
+  }
+  end {
+    line: 7
+    column: 4
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 6
+      column: 9
+    }
+    end {
+      line: 7
+      column: 4
+    }
+  }
+  py_stmt {
+    source_info {
+      start {
+        line: 6
+        column: 9
+      }
+      end {
+        line: 6
+        column: 45
+      }
+    }
+    code: "self.value = min(self.value + 1, MAX)"
+  }
+}
+
+visitActiondef childProto source_info {
+  start {
+    line: 6
+    column: 9
+  }
+  end {
+    line: 7
+    column: 4
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 6
+      column: 9
+    }
+    end {
+      line: 7
+      column: 4
+    }
+  }
+  py_stmt {
+    source_info {
+      start {
+        line: 6
+        column: 9
+      }
+      end {
+        line: 6
+        column: 45
+      }
+    }
+    code: "self.value = min(self.value + 1, MAX)"
+  }
+}
+
+action.fairness 
+action.fairness.level 0
+visitActiondef action.fairness not set
+action source_info {
+  start {
+    line: 5
+    column: 5
+  }
+  end {
+    line: 7
+    column: 4
+  }
+}
+name: "Inc"
+flow: FLOW_ATOMIC
+fairness {
+  level: FAIRNESS_LEVEL_UNFAIR
+}
+block {
+  source_info {
+    start {
+      line: 6
+      column: 9
+    }
+    end {
+      line: 7
+      column: 4
+    }
+  }
+  flow: FLOW_ATOMIC
+  stmts {
+    source_info {
+      start {
+        line: 6
+        column: 9
+      }
+      end {
+        line: 7
+        column: 4
+      }
+    }
+    py_stmt {
+      source_info {
+        start {
+          line: 6
+          column: 9
+        }
+        end {
+          line: 6
+          column: 45
+        }
+      }
+      code: "self.value = min(self.value + 1, MAX)"
+    }
+  }
+}
+
+aggregate: None nextResult: source_info {
+  start {
+    line: 5
+    column: 5
+  }
+  end {
+    line: 7
+    column: 4
+  }
+}
+name: "Inc"
+flow: FLOW_ATOMIC
+fairness {
+  level: FAIRNESS_LEVEL_UNFAIR
+}
+block {
+  source_info {
+    start {
+      line: 6
+      column: 9
+    }
+    end {
+      line: 7
+      column: 4
+    }
+  }
+  flow: FLOW_ATOMIC
+  stmts {
+    source_info {
+      start {
+        line: 6
+        column: 9
+      }
+      end {
+        line: 7
+        column: 4
+      }
+    }
+    py_stmt {
+      source_info {
+        start {
+          line: 6
+          column: 9
+        }
+        end {
+          line: 6
+          column: 45
+        }
+      }
+      code: "self.value = min(self.value + 1, MAX)"
+    }
+  }
+}
+
+
+visitRoledef child index 7 atomicactionGet:returnself.value
+
+
+visitStmt StmtContext
+visitStmt child atomicactionGet:returnself.value
+
+
+visitActiondef ActiondefContext
+visitActiondef atomicactionGet:returnself.value
+visitActiondef ['ACTION', 'ATOMIC', 'COLON', 'EMPTY', 'ONEOF', 'PARALLEL', 'SERIAL', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'fairness', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'name', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'start', 'stop', 'suite', 'toString', 'toStringTree']
+visitActiondef children count 5
+visitActiondef full text
+ atomic action Get:
+        return self.value
+    
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitActiondef child index 0 atomic
+
+visitActiondef child index 1 action
+
+visitActiondef child index 2 Get
+
+visitActiondef child index 3 :
+
+visitActiondef child index 4 returnself.value
+log_childtree child SuiteContext returnself.value
+log_childtree child ['DEDENT', 'EMPTY', 'INDENT', 'LINE_BREAK', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'simple_stmt', 'start', 'stmt', 'stop', 'toString', 'toStringTree']
+log_childtree child 4
+log_childtree child 7
+log_childtree child [415 275 168 370 257 168 155 141]
+log_childtree child payload [415 275 168 370 257 168 155 141]
+log_childtree child full text
+ return self.value
+    
+---
+
+
+visitSuite SuiteContext
+visitSuite
+ returnself.value
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitSuite child index 0 
+
+visitSuite child index 1 
+
+visitSuite child index 2 returnself.value
+log_childtree child StmtContext returnself.value
+log_childtree child ['EMPTY', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'compound_stmt', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'labeled_stmt', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'simple_stmt', 'start', 'stop', 'toString', 'toStringTree']
+log_childtree child 1
+log_childtree child 4
+log_childtree child [287 415 275 168 370 257 168 155 141]
+log_childtree child payload [287 415 275 168 370 257 168 155 141]
+log_childtree child full text
+ return self.value
+    
+---
+
+
+visitStmt StmtContext
+visitStmt child returnself.value
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitReturn_stmt child index 0 return
+log_symbol SymbolName RETURN
+log_symbol getSymbol TerminalNodeImpl [@77,162:167='return',<5>,8:8] ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'getChild', 'getChildCount', 'getParent', 'getPayload', 'getSourceInterval', 'getSymbol', 'getText', 'parentCtx', 'symbol']
+log_symbol symbol dir ['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+log_symbol symbol type 5
+
+visitReturn_stmt child index 1 self.value
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+aggregate: None nextResult: source_info {
+  start {
+    line: 8
+    column: 9
+  }
+  end {
+    line: 8
+    column: 25
+  }
+}
+py_expr: "self.value"
+expr {
+  source_info {
+    start {
+      line: 8
+      column: 16
+    }
+    end {
+      line: 8
+      column: 25
+    }
+  }
+  py_expr: "self.value"
+}
+
+aggregate: source_info {
+  start {
+    line: 8
+    column: 9
+  }
+  end {
+    line: 8
+    column: 25
+  }
+}
+py_expr: "self.value"
+expr {
+  source_info {
+    start {
+      line: 8
+      column: 16
+    }
+    end {
+      line: 8
+      column: 25
+    }
+  }
+  py_expr: "self.value"
+}
+ nextResult: None
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitSuite child index 3 
+log_symbol SymbolName DEDENT
+log_symbol getSymbol TerminalNodeImpl [@84,184:183='',<2>,9:4] ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'getChild', 'getChildCount', 'getParent', 'getPayload', 'getSourceInterval', 'getSymbol', 'getText', 'parentCtx', 'symbol']
+log_symbol symbol dir ['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+log_symbol symbol type 2
+visitSuite block source_info {
+  start {
+    line: 8
+    column: 9
+  }
+  end {
+    line: 9
+    column: 4
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 8
+      column: 9
+    }
+    end {
+      line: 9
+      column: 4
+    }
+  }
+  return_stmt {
+    source_info {
+      start {
+        line: 8
+        column: 9
+      }
+      end {
+        line: 8
+        column: 25
+      }
+    }
+    py_expr: "self.value"
+    expr {
+      source_info {
+        start {
+          line: 8
+          column: 16
+        }
+        end {
+          line: 8
+          column: 25
+        }
+      }
+      py_expr: "self.value"
+    }
+  }
+}
+
+visitActiondef childProto source_info {
+  start {
+    line: 8
+    column: 9
+  }
+  end {
+    line: 9
+    column: 4
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 8
+      column: 9
+    }
+    end {
+      line: 9
+      column: 4
+    }
+  }
+  return_stmt {
+    source_info {
+      start {
+        line: 8
+        column: 9
+      }
+      end {
+        line: 8
+        column: 25
+      }
+    }
+    py_expr: "self.value"
+    expr {
+      source_info {
+        start {
+          line: 8
+          column: 16
+        }
+        end {
+          line: 8
+          column: 25
+        }
+      }
+      py_expr: "self.value"
+    }
+  }
+}
+
+action.fairness 
+action.fairness.level 0
+visitActiondef action.fairness not set
+action source_info {
+  start {
+    line: 7
+    column: 5
+  }
+  end {
+    line: 9
+    column: 4
+  }
+}
+name: "Get"
+flow: FLOW_ATOMIC
+fairness {
+  level: FAIRNESS_LEVEL_UNFAIR
+}
+block {
+  source_info {
+    start {
+      line: 8
+      column: 9
+    }
+    end {
+      line: 9
+      column: 4
+    }
+  }
+  flow: FLOW_ATOMIC
+  stmts {
+    source_info {
+      start {
+        line: 8
+        column: 9
+      }
+      end {
+        line: 9
+        column: 4
+      }
+    }
+    return_stmt {
+      source_info {
+        start {
+          line: 8
+          column: 9
+        }
+        end {
+          line: 8
+          column: 25
+        }
+      }
+      py_expr: "self.value"
+      expr {
+        source_info {
+          start {
+            line: 8
+            column: 16
+          }
+          end {
+            line: 8
+            column: 25
+          }
+        }
+        py_expr: "self.value"
+      }
+    }
+  }
+}
+
+aggregate: None nextResult: source_info {
+  start {
+    line: 7
+    column: 5
+  }
+  end {
+    line: 9
+    column: 4
+  }
+}
+name: "Get"
+flow: FLOW_ATOMIC
+fairness {
+  level: FAIRNESS_LEVEL_UNFAIR
+}
+block {
+  source_info {
+    start {
+      line: 8
+      column: 9
+    }
+    end {
+      line: 9
+      column: 4
+    }
+  }
+  flow: FLOW_ATOMIC
+  stmts {
+    source_info {
+      start {
+        line: 8
+        column: 9
+      }
+      end {
+        line: 9
+        column: 4
+      }
+    }
+    return_stmt {
+      source_info {
+        start {
+          line: 8
+          column: 9
+        }
+        end {
+          line: 8
+          column: 25
+        }
+      }
+      py_expr: "self.value"
+      expr {
+        source_info {
+          start {
+            line: 8
+            column: 16
+          }
+          end {
+            line: 8
+            column: 25
+          }
+        }
+        py_expr: "self.value"
+      }
+    }
+  }
+}
+
+
+visitRoledef child index 8 atomicactionDec:self.value=max(self.value-1,0)
+
+
+visitStmt StmtContext
+visitStmt child atomicactionDec:self.value=max(self.value-1,0)
+
+
+visitActiondef ActiondefContext
+visitActiondef atomicactionDec:self.value=max(self.value-1,0)
+visitActiondef ['ACTION', 'ATOMIC', 'COLON', 'EMPTY', 'ONEOF', 'PARALLEL', 'SERIAL', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'fairness', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'name', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'start', 'stop', 'suite', 'toString', 'toStringTree']
+visitActiondef children count 5
+visitActiondef full text
+ atomic action Dec:
+        self.value = max(self.value - 1, 0)
+
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitActiondef child index 0 atomic
+
+visitActiondef child index 1 action
+
+visitActiondef child index 2 Dec
+
+visitActiondef child index 3 :
+
+visitActiondef child index 4 self.value=max(self.value-1,0)
+log_childtree child SuiteContext self.value=max(self.value-1,0)
+log_childtree child ['DEDENT', 'EMPTY', 'INDENT', 'LINE_BREAK', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'simple_stmt', 'start', 'stmt', 'stop', 'toString', 'toStringTree']
+log_childtree child 4
+log_childtree child 7
+log_childtree child [415 275 168 370 257 168 155 141]
+log_childtree child payload [415 275 168 370 257 168 155 141]
+log_childtree child full text
+ self.value = max(self.value - 1, 0)
+
+---
+
+
+visitSuite SuiteContext
+visitSuite
+ self.value=max(self.value-1,0)
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitSuite child index 0 
+
+visitSuite child index 1 
+
+visitSuite child index 2 self.value=max(self.value-1,0)
+log_childtree child StmtContext self.value=max(self.value-1,0)
+log_childtree child ['EMPTY', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'compound_stmt', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'labeled_stmt', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'simple_stmt', 'start', 'stop', 'toString', 'toStringTree']
+log_childtree child 1
+log_childtree child 4
+log_childtree child [287 415 275 168 370 257 168 155 141]
+log_childtree child payload [287 415 275 168 370 257 168 155 141]
+log_childtree child full text
+ self.value = max(self.value - 1, 0)
+
+---
+
+
+visitStmt StmtContext
+visitStmt child self.value=max(self.value-1,0)
+visitExpr_stmt full text
+ self.value = max(self.value - 1, 0)
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+aggregate: None nextResult: source_info {
+  start {
+    line: 10
+    column: 9
+  }
+  end {
+    line: 10
+    column: 43
+  }
+}
+code: "self.value = max(self.value - 1, 0)"
+
+aggregate: source_info {
+  start {
+    line: 10
+    column: 9
+  }
+  end {
+    line: 10
+    column: 43
+  }
+}
+code: "self.value = max(self.value - 1, 0)"
+ nextResult: None
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitSuite child index 3 
+log_symbol SymbolName DEDENT
+log_symbol getSymbol TerminalNodeImpl [@117,247:246='',<2>,11:0] ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'getChild', 'getChildCount', 'getParent', 'getPayload', 'getSourceInterval', 'getSymbol', 'getText', 'parentCtx', 'symbol']
+log_symbol symbol dir ['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+log_symbol symbol type 2
+visitSuite block source_info {
+  start {
+    line: 10
+    column: 9
+  }
+  end {
+    line: 11
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 10
+      column: 9
+    }
+    end {
+      line: 11
+    }
+  }
+  py_stmt {
+    source_info {
+      start {
+        line: 10
+        column: 9
+      }
+      end {
+        line: 10
+        column: 43
+      }
+    }
+    code: "self.value = max(self.value - 1, 0)"
+  }
+}
+
+visitActiondef childProto source_info {
+  start {
+    line: 10
+    column: 9
+  }
+  end {
+    line: 11
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 10
+      column: 9
+    }
+    end {
+      line: 11
+    }
+  }
+  py_stmt {
+    source_info {
+      start {
+        line: 10
+        column: 9
+      }
+      end {
+        line: 10
+        column: 43
+      }
+    }
+    code: "self.value = max(self.value - 1, 0)"
+  }
+}
+
+action.fairness 
+action.fairness.level 0
+visitActiondef action.fairness not set
+action source_info {
+  start {
+    line: 9
+    column: 5
+  }
+  end {
+    line: 11
+  }
+}
+name: "Dec"
+flow: FLOW_ATOMIC
+fairness {
+  level: FAIRNESS_LEVEL_UNFAIR
+}
+block {
+  source_info {
+    start {
+      line: 10
+      column: 9
+    }
+    end {
+      line: 11
+    }
+  }
+  flow: FLOW_ATOMIC
+  stmts {
+    source_info {
+      start {
+        line: 10
+        column: 9
+      }
+      end {
+        line: 11
+      }
+    }
+    py_stmt {
+      source_info {
+        start {
+          line: 10
+          column: 9
+        }
+        end {
+          line: 10
+          column: 43
+        }
+      }
+      code: "self.value = max(self.value - 1, 0)"
+    }
+  }
+}
+
+aggregate: None nextResult: source_info {
+  start {
+    line: 9
+    column: 5
+  }
+  end {
+    line: 11
+  }
+}
+name: "Dec"
+flow: FLOW_ATOMIC
+fairness {
+  level: FAIRNESS_LEVEL_UNFAIR
+}
+block {
+  source_info {
+    start {
+      line: 10
+      column: 9
+    }
+    end {
+      line: 11
+    }
+  }
+  flow: FLOW_ATOMIC
+  stmts {
+    source_info {
+      start {
+        line: 10
+        column: 9
+      }
+      end {
+        line: 11
+      }
+    }
+    py_stmt {
+      source_info {
+        start {
+          line: 10
+          column: 9
+        }
+        end {
+          line: 10
+          column: 43
+        }
+      }
+      code: "self.value = max(self.value - 1, 0)"
+    }
+  }
+}
+
+
+visitRoledef child index 9 
+log_symbol SymbolName DEDENT
+log_symbol getSymbol TerminalNodeImpl [@118,247:246='',<2>,11:0] ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'getChild', 'getChildCount', 'getParent', 'getPayload', 'getSourceInterval', 'getSymbol', 'getText', 'parentCtx', 'symbol']
+log_symbol symbol dir ['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+log_symbol symbol type 2
+role source_info {
+  start {
+    line: 2
+    column: 1
+  }
+  end {
+    line: 11
+  }
+}
+name: "Counter"
+actions {
+  source_info {
+    start {
+      line: 3
+      column: 5
+    }
+    end {
+      line: 5
+      column: 4
+    }
+  }
+  name: "Init"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_STRONG
+  }
+  block {
+    source_info {
+      start {
+        line: 4
+        column: 9
+      }
+      end {
+        line: 5
+        column: 4
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 4
+          column: 9
+        }
+        end {
+          line: 5
+          column: 4
+        }
+      }
+      py_stmt {
+        source_info {
+          start {
+            line: 4
+            column: 9
+          }
+          end {
+            line: 4
+            column: 22
+          }
+        }
+        code: "self.value = 0"
+      }
+    }
+  }
+}
+actions {
+  source_info {
+    start {
+      line: 5
+      column: 5
+    }
+    end {
+      line: 7
+      column: 4
+    }
+  }
+  name: "Inc"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_UNFAIR
+  }
+  block {
+    source_info {
+      start {
+        line: 6
+        column: 9
+      }
+      end {
+        line: 7
+        column: 4
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 6
+          column: 9
+        }
+        end {
+          line: 7
+          column: 4
+        }
+      }
+      py_stmt {
+        source_info {
+          start {
+            line: 6
+            column: 9
+          }
+          end {
+            line: 6
+            column: 45
+          }
+        }
+        code: "self.value = min(self.value + 1, MAX)"
+      }
+    }
+  }
+}
+actions {
+  source_info {
+    start {
+      line: 7
+      column: 5
+    }
+    end {
+      line: 9
+      column: 4
+    }
+  }
+  name: "Get"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_UNFAIR
+  }
+  block {
+    source_info {
+      start {
+        line: 8
+        column: 9
+      }
+      end {
+        line: 9
+        column: 4
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 8
+          column: 9
+        }
+        end {
+          line: 9
+          column: 4
+        }
+      }
+      return_stmt {
+        source_info {
+          start {
+            line: 8
+            column: 9
+          }
+          end {
+            line: 8
+            column: 25
+          }
+        }
+        py_expr: "self.value"
+        expr {
+          source_info {
+            start {
+              line: 8
+              column: 16
+            }
+            end {
+              line: 8
+              column: 25
+            }
+          }
+          py_expr: "self.value"
+        }
+      }
+    }
+  }
+}
+actions {
+  source_info {
+    start {
+      line: 9
+      column: 5
+    }
+    end {
+      line: 11
+    }
+  }
+  name: "Dec"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_UNFAIR
+  }
+  block {
+    source_info {
+      start {
+        line: 10
+        column: 9
+      }
+      end {
+        line: 11
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 10
+          column: 9
+        }
+        end {
+          line: 11
+        }
+      }
+      py_stmt {
+        source_info {
+          start {
+            line: 10
+            column: 9
+          }
+          end {
+            line: 10
+            column: 43
+          }
+        }
+        code: "self.value = max(self.value - 1, 0)"
+      }
+    }
+  }
+}
+
+visitRole_def_stmt childProto source_info {
+  start {
+    line: 2
+    column: 1
+  }
+  end {
+    line: 11
+  }
+}
+name: "Counter"
+actions {
+  source_info {
+    start {
+      line: 3
+      column: 5
+    }
+    end {
+      line: 5
+      column: 4
+    }
+  }
+  name: "Init"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_STRONG
+  }
+  block {
+    source_info {
+      start {
+        line: 4
+        column: 9
+      }
+      end {
+        line: 5
+        column: 4
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 4
+          column: 9
+        }
+        end {
+          line: 5
+          column: 4
+        }
+      }
+      py_stmt {
+        source_info {
+          start {
+            line: 4
+            column: 9
+          }
+          end {
+            line: 4
+            column: 22
+          }
+        }
+        code: "self.value = 0"
+      }
+    }
+  }
+}
+actions {
+  source_info {
+    start {
+      line: 5
+      column: 5
+    }
+    end {
+      line: 7
+      column: 4
+    }
+  }
+  name: "Inc"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_UNFAIR
+  }
+  block {
+    source_info {
+      start {
+        line: 6
+        column: 9
+      }
+      end {
+        line: 7
+        column: 4
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 6
+          column: 9
+        }
+        end {
+          line: 7
+          column: 4
+        }
+      }
+      py_stmt {
+        source_info {
+          start {
+            line: 6
+            column: 9
+          }
+          end {
+            line: 6
+            column: 45
+          }
+        }
+        code: "self.value = min(self.value + 1, MAX)"
+      }
+    }
+  }
+}
+actions {
+  source_info {
+    start {
+      line: 7
+      column: 5
+    }
+    end {
+      line: 9
+      column: 4
+    }
+  }
+  name: "Get"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_UNFAIR
+  }
+  block {
+    source_info {
+      start {
+        line: 8
+        column: 9
+      }
+      end {
+        line: 9
+        column: 4
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 8
+          column: 9
+        }
+        end {
+          line: 9
+          column: 4
+        }
+      }
+      return_stmt {
+        source_info {
+          start {
+            line: 8
+            column: 9
+          }
+          end {
+            line: 8
+            column: 25
+          }
+        }
+        py_expr: "self.value"
+        expr {
+          source_info {
+            start {
+              line: 8
+              column: 16
+            }
+            end {
+              line: 8
+              column: 25
+            }
+          }
+          py_expr: "self.value"
+        }
+      }
+    }
+  }
+}
+actions {
+  source_info {
+    start {
+      line: 9
+      column: 5
+    }
+    end {
+      line: 11
+    }
+  }
+  name: "Dec"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_UNFAIR
+  }
+  block {
+    source_info {
+      start {
+        line: 10
+        column: 9
+      }
+      end {
+        line: 11
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 10
+          column: 9
+        }
+        end {
+          line: 11
+        }
+      }
+      py_stmt {
+        source_info {
+          start {
+            line: 10
+            column: 9
+          }
+          end {
+            line: 10
+            column: 43
+          }
+        }
+        code: "self.value = max(self.value - 1, 0)"
+      }
+    }
+  }
+}
+
+visitRole_def_stmt childProto is role source_info {
+  start {
+    line: 2
+    column: 1
+  }
+  end {
+    line: 11
+  }
+}
+name: "Counter"
+actions {
+  source_info {
+    start {
+      line: 3
+      column: 5
+    }
+    end {
+      line: 5
+      column: 4
+    }
+  }
+  name: "Init"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_STRONG
+  }
+  block {
+    source_info {
+      start {
+        line: 4
+        column: 9
+      }
+      end {
+        line: 5
+        column: 4
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 4
+          column: 9
+        }
+        end {
+          line: 5
+          column: 4
+        }
+      }
+      py_stmt {
+        source_info {
+          start {
+            line: 4
+            column: 9
+          }
+          end {
+            line: 4
+            column: 22
+          }
+        }
+        code: "self.value = 0"
+      }
+    }
+  }
+}
+actions {
+  source_info {
+    start {
+      line: 5
+      column: 5
+    }
+    end {
+      line: 7
+      column: 4
+    }
+  }
+  name: "Inc"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_UNFAIR
+  }
+  block {
+    source_info {
+      start {
+        line: 6
+        column: 9
+      }
+      end {
+        line: 7
+        column: 4
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 6
+          column: 9
+        }
+        end {
+          line: 7
+          column: 4
+        }
+      }
+      py_stmt {
+        source_info {
+          start {
+            line: 6
+            column: 9
+          }
+          end {
+            line: 6
+            column: 45
+          }
+        }
+        code: "self.value = min(self.value + 1, MAX)"
+      }
+    }
+  }
+}
+actions {
+  source_info {
+    start {
+      line: 7
+      column: 5
+    }
+    end {
+      line: 9
+      column: 4
+    }
+  }
+  name: "Get"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_UNFAIR
+  }
+  block {
+    source_info {
+      start {
+        line: 8
+        column: 9
+      }
+      end {
+        line: 9
+        column: 4
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 8
+          column: 9
+        }
+        end {
+          line: 9
+          column: 4
+        }
+      }
+      return_stmt {
+        source_info {
+          start {
+            line: 8
+            column: 9
+          }
+          end {
+            line: 8
+            column: 25
+          }
+        }
+        py_expr: "self.value"
+        expr {
+          source_info {
+            start {
+              line: 8
+              column: 16
+            }
+            end {
+              line: 8
+              column: 25
+            }
+          }
+          py_expr: "self.value"
+        }
+      }
+    }
+  }
+}
+actions {
+  source_info {
+    start {
+      line: 9
+      column: 5
+    }
+    end {
+      line: 11
+    }
+  }
+  name: "Dec"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_UNFAIR
+  }
+  block {
+    source_info {
+      start {
+        line: 10
+        column: 9
+      }
+      end {
+        line: 11
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 10
+          column: 9
+        }
+        end {
+          line: 11
+        }
+      }
+      py_stmt {
+        source_info {
+          start {
+            line: 10
+            column: 9
+          }
+          end {
+            line: 10
+            column: 43
+          }
+        }
+        code: "self.value = max(self.value - 1, 0)"
+      }
+    }
+  }
+}
+
+
+visitFile_input child index 2 actionInit:counter=Counter() StmtContext
+
+
+visitStmt StmtContext
+visitStmt child actionInit:counter=Counter()
+
+
+visitActiondef ActiondefContext
+visitActiondef actionInit:counter=Counter()
+visitActiondef ['ACTION', 'ATOMIC', 'COLON', 'EMPTY', 'ONEOF', 'PARALLEL', 'SERIAL', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'fairness', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'name', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'start', 'stop', 'suite', 'toString', 'toStringTree']
+visitActiondef children count 4
+visitActiondef full text
+ action Init:
+    counter = Counter()
+
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitActiondef child index 0 action
+
+visitActiondef child index 1 Init
+
+visitActiondef child index 2 :
+
+visitActiondef child index 3 counter=Counter()
+log_childtree child SuiteContext counter=Counter()
+log_childtree child ['DEDENT', 'EMPTY', 'INDENT', 'LINE_BREAK', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'simple_stmt', 'start', 'stmt', 'stop', 'toString', 'toStringTree']
+log_childtree child 4
+log_childtree child 7
+log_childtree child [415 275 168 155 141]
+log_childtree child payload [415 275 168 155 141]
+log_childtree child full text
+ counter = Counter()
+
+---
+
+
+visitSuite SuiteContext
+visitSuite
+ counter=Counter()
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitSuite child index 0 
+
+visitSuite child index 1 
+
+visitSuite child index 2 counter=Counter()
+log_childtree child StmtContext counter=Counter()
+log_childtree child ['EMPTY', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'compound_stmt', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'labeled_stmt', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'simple_stmt', 'start', 'stop', 'toString', 'toStringTree']
+log_childtree child 1
+log_childtree child 4
+log_childtree child [287 415 275 168 155 141]
+log_childtree child payload [287 415 275 168 155 141]
+log_childtree child full text
+ counter = Counter()
+
+---
+
+
+visitStmt StmtContext
+visitStmt child counter=Counter()
+
+
+visitFunc_call_stmt Func_call_stmtContext
+visitFunc_call_stmt counter=Counter()
+visitFunc_call_stmt ['ASSIGN', 'CLOSE_PAREN', 'DOT', 'EMPTY', 'NAME', 'OPEN_PAREN', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'arglist', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'start', 'stop', 'toString', 'toStringTree']
+visitFunc_call_stmt children count 5
+visitFunc_call_stmt full text
+ counter = Counter()
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitFunc_call_stmt child index 4 )
+
+visitFunc_call_stmt child index 3 (
+
+visitFunc_call_stmt child index 2 Counter
+
+visitFunc_call_stmt child index 1 =
+
+visitFunc_call_stmt child index 0 counter
+func_call source_info {
+  start {
+    line: 12
+    column: 5
+  }
+  end {
+    line: 12
+    column: 23
+  }
+}
+vars: "counter"
+name: "Counter"
+
+aggregate: None nextResult: source_info {
+  start {
+    line: 12
+    column: 5
+  }
+  end {
+    line: 12
+    column: 23
+  }
+}
+vars: "counter"
+name: "Counter"
+
+aggregate: source_info {
+  start {
+    line: 12
+    column: 5
+  }
+  end {
+    line: 12
+    column: 23
+  }
+}
+vars: "counter"
+name: "Counter"
+ nextResult: None
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitSuite child index 3 
+log_symbol SymbolName DEDENT
+log_symbol getSymbol TerminalNodeImpl [@136,284:283='',<2>,13:0] ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'getChild', 'getChildCount', 'getParent', 'getPayload', 'getSourceInterval', 'getSymbol', 'getText', 'parentCtx', 'symbol']
+log_symbol symbol dir ['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+log_symbol symbol type 2
+visitSuite block source_info {
+  start {
+    line: 12
+    column: 5
+  }
+  end {
+    line: 13
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 12
+      column: 5
+    }
+    end {
+      line: 13
+    }
+  }
+  call_stmt {
+    source_info {
+      start {
+        line: 12
+        column: 5
+      }
+      end {
+        line: 12
+        column: 23
+      }
+    }
+    vars: "counter"
+    name: "Counter"
+  }
+}
+
+visitActiondef childProto source_info {
+  start {
+    line: 12
+    column: 5
+  }
+  end {
+    line: 13
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 12
+      column: 5
+    }
+    end {
+      line: 13
+    }
+  }
+  call_stmt {
+    source_info {
+      start {
+        line: 12
+        column: 5
+      }
+      end {
+        line: 12
+        column: 23
+      }
+    }
+    vars: "counter"
+    name: "Counter"
+  }
+}
+
+action.fairness level: FAIRNESS_LEVEL_STRONG
+
+action.fairness.level 3
+action source_info {
+  start {
+    line: 11
+    column: 1
+  }
+  end {
+    line: 13
+  }
+}
+name: "Init"
+flow: FLOW_ATOMIC
+fairness {
+  level: FAIRNESS_LEVEL_STRONG
+}
+block {
+  source_info {
+    start {
+      line: 12
+      column: 5
+    }
+    end {
+      line: 13
+    }
+  }
+  flow: FLOW_ATOMIC
+  stmts {
+    source_info {
+      start {
+        line: 12
+        column: 5
+      }
+      end {
+        line: 13
+      }
+    }
+    call_stmt {
+      source_info {
+        start {
+          line: 12
+          column: 5
+        }
+        end {
+          line: 12
+          column: 23
+        }
+      }
+      vars: "counter"
+      name: "Counter"
+    }
+  }
+}
+
+aggregate: None nextResult: source_info {
+  start {
+    line: 11
+    column: 1
+  }
+  end {
+    line: 13
+  }
+}
+name: "Init"
+flow: FLOW_ATOMIC
+fairness {
+  level: FAIRNESS_LEVEL_STRONG
+}
+block {
+  source_info {
+    start {
+      line: 12
+      column: 5
+    }
+    end {
+      line: 13
+    }
+  }
+  flow: FLOW_ATOMIC
+  stmts {
+    source_info {
+      start {
+        line: 12
+        column: 5
+      }
+      end {
+        line: 13
+      }
+    }
+    call_stmt {
+      source_info {
+        start {
+          line: 12
+          column: 5
+        }
+        end {
+          line: 12
+          column: 23
+        }
+      }
+      vars: "counter"
+      name: "Counter"
+    }
+  }
+}
+
+
+visitFile_input child index 3 alwaysassertionWithinRange:returncounter.valueinrange(0,MAX+1) StmtContext
+
+
+visitStmt StmtContext
+visitStmt child alwaysassertionWithinRange:returncounter.valueinrange(0,MAX+1)
+
+
+visitAssertiondef AssertiondefContext
+visitAssertiondef alwaysassertionWithinRange:returncounter.valueinrange(0,MAX+1)
+visitAssertiondef ['ALWAYS', 'ASSERTION', 'CLOSE_PAREN', 'COLON', 'EMPTY', 'EVENTUALLY', 'EXISTS', 'OPEN_PAREN', 'TRANSITION', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'name', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'start', 'stop', 'suite', 'toString', 'toStringTree', 'typedargslist']
+visitAssertiondef children count 5
+visitAssertiondef full text
+ always assertion WithinRange:
+    return counter.value in range(0, MAX+1)
+
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitAssertiondef child index 0 always
+
+visitAssertiondef child index 1 assertion
+
+visitAssertiondef child index 2 WithinRange
+visitAssertiondef child start,stop [@141,301:311='WithinRange',<117>,13:17] [@141,301:311='WithinRange',<117>,13:17]
+
+visitAssertiondef child index 3 :
+
+visitAssertiondef child index 4 returncounter.valueinrange(0,MAX+1)
+visitAssertiondef child start,stop [@144,318:317='',<3>,14:4] [@166,358:357='',<2>,15:0]
+log_childtree child SuiteContext returncounter.valueinrange(0,MAX+1)
+log_childtree child ['DEDENT', 'EMPTY', 'INDENT', 'LINE_BREAK', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'simple_stmt', 'start', 'stmt', 'stop', 'toString', 'toStringTree']
+log_childtree child 4
+log_childtree child 7
+log_childtree child [488 274 168 155 141]
+log_childtree child payload [488 274 168 155 141]
+log_childtree child full text
+ return counter.value in range(0, MAX+1)
+
+---
+
+
+visitSuite SuiteContext
+visitSuite
+ returncounter.valueinrange(0,MAX+1)
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitSuite child index 0 
+
+visitSuite child index 1 
+
+visitSuite child index 2 returncounter.valueinrange(0,MAX+1)
+log_childtree child StmtContext returncounter.valueinrange(0,MAX+1)
+log_childtree child ['EMPTY', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'addChild', 'addErrorNode', 'addTokenNode', 'children', 'compound_stmt', 'copyFrom', 'depth', 'enterRule', 'exception', 'exitRule', 'getAltNumber', 'getChild', 'getChildCount', 'getChildren', 'getPayload', 'getRuleContext', 'getRuleIndex', 'getSourceInterval', 'getText', 'getToken', 'getTokens', 'getTypedRuleContext', 'getTypedRuleContexts', 'invokingState', 'isEmpty', 'labeled_stmt', 'parentCtx', 'parser', 'removeLastChild', 'setAltNumber', 'simple_stmt', 'start', 'stop', 'toString', 'toStringTree']
+log_childtree child 1
+log_childtree child 4
+log_childtree child [287 488 274 168 155 141]
+log_childtree child payload [287 488 274 168 155 141]
+log_childtree child full text
+ return counter.value in range(0, MAX+1)
+
+---
+
+
+visitStmt StmtContext
+visitStmt child returncounter.valueinrange(0,MAX+1)
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitReturn_stmt child index 0 return
+log_symbol SymbolName RETURN
+log_symbol getSymbol TerminalNodeImpl [@147,318:323='return',<5>,14:4] ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'getChild', 'getChildCount', 'getParent', 'getPayload', 'getSourceInterval', 'getSymbol', 'getText', 'parentCtx', 'symbol']
+log_symbol symbol dir ['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+log_symbol symbol type 5
+
+visitReturn_stmt child index 1 counter.valueinrange(0,MAX+1)
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+aggregate: None nextResult: source_info {
+  start {
+    line: 14
+    column: 5
+  }
+  end {
+    line: 14
+    column: 43
+  }
+}
+py_expr: "counter.value in range(0, MAX+1)"
+expr {
+  source_info {
+    start {
+      line: 14
+      column: 12
+    }
+    end {
+      line: 14
+      column: 43
+    }
+  }
+  py_expr: "counter.value in range(0, MAX+1)"
+}
+
+aggregate: source_info {
+  start {
+    line: 14
+    column: 5
+  }
+  end {
+    line: 14
+    column: 43
+  }
+}
+py_expr: "counter.value in range(0, MAX+1)"
+expr {
+  source_info {
+    start {
+      line: 14
+      column: 12
+    }
+    end {
+      line: 14
+      column: 43
+    }
+  }
+  py_expr: "counter.value in range(0, MAX+1)"
+}
+ nextResult: None
+['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+
+visitSuite child index 3 
+log_symbol SymbolName DEDENT
+log_symbol getSymbol TerminalNodeImpl [@166,358:357='',<2>,15:0] ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', 'accept', 'getChild', 'getChildCount', 'getParent', 'getPayload', 'getSourceInterval', 'getSymbol', 'getText', 'parentCtx', 'symbol']
+log_symbol symbol dir ['DEFAULT_CHANNEL', 'EMPTY_SOURCE', 'EOF', 'EPSILON', 'HIDDEN_CHANNEL', 'INVALID_TYPE', 'MIN_USER_TOKEN_TYPE', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_text', 'channel', 'clone', 'column', 'getInputStream', 'getTokenSource', 'line', 'source', 'start', 'stop', 'text', 'tokenIndex', 'type']
+log_symbol symbol type 2
+visitSuite block source_info {
+  start {
+    line: 14
+    column: 5
+  }
+  end {
+    line: 15
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 14
+      column: 5
+    }
+    end {
+      line: 15
+    }
+  }
+  return_stmt {
+    source_info {
+      start {
+        line: 14
+        column: 5
+      }
+      end {
+        line: 14
+        column: 43
+      }
+    }
+    py_expr: "counter.value in range(0, MAX+1)"
+    expr {
+      source_info {
+        start {
+          line: 14
+          column: 12
+        }
+        end {
+          line: 14
+          column: 43
+        }
+      }
+      py_expr: "counter.value in range(0, MAX+1)"
+    }
+  }
+}
+
+visitAssertiondef childProto source_info {
+  start {
+    line: 14
+    column: 5
+  }
+  end {
+    line: 15
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 14
+      column: 5
+    }
+    end {
+      line: 15
+    }
+  }
+  return_stmt {
+    source_info {
+      start {
+        line: 14
+        column: 5
+      }
+      end {
+        line: 14
+        column: 43
+      }
+    }
+    py_expr: "counter.value in range(0, MAX+1)"
+    expr {
+      source_info {
+        start {
+          line: 14
+          column: 12
+        }
+        end {
+          line: 14
+          column: 43
+        }
+      }
+      py_expr: "counter.value in range(0, MAX+1)"
+    }
+  }
+}
+
+assertion source_info {
+  start {
+    line: 13
+    column: 1
+  }
+  end {
+    line: 15
+  }
+}
+name: "WithinRange"
+temporal_operators: "always"
+block {
+  source_info {
+    start {
+      line: 14
+      column: 5
+    }
+    end {
+      line: 15
+    }
+  }
+  flow: FLOW_ATOMIC
+  stmts {
+    source_info {
+      start {
+        line: 14
+        column: 5
+      }
+      end {
+        line: 15
+      }
+    }
+    return_stmt {
+      source_info {
+        start {
+          line: 14
+          column: 5
+        }
+        end {
+          line: 14
+          column: 43
+        }
+      }
+      py_expr: "counter.value in range(0, MAX+1)"
+      expr {
+        source_info {
+          start {
+            line: 14
+            column: 12
+          }
+          end {
+            line: 14
+            column: 43
+          }
+        }
+        py_expr: "counter.value in range(0, MAX+1)"
+      }
+    }
+  }
+}
+py_code: "def WithinRange():\n    return counter.value in range(0, MAX+1)\n"
+
+aggregate: None nextResult: source_info {
+  start {
+    line: 13
+    column: 1
+  }
+  end {
+    line: 15
+  }
+}
+name: "WithinRange"
+temporal_operators: "always"
+block {
+  source_info {
+    start {
+      line: 14
+      column: 5
+    }
+    end {
+      line: 15
+    }
+  }
+  flow: FLOW_ATOMIC
+  stmts {
+    source_info {
+      start {
+        line: 14
+        column: 5
+      }
+      end {
+        line: 15
+      }
+    }
+    return_stmt {
+      source_info {
+        start {
+          line: 14
+          column: 5
+        }
+        end {
+          line: 14
+          column: 43
+        }
+      }
+      py_expr: "counter.value in range(0, MAX+1)"
+      expr {
+        source_info {
+          start {
+            line: 14
+            column: 12
+          }
+          end {
+            line: 14
+            column: 43
+          }
+        }
+        py_expr: "counter.value in range(0, MAX+1)"
+      }
+    }
+  }
+}
+py_code: "def WithinRange():\n    return counter.value in range(0, MAX+1)\n"
+
+file source_info {
+  file_name: "counter.fizz"
+  start {
+    line: 1
+    column: 1
+  }
+  end {
+    line: 15
+  }
+}
+invariants {
+  source_info {
+    start {
+      line: 13
+      column: 1
+    }
+    end {
+      line: 15
+    }
+  }
+  name: "WithinRange"
+  temporal_operators: "always"
+  block {
+    source_info {
+      start {
+        line: 14
+        column: 5
+      }
+      end {
+        line: 15
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 14
+          column: 5
+        }
+        end {
+          line: 15
+        }
+      }
+      return_stmt {
+        source_info {
+          start {
+            line: 14
+            column: 5
+          }
+          end {
+            line: 14
+            column: 43
+          }
+        }
+        py_expr: "counter.value in range(0, MAX+1)"
+        expr {
+          source_info {
+            start {
+              line: 14
+              column: 12
+            }
+            end {
+              line: 14
+              column: 43
+            }
+          }
+          py_expr: "counter.value in range(0, MAX+1)"
+        }
+      }
+    }
+  }
+  py_code: "def WithinRange():\n    return counter.value in range(0, MAX+1)\n"
+}
+actions {
+  source_info {
+    start {
+      line: 11
+      column: 1
+    }
+    end {
+      line: 13
+    }
+  }
+  name: "Init"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_STRONG
+  }
+  block {
+    source_info {
+      start {
+        line: 12
+        column: 5
+      }
+      end {
+        line: 13
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 12
+          column: 5
+        }
+        end {
+          line: 13
+        }
+      }
+      call_stmt {
+        source_info {
+          start {
+            line: 12
+            column: 5
+          }
+          end {
+            line: 12
+            column: 23
+          }
+        }
+        vars: "counter"
+        name: "Counter"
+      }
+    }
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 1
+      column: 1
+    }
+    end {
+      line: 2
+    }
+  }
+  py_stmt {
+    source_info {
+      start {
+        line: 1
+        column: 1
+      }
+      end {
+        line: 1
+        column: 7
+      }
+    }
+    code: "MAX = 3"
+  }
+}
+roles {
+  source_info {
+    start {
+      line: 2
+      column: 1
+    }
+    end {
+      line: 11
+    }
+  }
+  name: "Counter"
+  actions {
+    source_info {
+      start {
+        line: 3
+        column: 5
+      }
+      end {
+        line: 5
+        column: 4
+      }
+    }
+    name: "Init"
+    flow: FLOW_ATOMIC
+    fairness {
+      level: FAIRNESS_LEVEL_STRONG
+    }
+    block {
+      source_info {
+        start {
+          line: 4
+          column: 9
+        }
+        end {
+          line: 5
+          column: 4
+        }
+      }
+      flow: FLOW_ATOMIC
+      stmts {
+        source_info {
+          start {
+            line: 4
+            column: 9
+          }
+          end {
+            line: 5
+            column: 4
+          }
+        }
+        py_stmt {
+          source_info {
+            start {
+              line: 4
+              column: 9
+            }
+            end {
+              line: 4
+              column: 22
+            }
+          }
+          code: "self.value = 0"
+        }
+      }
+    }
+  }
+  actions {
+    source_info {
+      start {
+        line: 5
+        column: 5
+      }
+      end {
+        line: 7
+        column: 4
+      }
+    }
+    name: "Inc"
+    flow: FLOW_ATOMIC
+    fairness {
+      level: FAIRNESS_LEVEL_UNFAIR
+    }
+    block {
+      source_info {
+        start {
+          line: 6
+          column: 9
+        }
+        end {
+          line: 7
+          column: 4
+        }
+      }
+      flow: FLOW_ATOMIC
+      stmts {
+        source_info {
+          start {
+            line: 6
+            column: 9
+          }
+          end {
+            line: 7
+            column: 4
+          }
+        }
+        py_stmt {
+          source_info {
+            start {
+              line: 6
+              column: 9
+            }
+            end {
+              line: 6
+              column: 45
+            }
+          }
+          code: "self.value = min(self.value + 1, MAX)"
+        }
+      }
+    }
+  }
+  actions {
+    source_info {
+      start {
+        line: 7
+        column: 5
+      }
+      end {
+        line: 9
+        column: 4
+      }
+    }
+    name: "Get"
+    flow: FLOW_ATOMIC
+    fairness {
+      level: FAIRNESS_LEVEL_UNFAIR
+    }
+    block {
+      source_info {
+        start {
+          line: 8
+          column: 9
+        }
+        end {
+          line: 9
+          column: 4
+        }
+      }
+      flow: FLOW_ATOMIC
+      stmts {
+        source_info {
+          start {
+            line: 8
+            column: 9
+          }
+          end {
+            line: 9
+            column: 4
+          }
+        }
+        return_stmt {
+          source_info {
+            start {
+              line: 8
+              column: 9
+            }
+            end {
+              line: 8
+              column: 25
+            }
+          }
+          py_expr: "self.value"
+          expr {
+            source_info {
+              start {
+                line: 8
+                column: 16
+              }
+              end {
+                line: 8
+                column: 25
+              }
+            }
+            py_expr: "self.value"
+          }
+        }
+      }
+    }
+  }
+  actions {
+    source_info {
+      start {
+        line: 9
+        column: 5
+      }
+      end {
+        line: 11
+      }
+    }
+    name: "Dec"
+    flow: FLOW_ATOMIC
+    fairness {
+      level: FAIRNESS_LEVEL_UNFAIR
+    }
+    block {
+      source_info {
+        start {
+          line: 10
+          column: 9
+        }
+        end {
+          line: 11
+        }
+      }
+      flow: FLOW_ATOMIC
+      stmts {
+        source_info {
+          start {
+            line: 10
+            column: 9
+          }
+          end {
+            line: 11
+          }
+        }
+        py_stmt {
+          source_info {
+            start {
+              line: 10
+              column: 9
+            }
+            end {
+              line: 10
+              column: 43
+            }
+          }
+          code: "self.value = max(self.value - 1, 0)"
+        }
+      }
+    }
+  }
+}
+
+proto:
+ source_info {
+  file_name: "counter.fizz"
+  start {
+    line: 1
+    column: 1
+  }
+  end {
+    line: 15
+  }
+}
+invariants {
+  source_info {
+    start {
+      line: 13
+      column: 1
+    }
+    end {
+      line: 15
+    }
+  }
+  name: "WithinRange"
+  temporal_operators: "always"
+  block {
+    source_info {
+      start {
+        line: 14
+        column: 5
+      }
+      end {
+        line: 15
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 14
+          column: 5
+        }
+        end {
+          line: 15
+        }
+      }
+      return_stmt {
+        source_info {
+          start {
+            line: 14
+            column: 5
+          }
+          end {
+            line: 14
+            column: 43
+          }
+        }
+        py_expr: "counter.value in range(0, MAX+1)"
+        expr {
+          source_info {
+            start {
+              line: 14
+              column: 12
+            }
+            end {
+              line: 14
+              column: 43
+            }
+          }
+          py_expr: "counter.value in range(0, MAX+1)"
+        }
+      }
+    }
+  }
+  py_code: "def WithinRange():\n    return counter.value in range(0, MAX+1)\n"
+}
+actions {
+  source_info {
+    start {
+      line: 11
+      column: 1
+    }
+    end {
+      line: 13
+    }
+  }
+  name: "Init"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_STRONG
+  }
+  block {
+    source_info {
+      start {
+        line: 12
+        column: 5
+      }
+      end {
+        line: 13
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 12
+          column: 5
+        }
+        end {
+          line: 13
+        }
+      }
+      call_stmt {
+        source_info {
+          start {
+            line: 12
+            column: 5
+          }
+          end {
+            line: 12
+            column: 23
+          }
+        }
+        vars: "counter"
+        name: "Counter"
+      }
+    }
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 1
+      column: 1
+    }
+    end {
+      line: 2
+    }
+  }
+  py_stmt {
+    source_info {
+      start {
+        line: 1
+        column: 1
+      }
+      end {
+        line: 1
+        column: 7
+      }
+    }
+    code: "MAX = 3"
+  }
+}
+roles {
+  source_info {
+    start {
+      line: 2
+      column: 1
+    }
+    end {
+      line: 11
+    }
+  }
+  name: "Counter"
+  actions {
+    source_info {
+      start {
+        line: 3
+        column: 5
+      }
+      end {
+        line: 5
+        column: 4
+      }
+    }
+    name: "Init"
+    flow: FLOW_ATOMIC
+    fairness {
+      level: FAIRNESS_LEVEL_STRONG
+    }
+    block {
+      source_info {
+        start {
+          line: 4
+          column: 9
+        }
+        end {
+          line: 5
+          column: 4
+        }
+      }
+      flow: FLOW_ATOMIC
+      stmts {
+        source_info {
+          start {
+            line: 4
+            column: 9
+          }
+          end {
+            line: 5
+            column: 4
+          }
+        }
+        py_stmt {
+          source_info {
+            start {
+              line: 4
+              column: 9
+            }
+            end {
+              line: 4
+              column: 22
+            }
+          }
+          code: "self.value = 0"
+        }
+      }
+    }
+  }
+  actions {
+    source_info {
+      start {
+        line: 5
+        column: 5
+      }
+      end {
+        line: 7
+        column: 4
+      }
+    }
+    name: "Inc"
+    flow: FLOW_ATOMIC
+    fairness {
+      level: FAIRNESS_LEVEL_UNFAIR
+    }
+    block {
+      source_info {
+        start {
+          line: 6
+          column: 9
+        }
+        end {
+          line: 7
+          column: 4
+        }
+      }
+      flow: FLOW_ATOMIC
+      stmts {
+        source_info {
+          start {
+            line: 6
+            column: 9
+          }
+          end {
+            line: 7
+            column: 4
+          }
+        }
+        py_stmt {
+          source_info {
+            start {
+              line: 6
+              column: 9
+            }
+            end {
+              line: 6
+              column: 45
+            }
+          }
+          code: "self.value = min(self.value + 1, MAX)"
+        }
+      }
+    }
+  }
+  actions {
+    source_info {
+      start {
+        line: 7
+        column: 5
+      }
+      end {
+        line: 9
+        column: 4
+      }
+    }
+    name: "Get"
+    flow: FLOW_ATOMIC
+    fairness {
+      level: FAIRNESS_LEVEL_UNFAIR
+    }
+    block {
+      source_info {
+        start {
+          line: 8
+          column: 9
+        }
+        end {
+          line: 9
+          column: 4
+        }
+      }
+      flow: FLOW_ATOMIC
+      stmts {
+        source_info {
+          start {
+            line: 8
+            column: 9
+          }
+          end {
+            line: 9
+            column: 4
+          }
+        }
+        return_stmt {
+          source_info {
+            start {
+              line: 8
+              column: 9
+            }
+            end {
+              line: 8
+              column: 25
+            }
+          }
+          py_expr: "self.value"
+          expr {
+            source_info {
+              start {
+                line: 8
+                column: 16
+              }
+              end {
+                line: 8
+                column: 25
+              }
+            }
+            py_expr: "self.value"
+          }
+        }
+      }
+    }
+  }
+  actions {
+    source_info {
+      start {
+        line: 9
+        column: 5
+      }
+      end {
+        line: 11
+      }
+    }
+    name: "Dec"
+    flow: FLOW_ATOMIC
+    fairness {
+      level: FAIRNESS_LEVEL_UNFAIR
+    }
+    block {
+      source_info {
+        start {
+          line: 10
+          column: 9
+        }
+        end {
+          line: 11
+        }
+      }
+      flow: FLOW_ATOMIC
+      stmts {
+        source_info {
+          start {
+            line: 10
+            column: 9
+          }
+          end {
+            line: 11
+          }
+        }
+        py_stmt {
+          source_info {
+            start {
+              line: 10
+              column: 9
+            }
+            end {
+              line: 10
+              column: 43
+            }
+          }
+          code: "self.value = max(self.value - 1, 0)"
+        }
+      }
+    }
+  }
+}
+
+Parsed AST: source_info {
+  file_name: "counter.fizz"
+  start {
+    line: 1
+    column: 1
+  }
+  end {
+    line: 15
+  }
+}
+invariants {
+  source_info {
+    start {
+      line: 13
+      column: 1
+    }
+    end {
+      line: 15
+    }
+  }
+  name: "WithinRange"
+  temporal_operators: "always"
+  block {
+    source_info {
+      start {
+        line: 14
+        column: 5
+      }
+      end {
+        line: 15
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 14
+          column: 5
+        }
+        end {
+          line: 15
+        }
+      }
+      return_stmt {
+        source_info {
+          start {
+            line: 14
+            column: 5
+          }
+          end {
+            line: 14
+            column: 43
+          }
+        }
+        py_expr: "counter.value in range(0, MAX+1)"
+        expr {
+          source_info {
+            start {
+              line: 14
+              column: 12
+            }
+            end {
+              line: 14
+              column: 43
+            }
+          }
+          py_expr: "counter.value in range(0, MAX+1)"
+        }
+      }
+    }
+  }
+  py_code: "def WithinRange():\n    return counter.value in range(0, MAX+1)\n"
+}
+actions {
+  source_info {
+    start {
+      line: 11
+      column: 1
+    }
+    end {
+      line: 13
+    }
+  }
+  name: "Init"
+  flow: FLOW_ATOMIC
+  fairness {
+    level: FAIRNESS_LEVEL_STRONG
+  }
+  block {
+    source_info {
+      start {
+        line: 12
+        column: 5
+      }
+      end {
+        line: 13
+      }
+    }
+    flow: FLOW_ATOMIC
+    stmts {
+      source_info {
+        start {
+          line: 12
+          column: 5
+        }
+        end {
+          line: 13
+        }
+      }
+      call_stmt {
+        source_info {
+          start {
+            line: 12
+            column: 5
+          }
+          end {
+            line: 12
+            column: 23
+          }
+        }
+        vars: "counter"
+        name: "Counter"
+      }
+    }
+  }
+}
+stmts {
+  source_info {
+    start {
+      line: 1
+      column: 1
+    }
+    end {
+      line: 2
+    }
+  }
+  py_stmt {
+    source_info {
+      start {
+        line: 1
+        column: 1
+      }
+      end {
+        line: 1
+        column: 7
+      }
+    }
+    code: "MAX = 3"
+  }
+}
+roles {
+  source_info {
+    start {
+      line: 2
+      column: 1
+    }
+    end {
+      line: 11
+    }
+  }
+  name: "Counter"
+  actions {
+    source_info {
+      start {
+        line: 3
+        column: 5
+      }
+      end {
+        line: 5
+        column: 4
+      }
+    }
+    name: "Init"
+    flow: FLOW_ATOMIC
+    fairness {
+      level: FAIRNESS_LEVEL_STRONG
+    }
+    block {
+      source_info {
+        start {
+          line: 4
+          column: 9
+        }
+        end {
+          line: 5
+          column: 4
+        }
+      }
+      flow: FLOW_ATOMIC
+      stmts {
+        source_info {
+          start {
+            line: 4
+            column: 9
+          }
+          end {
+            line: 5
+            column: 4
+          }
+        }
+        py_stmt {
+          source_info {
+            start {
+              line: 4
+              column: 9
+            }
+            end {
+              line: 4
+              column: 22
+            }
+          }
+          code: "self.value = 0"
+        }
+      }
+    }
+  }
+  actions {
+    source_info {
+      start {
+        line: 5
+        column: 5
+      }
+      end {
+        line: 7
+        column: 4
+      }
+    }
+    name: "Inc"
+    flow: FLOW_ATOMIC
+    fairness {
+      level: FAIRNESS_LEVEL_UNFAIR
+    }
+    block {
+      source_info {
+        start {
+          line: 6
+          column: 9
+        }
+        end {
+          line: 7
+          column: 4
+        }
+      }
+      flow: FLOW_ATOMIC
+      stmts {
+        source_info {
+          start {
+            line: 6
+            column: 9
+          }
+          end {
+            line: 7
+            column: 4
+          }
+        }
+        py_stmt {
+          source_info {
+            start {
+              line: 6
+              column: 9
+            }
+            end {
+              line: 6
+              column: 45
+            }
+          }
+          code: "self.value = min(self.value + 1, MAX)"
+        }
+      }
+    }
+  }
+  actions {
+    source_info {
+      start {
+        line: 7
+        column: 5
+      }
+      end {
+        line: 9
+        column: 4
+      }
+    }
+    name: "Get"
+    flow: FLOW_ATOMIC
+    fairness {
+      level: FAIRNESS_LEVEL_UNFAIR
+    }
+    block {
+      source_info {
+        start {
+          line: 8
+          column: 9
+        }
+        end {
+          line: 9
+          column: 4
+        }
+      }
+      flow: FLOW_ATOMIC
+      stmts {
+        source_info {
+          start {
+            line: 8
+            column: 9
+          }
+          end {
+            line: 9
+            column: 4
+          }
+        }
+        return_stmt {
+          source_info {
+            start {
+              line: 8
+              column: 9
+            }
+            end {
+              line: 8
+              column: 25
+            }
+          }
+          py_expr: "self.value"
+          expr {
+            source_info {
+              start {
+                line: 8
+                column: 16
+              }
+              end {
+                line: 8
+                column: 25
+              }
+            }
+            py_expr: "self.value"
+          }
+        }
+      }
+    }
+  }
+  actions {
+    source_info {
+      start {
+        line: 9
+        column: 5
+      }
+      end {
+        line: 11
+      }
+    }
+    name: "Dec"
+    flow: FLOW_ATOMIC
+    fairness {
+      level: FAIRNESS_LEVEL_UNFAIR
+    }
+    block {
+      source_info {
+        start {
+          line: 10
+          column: 9
+        }
+        end {
+          line: 11
+        }
+      }
+      flow: FLOW_ATOMIC
+      stmts {
+        source_info {
+          start {
+            line: 10
+            column: 9
+          }
+          end {
+            line: 11
+          }
+        }
+        py_stmt {
+          source_info {
+            start {
+              line: 10
+              column: 9
+            }
+            end {
+              line: 10
+              column: 43
+            }
+          }
+          code: "self.value = max(self.value - 1, 0)"
+        }
+      }
+    }
+  }
+}
+front_matter {
+}
+
+Generated counter_interfaces.ts in generated/ from interfaces.ts.j2
+Generated counter_adapters.ts in generated/ from adapters.ts.j2
+Generated counter_test.ts in generated/ from test.ts.j2

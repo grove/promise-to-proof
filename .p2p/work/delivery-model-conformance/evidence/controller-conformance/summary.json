@@ -1,0 +1,775 @@
+{
+  "pins": {
+    "fizzbee": "0.5.3",
+    "mbt": "0.2.0",
+    "npm": "0.1.2"
+  },
+  "model_sha256": "a83257fd17d70bec4ed6deb653f76800f8ab694375d82488918d118061b3de31",
+  "runs": [
+    {
+      "case": "successful-delivery",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/successful-delivery-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/successful-delivery-42/fixture",
+        "P2P_MBT_CASE": "successful-delivery",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 105,
+      "model_max_depth": 8,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 1,
+        "Proof": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case successful-delivery --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "blocked-failure",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/blocked-failure-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/blocked-failure-42/fixture",
+        "P2P_MBT_CASE": "blocked-failure",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 153,
+      "model_max_depth": 11,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 2,
+        "Proof": 2,
+        "Restart": 2,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case blocked-failure --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "known-result-restart",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/known-result-restart-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/known-result-restart-42/fixture",
+        "P2P_MBT_CASE": "known-result-restart",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 105,
+      "model_max_depth": 8,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 1,
+        "Proof": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case known-result-restart --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "uncertain-launch-restart",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/uncertain-launch-restart-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/uncertain-launch-restart-42/fixture",
+        "P2P_MBT_CASE": "uncertain-launch-restart",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 41,
+      "model_max_depth": 5,
+      "actions": {
+        "Start": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case uncertain-launch-restart --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "repair-restart-exhaustion",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/repair-restart-exhaustion-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/repair-restart-exhaustion-42/fixture",
+        "P2P_MBT_CASE": "repair-restart-exhaustion",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 153,
+      "model_max_depth": 11,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 2,
+        "Proof": 2,
+        "Restart": 2,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case repair-restart-exhaustion --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "successful-repair",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/successful-repair-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/successful-repair-42/fixture",
+        "P2P_MBT_CASE": "successful-repair",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 153,
+      "model_max_depth": 11,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 2,
+        "Proof": 2,
+        "Restart": 2,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case successful-repair --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "unauthorized-before-dispatch",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/unauthorized-before-dispatch-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/unauthorized-before-dispatch-42/fixture",
+        "P2P_MBT_CASE": "unauthorized-before-dispatch",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 33,
+      "model_max_depth": 4,
+      "actions": {
+        "Start": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case unauthorized-before-dispatch --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "stale-identity",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/stale-identity-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/stale-identity-42/fixture",
+        "P2P_MBT_CASE": "stale-identity",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 121,
+      "model_max_depth": 9,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 1,
+        "Proof": 1,
+        "Corrupt": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case stale-identity --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "mistyped-identity",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/mistyped-identity-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/mistyped-identity-42/fixture",
+        "P2P_MBT_CASE": "mistyped-identity",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 121,
+      "model_max_depth": 9,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 1,
+        "Proof": 1,
+        "Corrupt": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case mistyped-identity --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "candidate-mutated-during-verification",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/candidate-mutated-during-verification-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/candidate-mutated-during-verification-42/fixture",
+        "P2P_MBT_CASE": "candidate-mutated-during-verification",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 121,
+      "model_max_depth": 9,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 1,
+        "Proof": 1,
+        "Corrupt": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case candidate-mutated-during-verification --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "incomplete-archive",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/incomplete-archive-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/incomplete-archive-42/fixture",
+        "P2P_MBT_CASE": "incomplete-archive",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 121,
+      "model_max_depth": 9,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 1,
+        "Proof": 1,
+        "Corrupt": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case incomplete-archive --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "interrupted-report-storage",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/interrupted-report-storage-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/interrupted-report-storage-42/fixture",
+        "P2P_MBT_CASE": "interrupted-report-storage",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 121,
+      "model_max_depth": 9,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 1,
+        "Proof": 1,
+        "Restart": 2,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case interrupted-report-storage --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "late-stage-result",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/late-stage-result-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/late-stage-result-42/fixture",
+        "P2P_MBT_CASE": "late-stage-result",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 121,
+      "model_max_depth": 9,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 1,
+        "Proof": 1,
+        "Corrupt": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case late-stage-result --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "duplicate-report-write",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/duplicate-report-write-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/duplicate-report-write-42/fixture",
+        "P2P_MBT_CASE": "duplicate-report-write",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 121,
+      "model_max_depth": 9,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 1,
+        "Proof": 1,
+        "Corrupt": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case duplicate-report-write --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "repeated-resume",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/repeated-resume-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/repeated-resume-42/fixture",
+        "P2P_MBT_CASE": "repeated-resume",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 105,
+      "model_max_depth": 8,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 1,
+        "Proof": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case repeated-resume --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "contested-dirty-file",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/contested-dirty-file-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/contested-dirty-file-42/fixture",
+        "P2P_MBT_CASE": "contested-dirty-file",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 33,
+      "model_max_depth": 4,
+      "actions": {
+        "Start": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case contested-dirty-file --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "concurrent-resume",
+      "seed": 42,
+      "mutation": null,
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/concurrent-resume-42/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/concurrent-resume-42/fixture",
+        "P2P_MBT_CASE": "concurrent-resume",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 0,
+      "model_nodes": 105,
+      "model_max_depth": 8,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Overlap": 1,
+        "Proof": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case concurrent-resume --seed 42 --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "stale-identity",
+      "seed": 42,
+      "mutation": "stale-report-guard-removed",
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/stale-identity-42-stale-report-guard-removed/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/controller-stale-report-guard-removed",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/stale-identity-42-stale-report-guard-removed/fixture",
+        "P2P_MBT_CASE": "stale-identity",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 1,
+      "model_nodes": 121,
+      "model_max_depth": 9,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 1,
+        "Proof": 1,
+        "Corrupt": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case stale-identity --seed 42 --mutation stale-report-guard-removed --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "duplicate-report-write",
+      "seed": 42,
+      "mutation": "duplicate-report-guard-removed",
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/duplicate-report-write-42-duplicate-report-guard-removed/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/controller-duplicate-report-guard-removed",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/duplicate-report-write-42-duplicate-report-guard-removed/fixture",
+        "P2P_MBT_CASE": "duplicate-report-write",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 1,
+      "model_nodes": 121,
+      "model_max_depth": 9,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 1,
+        "Proof": 1,
+        "Corrupt": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case duplicate-report-write --seed 42 --mutation duplicate-report-guard-removed --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "late-stage-result",
+      "seed": 42,
+      "mutation": "late-receipt-guard-removed",
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/late-stage-result-42-late-receipt-guard-removed/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/controller-late-receipt-guard-removed",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/late-stage-result-42-late-receipt-guard-removed/fixture",
+        "P2P_MBT_CASE": "late-stage-result",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 1,
+      "model_nodes": 121,
+      "model_max_depth": 9,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 1,
+        "Proof": 1,
+        "Corrupt": 1,
+        "Restart": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case late-stage-result --seed 42 --mutation late-receipt-guard-removed --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "repair-restart-exhaustion",
+      "seed": 42,
+      "mutation": "repair-bound-removed",
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/repair-restart-exhaustion-42-repair-bound-removed/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/controller-repair-bound-removed",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/repair-restart-exhaustion-42-repair-bound-removed/fixture",
+        "P2P_MBT_CASE": "repair-restart-exhaustion",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 1,
+      "model_nodes": 153,
+      "model_max_depth": 11,
+      "actions": {
+        "Start": 1,
+        "Inspect": 1,
+        "Review": 2,
+        "Proof": 2,
+        "Restart": 2,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case repair-restart-exhaustion --seed 42 --mutation repair-bound-removed --output-dir NEW_DIRECTORY"
+    },
+    {
+      "case": "unauthorized-before-dispatch",
+      "seed": 42,
+      "mutation": "authority-guard-removed",
+      "evidence_class": "substitute-backed actual controller CLI",
+      "command": [
+        "node",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/runtime/dist/conformance_test.js"
+      ],
+      "server_command": [
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-server",
+        "--states_file",
+        "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/unauthorized-before-dispatch-42-authority-guard-removed/graph"
+      ],
+      "environment": {
+        "P2P_REPO": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/controller-authority-guard-removed",
+        "P2P_TRACE_DIR": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-strict3/unauthorized-before-dispatch-42-authority-guard-removed/fixture",
+        "P2P_MBT_CASE": "unauthorized-before-dispatch",
+        "FIZZBEE_MBT_BIN": "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner",
+        "FIZZBEE_MBT_SEQ_SEED": "42"
+      },
+      "exit": 1,
+      "model_nodes": 33,
+      "model_max_depth": 4,
+      "actions": {
+        "Start": 1,
+        "Resume": 2
+      },
+      "trace": "fixture/actions.jsonl",
+      "replay": "python3 checks/delivery-model/conformance.py --case unauthorized-before-dispatch --seed 42 --mutation authority-guard-removed --output-dir NEW_DIRECTORY"
+    }
+  ],
+  "result": "PASS"
+}

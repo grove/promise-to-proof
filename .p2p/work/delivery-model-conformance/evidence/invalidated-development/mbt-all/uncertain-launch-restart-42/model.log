@@ -1,0 +1,17 @@
+Model checking /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-all/uncertain-launch-restart-42/conformance.json
+configFileName: /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-all/uncertain-launch-restart-42/fizz.yaml
+fizz.yaml not found. Using default options
+StateSpaceOptions: options:{max_actions:32 max_concurrent_actions:1} deadlock_detection:false
+Nodes: 5, queued: 0, elapsed: 1.243333ms
+Time taken for model checking: 1.248125ms
+Writen graph dotfile: /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-all/uncertain-launch-restart-42/graph/graph.dot
+To generate svg, run: 
+dot -Tsvg /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-all/uncertain-launch-restart-42/graph/graph.dot -o graph.svg && open graph.svg
+Writen communication diagram dotfile: /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-all/uncertain-launch-restart-42/graph/communication.dot
+To generate svg, run: 
+dot -Tsvg /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-all/uncertain-launch-restart-42/graph/communication.dot -o communication.svg && open communication.svg
+Valid Nodes: 5 Unique states: 5
+IsLive: true
+Time taken to check liveness: 293.542µs
+PASSED: Model checker completed successfully
+Writen 1 node files and 1 link files to dir /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/implementation-source/.p2p/tmp/mbt-all/uncertain-launch-restart-42/graph

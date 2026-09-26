@@ -1,0 +1,8 @@
+.p2p/tmp/mbt-first/runtime/conformance_adapters.ts(1,27): error TS2307: Cannot find module 'node:child_process' or its corresponding type declarations.
+.p2p/tmp/mbt-first/runtime/conformance_adapters.ts(2,25): error TS2307: Cannot find module 'node:path' or its corresponding type declarations.
+.p2p/tmp/mbt-first/runtime/conformance_adapters.ts(3,26): error TS2724: '"./conformance_interfaces.js"' has no exported member named 'ControllerModel'. Did you mean 'ControllerRole'?
+.p2p/tmp/mbt-first/runtime/conformance_adapters.ts(7,28): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+.p2p/tmp/mbt-first/runtime/conformance_adapters.ts(8,14): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+.p2p/tmp/mbt-first/runtime/conformance_adapters.ts(9,29): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+.p2p/tmp/mbt-first/runtime/conformance_test.ts(5,10): error TS2305: Module '"./conformance_adapters.js"' has no exported member 'newConformanceModel'.
+.p2p/tmp/mbt-first/runtime/conformance_test.ts(48,5): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.

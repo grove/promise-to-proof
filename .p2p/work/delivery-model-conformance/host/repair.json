@@ -1,0 +1,24 @@
+{
+  "candidate_after": "snapshot:sha256:7a82e6bfc71d1e7fcf2318f9aa18473ed9a92e06c8f0d318b40b9be44dfcf912",
+  "candidate_before": "snapshot:sha256:7a82e6bfc71d1e7fcf2318f9aa18473ed9a92e06c8f0d318b40b9be44dfcf912",
+  "command": [
+    "/opt/homebrew/bin/python3",
+    "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/check-product-identity.py",
+    "--candidate",
+    "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/candidate.json",
+    "--live-host",
+    "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host"
+  ],
+  "context": "enclosing /root",
+  "cycle": 1,
+  "exit_code": 0,
+  "observations": {
+    "both_receipts_match": true,
+    "candidate": "snapshot:sha256:7a82e6bfc71d1e7fcf2318f9aa18473ed9a92e06c8f0d318b40b9be44dfcf912",
+    "entry_count": 126,
+    "hash_format": "SHA256(canonical JSON manifest entry), including path, type, mode and encoded content or symlink target",
+    "source_and_code_preserved": true
+  },
+  "proof_sha256": "e0c33371b90d18550ba84c90ad622ba12d6c8dc703f50fd6de1f7e1fef43ff56",
+  "skill": "/Users/grove/.agents/skills/repair-gaps/SKILL.md"
+}

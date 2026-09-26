@@ -1,0 +1,12 @@
+{
+  "attempt_id": "19a726ff-dcab-4067-94d5-3f70a4a37b02",
+  "elapsed_seconds": 0.01,
+  "event_sha256": "0d8dc8afcfd7edccb1e077b03d41606333e35efe781c2a236c9d38610b2e2bc8",
+  "exit_code": 0,
+  "finished": "2026-09-26T15:17:07.889072+00:00",
+  "inputs": {
+    "contract_sha256": "5fd555eb8132a635c95dcdfb76e647d3b859b51a51539fbc38aeb067986a502a",
+    "probe_sha256": "0afc999b26d705e71db69dc06ddfb2d06b11b2cd48a029e51ea2922e8ce198e8"
+  },
+  "outcome": "finished"
+}

@@ -1,0 +1,18 @@
+{
+  "kind": "mutation",
+  "name": "evidence-lost",
+  "scenario": "evidence-lost",
+  "mutation": "evidence-lost",
+  "command": [
+    "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-fp8kqdgo/mutation-evidence-lost",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-fp8kqdgo/mutation-evidence-lost.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 1.287,
+  "model_sha256": "47ec55b1b0fedc6347d564e22adbf3418eef3fb43798708a2f18851f959e7bec",
+  "property": "DurableEvidence",
+  "steps": 36,
+  "result": "expected counterexample"
+}

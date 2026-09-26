@@ -1,0 +1,715 @@
+2026/09/26 17:18:29 Loaded 121 nodes and 968 links
+2026/09/26 17:18:29 State Space Options: options:{max_actions:256 max_concurrent_actions:1 crash_on_yield:true} deadlock_detection:false
+Generated 8 unique operations
+Generated 8 operation groups
+Group: Controller#0.Restart
+  Op: role:{role_name:"Controller"} action_name:"Restart", MaxYields: 0
+Group: Controller#0.Inspect
+  Op: role:{role_name:"Controller"} action_name:"Inspect", MaxYields: 0
+Group: Controller#0.Resume
+  Op: role:{role_name:"Controller"} action_name:"Resume", MaxYields: 0
+Group: Controller#0.Overlap
+  Op: role:{role_name:"Controller"} action_name:"Overlap", MaxYields: 0
+Group: Controller#0.Start
+  Op: role:{role_name:"Controller"} action_name:"Start", MaxYields: 0
+Group: Controller#0.Review
+  Op: role:{role_name:"Controller"} action_name:"Review", MaxYields: 0
+Group: Controller#0.Proof
+  Op: role:{role_name:"Controller"} action_name:"Proof", MaxYields: 0
+Group: Controller#0.Corrupt
+  Op: role:{role_name:"Controller"} action_name:"Corrupt", MaxYields: 0
+2026/09/26 17:18:29 FizzMo server listening on :50051
+2026/09/26 17:18:29 Received StartTestRun request: 
+Received ValidateTrace request: demo-run-id
+  Request 0: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 0: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:202815500 end_unix_nano:202875375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 1: role:{role_name:"Controller"} action_name:"Restart"
+  Response 1: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:203649250 end_unix_nano:203700500} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 2: role:{role_name:"Controller"} action_name:"Start"
+  Response 2: return_values:{str_value:"77|RUNNING|3|3|implementation|0|1|0|0|1"} exec_time:{start_unix_nano:204116667 end_unix_nano:3344001542} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 3: role:{role_name:"Controller"} action_name:"Resume"
+  Response 3: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:3345139209 end_unix_nano:3345196250} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 4: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 4: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:3345690084 end_unix_nano:3345734625} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 5: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 5: return_values:{str_value:"1|RUNNING|3|3|implementation|0|1|0|0|1"} exec_time:{start_unix_nano:3346073500 end_unix_nano:3800981834} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 6: role:{role_name:"Controller"} action_name:"Start"
+  Response 6: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:3801704084 end_unix_nano:3801716500} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 7: role:{role_name:"Controller"} action_name:"Restart"
+  Response 7: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:3802174042 end_unix_nano:3802189375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 8: role:{role_name:"Controller"} action_name:"Restart"
+  Response 8: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:3802786459 end_unix_nano:3802806250} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 9: role:{role_name:"Controller"} action_name:"Start"
+  Response 9: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:3803330750 end_unix_nano:3803340084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 10: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 10: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:3803666459 end_unix_nano:3803736792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 11: role:{role_name:"Controller"} action_name:"Restart"
+  Response 11: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:3804012000 end_unix_nano:3804018875} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 12: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 12: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:3804341625 end_unix_nano:3804348750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 13: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 13: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:3804660792 end_unix_nano:3804667792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 14: role:{role_name:"Controller"} action_name:"Proof"
+  Response 14: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:3804938167 end_unix_nano:3804970584} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 15: role:{role_name:"Controller"} action_name:"Review"
+  Response 15: return_values:{str_value:"77|RUNNING|4|4|implementation,review|0|1|1|0|1"} exec_time:{start_unix_nano:3805216834 end_unix_nano:5387949875} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 16: role:{role_name:"Controller"} action_name:"Proof"
+  Response 16: return_values:{str_value:"77|RUNNING|5|4|implementation,review|0|1|1|0|1"} exec_time:{start_unix_nano:5388508334 end_unix_nano:6265408667} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 17: role:{role_name:"Controller"} action_name:"Resume"
+  Response 17: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6265989834 end_unix_nano:6265999250} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 18: role:{role_name:"Controller"} action_name:"Review"
+  Response 18: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6266354417 end_unix_nano:6266361584} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 19: role:{role_name:"Controller"} action_name:"Restart"
+  Response 19: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6266597667 end_unix_nano:6266604875} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 20: role:{role_name:"Controller"} action_name:"Proof"
+  Response 20: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6266834209 end_unix_nano:6266839209} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 21: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 21: return_values:{str_value:"0|RUNNING|5|4|implementation,review|0|1|1|0|1"} exec_time:{start_unix_nano:6267027417 end_unix_nano:6376494167} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 22: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 22: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6377012542 end_unix_nano:6377021000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 23: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 23: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6377289375 end_unix_nano:6377295584} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 24: role:{role_name:"Controller"} action_name:"Resume"
+  Response 24: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6377527875 end_unix_nano:6377533584} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 25: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 25: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6377789334 end_unix_nano:6377796125} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 26: role:{role_name:"Controller"} action_name:"Resume"
+  Response 26: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6378035959 end_unix_nano:6378042625} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 27: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 27: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6378275792 end_unix_nano:6378281125} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 28: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 28: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6378487375 end_unix_nano:6378492250} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 29: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 29: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6378701792 end_unix_nano:6378706334} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 30: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 30: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6378917459 end_unix_nano:6378922750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 31: role:{role_name:"Controller"} action_name:"Proof"
+  Response 31: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6379130000 end_unix_nano:6379135084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 32: role:{role_name:"Controller"} action_name:"Start"
+  Response 32: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6379441709 end_unix_nano:6379447750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 33: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 33: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:6379680000 end_unix_nano:6379686000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 34: role:{role_name:"Controller"} action_name:"Restart"
+  Response 34: return_values:{str_value:"1|BLOCKED|5|5|implementation,proof,review|0|1|1|-1|1"} exec_time:{start_unix_nano:6379937084 end_unix_nano:7717383375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 35: role:{role_name:"Controller"} action_name:"Review"
+  Response 35: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:7718074792 end_unix_nano:7718084584} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 36: role:{role_name:"Controller"} action_name:"Review"
+  Response 36: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:7718811542 end_unix_nano:7718823792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 37: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 37: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:7719115875 end_unix_nano:7719122500} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 38: role:{role_name:"Controller"} action_name:"Resume"
+  Response 38: return_values:{str_value:"1|BLOCKED|5|5|implementation,proof,review|0|1|1|-1|1"} exec_time:{start_unix_nano:7719338917 end_unix_nano:8441237084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 39: role:{role_name:"Controller"} action_name:"Start"
+  Response 39: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:8441791542 end_unix_nano:8441800000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 40: role:{role_name:"Controller"} action_name:"Start"
+  Response 40: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:8442122459 end_unix_nano:8442128542} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 41: role:{role_name:"Controller"} action_name:"Resume"
+  Response 41: return_values:{str_value:"1|BLOCKED|5|5|implementation,proof,review|0|1|1|-1|1"} exec_time:{start_unix_nano:8442371459 end_unix_nano:9126161792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 42: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 42: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9126853125 end_unix_nano:9126861959} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 43: role:{role_name:"Controller"} action_name:"Start"
+  Response 43: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9127157542 end_unix_nano:9127164750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 44: role:{role_name:"Controller"} action_name:"Proof"
+  Response 44: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9127427000 end_unix_nano:9127432792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 45: role:{role_name:"Controller"} action_name:"Review"
+  Response 45: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9127674125 end_unix_nano:9127678625} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 46: role:{role_name:"Controller"} action_name:"Start"
+  Response 46: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9127939709 end_unix_nano:9127944042} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 47: role:{role_name:"Controller"} action_name:"Start"
+  Response 47: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9128121709 end_unix_nano:9128125250} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 48: role:{role_name:"Controller"} action_name:"Restart"
+  Response 48: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9128303959 end_unix_nano:9128308792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 49: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 49: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9128532834 end_unix_nano:9128539959} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 50: role:{role_name:"Controller"} action_name:"Review"
+  Response 50: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9128782875 end_unix_nano:9128788834} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 51: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 51: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9129011209 end_unix_nano:9129015375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 52: role:{role_name:"Controller"} action_name:"Review"
+  Response 52: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9129192542 end_unix_nano:9129196000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 53: role:{role_name:"Controller"} action_name:"Review"
+  Response 53: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9129418042 end_unix_nano:9129424375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 54: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 54: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9129714584 end_unix_nano:9129719834} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 55: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 55: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9129896000 end_unix_nano:9129901709} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 56: role:{role_name:"Controller"} action_name:"Start"
+  Response 56: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9130112459 end_unix_nano:9130117792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 57: role:{role_name:"Controller"} action_name:"Proof"
+  Response 57: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9130330084 end_unix_nano:9130335042} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 58: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 58: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9130526042 end_unix_nano:9130530917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 59: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 59: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9130769750 end_unix_nano:9130774917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 60: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 60: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9130978625 end_unix_nano:9130983209} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 61: role:{role_name:"Controller"} action_name:"Review"
+  Response 61: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9131169625 end_unix_nano:9131173917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 62: role:{role_name:"Controller"} action_name:"Start"
+  Response 62: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9131360667 end_unix_nano:9131365292} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 63: role:{role_name:"Controller"} action_name:"Resume"
+  Response 63: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9131652125 end_unix_nano:9131656542} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 64: role:{role_name:"Controller"} action_name:"Proof"
+  Response 64: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9131838459 end_unix_nano:9131841917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 65: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 65: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9132011125 end_unix_nano:9132015209} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 66: role:{role_name:"Controller"} action_name:"Review"
+  Response 66: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9132332334 end_unix_nano:9132336042} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 67: role:{role_name:"Controller"} action_name:"Review"
+  Response 67: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9132530959 end_unix_nano:9132534959} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 68: role:{role_name:"Controller"} action_name:"Proof"
+  Response 68: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9132688834 end_unix_nano:9132692167} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 69: role:{role_name:"Controller"} action_name:"Proof"
+  Response 69: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9132881375 end_unix_nano:9132887375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 70: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 70: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9133157375 end_unix_nano:9133171042} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 71: role:{role_name:"Controller"} action_name:"Start"
+  Response 71: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9133473084 end_unix_nano:9133479542} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 72: role:{role_name:"Controller"} action_name:"Proof"
+  Response 72: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9133760125 end_unix_nano:9133765792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 73: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 73: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9134080125 end_unix_nano:9134087459} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 74: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 74: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9134337209 end_unix_nano:9134342417} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 75: role:{role_name:"Controller"} action_name:"Resume"
+  Response 75: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9134535834 end_unix_nano:9134539459} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 76: role:{role_name:"Controller"} action_name:"Proof"
+  Response 76: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9134712709 end_unix_nano:9134717834} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 77: role:{role_name:"Controller"} action_name:"Start"
+  Response 77: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9134902792 end_unix_nano:9134906667} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 78: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 78: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9135209584 end_unix_nano:9135221500} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 79: role:{role_name:"Controller"} action_name:"Start"
+  Response 79: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9135377000 end_unix_nano:9135380459} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 80: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 80: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9135553959 end_unix_nano:9135557875} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 81: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 81: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9135705292 end_unix_nano:9135711917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 82: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 82: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9135879500 end_unix_nano:9135885959} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 83: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 83: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9136118125 end_unix_nano:9136122500} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 84: role:{role_name:"Controller"} action_name:"Start"
+  Response 84: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9136384959 end_unix_nano:9136407709} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 85: role:{role_name:"Controller"} action_name:"Review"
+  Response 85: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9136659417 end_unix_nano:9136666667} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 86: role:{role_name:"Controller"} action_name:"Resume"
+  Response 86: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9136873250 end_unix_nano:9136877375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 87: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 87: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9137057209 end_unix_nano:9137061292} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 88: role:{role_name:"Controller"} action_name:"Proof"
+  Response 88: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9137212542 end_unix_nano:9137217250} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 89: role:{role_name:"Controller"} action_name:"Restart"
+  Response 89: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9137389917 end_unix_nano:9137396792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 90: role:{role_name:"Controller"} action_name:"Resume"
+  Response 90: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9137708084 end_unix_nano:9137712792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 91: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 91: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9137936125 end_unix_nano:9137942084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 92: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 92: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9138132625 end_unix_nano:9138137209} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 93: role:{role_name:"Controller"} action_name:"Resume"
+  Response 93: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9138317459 end_unix_nano:9138324000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 94: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 94: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9138501209 end_unix_nano:9138508417} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 95: role:{role_name:"Controller"} action_name:"Resume"
+  Response 95: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9138698625 end_unix_nano:9138707584} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 96: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 96: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9138895584 end_unix_nano:9138898834} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 97: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 97: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9139051209 end_unix_nano:9139054792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 98: role:{role_name:"Controller"} action_name:"Start"
+  Response 98: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9139232459 end_unix_nano:9139240959} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 99: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 99: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9139416792 end_unix_nano:9139419917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 100: role:{role_name:"Controller"} action_name:"Start"
+  Response 100: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9139573375 end_unix_nano:9139576917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 101: role:{role_name:"Controller"} action_name:"Review"
+  Response 101: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9139780125 end_unix_nano:9139783500} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 102: role:{role_name:"Controller"} action_name:"Review"
+  Response 102: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9140100125 end_unix_nano:9140107834} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 103: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 103: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9140309084 end_unix_nano:9140318375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 104: role:{role_name:"Controller"} action_name:"Resume"
+  Response 104: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9140471917 end_unix_nano:9140475625} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 105: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 105: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9140624209 end_unix_nano:9140629042} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 106: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 106: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9140842334 end_unix_nano:9140850042} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 107: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 107: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9141074417 end_unix_nano:9141080459} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 108: role:{role_name:"Controller"} action_name:"Review"
+  Response 108: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9141267709 end_unix_nano:9141273375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 109: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 109: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9141475834 end_unix_nano:9141480917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 110: role:{role_name:"Controller"} action_name:"Start"
+  Response 110: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9141640084 end_unix_nano:9141644042} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 111: role:{role_name:"Controller"} action_name:"Review"
+  Response 111: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9141800750 end_unix_nano:9141803750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 112: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 112: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9141944667 end_unix_nano:9141950750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 113: role:{role_name:"Controller"} action_name:"Review"
+  Response 113: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9142105459 end_unix_nano:9142108917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 114: role:{role_name:"Controller"} action_name:"Start"
+  Response 114: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9142450500 end_unix_nano:9142454334} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 115: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 115: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9142623375 end_unix_nano:9142627375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 116: role:{role_name:"Controller"} action_name:"Review"
+  Response 116: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9142785709 end_unix_nano:9142789334} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 117: role:{role_name:"Controller"} action_name:"Start"
+  Response 117: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9142990167 end_unix_nano:9142994084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 118: role:{role_name:"Controller"} action_name:"Proof"
+  Response 118: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9143168417 end_unix_nano:9143172459} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 119: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 119: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9143380417 end_unix_nano:9143386584} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 120: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 120: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9143612209 end_unix_nano:9143618667} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 121: role:{role_name:"Controller"} action_name:"Review"
+  Response 121: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9143808042 end_unix_nano:9143812000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 122: role:{role_name:"Controller"} action_name:"Resume"
+  Response 122: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9143984250 end_unix_nano:9143989459} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 123: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 123: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9144163459 end_unix_nano:9144166792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 124: role:{role_name:"Controller"} action_name:"Start"
+  Response 124: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9144306709 end_unix_nano:9144310084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 125: role:{role_name:"Controller"} action_name:"Proof"
+  Response 125: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9144506417 end_unix_nano:9144511792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 126: role:{role_name:"Controller"} action_name:"Review"
+  Response 126: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9144843584 end_unix_nano:9144847834} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 127: role:{role_name:"Controller"} action_name:"Restart"
+  Response 127: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9145019667 end_unix_nano:9145025292} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 128: role:{role_name:"Controller"} action_name:"Resume"
+  Response 128: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9145173875 end_unix_nano:9145178625} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 129: role:{role_name:"Controller"} action_name:"Review"
+  Response 129: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9145319459 end_unix_nano:9145322417} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 130: role:{role_name:"Controller"} action_name:"Restart"
+  Response 130: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9145532209 end_unix_nano:9145537959} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 131: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 131: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9145726875 end_unix_nano:9145730917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 132: role:{role_name:"Controller"} action_name:"Resume"
+  Response 132: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9145901625 end_unix_nano:9145905042} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 133: role:{role_name:"Controller"} action_name:"Restart"
+  Response 133: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9146105542 end_unix_nano:9146118000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 134: role:{role_name:"Controller"} action_name:"Review"
+  Response 134: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9146321709 end_unix_nano:9146326417} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 135: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 135: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9146532667 end_unix_nano:9146539334} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 136: role:{role_name:"Controller"} action_name:"Restart"
+  Response 136: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9146718834 end_unix_nano:9146724750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 137: role:{role_name:"Controller"} action_name:"Restart"
+  Response 137: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9146895250 end_unix_nano:9146901625} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 138: role:{role_name:"Controller"} action_name:"Restart"
+  Response 138: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9147122959 end_unix_nano:9147128500} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 139: role:{role_name:"Controller"} action_name:"Start"
+  Response 139: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9147328917 end_unix_nano:9147332959} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 140: role:{role_name:"Controller"} action_name:"Proof"
+  Response 140: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9147489875 end_unix_nano:9147493959} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 141: role:{role_name:"Controller"} action_name:"Resume"
+  Response 141: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9147641875 end_unix_nano:9147645625} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 142: role:{role_name:"Controller"} action_name:"Review"
+  Response 142: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9147773542 end_unix_nano:9147776292} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 143: role:{role_name:"Controller"} action_name:"Review"
+  Response 143: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9147900167 end_unix_nano:9147902709} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 144: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 144: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9148038042 end_unix_nano:9148043125} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 145: role:{role_name:"Controller"} action_name:"Proof"
+  Response 145: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9148198084 end_unix_nano:9148202417} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 146: role:{role_name:"Controller"} action_name:"Restart"
+  Response 146: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9148349875 end_unix_nano:9148354542} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 147: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 147: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9148520625 end_unix_nano:9148525167} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 148: role:{role_name:"Controller"} action_name:"Proof"
+  Response 148: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9148737417 end_unix_nano:9148743584} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 149: role:{role_name:"Controller"} action_name:"Restart"
+  Response 149: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9148920667 end_unix_nano:9148924834} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 150: role:{role_name:"Controller"} action_name:"Review"
+  Response 150: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9149089625 end_unix_nano:9149092417} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 151: role:{role_name:"Controller"} action_name:"Review"
+  Response 151: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9149234250 end_unix_nano:9149236917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 152: role:{role_name:"Controller"} action_name:"Review"
+  Response 152: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9149547667 end_unix_nano:9149551292} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 153: role:{role_name:"Controller"} action_name:"Restart"
+  Response 153: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9149688584 end_unix_nano:9149693209} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 154: role:{role_name:"Controller"} action_name:"Resume"
+  Response 154: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9149830667 end_unix_nano:9149834000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 155: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 155: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9150013167 end_unix_nano:9150018584} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 156: role:{role_name:"Controller"} action_name:"Restart"
+  Response 156: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9150210209 end_unix_nano:9150215459} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 157: role:{role_name:"Controller"} action_name:"Proof"
+  Response 157: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9150423584 end_unix_nano:9150427792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 158: role:{role_name:"Controller"} action_name:"Resume"
+  Response 158: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9150605917 end_unix_nano:9150609542} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 159: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 159: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9150774375 end_unix_nano:9150778292} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 160: role:{role_name:"Controller"} action_name:"Proof"
+  Response 160: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9150986459 end_unix_nano:9150991292} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 161: role:{role_name:"Controller"} action_name:"Proof"
+  Response 161: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9151179000 end_unix_nano:9151182417} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 162: role:{role_name:"Controller"} action_name:"Restart"
+  Response 162: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9151358375 end_unix_nano:9151370709} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 163: role:{role_name:"Controller"} action_name:"Start"
+  Response 163: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9151571917 end_unix_nano:9151577959} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 164: role:{role_name:"Controller"} action_name:"Restart"
+  Response 164: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9151758417 end_unix_nano:9151765792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 165: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 165: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9151919334 end_unix_nano:9151924209} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 166: role:{role_name:"Controller"} action_name:"Resume"
+  Response 166: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9152081125 end_unix_nano:9152084459} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 167: role:{role_name:"Controller"} action_name:"Restart"
+  Response 167: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9152273625 end_unix_nano:9152280000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 168: role:{role_name:"Controller"} action_name:"Start"
+  Response 168: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9152493584 end_unix_nano:9152498459} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 169: role:{role_name:"Controller"} action_name:"Proof"
+  Response 169: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9152710875 end_unix_nano:9152715334} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 170: role:{role_name:"Controller"} action_name:"Start"
+  Response 170: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9152920625 end_unix_nano:9152930417} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 171: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 171: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9153126209 end_unix_nano:9153130750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 172: role:{role_name:"Controller"} action_name:"Review"
+  Response 172: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9153291250 end_unix_nano:9153295250} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 173: role:{role_name:"Controller"} action_name:"Proof"
+  Response 173: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9153455125 end_unix_nano:9153460417} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 174: role:{role_name:"Controller"} action_name:"Review"
+  Response 174: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9153624209 end_unix_nano:9153627667} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 175: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 175: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9153782709 end_unix_nano:9153786417} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 176: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 176: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9153967875 end_unix_nano:9153973084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 177: role:{role_name:"Controller"} action_name:"Restart"
+  Response 177: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9154303292 end_unix_nano:9154308000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 178: role:{role_name:"Controller"} action_name:"Restart"
+  Response 178: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9154476375 end_unix_nano:9154479792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 179: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 179: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9154639250 end_unix_nano:9154642542} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 180: role:{role_name:"Controller"} action_name:"Proof"
+  Response 180: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9154798792 end_unix_nano:9154802000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 181: role:{role_name:"Controller"} action_name:"Resume"
+  Response 181: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9154981709 end_unix_nano:9154985750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 182: role:{role_name:"Controller"} action_name:"Proof"
+  Response 182: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9155188625 end_unix_nano:9155192084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 183: role:{role_name:"Controller"} action_name:"Start"
+  Response 183: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9155360625 end_unix_nano:9155364834} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 184: role:{role_name:"Controller"} action_name:"Resume"
+  Response 184: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9155502292 end_unix_nano:9155505625} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 185: role:{role_name:"Controller"} action_name:"Start"
+  Response 185: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9155636042 end_unix_nano:9155638875} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 186: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 186: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9155767209 end_unix_nano:9155770000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 187: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 187: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9155929167 end_unix_nano:9155933709} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 188: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 188: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9156112667 end_unix_nano:9156115792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 189: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 189: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9156252792 end_unix_nano:9156255792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 190: role:{role_name:"Controller"} action_name:"Proof"
+  Response 190: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9156385625 end_unix_nano:9156389167} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 191: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 191: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9156542250 end_unix_nano:9156545334} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 192: role:{role_name:"Controller"} action_name:"Resume"
+  Response 192: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9156688375 end_unix_nano:9156691334} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 193: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 193: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9156863459 end_unix_nano:9156866709} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 194: role:{role_name:"Controller"} action_name:"Restart"
+  Response 194: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9157026292 end_unix_nano:9157029375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 195: role:{role_name:"Controller"} action_name:"Review"
+  Response 195: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9157166000 end_unix_nano:9157169250} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 196: role:{role_name:"Controller"} action_name:"Start"
+  Response 196: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9157344625 end_unix_nano:9157348792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 197: role:{role_name:"Controller"} action_name:"Proof"
+  Response 197: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9157528334 end_unix_nano:9157533000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 198: role:{role_name:"Controller"} action_name:"Resume"
+  Response 198: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9157707750 end_unix_nano:9157711459} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 199: role:{role_name:"Controller"} action_name:"Review"
+  Response 199: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9157855584 end_unix_nano:9157859959} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 200: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 200: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9158013792 end_unix_nano:9158017125} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 201: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 201: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9158171125 end_unix_nano:9158174084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 202: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 202: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9158470125 end_unix_nano:9158473500} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 203: role:{role_name:"Controller"} action_name:"Review"
+  Response 203: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9158611625 end_unix_nano:9158614334} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 204: role:{role_name:"Controller"} action_name:"Restart"
+  Response 204: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9158763125 end_unix_nano:9158766000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 205: role:{role_name:"Controller"} action_name:"Start"
+  Response 205: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9158954375 end_unix_nano:9158958167} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 206: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 206: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9159132250 end_unix_nano:9159136959} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 207: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 207: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9159324709 end_unix_nano:9159328917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 208: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 208: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9159470584 end_unix_nano:9159473584} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 209: role:{role_name:"Controller"} action_name:"Review"
+  Response 209: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9159610875 end_unix_nano:9159613959} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 210: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 210: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9159783167 end_unix_nano:9159785709} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 211: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 211: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9159917250 end_unix_nano:9159920084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 212: role:{role_name:"Controller"} action_name:"Proof"
+  Response 212: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9160053917 end_unix_nano:9160057209} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 213: role:{role_name:"Controller"} action_name:"Restart"
+  Response 213: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9160189834 end_unix_nano:9160192709} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 214: role:{role_name:"Controller"} action_name:"Start"
+  Response 214: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9160317792 end_unix_nano:9160320834} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 215: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 215: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9160449750 end_unix_nano:9160452542} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 216: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 216: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9160585417 end_unix_nano:9160588209} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 217: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 217: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9160731709 end_unix_nano:9160735125} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 218: role:{role_name:"Controller"} action_name:"Review"
+  Response 218: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9160898459 end_unix_nano:9160901459} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 219: role:{role_name:"Controller"} action_name:"Resume"
+  Response 219: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9161033459 end_unix_nano:9161036375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 220: role:{role_name:"Controller"} action_name:"Restart"
+  Response 220: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9161219125 end_unix_nano:9161223750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 221: role:{role_name:"Controller"} action_name:"Start"
+  Response 221: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9161438125 end_unix_nano:9161442000} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 222: role:{role_name:"Controller"} action_name:"Restart"
+  Response 222: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9161615667 end_unix_nano:9161620334} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 223: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 223: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9161752375 end_unix_nano:9161754917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 224: role:{role_name:"Controller"} action_name:"Resume"
+  Response 224: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9161934250 end_unix_nano:9161937792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 225: role:{role_name:"Controller"} action_name:"Start"
+  Response 225: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9162144334 end_unix_nano:9162147750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 226: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 226: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9162463625 end_unix_nano:9162466667} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 227: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 227: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9162625667 end_unix_nano:9162632750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 228: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 228: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9162782709 end_unix_nano:9162785750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 229: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 229: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9162951167 end_unix_nano:9162953667} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 230: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 230: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9163113500 end_unix_nano:9163116500} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 231: role:{role_name:"Controller"} action_name:"Restart"
+  Response 231: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9163272875 end_unix_nano:9163276209} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 232: role:{role_name:"Controller"} action_name:"Resume"
+  Response 232: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9163438584 end_unix_nano:9163441584} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 233: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 233: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9163623042 end_unix_nano:9163626709} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 234: role:{role_name:"Controller"} action_name:"Start"
+  Response 234: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9163778750 end_unix_nano:9163782375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 235: role:{role_name:"Controller"} action_name:"Proof"
+  Response 235: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9163921042 end_unix_nano:9163923959} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 236: role:{role_name:"Controller"} action_name:"Start"
+  Response 236: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9164057750 end_unix_nano:9164060625} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 237: role:{role_name:"Controller"} action_name:"Resume"
+  Response 237: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9164190292 end_unix_nano:9164193334} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 238: role:{role_name:"Controller"} action_name:"Proof"
+  Response 238: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9164333084 end_unix_nano:9164335834} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 239: role:{role_name:"Controller"} action_name:"Proof"
+  Response 239: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9164464667 end_unix_nano:9164467167} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 240: role:{role_name:"Controller"} action_name:"Restart"
+  Response 240: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9164594250 end_unix_nano:9164596792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 241: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 241: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9164722375 end_unix_nano:9164724917} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 242: role:{role_name:"Controller"} action_name:"Review"
+  Response 242: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9164844584 end_unix_nano:9164847125} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 243: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 243: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9165272875 end_unix_nano:9165276792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 244: role:{role_name:"Controller"} action_name:"Proof"
+  Response 244: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9165718000 end_unix_nano:9165724084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 245: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 245: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9165945125 end_unix_nano:9165949375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 246: role:{role_name:"Controller"} action_name:"Review"
+  Response 246: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9166109167 end_unix_nano:9166112084} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 247: role:{role_name:"Controller"} action_name:"Restart"
+  Response 247: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9166276459 end_unix_nano:9166279042} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 248: role:{role_name:"Controller"} action_name:"Proof"
+  Response 248: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9166417042 end_unix_nano:9166420292} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 249: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 249: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9166585500 end_unix_nano:9166589167} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 250: role:{role_name:"Controller"} action_name:"Start"
+  Response 250: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9166762917 end_unix_nano:9166767042} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 251: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 251: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9167175209 end_unix_nano:9167178375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 252: role:{role_name:"Controller"} action_name:"Overlap"
+  Response 252: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9167358667 end_unix_nano:9167363792} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 253: role:{role_name:"Controller"} action_name:"Start"
+  Response 253: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9167642250 end_unix_nano:9167650542} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 254: role:{role_name:"Controller"} action_name:"Inspect"
+  Response 254: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9167967209 end_unix_nano:9167979417} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 255: role:{role_name:"Controller"} action_name:"Corrupt"
+  Response 255: return_values:{str_value:"DISABLED"} exec_time:{start_unix_nano:9168233875 end_unix_nano:9168237375} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+Validating trace for RunId: demo-run-id
+    Action Link: Controller#0.Inspect
+    Found matching Source Link: dest:6 name:"Controller#0.Inspect" weight:0.125 type:"action" 10:"\n\x14Controller#0.Inspect\x12\n\"DISABLED\""
+  End of Request 0, current nodeId: 6, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Inspect":"DISABLED"} roles:[map[fields:map[attempts:0 current:1 fault:false generation:0 inspected:false phase:new proof:0 repair:0 repeats:0 reports: review:0 saved:0 status:ABSENT] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1] totalActions:1] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Restart
+    Found matching Source Link: src:6 dest:5 name:"Controller#0.Restart" weight:0.125 type:"action" 10:"\n\x14Controller#0.Restart\x12\n\"DISABLED\""
+  End of Request 1, current nodeId: 5, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Restart":"DISABLED"} roles:[map[fields:map[attempts:0 current:1 fault:false generation:0 inspected:false phase:new proof:0 repair:0 repeats:0 reports: review:0 saved:0 status:ABSENT] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Restart:1] totalActions:1] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Start
+    Found matching Source Link: src:5 dest:1 name:"Controller#0.Start" labels:"Projection.call" weight:0.125 type:"action" 10:"\n\x12Controller#0.Start\x12)\"77|RUNNING|3|3|implementation|0|1|0|0|1\""
+  End of Request 2, current nodeId: 1, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Start":"77|RUNNING|3|3|implementation|0|1|0|0|1"} roles:[map[fields:map[attempts:3 current:1 fault:false generation:1 inspected:false phase:review proof:0 repair:0 repeats:0 reports:implementation review:0 saved:3 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Start:1] totalActions:1] threads:[] witness:[[false false false false]]]
+. Expected 77|RUNNING|3|3|implementation|0|1|0|0|1
+. Actual [str_value:"77|RUNNING|3|3|implementation|0|1|0|0|1"], len:1
+    Action Link: Controller#0.Resume
+    Found matching Source Link: src:1 dest:15 name:"Controller#0.Resume" weight:0.125 type:"action" 10:"\n\x13Controller#0.Resume\x12\n\"DISABLED\""
+  End of Request 3, current nodeId: 15, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Resume":"DISABLED"} roles:[map[fields:map[attempts:3 current:1 fault:false generation:1 inspected:false phase:review proof:0 repair:0 repeats:0 reports:implementation review:0 saved:3 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Resume:1 Controller#0.Start:1] totalActions:2] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Corrupt
+    Found matching Source Link: src:15 dest:12 name:"Controller#0.Corrupt" weight:0.125 type:"action" 10:"\n\x14Controller#0.Corrupt\x12\n\"DISABLED\""
+  End of Request 4, current nodeId: 12, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Corrupt":"DISABLED"} roles:[map[fields:map[attempts:3 current:1 fault:false generation:1 inspected:false phase:review proof:0 repair:0 repeats:0 reports:implementation review:0 saved:3 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:1 Controller#0.Start:1] totalActions:2] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Inspect
+    Found matching Source Link: src:12 dest:14 name:"Controller#0.Inspect" labels:"Projection.call" weight:0.125 type:"action" 10:"\n\x14Controller#0.Inspect\x12(\"1|RUNNING|3|3|implementation|0|1|0|0|1\""
+  End of Request 5, current nodeId: 14, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Inspect":"1|RUNNING|3|3|implementation|0|1|0|0|1"} roles:[map[fields:map[attempts:3 current:1 fault:false generation:1 inspected:true phase:review proof:0 repair:0 repeats:0 reports:implementation review:0 saved:3 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Start:1] totalActions:2] threads:[] witness:[[false false false false]]]
+. Expected 1|RUNNING|3|3|implementation|0|1|0|0|1
+. Actual [str_value:"1|RUNNING|3|3|implementation|0|1|0|0|1"], len:1
+    Action Link: Controller#0.Start
+    Found matching Source Link: src:14 dest:25 name:"Controller#0.Start" weight:0.125 type:"action" 10:"\n\x12Controller#0.Start\x12\n\"DISABLED\""
+  End of Request 6, current nodeId: 25, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Start":"DISABLED"} roles:[map[fields:map[attempts:3 current:1 fault:false generation:1 inspected:true phase:review proof:0 repair:0 repeats:0 reports:implementation review:0 saved:3 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Start:2] totalActions:3] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Restart
+    Found matching Source Link: src:25 dest:29 name:"Controller#0.Restart" weight:0.125 type:"action" 10:"\n\x14Controller#0.Restart\x12\n\"DISABLED\""
+  End of Request 7, current nodeId: 29, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Restart":"DISABLED"} roles:[map[fields:map[attempts:3 current:1 fault:false generation:1 inspected:true phase:review proof:0 repair:0 repeats:0 reports:implementation review:0 saved:3 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Restart:1 Controller#0.Start:1] totalActions:3] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Restart
+    Found matching Source Link: src:29 dest:29 name:"Controller#0.Restart" weight:0.125 type:"action" 10:"\n\x14Controller#0.Restart\x12\n\"DISABLED\""
+  End of Request 8, current nodeId: 29, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Restart":"DISABLED"} roles:[map[fields:map[attempts:3 current:1 fault:false generation:1 inspected:true phase:review proof:0 repair:0 repeats:0 reports:implementation review:0 saved:3 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Restart:1 Controller#0.Start:1] totalActions:3] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Start
+    Found matching Source Link: src:29 dest:25 name:"Controller#0.Start" weight:0.125 type:"action" 10:"\n\x12Controller#0.Start\x12\n\"DISABLED\""
+  End of Request 9, current nodeId: 25, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Start":"DISABLED"} roles:[map[fields:map[attempts:3 current:1 fault:false generation:1 inspected:true phase:review proof:0 repair:0 repeats:0 reports:implementation review:0 saved:3 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Start:2] totalActions:3] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Overlap
+    Found matching Source Link: src:25 dest:32 name:"Controller#0.Overlap" weight:0.125 type:"action" 10:"\n\x14Controller#0.Overlap\x12\n\"DISABLED\""
+  End of Request 10, current nodeId: 32, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Overlap":"DISABLED"} roles:[map[fields:map[attempts:3 current:1 fault:false generation:1 inspected:true phase:review proof:0 repair:0 repeats:0 reports:implementation review:0 saved:3 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Overlap:1 Controller#0.Start:1] totalActions:3] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Restart
+    Found matching Source Link: src:32 dest:29 name:"Controller#0.Restart" weight:0.125 type:"action" 10:"\n\x14Controller#0.Restart\x12\n\"DISABLED\""
+  End of Request 11, current nodeId: 29, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Restart":"DISABLED"} roles:[map[fields:map[attempts:3 current:1 fault:false generation:1 inspected:true phase:review proof:0 repair:0 repeats:0 reports:implementation review:0 saved:3 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Restart:1 Controller#0.Start:1] totalActions:3] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Corrupt
+    Found matching Source Link: src:29 dest:28 name:"Controller#0.Corrupt" weight:0.125 type:"action" 10:"\n\x14Controller#0.Corrupt\x12\n\"DISABLED\""
+  End of Request 12, current nodeId: 28, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Corrupt":"DISABLED"} roles:[map[fields:map[attempts:3 current:1 fault:false generation:1 inspected:true phase:review proof:0 repair:0 repeats:0 reports:implementation review:0 saved:3 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:1 Controller#0.Inspect:1 Controller#0.Start:1] totalActions:3] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Overlap
+    Found matching Source Link: src:28 dest:32 name:"Controller#0.Overlap" weight:0.125 type:"action" 10:"\n\x14Controller#0.Overlap\x12\n\"DISABLED\""
+  End of Request 13, current nodeId: 32, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Overlap":"DISABLED"} roles:[map[fields:map[attempts:3 current:1 fault:false generation:1 inspected:true phase:review proof:0 repair:0 repeats:0 reports:implementation review:0 saved:3 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Overlap:1 Controller#0.Start:1] totalActions:3] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Proof
+    Found matching Source Link: src:32 dest:27 name:"Controller#0.Proof" weight:0.125 type:"action" 10:"\n\x12Controller#0.Proof\x12\n\"DISABLED\""
+  End of Request 14, current nodeId: 27, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Proof":"DISABLED"} roles:[map[fields:map[attempts:3 current:1 fault:false generation:1 inspected:true phase:review proof:0 repair:0 repeats:0 reports:implementation review:0 saved:3 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Start:1] totalActions:3] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Review
+    Found matching Source Link: src:27 dest:26 name:"Controller#0.Review" labels:"Projection.call" weight:0.125 type:"action" 10:"\n\x13Controller#0.Review\x120\"77|RUNNING|4|4|implementation,review|0|1|1|0|1\""
+  End of Request 15, current nodeId: 26, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Review":"77|RUNNING|4|4|implementation,review|0|1|1|0|1"} roles:[map[fields:map[attempts:4 current:1 fault:false generation:1 inspected:true phase:proof proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:3] threads:[] witness:[[false false false false]]]
+. Expected 77|RUNNING|4|4|implementation,review|0|1|1|0|1
+. Actual [str_value:"77|RUNNING|4|4|implementation,review|0|1|1|0|1"], len:1
+    Action Link: Controller#0.Proof
+    Found matching Source Link: src:26 dest:43 name:"Controller#0.Proof" labels:"Projection.call" weight:0.125 type:"action" 10:"\n\x12Controller#0.Proof\x120\"77|RUNNING|5|4|implementation,review|0|1|1|0|1\""
+  End of Request 16, current nodeId: 43, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Proof":"77|RUNNING|5|4|implementation,review|0|1|1|0|1"} roles:[map[fields:map[attempts:5 current:1 fault:false generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:4] threads:[] witness:[[false false false false]]]
+. Expected 77|RUNNING|5|4|implementation,review|0|1|1|0|1
+. Actual [str_value:"77|RUNNING|5|4|implementation,review|0|1|1|0|1"], len:1
+    Action Link: Controller#0.Resume
+    Found matching Source Link: src:43 dest:63 name:"Controller#0.Resume" weight:0.125 type:"action" 10:"\n\x13Controller#0.Resume\x12\n\"DISABLED\""
+  End of Request 17, current nodeId: 63, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Resume":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:false generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Resume:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:5] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Review
+    Found matching Source Link: src:63 dest:58 name:"Controller#0.Review" weight:0.125 type:"action" 10:"\n\x13Controller#0.Review\x12\n\"DISABLED\""
+  End of Request 18, current nodeId: 58, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Review":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:false generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Review:2 Controller#0.Start:1] totalActions:5] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Restart
+    Found matching Source Link: src:58 dest:61 name:"Controller#0.Restart" weight:0.125 type:"action" 10:"\n\x14Controller#0.Restart\x12\n\"DISABLED\""
+  End of Request 19, current nodeId: 61, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Restart":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:false generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Restart:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:5] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Proof
+    Found matching Source Link: src:61 dest:59 name:"Controller#0.Proof" weight:0.125 type:"action" 10:"\n\x12Controller#0.Proof\x12\n\"DISABLED\""
+  End of Request 20, current nodeId: 59, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Proof":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:false generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Inspect:1 Controller#0.Proof:2 Controller#0.Review:1 Controller#0.Start:1] totalActions:5] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Corrupt
+    Found matching Source Link: src:59 dest:60 name:"Controller#0.Corrupt" labels:"Projection.call" weight:0.125 type:"action" 10:"\n\x14Controller#0.Corrupt\x12/\"0|RUNNING|5|4|implementation,review|0|1|1|0|1\""
+  End of Request 21, current nodeId: 60, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Corrupt":"0|RUNNING|5|4|implementation,review|0|1|1|0|1"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:1 Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:5] threads:[] witness:[[false false false false]]]
+. Expected 0|RUNNING|5|4|implementation,review|0|1|1|0|1
+. Actual [str_value:"0|RUNNING|5|4|implementation,review|0|1|1|0|1"], len:1
+    Action Link: Controller#0.Corrupt
+    Found matching Source Link: src:60 dest:76 name:"Controller#0.Corrupt" weight:0.125 type:"action" 10:"\n\x14Controller#0.Corrupt\x12\n\"DISABLED\""
+  End of Request 22, current nodeId: 76, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Corrupt":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:2 Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:6] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Overlap
+    Found matching Source Link: src:76 dest:80 name:"Controller#0.Overlap" weight:0.125 type:"action" 10:"\n\x14Controller#0.Overlap\x12\n\"DISABLED\""
+  End of Request 23, current nodeId: 80, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Overlap":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:1 Controller#0.Inspect:1 Controller#0.Overlap:1 Controller#0.Proof:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:6] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Resume
+    Found matching Source Link: src:80 dest:79 name:"Controller#0.Resume" weight:0.125 type:"action" 10:"\n\x13Controller#0.Resume\x12\n\"DISABLED\""
+  End of Request 24, current nodeId: 79, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Resume":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:1 Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Resume:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:6] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Overlap
+    Found matching Source Link: src:79 dest:80 name:"Controller#0.Overlap" weight:0.125 type:"action" 10:"\n\x14Controller#0.Overlap\x12\n\"DISABLED\""
+  End of Request 25, current nodeId: 80, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Overlap":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:1 Controller#0.Inspect:1 Controller#0.Overlap:1 Controller#0.Proof:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:6] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Resume
+    Found matching Source Link: src:80 dest:79 name:"Controller#0.Resume" weight:0.125 type:"action" 10:"\n\x13Controller#0.Resume\x12\n\"DISABLED\""
+  End of Request 26, current nodeId: 79, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Resume":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:1 Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Resume:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:6] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Corrupt
+    Found matching Source Link: src:79 dest:76 name:"Controller#0.Corrupt" weight:0.125 type:"action" 10:"\n\x14Controller#0.Corrupt\x12\n\"DISABLED\""
+  End of Request 27, current nodeId: 76, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Corrupt":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:2 Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:6] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Overlap
+    Found matching Source Link: src:76 dest:80 name:"Controller#0.Overlap" weight:0.125 type:"action" 10:"\n\x14Controller#0.Overlap\x12\n\"DISABLED\""
+  End of Request 28, current nodeId: 80, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Overlap":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:1 Controller#0.Inspect:1 Controller#0.Overlap:1 Controller#0.Proof:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:6] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Overlap
+    Found matching Source Link: src:80 dest:80 name:"Controller#0.Overlap" weight:0.125 type:"action" 10:"\n\x14Controller#0.Overlap\x12\n\"DISABLED\""
+  End of Request 29, current nodeId: 80, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Overlap":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:1 Controller#0.Inspect:1 Controller#0.Overlap:1 Controller#0.Proof:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:6] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Corrupt
+    Found matching Source Link: src:80 dest:76 name:"Controller#0.Corrupt" weight:0.125 type:"action" 10:"\n\x14Controller#0.Corrupt\x12\n\"DISABLED\""
+  End of Request 30, current nodeId: 76, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Corrupt":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:2 Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:6] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Proof
+    Found matching Source Link: src:76 dest:75 name:"Controller#0.Proof" weight:0.125 type:"action" 10:"\n\x12Controller#0.Proof\x12\n\"DISABLED\""
+  End of Request 31, current nodeId: 75, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Proof":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:1 Controller#0.Inspect:1 Controller#0.Proof:2 Controller#0.Review:1 Controller#0.Start:1] totalActions:6] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Start
+    Found matching Source Link: src:75 dest:73 name:"Controller#0.Start" weight:0.125 type:"action" 10:"\n\x12Controller#0.Start\x12\n\"DISABLED\""
+  End of Request 32, current nodeId: 73, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Start":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:1 Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Review:1 Controller#0.Start:2] totalActions:6] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Corrupt
+    Found matching Source Link: src:73 dest:76 name:"Controller#0.Corrupt" weight:0.125 type:"action" 10:"\n\x14Controller#0.Corrupt\x12\n\"DISABLED\""
+  End of Request 33, current nodeId: 76, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Corrupt":"DISABLED"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:pending proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:RUNNING] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:2 Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:6] threads:[] witness:[[false false false false]]]
+. Expected DISABLED
+. Actual [str_value:"DISABLED"], len:1
+    Action Link: Controller#0.Restart
+    Found matching Source Link: src:76 dest:77 name:"Controller#0.Restart" labels:"Projection.call" weight:0.125 type:"action" 10:"\n\x14Controller#0.Restart\x12/\"1|BLOCKED|5|4|implementation,review|0|1|1|0|1\""
+  End of Request 34, current nodeId: 77, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Restart":"1|BLOCKED|5|4|implementation,review|0|1|1|0|1"} roles:[map[fields:map[attempts:5 current:1 fault:true generation:1 inspected:true phase:terminal proof:0 repair:0 repeats:0 reports:implementation,review review:1 saved:4 status:BLOCKED] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Corrupt:1 Controller#0.Inspect:1 Controller#0.Proof:1 Controller#0.Restart:1 Controller#0.Review:1 Controller#0.Start:1] totalActions:6] threads:[] witness:[[false false false false]]]
+. Expected 1|BLOCKED|5|4|implementation,review|0|1|1|0|1
+. Actual [str_value:"1|BLOCKED|5|5|implementation,proof,review|0|1|1|-1|1"], len:1
+
+
+    Error: Found return value mismatch for Action Link: Controller#0.Restart, expected: 1|BLOCKED|5|4|implementation,review|0|1|1|0|1, actual: [str_value:"1|BLOCKED|5|5|implementation,proof,review|0|1|1|-1|1"]
+

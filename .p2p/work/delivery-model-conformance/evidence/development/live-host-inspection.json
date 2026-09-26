@@ -1,0 +1,139 @@
+{
+  "kind": "live-host development inspection, not acceptance proof for issue 30",
+  "passed": true,
+  "product_key": "snapshot:sha256:7a82e6bfc71d1e7fcf2318f9aa18473ed9a92e06c8f0d318b40b9be44dfcf912",
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/candidate/skills/productivity/deliver-issue/scripts/p2p_delivery.py",
+    "--repo",
+    "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source",
+    "run",
+    "work/tiny.md",
+    "--comparison-base",
+    "6ca164bc97b9953607118abcb99bad727b17c757",
+    "--authorize-local",
+    "--max-dispatches",
+    "7"
+  ],
+  "controller_invocation": "8a6276f2-d51e-4d16-9cdc-7175a5fbaafe",
+  "controller_status": "REVIEWED_AND_PROVEN",
+  "code_unchanged": true,
+  "source_preserved": true,
+  "host_issued_sessions": [
+    {
+      "stage": "preflight-1",
+      "attempt_id": "662d4c34-daf5-4ff7-99b2-bc9d1590a8e5",
+      "session_id": "01a0de4d-d57a-72d0-a0b9-019ff03a486a",
+      "event_sha256": "713c6ee8946f39fc49486003f6e1f24a8884973806328992e8fb145d9ccfc245",
+      "completed_commands": 1,
+      "exit": 0,
+      "actual_probe_observations": {
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.git/HEAD:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.git/HEAD:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.git/HEAD:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.git/index:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.git/index:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.git/index:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/admission.json:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/admission.json:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/admission.json:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/base-manifest.json:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/base-manifest.json:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/base-manifest.json:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/candidate-sentinel:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/candidate-sentinel:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/candidate-sentinel:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/repository.git/HEAD:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/repository.git/HEAD:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/repository.git/HEAD:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/workspace/spec.txt:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/workspace/spec.txt:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/workspace/spec.txt:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/workspace/work/tiny.md:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/workspace/work/tiny.md:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/workspace/work/tiny.md:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/work/tiny.md:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/work/tiny.md:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/work/tiny.md:symlink": "denied",
+        "network": "denied",
+        "scratch": "ok"
+      }
+    },
+    {
+      "stage": "preflight-2",
+      "attempt_id": "abc84cc4-fa49-42a4-a5fd-c7e52551a68c",
+      "session_id": "01a0de4e-5f50-7a53-9f65-7969d9159054",
+      "event_sha256": "f6c65d36af38f4b81b92f5822a6cf02f40c10683952db33adf2579ac96cec4b0",
+      "completed_commands": 1,
+      "exit": 0,
+      "actual_probe_observations": {
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.git/HEAD:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.git/HEAD:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.git/HEAD:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.git/index:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.git/index:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.git/index:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/admission.json:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/admission.json:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/admission.json:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/base-manifest.json:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/base-manifest.json:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/base-manifest.json:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/candidate-sentinel:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/candidate-sentinel:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/candidate-sentinel:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/repository.git/HEAD:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/repository.git/HEAD:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/repository.git/HEAD:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/workspace/spec.txt:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/workspace/spec.txt:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/workspace/spec.txt:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/workspace/work/tiny.md:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/workspace/work/tiny.md:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/.p2p/work/tiny/runtime/workspace/work/tiny.md:symlink": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/work/tiny.md:absolute": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/work/tiny.md:subprocess": "denied",
+        "/Users/grove/projects/promise-to-proof/.p2p/work/delivery-model-conformance/evidence/live-host/tiny-source/work/tiny.md:symlink": "denied",
+        "network": "denied",
+        "scratch": "ok"
+      }
+    },
+    {
+      "stage": "implementation",
+      "attempt_id": "3a8d28e6-a95f-4e45-914d-77568429cc10",
+      "session_id": "01a0de4e-f14c-7d53-8285-f042b0d75ad6",
+      "event_sha256": "6d0684f4593be72a8ababd13ffd7e8ff91e5bdd0936a2dd190d5b0da88504b61",
+      "completed_commands": 10,
+      "exit": 0,
+      "report_status": "IMPLEMENTED",
+      "requirements": [
+        "R1"
+      ]
+    },
+    {
+      "stage": "review",
+      "attempt_id": "eb17669c-bd21-49e3-959a-63b457af984b",
+      "session_id": "01a0de51-179e-71d1-bc2e-00471d6a9c14",
+      "event_sha256": "b3e9b4f69eb845f9a7c8ae785614df27982c4763f34eb4d4e442c8a2452aca23",
+      "completed_commands": 9,
+      "exit": 0,
+      "report_status": "REVIEWED",
+      "requirements": [
+        "R1"
+      ]
+    },
+    {
+      "stage": "proof",
+      "attempt_id": "7c49fbc7-1e2b-4d4d-8aa3-c82aceb31708",
+      "session_id": "01a0de52-e43d-7ca3-bc12-df0b0f5ff737",
+      "event_sha256": "48469ad4a3de99ee7fe28459ad637d82438cfeb26f35ae0ab3c65e1b3ec9f207",
+      "completed_commands": 12,
+      "exit": 0,
+      "report_status": "PROVEN",
+      "requirements": [
+        "R1"
+      ]
+    }
+  ],
+  "scope_limit": "actual serial host delivery and isolation; CLI overlap established separately with substitute replies"
+}

@@ -1,0 +1,67 @@
+2026/09/26 16:51:44 Loaded 2 nodes and 2 links
+2026/09/26 16:51:44 State Space Options: options:{max_actions:100 max_concurrent_actions:2 crash_on_yield:true} deadlock_detection:true
+Generated 1 unique operations
+Generated 1 operation groups
+Group: Controller#0.Status
+  Op: role:{role_name:"Controller"} action_name:"Status", MaxYields: 0
+2026/09/26 16:51:44 FizzMo server listening on :50051
+2026/09/26 16:51:45 Received StartTestRun request: 
+Received ValidateTrace request: demo-run-id
+  Request 0: role:{role_name:"Controller"} action_name:"Status"
+  Response 0: return_values:{str_value:"BLOCKED"} exec_time:{start_unix_nano:18529333 end_unix_nano:96966750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 1: role:{role_name:"Controller"} action_name:"Status"
+  Response 1: return_values:{str_value:"BLOCKED"} exec_time:{start_unix_nano:98253041 end_unix_nano:165244083} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 2: role:{role_name:"Controller"} action_name:"Status"
+  Response 2: return_values:{str_value:"BLOCKED"} exec_time:{start_unix_nano:165938833 end_unix_nano:232590583} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+Validating trace for RunId: demo-run-id
+    Action Link: Controller#0.Status
+    Found matching Source Link: dest:1 name:"Controller#0.Status" weight:1 type:"action" 10:"\n\x13Controller#0.Status\x12\t\"BLOCKED\""
+  End of Request 0, current nodeId: 1, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Status":"BLOCKED"} roles:[map[fields:map[] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Status:1] totalActions:1] threads:[] witness:[[]]]
+. Expected BLOCKED
+. Actual [str_value:"BLOCKED"], len:1
+    Action Link: Controller#0.Status
+    Found matching Source Link: src:1 dest:1 name:"Controller#0.Status" weight:1 type:"action" 10:"\n\x13Controller#0.Status\x12\t\"BLOCKED\""
+  End of Request 1, current nodeId: 1, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Status":"BLOCKED"} roles:[map[fields:map[] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Status:1] totalActions:1] threads:[] witness:[[]]]
+. Expected BLOCKED
+. Actual [str_value:"BLOCKED"], len:1
+    Action Link: Controller#0.Status
+    Found matching Source Link: src:1 dest:1 name:"Controller#0.Status" weight:1 type:"action" 10:"\n\x13Controller#0.Status\x12\t\"BLOCKED\""
+  End of Request 2, current nodeId: 1, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Status":"BLOCKED"} roles:[map[fields:map[] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Status:1] totalActions:1] threads:[] witness:[[]]]
+. Expected BLOCKED
+. Actual [str_value:"BLOCKED"], len:1
+2026/09/26 16:51:45 Received StartTestRun request: 
+Received ValidateTrace request: demo-run-id
+  Request 0: role:{role_name:"Controller"} action_name:"Status"
+  Response 0: return_values:{str_value:"STATUS_WRONG"} exec_time:{start_unix_nano:17714083 end_unix_nano:84986750} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 1: role:{role_name:"Controller"} action_name:"Status"
+  Response 1: return_values:{str_value:"STATUS_WRONG"} exec_time:{start_unix_nano:86178375 end_unix_nano:162680167} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 2: role:{role_name:"Controller"} action_name:"Status"
+  Response 2: return_values:{str_value:"STATUS_WRONG"} exec_time:{start_unix_nano:163599958 end_unix_nano:240962250} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+Validating trace for RunId: demo-run-id
+    Action Link: Controller#0.Status
+    Found matching Source Link: dest:1 name:"Controller#0.Status" weight:1 type:"action" 10:"\n\x13Controller#0.Status\x12\t\"BLOCKED\""
+  End of Request 0, current nodeId: 1, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Status":"BLOCKED"} roles:[map[fields:map[] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Status:1] totalActions:1] threads:[] witness:[[]]]
+. Expected BLOCKED
+. Actual [str_value:"STATUS_WRONG"], len:1
+
+
+    Error: Found return value mismatch for Action Link: Controller#0.Status, expected: BLOCKED, actual: [str_value:"STATUS_WRONG"]
+
+2026/09/26 16:51:45 Received StartTestRun request: 
+Received ValidateTrace request: demo-run-id
+  Request 0: role:{role_name:"Controller"} action_name:"Status"
+  Response 0: return_values:{str_value:"STATUS_WRONG"} exec_time:{start_unix_nano:25339291 end_unix_nano:101679083} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 1: role:{role_name:"Controller"} action_name:"Status"
+  Response 1: return_values:{str_value:"STATUS_WRONG"} exec_time:{start_unix_nano:102904750 end_unix_nano:177061500} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+  Request 2: role:{role_name:"Controller"} action_name:"Status"
+  Response 2: return_values:{str_value:"STATUS_WRONG"} exec_time:{start_unix_nano:177834916 end_unix_nano:246893916} status:{code:STATUS_OK message:"OK"} roles:{role_name:"Controller"}
+Validating trace for RunId: demo-run-id
+    Action Link: Controller#0.Status
+    Found matching Source Link: dest:1 name:"Controller#0.Status" weight:1 type:"action" 10:"\n\x13Controller#0.Status\x12\t\"BLOCKED\""
+  End of Request 0, current nodeId: 1, node: map[channel_messages:map[] channels:map[] current:0 failedInvariants:<nil> name:yield returns:{"Controller#0.Status":"BLOCKED"} roles:[map[fields:map[] name:Controller params:map[] ref:0 ref_string:Controller#0]] state:map[controller:role Controller#0] stats:map[counts:map[Controller#0.Status:1] totalActions:1] threads:[] witness:[[]]]
+. Expected BLOCKED
+. Actual [str_value:"STATUS_WRONG"], len:1
+
+
+    Error: Found return value mismatch for Action Link: Controller#0.Status, expected: BLOCKED, actual: [str_value:"STATUS_WRONG"]
+

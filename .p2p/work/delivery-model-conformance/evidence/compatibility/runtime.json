@@ -1,0 +1,9 @@
+{
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "python": "3.9.6",
+  "node": "v26.9.0",
+  "npm": "11.19.1",
+  "result": "compatibility demonstrated; no acceptance claim",
+  "seed": 42,
+  "scope": "one real controller status read on an unstarted fixture; sequential only"
+}

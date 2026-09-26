@@ -1,0 +1,11 @@
+{
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python_executable": "/opt/homebrew/opt/python@3.14/bin/python3.14",
+  "versions": {
+    "python": "Python 3.14.7",
+    "node": "v26.9.0",
+    "npm": "11.19.1",
+    "git": "git version 2.54.0 (Apple Git-157)"
+  },
+  "kind": "development environment; fixture transport, not host evidence"
+}

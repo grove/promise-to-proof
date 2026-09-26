@@ -1,0 +1,15 @@
+{
+  "elapsed_seconds": 30.34856087481603,
+  "events_sha256": "8f8b0a5187661bc2b99c1e49b862d899ad491fdc29bc6f7adde82bdc02ab925c",
+  "exit_code": 0,
+  "finished": "2026-09-26T14:48:39.170451+00:00",
+  "outcome": "finished",
+  "session_id": "01a0de30-17a2-7380-bb67-01db81966a94",
+  "usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 25856,
+    "input_tokens": 37978,
+    "output_tokens": 1299,
+    "reasoning_output_tokens": 259
+  }
+}

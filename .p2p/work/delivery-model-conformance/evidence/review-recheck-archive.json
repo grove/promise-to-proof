@@ -1,0 +1,11 @@
+{
+  "archive": "evidence/review-recheck.tar.gz",
+  "files": [
+    "candidate-validation-f1-recheck.json",
+    "candidate-validation-final.json",
+    "candidate-validation.json"
+  ],
+  "original_scratch": "/private/tmp/p2p-review30b",
+  "primary_observations": "host/review-recheck/events.jsonl and host/review-clarification/events.jsonl",
+  "sha256": "1c8195f7b37c82345048cc6f03e7920511c86931f5343cbd7cc5a3d51b81edf5"
+}

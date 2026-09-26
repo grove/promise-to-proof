@@ -1,0 +1,6 @@
+{
+  "path": "skills/productivity/deliver-issue/scripts/p2p_delivery.py",
+  "before": "if stored.exists() and stored.read_bytes() != encoded(report):",
+  "after": "if False:",
+  "count": 1
+}

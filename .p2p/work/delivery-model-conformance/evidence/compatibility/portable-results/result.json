@@ -1,0 +1,8 @@
+{
+  "result": "compatibility demonstrated",
+  "seed": 42,
+  "good_exit": 0,
+  "bad_exit": 1,
+  "replay_exit": 1,
+  "scope": "real public controller status on unstarted fixture; no lifecycle acceptance"
+}

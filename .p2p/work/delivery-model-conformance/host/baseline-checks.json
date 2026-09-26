@@ -1,0 +1,9 @@
+{
+  "controller_command": "python3 checks/test_p2p_delivery.py",
+  "controller_output": "evidence/controller-baseline.txt",
+  "controller_result": "19 tests, 70.878s, OK",
+  "model_command": "python3 checks/delivery-model/check.py --fizz /private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz --output-dir .p2p/work/delivery-model-conformance/evidence/model-baseline",
+  "model_result": "PASS: 43 checks; model evidence only",
+  "model_summary": "evidence/model-baseline/summary.json",
+  "scope": "Unmodified baseline, prior to Phase 3 implementation; not final candidate proof"
+}

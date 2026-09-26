@@ -1,0 +1,28 @@
+gRPC server started on /var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/fizzbee-mbt-6qwtzZ/plugin.sock
+Starting runner: /Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/fizzbee-mbt-0.2.0-macos_arm/fizzbee-mbt-runner --plugin-addr=/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/fizzbee-mbt-6qwtzZ/plugin.sock --max-seq-runs=10 --max-parallel-runs=0 --max-actions=10 --seq-seed=42
+Running 1 test with seed 42
+{"subprocess":"Init","observed":{"value":0}}
+{"subprocess":"Inc","observed":{"value":1}}
+{"subprocess":"Inc","observed":{"value":2}}
+{"subprocess":"Get","observed":{"value":2}}
+{"subprocess":"Dec","observed":{"value":1}}
+{"subprocess":"Inc","observed":{"value":2}}
+{"subprocess":"Get","observed":{"value":2}}
+{"subprocess":"Dec","observed":{"value":1}}
+{"subprocess":"Inc","observed":{"value":2}}
+{"subprocess":"Inc","observed":{"value":3}}
+{"subprocess":"Inc","observed":{"value":3}}
+Validation failed: Failed: Counter#0.Get, expected: [int_value:2], actual: [int_value:3]
+      0: Counter#0.Inc()
+      1: Counter#0.Inc()
+==>   2: Counter#0.Get() -> 3
+Return value mismatched
+Expected:
+      2: Counter#0.Get() -> 2
+Test failure after 1 trace(s).
+To retry the same trace, use: --seq-seed=42
+Test executor shut down gracefully
+Test failed: Error: Runner exited with code 1, signal null
+    at ChildProcess.<anonymous> (/Users/grove/projects/promise-to-proof/.p2p/tmp/issue-30/compatibility/node_modules/@fizzbee/mbt/dist/runner.js:137:28)
+    at ChildProcess.emit (node:events:514:20)
+    at ChildProcess._handle.onexit (node:internal/child_process:294:12)
