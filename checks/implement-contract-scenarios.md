@@ -242,3 +242,13 @@ in `.p2p/work/foo-bar/`, `.p2p/` is excluded from candidate content, and exact
 work-item, binding parent/spec, and comparison-base identities are recorded.
 Prior uncommitted records survive reruns. Delete temporary files before the
 next stage and verify the work-item path alone locates the handoff.
+
+## Epic delivery strategy scenarios
+
+S1–S5, S8, S10, S13–S14: use the approved destination before editing, verify actual prerequisites, preserve work, and return candidate extraction to implementation.
+
+Use the [disposable epic fixtures](./epic-delivery-scenarios.md) and its fresh
+installed-skill invocation procedure. Keep its oracle out of actor input. Inspect
+saved plan/report identities, actual Git refs, and controlled tracker call logs
+as well as the response. Follow the listed variants and positive verification
+phases; a baseline blocker alone does not execute the whole source scenario.

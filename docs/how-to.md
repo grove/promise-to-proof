@@ -241,6 +241,85 @@ stacked PRs.
 Finally, capture one integrated candidate and review and prove the full parent.
 Child proofs do not combine into parent proof.
 
+## Deliver an epic with mixed destinations
+
+Suppose a registry epic has three children: capture, lookup, and summary.
+Capture is useful on its own. Lookup and summary must reach users together.
+The repository's final destination is `trunk`.
+
+1. Ask for a delivery preview on the established parent contract:
+
+   ```text
+   /slice-contract work/registry.md; capture may ship independently; keep lookup and summary together on epic/registry; final destination trunk; draft only
+   ```
+
+   Check that capture targets `trunk`, while lookup and summary target
+   `epic/registry`. The preview explains whether each intermediate outcome is
+   acceptable if the other children never ship. Dependencies alone do not
+   determine the destination.
+
+2. Approve the exact plan revision. The saved plan is
+   `.p2p/work/registry/slicing.md`. If `epic/registry` does not exist, the handoff
+   names its exact starting commit and the local or remote creation needed.
+   Approve those concrete effects separately, or include them explicitly in the
+   same grant. Saving the strategy creates no branch.
+
+3. Complete the child contracts with `/plan-acceptance`, then run each child's
+   delivery from its work path:
+
+   ```text
+   /deliver-issue work/registry-capture.md
+   /deliver-issue work/registry-lookup.md
+   /deliver-issue work/registry-summary.md
+   ```
+
+   Each workflow recovers its destination from the parent plan. Lookup waits
+   until its required capture behavior exists in the actual candidate. After
+   matching full child review and proof, `/publish-pr work/registry-lookup.md`
+   previews a child PR targeting `epic/registry`. Review its exact preview before
+   authorizing publication.
+
+4. If lookup later becomes useful independently while its PR is open, revise
+   the existing parent:
+
+   ```text
+   /slice-contract work/registry.md; lookup may now ship independently to trunk; inspect its open PR and preview the change
+   ```
+
+   Check the old and new destinations, affected children, saved work, required
+   PR actions, and stale verification. Approve the revised strategy. Previously
+   landed capture remains landed. Summary keeps its approved destination.
+   Saving the revision leaves the open lookup PR unchanged.
+
+5. Prepare lookup's candidate against `trunk`. If its current candidate includes
+   unfinished sibling work, return to `/implement-contract` to isolate its
+   contribution. A changed base needs fresh review; changed candidate content
+   needs full fresh review and proof. Then run `/publish-pr` to preview the
+   exact retargeting of the existing lookup PR. Authorize that concrete edit
+   after inspecting the preview. The skill reads the resulting target back and
+   preserves unrelated human text. `/merge-readiness` reports a target mismatch
+   until the actual PR agrees with the revised plan.
+
+6. Assemble every required contribution, including the independently landed
+   work from `trunk`, into one exact parent candidate. Run both stages:
+
+   ```text
+   /review-implementation work/registry.md
+   /prove work/registry.md
+   ```
+
+   A failed interaction returns to implementation or repair and requires fresh
+   verification. Once full parent review and proof match, `/publish-pr
+   work/registry.md` previews the remaining parent PR to `trunk`.
+   `/merge-readiness` then checks the final destination's required CI and
+   repository approvals. If every child landed independently, verify the
+   assembled parent on `trunk`; no empty parent PR is needed.
+
+Transfer the work files and `.p2p/work/` records with the candidate when changing
+checkouts. A fresh session can then start from a child path without repeating
+the strategy decision. A proposal awaiting approval does not replace the saved
+approved plan.
+
 ## Create a tracker mirror when you need one
 
 Local work does not require a GitHub issue. To publish a specification summary,

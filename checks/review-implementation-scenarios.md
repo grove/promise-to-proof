@@ -193,3 +193,13 @@ and saves `review.md` in `.p2p/work/foo-bar/`. Commit only generated records
 with separate authority; the report keeps the original candidate identity.
 Changing product content, the work item, binding parent/spec bytes, or the
 comparison base rejects reuse. The reviewer never repairs product content.
+
+## Epic delivery strategy scenarios
+
+S2–S4, S8, S10–S13: review the inherited agreement against the intended full base SHA; refresh stale integration bases and inspect the assembled parent.
+
+Use the [disposable epic fixtures](./epic-delivery-scenarios.md) and its fresh
+installed-skill invocation procedure. Keep its oracle out of actor input. Inspect
+saved plan/report identities, actual Git refs, and controlled tracker call logs
+as well as the response. Follow the listed variants and positive verification
+phases; a baseline blocker alone does not execute the whole source scenario.

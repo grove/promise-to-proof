@@ -70,6 +70,26 @@ every parent obligation, including interactions and shared invariants, against
 one exact integrated candidate. Assign actual integration code and checks to a
 ticket when needed; ordinary parent proof needs no extra integration ticket.
 
+### How do child completion, integration, and parent acceptance differ?
+
+Child completion means the child's complete contribution has matching review
+and proof for its exact candidate. Integration means that contribution exists
+alongside the required work in the actual assembled candidate. Parent acceptance
+requires full parent proof of that candidate, including interactions and inherited
+constraints. Green child checks and merged tickets do not establish it.
+
+A grouped child's PR targets the approved integration branch. An independent
+child targets the final destination, even when it has prerequisites. The parent
+still needs review and proof after all independent children land, but it needs
+no empty PR. Publication requires matching full review and proof; final merge
+readiness also requires the destination's CI and repository approvals. None of
+these results grants merge authority.
+
+To change destinations after work starts, revise the existing parent through
+`slice-contract`. Strategy approval alone does not retarget an open PR or change
+a branch. Follow the [mixed-destination walkthrough](./how-to.md#deliver-an-epic-with-mixed-destinations)
+for the separate candidate, retargeting, and parent verification steps.
+
 ## Contracts and candidates
 
 ### What does `audit-acceptance` do?
