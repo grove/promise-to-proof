@@ -174,16 +174,22 @@ def host_events(path):
             'message': messages[-1] if messages else '', 'executions': executions}
 
 
-def report_schema():
+def report_schema(stage):
     string = {'type': 'string'}
     def obj(properties):
         return {'type': 'object', 'properties': properties, 'required': list(properties), 'additionalProperties': False}
     evidence = obj({'assertion': string, 'observation': string, 'artifact': string})
-    row = obj({'id': string, 'verdict': string, 'observation': string,
-               'evidence': {'type': 'array', 'items': evidence}})
-    return obj({'status': string, 'input_identity_json': string, 'details': string,
-                'requirements': {'type': 'array', 'items': row},
-                'gaps': {'type': 'array', 'items': string}})
+    if stage == 'review':
+        row = obj({'id': string, 'observation': string})
+    else:
+        row = obj({'id': string, 'verdict': string, 'observation': string,
+                   'evidence': {'type': 'array', 'items': evidence}})
+    properties = {'status': string, 'input_identity_json': string, 'details': string,
+                  'requirements': {'type': 'array', 'items': row},
+                  'gaps': {'type': 'array', 'items': string}}
+    if stage == 'review':
+        properties['findings'] = {'type': 'array', 'items': string}
+    return obj(properties)
 
 
 class Delivery:
@@ -400,6 +406,13 @@ assert results['scratch'] == 'ok'
         inputs = identity(self.state['candidate'])
         prior = self.state.get('reports', {})
         skill_stage = self.state.get('repair_skill', 'repair') if name == 'repair' else name
+        report_format = ('Review rows contain only id and observation. Put every review-local finding in the '
+                         'top-level findings array with its ID and summary. REVIEWED requires empty findings '
+                         'and gaps; CHANGES NEEDED requires a finding. Do not assign review verdicts. '
+                         if name == 'review' else
+                         'Each row needs a substantive observation. Proof rows need command/output evidence in '
+                         'artifact, an assertion, and observation. Use verdict proven for established proof rows; '
+                         'otherwise name the gap. ')
         prompt = (f'Invoke the installed {STAGES[skill_stage]} skill at {self.state["skills"][skill_stage]["path"]}. '
                   f'Read it and its references. Work item {self.work}, workspace {self.workspace}. '
                   f'Comparison base {self.state["comparison_base"]}. Whole contract, full scope. '
@@ -410,13 +423,10 @@ assert results['scratch'] == 'ok'
                   'Use fresh independent observations, do not trust previous judgments. '
                   f'Exact input_identity_json must encode this object: {json.dumps(inputs)}. '
                   f'Every requirement must occur exactly once: {self.state["requirements"]}. '
-                  'Each row needs a substantive observation; proof rows need actual command/output evidence '
-                  'in artifact, an assertion, and observation. '
+                  f'{report_format}Status uses normal skill vocabulary. details contains the full human report. '
                   'Keep generated fixtures and verbose debug output in scratch. Return the relevant command, '
                   'assertion, result, and environment in the report; do not dump entire logs or workspaces. '
-                  'Use verdict proven for established proof rows, '
-                  'reviewed for review rows without findings; otherwise name the gap. Status uses normal skill '
-                  'vocabulary. details contains the full human report. Never fabricate results. '
+                  'Never fabricate results. '
                   f'Previous reports for repair only: {json.dumps(prior) if name == "repair" else "none"}. ')
         if name in ('review', 'proof'):
             prompt += ('Candidate and Git metadata are protected outside writable scratch. Run checks against '
@@ -427,7 +437,7 @@ assert results['scratch'] == 'ok'
                        'do not include it in product content. Preserve agreement and binding inputs. ')
         attempt, host = self.dispatch(name, inputs, prompt,
                                       self.workspace if name in ('implementation', 'repair') else None,
-                                      report_schema())
+                                      report_schema(name))
         self.source_stable()
         if name in ('review', 'proof'):
             self.current()
@@ -439,6 +449,16 @@ assert results['scratch'] == 'ok'
             raise ValueError('stage omitted/duplicated full requirement coverage: ' + attempt['id'])
         if not report['details'].strip() or any(not row['observation'].strip() for row in rows):
             raise ValueError('stage returned incomplete report observations: ' + attempt['id'])
+        if name == 'review':
+            if any(set(row) != {'id', 'observation'} for row in rows):
+                raise ValueError('review report rows must not contain verdicts or proof evidence')
+            findings = report.get('findings')
+            if not isinstance(findings, list) or any(not isinstance(item, str) or not item.strip() for item in findings):
+                raise ValueError('review report findings must be nonempty strings')
+            if report['status'] == 'REVIEWED' and (findings or report['gaps']):
+                raise ValueError('REVIEWED review report contains findings or gaps')
+            if report['status'] == 'CHANGES NEEDED' and not findings:
+                raise ValueError('CHANGES NEEDED review report has no findings')
         if name == 'proof' and report['status'] == 'PROVEN':
             if not host['executions'] or any(row['verdict'] != 'proven' or not row['evidence'] for row in rows):
                 raise ValueError('proof lacks full independently exercised evidence')
@@ -483,8 +503,10 @@ assert results['scratch'] == 'ok'
                 raise ValueError('incomplete ' + name + ' requirement coverage')
         if review['status'] != 'REVIEWED' or proof['status'] != 'PROVEN' or review['gaps'] or proof['gaps']:
             raise ValueError('full REVIEWED and PROVEN results are not available')
-        if any(row['verdict'] != 'reviewed' for row in review['requirements']):
-            raise ValueError('review contains unresolved requirement findings')
+        if review.get('findings'):
+            raise ValueError('review contains unresolved findings')
+        if 'findings' not in review and any(row.get('verdict') != 'reviewed' for row in review['requirements']):
+            raise ValueError('legacy review contains unresolved requirement findings')
         manifest = candidate.get('manifest') or fs.snapshot(self.workspace, candidate['commit'])
         key = 'snapshot:sha256:' + fs.digest(fs.canonical(manifest))
         contract_identity = {k: self.state['contract'][k] for k in ('source', 'revision', 'sha256')}
