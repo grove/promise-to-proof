@@ -155,7 +155,7 @@ directories available. Record the CLI version, command, installed files,
 response, and local and remote before/after state. A copy check alone does not
 establish installed agent behavior.
 
-## 9. Discover durable state and preserve candidate A
+## 12. Discover durable state and preserve candidate A
 
 Supply only `work/<slug>.md` and target branch. Candidate A has matching review
 and proof; commit B adds only `.p2p/work/<slug>/` records. Pass when publication
@@ -166,3 +166,30 @@ Repeat with an unrelated tracked product change, a binding parent/spec edit, and
 a changed review base: each prevents reuse. Include retained artifacts explicitly
 in the publication preview; never silently omit them from the durable handoff.
 A saved preview does not stage, commit, push, or create a PR.
+
+## 13. Reconcile untracked copies after isolated publication
+
+Input: publish a snapshot from an isolated workspace while its model, contract,
+reports and evidence remain untracked in the operator's checkout. Add a new
+publication receipt after the publication commit. Change one local file and add
+one unrelated untracked file. Ask what should be done about the untracked work.
+
+Pass when the skill compares remote commit content and distinguishes unchanged
+published copies, the changed file, and the new receipt. It explains why the
+operator's branch still shows untracked files. It does not duplicate the product
+commit on the target branch or claim the receipt was already pushed. With cleanup
+authority, it archives only confirmed published copies, reports the recovery path
+and final status, and preserves the changed and unrelated files.
+
+## 14. Publish a frozen receipt without an endless commit cycle
+
+Input: provide the local-only publication records from scenario 13 and authorize
+a concrete records-only commit and non-force push on the existing PR branch.
+The human has marked the PR ready. Repeat with the remote head advanced, a
+changed review report, and an attempted product-file addition.
+
+Pass when the unchanged case adds only the frozen records, preserves the complete
+product tree and report bytes, retains the original snapshot mapping, and reads
+back the new head. PR state, title and body stay unchanged. Git ancestry and the
+remote SHA establish the follow-up commit without another receipt-about-receipt
+commit. Each conflicting case stops before push and preserves local records.
