@@ -9,6 +9,7 @@ from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import sys
+import tempfile
 
 
 WORK = re.compile(r"work/[a-z0-9]+(?:-[a-z0-9]+)*\.md\Z")
@@ -165,6 +166,25 @@ def bindings(root, work):
     return [{"path": path, "sha256": value} for path, value in sorted(found.items())]
 
 
+def atomic_write(target, data):
+    """Retain either the previous complete bytes or the new complete bytes."""
+    with tempfile.NamedTemporaryFile(dir=target.parent, prefix=target.name + ".", delete=False) as output:
+        temporary = Path(output.name)
+        try:
+            output.write(data)
+            output.flush()
+            os.fsync(output.fileno())
+            os.replace(temporary, target)
+            descriptor = os.open(target.parent, os.O_RDONLY)
+            try:
+                os.fsync(descriptor)
+            finally:
+                os.close(descriptor)
+        finally:
+            if temporary.exists():
+                temporary.unlink()
+
+
 def save(root, work, name, data):
     item, artifact = paths(root, work)
     if not item.is_file():
@@ -182,9 +202,9 @@ def save(root, work, name, data):
         archived.parent.mkdir(parents=True, exist_ok=True)
         if archived.exists() and archived.read_bytes() != old:
             raise ValueError("history collision")
-        archived.write_bytes(old)
+        atomic_write(archived, old)
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_bytes(data)
+    atomic_write(target, data)
     return str(target.relative_to(root))
 
 

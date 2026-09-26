@@ -1,0 +1,29 @@
+{
+  "host_session": "01a0dd82-b854-7bd3-ba99-1e8a4e124501",
+  "usage": {
+    "input_tokens": 24064,
+    "cached_input_tokens": 11008,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 538,
+    "reasoning_output_tokens": 233
+  },
+  "exit": {
+    "exit_code": 0,
+    "outcome": "finished",
+    "finished": "2026-09-26T11:39:11.852445+00:00",
+    "elapsed_seconds": 25.157561666797847,
+    "event_sha256": "c26fed1a23e61ce7e38ada89d0be06ed0638aa0ec2c9405d2f1297f460f08f7f"
+  },
+  "project_config_warning": "",
+  "sentinel_unchanged": true,
+  "mcp_canary_absent": true,
+  "observations": [
+    {
+      "outside_write": "denied",
+      "scratch_write": "allowed",
+      "sentinel_unchanged": true
+    }
+  ],
+  "host_message": "The exact command exited with code **0** and printed:\n\n```text\nP2P_PROJECT_CONFIG={\"outside_write\": \"denied\", \"scratch_write\": \"allowed\", \"sentinel_unchanged\": true}\n```\n\nRuntime `ALL_TOOLS` names: `apply_patch`, `clock__curr_time`, `exec_command`, `view_image`, `write_stdin`. I did not invoke the MCP canary.",
+  "passed": true
+}

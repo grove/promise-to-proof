@@ -1,0 +1,357 @@
+{
+  "schema": "p2p-publication-preview/v1",
+  "repository": "grove/promise-to-proof",
+  "remote": "origin",
+  "remote_url": "https://github.com/grove/promise-to-proof.git",
+  "target": "main",
+  "observed_target_tip": "1a296f6ec7a064b32ce1be6a5d29f0c39df12294",
+  "head": "issue/28",
+  "head_state": "absent locally/remotely; no all-state PR match",
+  "candidate": "snapshot:sha256:847704b1ef38871fc2e62529426105cc31ae029a79c11e8190c00fcb3b519259",
+  "candidate_record": ".p2p/work/single-work-item-delivery/candidate.json",
+  "contract": "work/single-work-item-delivery.md",
+  "contract_sha256": "e447f13a94dae84b9af2dfc06cfb6be36900eee2c0e381a3942015245b48826d",
+  "comparison_base": "1a296f6ec7a064b32ce1be6a5d29f0c39df12294",
+  "commit": {
+    "parent": "1a296f6ec7a064b32ce1be6a5d29f0c39df12294",
+    "message": "Add single-work-item delivery controller",
+    "author": {
+      "name": "Geir Ove Grønmo",
+      "email": "grove@geirove.org",
+      "date": "2026-09-26T13:58:29+00:00"
+    },
+    "committer": {
+      "name": "Geir Ove Grønmo",
+      "email": "grove@geirove.org",
+      "date": "2026-09-26T13:58:29+00:00"
+    },
+    "signing": "unsigned, matching current configuration",
+    "hooks": "no active repository hooks observed; no hook bypass authorized",
+    "timestamp_policy": "fixed explicit UTC timestamp recorded in this preview"
+  },
+  "title": "Enforce single-work-item delivery on Codex CLI",
+  "body_path": ".p2p/work/single-work-item-delivery/publication-body.md",
+  "body_sha256": "8382aedd93f40873801aaedd403c2411c86ace04be569703c92a3e8e2e03fae4",
+  "product_tree": "Exact complete candidate manifest; no .p2p entries. Existing base .p2p files retained unchanged.",
+  "new_artifact_entries": [
+    {
+      "path": ".p2p/work/single-work-item-delivery/candidate.json",
+      "mode": "100644",
+      "sha256": "f3da09c0f3b4ae6088940a1c4d7931eea003ba36725e2e7bbcb57e4160f340d2",
+      "size": 1229976
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/evidence/fixture-tests-final.log",
+      "mode": "100644",
+      "sha256": "45fe42007a05eef6ed1c358a59aced2bc8ef08c8c8274f81efaab69f4fef01cb",
+      "size": 119
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/evidence/live-delivery-final/invocation.json",
+      "mode": "100644",
+      "sha256": "3c535fc0376911eb26cf0e4274c89b2eb3f3b95ab4afc2008f5151b16b563e3a",
+      "size": 15201
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/evidence/live-delivery-final/summary.json",
+      "mode": "100644",
+      "sha256": "28eac4d80441d604a551cc0f249de7ddddc8be8f147f95d7f5aa0d9f11d7039e",
+      "size": 26079
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/evidence/project-config-probe/observations.md",
+      "mode": "100644",
+      "sha256": "07dffc44758343cf53dba3d0b707694a5b1bbcec2ca8a96c2c782faf894be5f8",
+      "size": 2349
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/evidence/project-config-probe/summary.json",
+      "mode": "100644",
+      "sha256": "dd59bef6d0350e98f3bc28412347c4dc53089e2b88cade8569e5773214af5efe",
+      "size": 1075
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/evidence/project-config-probe/tool-discovery-host-excerpt.json",
+      "mode": "100644",
+      "sha256": "33275b0fe69ab7841b9697592ad96d5ee1503233f303a69d11adec9846840739",
+      "size": 6448
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/handoff.md",
+      "mode": "100644",
+      "sha256": "fc588a1b1ae3ebc2a325ba1e4d9ec73df5a44b02e66c13828698af256f6f4d18",
+      "size": 1895
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/cli-probe/events.jsonl",
+      "mode": "100644",
+      "sha256": "15dcb252773ed4bf8720b34e4ffe915c8ec3728195f308b549f957fadaf90f03",
+      "size": 3271
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/cli-probe/invocation.json",
+      "mode": "100644",
+      "sha256": "f9e600713edb51d7844bfb9141cad91d0026a1ca884c2df3e9af4c015ffd7ba9",
+      "size": 746
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/cli-probe/result.md",
+      "mode": "100644",
+      "sha256": "b271f099254a95434446f7f7eed4d93a3c194994e9be5f66a33eb72146120a65",
+      "size": 400
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/cli-probe/scratch-events.jsonl",
+      "mode": "100644",
+      "sha256": "be1ba7221036ce5cac073fe32eb5c1b5b000713387b28fa481a54d87faff8aa4",
+      "size": 3326
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/cli-probe/scratch-stderr.txt",
+      "mode": "100644",
+      "sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+      "size": 39
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/cli-probe/stderr.txt",
+      "mode": "100644",
+      "sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+      "size": 39
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/config-probe-2/events.jsonl",
+      "mode": "100644",
+      "sha256": "4e0766e84b1a56ea578626b9a733e2f237e2832df5181ab55769d5a42b97b6b9",
+      "size": 7505
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/config-probe-2/exit.json",
+      "mode": "100644",
+      "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+      "size": 16
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/config-probe-2/launch.json",
+      "mode": "100644",
+      "sha256": "cc9fc13004cef230b1e20f3843592b45b230f481341348697101f287d6247067",
+      "size": 2444
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/config-probe-2/stderr.txt",
+      "mode": "100644",
+      "sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+      "size": 39
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/config-probe/events.jsonl",
+      "mode": "100644",
+      "sha256": "454dd55c9423d89b900f776c4f5a9d84e499213307a8794a655e3a92b3e5d1a3",
+      "size": 3414
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/config-probe/exit.json",
+      "mode": "100644",
+      "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+      "size": 16
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/config-probe/launch.json",
+      "mode": "100644",
+      "sha256": "9fa914a81df22e567095cb0218c12e33e51b56331fa5b41a9c20da4a39f32485",
+      "size": 2444
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/config-probe/stderr.txt",
+      "mode": "100644",
+      "sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+      "size": 39
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/preflight.md",
+      "mode": "100644",
+      "sha256": "66de6ef2cbc5eca2338622c312d8cf33c1516cd71b754cf0ac93eace857802a5",
+      "size": 2056
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/proof-1/events.jsonl",
+      "mode": "100644",
+      "sha256": "40a18b24a51d774262bd243fcd04216d3240bd2084661f78418b20ff633b1975",
+      "size": 417282
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/proof-1/exit.json",
+      "mode": "100644",
+      "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+      "size": 16
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/proof-1/launch.json",
+      "mode": "100644",
+      "sha256": "0158799c85d2830fcd35516ebe4eec2200e92be025f5a110c4c6507166b3b014",
+      "size": 2109
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/proof-1/prompt.txt",
+      "mode": "100644",
+      "sha256": "9129b17174d93b612c21770542dcc87ed811740eeb7f44593cbc381e7ec46f65",
+      "size": 3714
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/proof-1/report.md",
+      "mode": "100644",
+      "sha256": "5e2124ce1e7cf2212e10906ceb8addb1ae3a16d0a1ec9e0b6413badb2319c0d4",
+      "size": 8591
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/proof-1/stderr.txt",
+      "mode": "100644",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/reconstruction.json",
+      "mode": "100644",
+      "sha256": "2acefd293482c837d41376fdfa53bc67283f0896ff678397333c22c3bd167c54",
+      "size": 529
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/review-1/events.jsonl",
+      "mode": "100644",
+      "sha256": "af75213106c5a493c5bf019c705aea5c467477c030f5d6f0d09f8d29f4b196ca",
+      "size": 3672494
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/review-1/exit.json",
+      "mode": "100644",
+      "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+      "size": 16
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/review-1/launch.json",
+      "mode": "100644",
+      "sha256": "879ecdf446033649d0cf2d9aefb1baf8f8c6a3d75654029b173cb57ee94f5aa6",
+      "size": 2113
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/review-1/prompt.txt",
+      "mode": "100644",
+      "sha256": "309ba78bfadd5213407d8b13a528a6cf3ec12bf9fe301e190d279ee62504109d",
+      "size": 2929
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/review-1/report.md",
+      "mode": "100644",
+      "sha256": "0ed47725dba69bd3613ef430f41229bcfcc285b41da2c8bf0a5b40822c668505",
+      "size": 5175
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/review-1/stderr.txt",
+      "mode": "100644",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/review-2/events.jsonl",
+      "mode": "100644",
+      "sha256": "d580607a1e97b8003adc41594a423ce8388367a507936bc1e9b2465e4698c5d2",
+      "size": 588681
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/review-2/exit.json",
+      "mode": "100644",
+      "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+      "size": 16
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/review-2/launch.json",
+      "mode": "100644",
+      "sha256": "06100f3ac755ba422db6d68ab0b45ccf8454fd5ec5a267564bc30e3d25d77347",
+      "size": 2197
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/review-2/prompt.txt",
+      "mode": "100644",
+      "sha256": "ede9a85a1c205d0e433fd2841b6c2652199ad6cf306bba67fd29667f33d48046",
+      "size": 3446
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/review-2/report.md",
+      "mode": "100644",
+      "sha256": "864a6b2cc2ba7ca7b239935848004f61a82e4287d8f80e6b3adfa4c71ffcf5f5",
+      "size": 6340
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/review-2/stderr.txt",
+      "mode": "100644",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/host/stages.json",
+      "mode": "100644",
+      "sha256": "628567395d3adefc156aa552937dcba9127cb6e10cca7101b21b00609a240d5e",
+      "size": 3610
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/implementation.md",
+      "mode": "100644",
+      "sha256": "999204eda3ca11c4a5d214791c8ad7e5705980658891100d41149f25b163777e",
+      "size": 11143
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/proof.md",
+      "mode": "100644",
+      "sha256": "5e2124ce1e7cf2212e10906ceb8addb1ae3a16d0a1ec9e0b6413badb2319c0d4",
+      "size": 8591
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/publication-body.md",
+      "mode": "100644",
+      "sha256": "8382aedd93f40873801aaedd403c2411c86ace04be569703c92a3e8e2e03fae4",
+      "size": 2558
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/publication-evidence-index.json",
+      "mode": "100644",
+      "sha256": "52e0191871c7c9f3957ae87644a0ff53e043655a42e61e8842bb57483c7de38d",
+      "size": 109792
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/publication-evidence.tar.gz",
+      "mode": "100644",
+      "sha256": "75b62b404abb21869702c115a95eae7dce79790101433cb9a99bed348d4629d2",
+      "size": 2401856
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/publication-recovery.md",
+      "mode": "100644",
+      "sha256": "b35bf959463a80f2e621fd8158b3b0bf14c863867232dd89738599844fb8c7b4",
+      "size": 3699
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/review.md",
+      "mode": "100644",
+      "sha256": "864a6b2cc2ba7ca7b239935848004f61a82e4287d8f80e6b3adfa4c71ffcf5f5",
+      "size": 6340
+    },
+    {
+      "path": ".p2p/work/single-work-item-delivery/snapshots/base-manifest.json",
+      "mode": "100644",
+      "sha256": "dff8d6d1461adbb82502b96c021f79ce35b8a46acd9c1ae3c7d7f186d4feb736",
+      "size": 1100143
+    }
+  ],
+  "self_inclusion": "Also commit this exact publication-inputs.json; its byte identity is recorded separately in publication.md to avoid a self-referential hash.",
+  "effects": [
+    "create one local publication commit in isolated workspace",
+    "push exact commit without force to new origin issue/28",
+    "create one draft pull request with this exact title and body"
+  ],
+  "later_local_only": [
+    "publication.md outcome updates",
+    "snapshot-to-commit mapping",
+    "remote ref and PR readback",
+    "checkout reconciliation"
+  ],
+  "checkout": "Leave source worktree and index unchanged, including all local copies."
+}

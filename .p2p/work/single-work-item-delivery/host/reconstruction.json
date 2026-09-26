@@ -1,0 +1,8 @@
+{
+  "candidate_directory": "/Users/Shared/p2p-issue-28-fixed-8lm678wl/candidate",
+  "candidate_key": "snapshot:sha256:847704b1ef38871fc2e62529426105cc31ae029a79c11e8190c00fcb3b519259",
+  "comparison_base": "1a296f6ec7a064b32ce1be6a5d29f0c39df12294",
+  "base_manifest_sha256": "dff8d6d1461adbb82502b96c021f79ce35b8a46acd9c1ae3c7d7f186d4feb736",
+  "reconstruction": "full paths, bytes, modes, symlink targets and comparison base match",
+  "artifacts": "/Users/grove/projects/promise-to-proof/.p2p/work/single-work-item-delivery"
+}
