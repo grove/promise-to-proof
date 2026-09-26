@@ -170,6 +170,8 @@ candidate has matching evidence, required CI, and repository approval and merge
 conditions. It reports blockers without merging or replacing the repository's
 approval process. Changes after the check require a new readiness assessment.
 
+For the executable macOS Codex CLI workflow, see [the local delivery controller](./p2p-delivery-controller.md). It retains resumable stages and an isolated candidate while preserving the source checkout.
+
 ## Learn from an accepted delivery (optional)
 
 After a full `PROVEN` result, use [`/retrospect`](../skills/productivity/retrospect/SKILL.md)
