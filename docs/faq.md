@@ -29,6 +29,19 @@ agreement to use after the issue discussion has grown or the work has moved to a
 new checkout. The contract lives in `work/<slug>.md`. The issue can link to it, and imported
 issue changes require explicit reconciliation into that file.
 
+### Can I plan now and deliver later without a planning PR?
+
+Yes. Direct `/plan-acceptance <issue>` saves the proposal locally and posts an
+exact copy on the issue for approval. Use `local-only` or `draft-only` to suppress
+the comment. Another person can later run `/deliver-issue <issue>` to import
+the approved text and binding inputs. Delivery preserves approval when they
+match and reconciles any amendments before implementation.
+
+The issue carries the planning handoff. The imported local contract remains
+canonical during delivery and can be included in the implementation PR.
+Planning invoked inside `deliver-issue` stays local, so the combined workflow
+does not gain an extra publication or approval step.
+
 ### When is `slice-contract` useful, and what does `NO SPLIT` mean?
 
 Use it when one parent contract contains several coherent outcomes that people
@@ -56,6 +69,26 @@ and integration may change behavior that passed earlier. Parent proof checks
 every parent obligation, including interactions and shared invariants, against
 one exact integrated candidate. Assign actual integration code and checks to a
 ticket when needed; ordinary parent proof needs no extra integration ticket.
+
+### How do child completion, integration, and parent acceptance differ?
+
+Child completion means the child's complete contribution has matching review
+and proof for its exact candidate. Integration means that contribution exists
+alongside the required work in the actual assembled candidate. Parent acceptance
+requires full parent proof of that candidate, including interactions and inherited
+constraints. Green child checks and merged tickets do not establish it.
+
+A grouped child's PR targets the approved integration branch. An independent
+child targets the final destination, even when it has prerequisites. The parent
+still needs review and proof after all independent children land, but it needs
+no empty PR. Publication requires matching full review and proof; final merge
+readiness also requires the destination's CI and repository approvals. None of
+these results grants merge authority.
+
+To change destinations after work starts, revise the existing parent through
+`slice-contract`. Strategy approval alone does not retarget an open PR or change
+a branch. Follow the [mixed-destination walkthrough](./how-to.md#deliver-an-epic-with-mixed-destinations)
+for the separate candidate, retargeting, and parent verification steps.
 
 ## Contracts and candidates
 

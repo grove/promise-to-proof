@@ -118,14 +118,33 @@ shared integration candidate or branch exception. Record dependencies and final
 integration work without creating a branch, weakening CI, or promising standalone
 merge readiness.
 
-Record the intended delivery path separately from the dependency graph. One
-parent PR may collect sequential child work on a parent-slug branch;
-independently publishable children may use separate branches named for their
-child work items and be integrated before final parent proof. Do not require one
-branch for all children by default. A child PR with an unmerged prerequisite
-needs a shared integration candidate or must wait for that prerequisite to land;
-`publish-pr` does not publish stacked PRs. Name the chosen path and any exception
-in the preview and saved plan, but do not create or switch branches here.
+Choose delivery destinations separately from the dependency graph under the
+protocol's Epic delivery plans rules. Ask whether each complete child outcome is
+acceptable at the configured final destination if the remaining children never
+ship. Ask about unclear product intent, not a preferred branching model. Existing
+flags can support independent delivery. Show the final destination, optional
+single integration branch and exact starting SHA, default choice, child
+exceptions, resolved destinations, and reasons. Record missing local or remote
+branch setup as pending actions; create or switch no branches here.
+
+Save an approved decision in the protocol's `## Approved delivery plan` section
+of `slicing.md`, with revision, explicit approval source, parent completion, and
+pending actions. Keep proposals in a separate section and preserve prior
+revisions. Normalize explicit approved legacy destinations without asking again,
+retaining their original approval evidence. Child contracts keep parent and
+decomposition links, not duplicate destination settings.
+
+For a strategy-change request, inspect the active plan, child work, reports, and
+known PR state. Show old/new destinations and reasons, affected children, exact
+setup/retarget actions, and verification refresh. Mark unknown remote state
+unresolved. Preserve unstarted child identities, contracts, dependencies, local
+work, human edits, and integration history. Keep confirmed final merges landed.
+An integrated child moving to independent delivery needs a candidate free of
+unfinished sibling payload; hand extraction to implementation. Saving the plan
+changes no PR or ref. Reuse existing scoped authority and distinguish strategy
+approval from listed effects. Unaffected children can continue. Destination-only
+changes leave acceptance revisions unchanged; changed promises return to
+`plan-acceptance`.
 
 Name how the assembled result will be assessed against the full parent agreement,
 including interactions and inherited invariants. Assign real integration code,

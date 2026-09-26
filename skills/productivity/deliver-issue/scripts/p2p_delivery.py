@@ -90,6 +90,136 @@ def skills():
     return result
 
 
+def routing(root, work):
+    """Read the approved Markdown decision; never infer approval or a child target."""
+    item, own_directory = fs.paths(root, work)
+    parents = []
+    for line in fs.document_lines(item.read_text()):
+        if re.match(r'^Parent(?: contract)?:', line):
+            for target in re.findall(r'\[[^\]]*\]\(([^)]+)\)', line):
+                parent = os.path.normpath(str(Path(work).parent / target.split('#', 1)[0]))
+                fs.paths(root, parent)
+                parents.append(parent)
+    if len(parents) > 1:
+        raise ValueError('conflicting parent routing; hand off to slice-contract')
+    if not parents and not (own_directory / 'slicing.md').exists():
+        return None
+    parent = parents[0] if parents else work
+    _, directory = fs.paths(root, parent)
+    path = fs.safe(root, str((directory / 'slicing.md').relative_to(root)))
+    if not path.is_file():
+        raise ValueError('missing approved routing; hand off to slice-contract ' + parent)
+    data = path.read_bytes()
+    sections = re.findall(rb'^## Approved delivery plan\r?\n.*?(?=^## |\Z)', data, re.M | re.S)
+    if len(sections) != 1 or list(fs.document_lines(data.decode())).count('## Approved delivery plan') != 1:
+        raise ValueError('missing/conflicting approved routing; normalize explicit legacy approval or hand off to slice-contract ' + parent)
+    text = sections[0].decode()
+    metadata = '\n'.join(fs.document_lines(text))
+    def field(name):
+        values = re.findall(r'^' + re.escape(name) + r': (.+)$', metadata, re.M)
+        if len(values) != 1 or not values[0].strip():
+            raise ValueError('missing/conflicting delivery plan field: ' + name)
+        return values[0].strip()
+    revision, approval = field('Plan revision'), field('Approval source')
+    if not re.fullmatch(r'v[1-9][0-9]*', revision) or approval.lower() in ('none', 'pending', 'unknown'):
+        raise ValueError('routing has no explicit approved revision/source; hand off to slice-contract ' + parent)
+    if field('Parent') != parent:
+        raise ValueError('delivery plan names a different parent')
+    final, integration, start = field('Final destination'), field('Integration branch'), field('Integration start')
+    default = field('Default choice')
+    if default not in ('independent', 'grouped'):
+        raise ValueError('invalid default delivery choice')
+    for branch in (final, integration):
+        if branch != 'none':
+            fs.git(root, 'check-ref-format', 'refs/heads/' + branch)
+    if final == 'none' or final == integration or (integration == 'none') != (start == 'none'):
+        raise ValueError('conflicting final/integration destinations')
+    if integration != 'none' and not re.fullmatch(r'[0-9a-f]{40}|[0-9a-f]{64}', start):
+        raise ValueError('integration setup requires a full starting commit SHA')
+    rows = {}
+    for line in metadata.splitlines():
+        if not line.startswith('|'):
+            continue
+        cells = [x.strip() for x in line.strip('|').split('|')]
+        if not cells or cells[0] == 'Child' or re.fullmatch(r'[-: ]+', cells[0]):
+            continue
+        if len(cells) != 5:
+            raise ValueError('invalid delivery child row')
+        child, choice, destination, reason, state = cells
+        fs.paths(root, child)
+        if child in rows or state not in ('remaining', 'landed') or not reason:
+            raise ValueError('duplicate or incomplete delivery child row: ' + child)
+        choice = default if choice == 'default' else choice
+        expected = {'independent': final, 'grouped': integration}.get(choice)
+        if expected is None or destination == 'none' or destination != expected:
+            raise ValueError('conflicting child destination: ' + child)
+        if state == 'landed' and destination != final:
+            raise ValueError('landed child must retain its final destination')
+        rows[child] = destination
+    if parents and work not in rows:
+        raise ValueError('child missing from approved routing; hand off to slice-contract ' + parent)
+    target = rows[work] if parents else final
+    # An explicit local ref is required for local delivery. Skills inspect remote
+    # state and perform any authorized setup before admitting this controller.
+    ref = 'refs/heads/' + target
+    try:
+        tip = fs.full_commit(root, ref)
+    except ValueError as error:
+        setup = f'; setup {ref} at {start} under covering authority and read back the ref' if target == integration else ''
+        raise ValueError('delivery destination missing: ' + ref + setup) from error
+    if target == integration:
+        fs.full_commit(root, start)
+        result = subprocess.run(['git', '-C', str(root), 'merge-base', '--is-ancestor', start, tip], capture_output=True)
+        if result.returncode:
+            raise ValueError('integration branch conflicts with approved starting commit: ' + ref)
+    return {'path': str(path.relative_to(root)), 'parent': parent, 'revision': revision,
+            'sha256': fs.digest(sections[0]), 'text': text, 'approval_source': approval,
+            'destination': target, 'target_ref': ref, 'target_tip': tip}
+
+
+def routing_records(root, decision):
+    """Transfer plan/history outside candidate identity, using existing file records."""
+    if decision is None:
+        return []
+    path = fs.safe(root, decision['path'])
+    selected = {path}
+    selected.update(path.parent.glob('history/**/slicing.md'))
+    approval = path.parent / 'planning-handoff.md'
+    if approval.is_file():
+        selected.add(approval)
+    # Local Markdown references can carry approval and captured parent evidence.
+    pending = list(selected)
+    while pending:
+        file = pending.pop()
+        fs.safe(root, str(file.relative_to(root)))
+        if file.suffix != '.md':
+            continue
+        # History retains the original bytes, including original relative links.
+        origin = path.parent if path.parent / 'history' in file.parents else file.parent
+        text = file.read_text()
+        targets = re.findall(r'\[[^\]]*\]\(([^)]+)\)', text)
+        # Older approvals name bare local Markdown receipts. Keep their bytes and
+        # authority intact while giving them the same transfer checks as links.
+        for line in fs.document_lines(text):
+            if line.startswith('Approval source:'):
+                plain = re.sub(r'\[[^\]]*\]\([^)]+\)|[a-zA-Z][a-zA-Z0-9+.-]*://\S+', '', line)
+                targets.extend(re.findall(r'(?<![\w/])([.\w/-]+\.md)(?=$|[\s.,;`])', plain))
+        for target in targets:
+            if re.match(r'[a-zA-Z][a-zA-Z0-9+.-]*:', target):
+                continue
+            relative = os.path.normpath(str(origin.relative_to(root) / target.split('#', 1)[0]))
+            if relative.startswith('.p2p/'):
+                linked = fs.safe(root, relative)
+                if not linked.is_file():
+                    raise ValueError('routing evidence unavailable: ' + relative)
+                if linked not in selected:
+                    selected.add(linked)
+                    pending.append(linked)
+    return [{'path': str(file.relative_to(root)), 'sha256': fs.digest(file.read_bytes()),
+             'content_base64': base64.b64encode(file.read_bytes()).decode(), 'type': 'file', 'mode': '100644'}
+            for file in sorted(selected)]
+
+
 def host_config(scratch):
     # Read only these preference keys. Credentials stay in their existing store.
     import tomllib
@@ -208,6 +338,16 @@ class Delivery:
         for key, value in admission.items():
             if self.state.get(key) != value:
                 raise ValueError('persisted admission changed: ' + key)
+        if routing(self.root, self.work) != self.state.get('routing'):
+            raise ValueError('approved delivery plan or destination tip changed; reconcile routing and refresh review')
+        if routing(self.workspace, self.work) != self.state.get('routing'):
+            raise ValueError('transferred approved delivery plan changed')
+        for record in self.state.get('routing_records', []):
+            if record['path'] == self.state['routing']['path']:
+                continue  # Pending proposals may change outside the approved section.
+            for root in (self.root, self.workspace):
+                if fs.digest(fs.safe(root, record['path']).read_bytes()) != record['sha256']:
+                    raise ValueError('retained routing history/evidence changed: ' + record['path'])
         current = fs.snapshot(self.root)
         if current != self.state['source_manifest']:
             old = {x['path']: x for x in self.state['source_manifest']}
@@ -401,9 +541,15 @@ assert results['scratch'] == 'ok'
         self.state['preflight_complete'] = True
         self.save()
 
+    def stage_inputs(self, candidate):
+        result = identity(candidate)
+        if self.state.get('routing') is not None:
+            result['routing'] = self.state['routing']
+        return result
+
     def stage(self, name):
         self.current()
-        inputs = identity(self.state['candidate'])
+        inputs = self.stage_inputs(self.state['candidate'])
         prior = self.state.get('reports', {})
         skill_stage = self.state.get('repair_skill', 'repair') if name == 'repair' else name
         report_format = ('Review rows contain only id and observation. Put every review-local finding in the '
@@ -416,6 +562,8 @@ assert results['scratch'] == 'ok'
         prompt = (f'Invoke the installed {STAGES[skill_stage]} skill at {self.state["skills"][skill_stage]["path"]}. '
                   f'Read it and its references. Work item {self.work}, workspace {self.workspace}. '
                   f'Comparison base {self.state["comparison_base"]}. Whole contract, full scope. '
+                  f'Approved delivery routing (separate from product identity): {json.dumps(self.state.get("routing"))}. '
+                  'Read transferred plan/history and verify prerequisite outcomes in the actual candidate. '
                   'The enclosing controller owns durable reports; return your full report in the required JSON '
                   'schema and it will save and reread it. Never mutate the source checkout, controller records, '
                   'agreement or binding inputs, or source/delivered Git metadata. Local stages and safe scratch '
@@ -497,7 +645,7 @@ assert results['scratch'] == 'ok'
         candidate = self.current()
         review, proof = self.read_report('review'), self.read_report('proof')
         for name, report in (('review', review), ('proof', proof)):
-            if json.loads(report['input_identity_json']) != identity(candidate):
+            if json.loads(report['input_identity_json']) != self.stage_inputs(candidate):
                 raise ValueError('stale ' + name + ' candidate/agreement/base identity')
             if sorted(row['id'] for row in report['requirements']) != sorted(self.state['requirements']):
                 raise ValueError('incomplete ' + name + ' requirement coverage')
@@ -585,6 +733,10 @@ def create(root, args):
     if not re.fullmatch(r'[0-9a-f]{40}|[0-9a-f]{64}', args.comparison_base):
         raise ValueError('comparison base must be an explicit full commit SHA')
     base = fs.full_commit(root, args.comparison_base)
+    decision = routing(root, args.work)
+    if decision is not None and base != decision['target_tip']:
+        raise ValueError('comparison base conflicts with approved destination ' + decision['destination'] + ': expected ' + decision['target_tip'] + ', actual ' + base)
+    records = routing_records(root, decision)
     installed = skills()
     fs.check_index(root)
     current = fs.snapshot(root)
@@ -604,7 +756,8 @@ def create(root, args):
         raise ValueError('contested dirty paths require explicit --exclude-dirty: ' + ', '.join(sorted(contested)))
     if excluded - dirty:
         raise ValueError('--exclude-dirty names paths that are not dirty: ' + ', '.join(sorted(excluded - dirty)))
-    manifest = {e['path']: e for e in committed}
+    starting = base if decision is not None else head
+    manifest = {e['path']: e for e in fs.snapshot(root, starting)}
     comparison = {e['path']: e for e in fs.snapshot(root, base)}
     for path in excluded:
         if path in comparison:
@@ -628,9 +781,11 @@ def create(root, args):
     retained(root, args.work, 'base-manifest.json', encoded(fs.snapshot(root, base)))
     workspace = runtime / 'workspace'
     materialize(workspace, sorted(manifest.values(), key=lambda e:e['path']))
+    materialize(workspace, records)
     (workspace / '.git').write_text('gitdir: ' + str(repository) + '\n')
     fs.git(workspace, 'config', '--local', 'core.bare', 'false')
-    fs.git(workspace, 'read-tree', head)
+    fs.git(workspace, 'update-ref', '--no-deref', 'HEAD', starting)
+    fs.git(workspace, 'read-tree', starting)
     # Git metadata is outside every worker writable root; never shared with source.
     state = {'schema': 'promise-to-proof/delivery/v1', 'policy': POLICY, 'invocation_id': str(uuid.uuid4()),
              'status': 'RUNNING', 'blocker': None, 'work_item': args.work, 'comparison_base': base,
@@ -638,6 +793,7 @@ def create(root, args):
              'source_manifest': current, 'source_head': head,
              'source_index_sha256': fs.digest(fs.git(root, 'ls-files', '--stage', '-z')),
              'excluded_dirty': sorted(excluded), 'skills': installed,
+             'routing': decision, 'routing_records': records, 'starting_commit': starting,
              'authority': {'local_stages': True, 'external_effects': False},
              'limits': {'dispatches': args.max_dispatches, 'elapsed_seconds': args.max_seconds},
              'deadline': None if args.max_seconds is None else time.time() + args.max_seconds,
@@ -650,7 +806,7 @@ def create(root, args):
                       'elapsed_limit': 'admission and process termination; provider billing may continue',
                       'trust': 'controller and OS trusted; no arbitrary same-user tamper resistance'}}
     delivery = Delivery(root, args.work, state)
-    retained(root, args.work, 'admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_manifest', 'source_head', 'source_index_sha256', 'excluded_dirty', 'skills', 'authority', 'limits', 'deadline', 'host')}))
+    retained(root, args.work, 'admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_manifest', 'source_head', 'source_index_sha256', 'excluded_dirty', 'skills', 'routing', 'routing_records', 'starting_commit', 'authority', 'limits', 'deadline', 'host')}))
     delivery.save()
     delivery.capture()
     delivery.save()
@@ -661,6 +817,8 @@ def result(delivery):
     state = delivery.state
     return {key: state[key] for key in ('status', 'blocker', 'invocation_id', 'work_item', 'comparison_base',
                                       'limits', 'repair_used', 'host')} | {
+        'routing': state.get('routing'),
+        'starting_commit': state.get('starting_commit'),
         'candidate': identity(state['candidate']) if state.get('candidate') else None,
         'reports': state.get('reports', {}), 'attempts': state['attempts'],
         'records': str(delivery.directory),

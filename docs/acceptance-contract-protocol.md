@@ -85,6 +85,54 @@ mirror. Resolve conflicting copies before proceeding. Migration changes the
 contract location and candidate inputs, so old results remain historical until
 fresh matching review and proof establish the new handoff.
 
+### Standalone planning on an issue
+
+A direct user invocation of `plan-acceptance <issue>` authorizes posting the
+proposed contract as a comment on that existing issue, unless the user requests
+local-only or draft-only output. This authority covers the planning handoff only,
+not issue-body replacement, labels, closure, commits, or PRs. Planning invoked by
+`deliver-issue` or another workflow inherits that workflow's authority and stays
+local unless issue publication was separately authorized.
+
+Save the proposal locally first. Post its exact UTF-8 text in a fenced block,
+with the intended `work/<slug>.md` path, revision, and SHA-256 outside the block.
+End the proposal with one newline before hashing and presenting it for approval.
+Choose a fence longer than any fence in the contract. The fenced content includes
+that final newline; fence lines are excluded from the hash. Include retrievable copies
+and hashes of binding sources and parents, preserving their relative paths, so
+another checkout can recover the agreement without a planning PR. A local path
+or digest alone is insufficient. Keep the issue body and human comments intact.
+Read back the comment and verify the extracted contract bytes and binding inputs.
+Reuse an identical existing handoff on retries; preserve old proposals when
+posting revisions. An uncertain write requires readback before another attempt.
+
+The issue comment is a shared planning handoff, not a second live contract store.
+Human approval must identify the exact proposal by comment and text hash, or by
+an equally unambiguous reference to the displayed text. Posting is not approval.
+Retain the comment URL, contract revision and hash, binding-input hashes, and
+the approver and approval evidence in `.p2p/work/<slug>/planning-handoff.md`.
+This record can capture approval from the invoking conversation or the issue;
+retain the actual approval text and its source, not an inferred status or label.
+For delivery from the issue alone, the approval evidence must be retrievable
+there. If approval exists only in the planning conversation, transfer the saved
+receipt explicitly or have the approving human record approval on the issue.
+Report this transfer requirement instead of claiming an issue-only handoff is ready.
+
+On issue import, delivery reads the handoff, approval, and subsequent amendments.
+It saves the exact approved text to `work/<slug>.md`, restores and checks binding
+inputs, and rereads them before implementation. Matching text and inputs retain
+their approval without another approval request. Missing or ambiguous approval,
+changed text even at the same revision, conflicting local content, or later
+amendments require reconciliation before dependent work. Preserve prior local
+bytes and human edits. Compare existing binding files before restoring missing
+inputs; reconcile differences instead of overwriting them with the saved copies.
+Missing binding content blocks the handoff. Keep provenance
+in the report rather than adding it to the approved contract bytes.
+
+After import, the local contract remains canonical under the rules above. There
+is no automatic synchronization. The contract and reports can travel with the
+implementation PR; neither planning nor delivery requires a preliminary PR.
+
 ## Durable generated records
 
 Save work-item output under `.p2p/work/<slug>/`: `implementation.md`,
@@ -281,6 +329,163 @@ against one exact integrated candidate. Closed tickets and historical child
 proofs do not compose into a parent verdict. Allocate actual integration work
 to a named ticket when needed; ordinary parent-level `/prove` needs no separate
 integration ticket. Existing review and merge conditions still apply.
+
+## Epic delivery plans
+
+`slice-contract` owns routing in `.p2p/work/<parent>/slicing.md`, alongside the
+decomposition. Resolve that record through the child's existing Parent and
+decomposition links. Unsliced work needs no plan. Do not copy destinations into
+child contracts. Transfer the plan, its approval evidence, and retained history
+with the work even though `.p2p/` stays outside product candidate identity.
+
+Choose each child's destination by asking whether its complete intermediate
+outcome would be acceptable at the final destination if the remaining children
+never shipped. Existing flags can make that outcome acceptable. Dependencies,
+release timing, hierarchy, and labels do not decide routing. Ask a focused
+product-outcome question when intent is unclear.
+
+The plan names the configured final destination, at most one integration branch,
+a default choice of `independent` or `grouped`, and child exceptions. Resolve
+`independent` to the final destination and `grouped` to the integration branch.
+Mixed delivery is a default plus exceptions, not a third mode. Display each
+child's resolved destination and reason, including which work can land first.
+
+Keep exactly one `## Approved delivery plan` section in `slicing.md`. Its exact
+UTF-8 bytes, from that heading through the byte before the next level-two heading
+or EOF, identify the active decision. Use these fields and table so the existing
+delivery controller can retain and check the same decision:
+
+```markdown
+## Approved delivery plan
+Plan revision: v1
+Approval source: <actual approval text and retrievable source>
+Parent: work/checkout.md
+Final destination: trunk
+Integration branch: epic/checkout
+Integration start: <full approved starting commit SHA>
+Default choice: grouped
+
+| Child | Choice | Destination | Reason | State |
+|---|---|---|---|---|
+| work/checkout-api.md | independent | trunk | Useful without checkout. | remaining |
+| work/checkout-flow.md | default | epic/checkout | Requires validation to be acceptable. | remaining |
+| work/checkout-validation.md | default | epic/checkout | Completes checkout behavior. | remaining |
+
+Parent completion: <contributions, interactions, inherited invariants and final integration checks>
+Pending actions: <exact setup or strategy-change effects, authority, confirmed effects and unresolved state>
+```
+
+Use plain repository-relative child paths and branch names in the table. A row's
+choice is `default`, `independent`, or `grouped`; its destination must agree with
+that choice. Use `none` for both integration fields when no group exists. Retain
+a confirmed final merge as `landed` with its historical destination and commit
+reference. Future changes affect only remaining work. Approval must be explicit
+and attributable. A label, saved draft, or heading is not approval evidence.
+
+Save pending revisions under `## Proposed delivery plan`, leaving the active
+approved section intact. Before activating an approved revision, retain the prior
+file through the history rule. Retain referenced approval text and historical
+plan bytes, not just a hash or vanished temporary path. Consumers record the
+plan path, approved revision, SHA-256 of that exact section, and a recoverable
+copy in their handoffs. Extract and hash the section as bytes with this same rule
+used by routing, then retain `section` unchanged:
+
+```python
+data = path.read_bytes()
+sections = re.findall(rb'^## Approved delivery plan\r?\n.*?(?=^## |\Z)', data, re.M | re.S)
+assert len(sections) == 1
+section = sections[0]
+plan_sha256 = hashlib.sha256(section).hexdigest()
+```
+
+Include separators before the next heading and preserve CRLF, trailing spaces,
+and EOF exactly. Do not trim, append a newline, or normalize the extracted text.
+After saving a publication or readiness record, read back its retained section
+bytes and hash and compare both with this extraction before claiming a handoff.
+Use relative Markdown links for local approval receipts, such as
+`[approval](approval.md)`. Existing bare `.md` paths in `Approval source:` are
+resolved relative to the plan and retained without rewriting the approved text.
+Missing referenced receipts block admission; changed or missing retained receipts
+block resume before dispatch. Transfer these receipts and linked history together.
+A pending proposal alone does not stale an active plan.
+An affected destination or approved-plan change invalidates routing previews
+without changing product candidate identity. Reconcile unchanged child routing
+against the new plan before continuing; never treat old preview authority as
+covering changed effects.
+
+Normalize an older explicit, approved destination into this section without a
+new strategy question. Preserve the original bytes, decision, and approval
+source. Missing, conflicting, or proposed-only routing requires a focused
+`/slice-contract <parent>` handoff before dependent work. Never infer a child's
+destination from the default branch. An unresolved proposal does not override
+an applicable approved decision.
+
+Resolve routing before selecting an implementation starting point or comparison
+base. State the destination and unavailable prerequisite outcomes. Confirm those
+outcomes in the actual candidate. Closed tickets do not establish them. Inspect
+the intended target ref and record its full tip SHA as the review base. A target
+advance requires fresh review; matching branch names do not preserve a base.
+Publication must inspect the remote target when the destination is remote.
+
+If an integration branch is missing, name its approved starting SHA and the
+specific local or remote creation needed. Planning changes no refs. A consuming
+workflow may create only refs covered by existing explicit authority, then read
+back their full SHAs. Reuse an existing ref only after confirming its approved
+origin and any subsequent integrated changes. A same-name unrelated branch is a
+conflict. Never overwrite it. An uncertain creation requires ref readback before
+retrying. This is a handoff within existing skills, not a new user command.
+
+Grouped child PRs target the integration branch directly and retain full child
+review, proof, and publication obligations. Wait for prerequisites to be integrated
+there, or use an existing explicitly approved shared-candidate exception with its
+scope and verification intact. Grouping cannot make an incomplete child
+publishable or permit unreviewed sibling payload. There is no stacked-PR path.
+Required CI remains a readiness gate, not an unrelated proof or publication gate.
+
+### Change an active strategy
+
+Read the active plan, child work, reports, and known PR state. Preview old and new
+destinations, reasons, affected children, exact branch or PR actions, and stale
+verification. Keep unknown remote state unresolved. Preserve child identities,
+contracts, dependency links, human edits, local candidates, and integration
+history. Keep confirmed final merges recorded as landed. Unaffected children may
+continue after their routing is reconciled. Saving a plan never changes a PR.
+
+Independent delivery of previously integrated work requires a candidate containing
+only the intended contribution and satisfied prerequisites. Inspect its full
+diff against the final target for unfinished sibling work. Candidate extraction
+or repair belongs to implementation; retargeting cannot repair scope.
+
+Strategy approval and authority for branch creation, publication, retargeting,
+and merging are distinct. Reuse unchanged grants within scope. A concrete grant
+may approve a revision and listed effects together. Record confirmed effects and
+outstanding actions after each step. Recheck current plan and relevant ref or PR
+state immediately before each effect; reject a stale preview after concurrent
+changes. Read back uncertain effects before retrying, preserving human changes
+and avoiding duplicate branches or PRs. Ambiguity blocks further writes.
+
+Destination-only changes do not revise acceptance contracts. A changed comparison
+base requires fresh full review. Changed candidate content or binding agreements
+require fresh full review and proof. Unchanged proof remains evidence only for
+its exact candidate and agreement; it cannot manufacture a report pair for new
+content. A changed product promise returns to `plan-acceptance`.
+
+### Verify the assembled parent
+
+Child completion, integration, and parent acceptance are separate events. Child
+handoffs name remaining integration work and parent review and proof. Evaluate
+all parent contributions, interactions, and inherited invariants on one exact
+assembled candidate, including independently landed children and required
+integration with the final destination. Closed issues, merge counts, green child
+checks, and historical child proof do not establish parent acceptance. A failing
+interaction leaves the parent unproven.
+
+Publish a parent PR only after matching full parent review and proof. Final
+readiness also requires the final destination's required CI and repository
+approvals. Changed inputs require the ordinary verification refresh. When all
+children land independently, verify the exact combined parent candidate without
+creating an empty parent or integration PR. Readiness advice never grants merge
+authority.
 
 ## Seams, oracles, and evidence plans
 

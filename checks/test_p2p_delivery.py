@@ -6,6 +6,7 @@ import io
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -127,6 +128,186 @@ class DeliveryTests(unittest.TestCase):
 
     def state(self):
         return json.loads((self.root / '.p2p/work/tiny/delivery.json').read_text())
+
+    def planned_child(self, choice='grouped'):
+        d.fs.git(self.root, 'branch', 'trunk', self.base)
+        d.fs.git(self.root, 'branch', 'epic/tiny', self.base)
+        (self.root / 'work/parent.md').write_text(CONTRACT.replace('tiny', 'parent'))
+        (self.root / 'work/tiny.md').write_text(CONTRACT + '\nParent: [Parent](parent.md)\n')
+        text = f'''# Slicing
+
+## Approved delivery plan
+Plan revision: v1
+Approval source: User approved v1 and these destinations in retained fixture request.
+Parent: work/parent.md
+Final destination: trunk
+Integration branch: epic/tiny
+Integration start: {self.base}
+Default choice: {choice}
+
+| Child | Choice | Destination | Reason | State |
+|---|---|---|---|---|
+| work/tiny.md | default | {'epic/tiny' if choice == 'grouped' else 'trunk'} | Complete acceptable fixture outcome. | remaining |
+
+Parent completion: Run combined greeting.
+Pending actions: none.
+
+'''
+        d.fs.save(self.root, 'work/parent.md', 'slicing.md', text.encode())
+        return self.root / '.p2p/work/parent/slicing.md'
+
+    def test_child_routing_transfers_plan_and_binds_stage_inputs(self):
+        path = self.planned_child()
+        d.fs.save(self.root, 'work/parent.md', 'approval.md', b'User: approve routing v1.\n')
+        path.write_text(path.read_text().replace('retained fixture request.', '[retained fixture request](approval.md).'))
+        old = path.read_bytes()
+        d.fs.save(self.root, 'work/parent.md', 'slicing.md', old + b'## Proposed delivery plan\nNot approved.\n')
+        code, value = self.cli()
+        self.assertEqual(code, 0, value)
+        state = self.state()
+        self.assertEqual(value['routing']['destination'], 'epic/tiny')
+        workspace = self.root / '.p2p/work/tiny/runtime/workspace'
+        self.assertEqual((workspace / path.relative_to(self.root)).read_bytes(), path.read_bytes())
+        history = '.p2p/work/parent/history/' + d.fs.digest(old) + '/slicing.md'
+        self.assertEqual((workspace / history).read_bytes(), old)
+        (workspace / history).write_bytes(b'changed historical routing')
+        code, value = self.cli('status')
+        self.assertEqual(code, 1)
+        self.assertIn('retained routing history/evidence changed', value['blocker'])
+        (workspace / history).write_bytes(old)
+        self.assertFalse(any(e['path'].startswith('.p2p/') for e in state['candidate']['manifest']))
+        for stage in ('implementation', 'review', 'proof'):
+            self.assertEqual(state['reports'][stage]['inputs']['routing'], state['routing'])
+        # A saved proposal changes neither the active decision nor candidate bytes.
+        d.fs.save(self.root, 'work/parent.md', 'slicing.md', old + b'## Proposed delivery plan\nAnother proposal.\n')
+        self.assertEqual(self.cli('resume')[0], 0)
+        changed = old.replace(b'Plan revision: v1', b'Plan revision: v2')
+        d.fs.save(self.root, 'work/parent.md', 'slicing.md', changed)
+        before = len(self.fake.calls)
+        code, value = self.cli('resume')
+        self.assertEqual(code, 1)
+        self.assertIn('approved delivery plan or destination tip changed', value['blocker'])
+        self.assertEqual(len(self.fake.calls), before)
+
+    def test_public_cli_retains_plain_approval_on_transfer_and_fresh_recovery(self):
+        path = self.planned_child()
+        path.write_text(path.read_text().replace('retained fixture request.', 'retained receipt approval.md.'))
+        receipt = path.parent / 'approval.md'
+        original = path.read_bytes()
+        d.fs.save(self.root, 'work/parent.md', 'slicing.md', original + b'## Proposed delivery plan\nPending.\n')
+
+        def cli(root, action):
+            command = [sys.executable, str(SCRIPTS / 'p2p_delivery.py'), '--repo', str(root), action, 'work/tiny.md']
+            if action == 'run':
+                command += ['--comparison-base', self.base, '--authorize-local', '--max-dispatches', '0']
+            result = subprocess.run(command, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 1, result.stderr)
+            return json.loads(result.stdout)
+
+        self.assertIn('routing evidence unavailable', cli(self.root, 'run')['blocker'])
+        self.assertFalse((self.root / '.p2p/work/tiny/delivery.json').exists())
+        receipt.write_bytes(b'User approved these exact v1 destinations.\n')
+        self.assertIn('dispatch-count limit', cli(self.root, 'run')['blocker'])
+        workspace = self.root / '.p2p/work/tiny/runtime/workspace'
+        self.assertEqual((workspace / receipt.relative_to(self.root)).read_bytes(), receipt.read_bytes())
+        history = '.p2p/work/parent/history/' + d.fs.digest(original) + '/slicing.md'
+        self.assertEqual((workspace / history).read_bytes(), original)
+        self.assertEqual(self.state()['attempts'], [])
+
+        recovered = Path(self.temp.name) / 'recovered'
+        subprocess.run(['git', 'clone', '-q', str(self.root), str(recovered)], check=True)
+        d.fs.git(recovered, 'branch', 'trunk', self.base)
+        d.fs.git(recovered, 'branch', 'epic/tiny', self.base)
+        shutil.copytree(workspace / 'work', recovered / 'work')
+        shutil.copytree(workspace / '.p2p/work/parent', recovered / '.p2p/work/parent')
+        self.assertIn('dispatch-count limit', cli(recovered, 'run')['blocker'])
+        self.assertEqual((recovered / '.p2p/work/tiny/runtime/workspace/.p2p/work/parent/approval.md').read_bytes(), receipt.read_bytes())
+        receipt.write_bytes(b'Changed approval.\n')
+        self.assertIn('retained routing history/evidence changed', cli(self.root, 'resume')['blocker'])
+        receipt.unlink()
+        self.assertIn('approval.md', cli(self.root, 'resume')['blocker'])
+        self.assertEqual(self.state()['attempts'], [])
+        missing = recovered / '.p2p/work/parent/approval.md'
+        missing.unlink()
+        self.assertIn('approval.md', cli(recovered, 'resume')['blocker'])
+
+    def test_child_missing_conflicting_and_proposed_routing_never_dispatch(self):
+        path = self.planned_child()
+        good = path.read_bytes()
+        for data, message in [(None, 'missing approved routing'),
+                              (good.replace(b'Approved delivery plan', b'Proposed delivery plan'), 'approved routing'),
+                              (good + good, 'conflicting approved routing'),
+                              (b'```markdown\n' + good + b'```\n', 'approved routing'),
+                              (good.replace(b'| default | epic/tiny |', b'| default | trunk |'), 'conflicting child destination')]:
+            if data is None:
+                path.unlink()
+            else:
+                path.write_bytes(data)
+            code, value = self.cli()
+            self.assertEqual(code, 1, value)
+            self.assertIn(message, value['blocker'])
+            self.assertEqual(self.fake.calls, [])
+
+    def test_child_starting_tree_is_target_not_unrelated_head(self):
+        self.planned_child('independent')
+        (self.root / 'sibling.txt').write_text('unfinished sibling payload\n')
+        d.fs.git(self.root, 'add', 'sibling.txt')
+        d.fs.git(self.root, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost',
+                 'commit', '-qm', 'Unrelated branch work')
+        code, value = self.cli()
+        self.assertEqual(code, 0, value)
+        self.assertNotIn('sibling.txt', [e['path'] for e in self.state()['candidate']['manifest']])
+        self.assertEqual(value['starting_commit'], self.base)
+        self.assertNotEqual(self.state()['source_head'], self.base)
+        self.assertEqual((self.root / 'sibling.txt').read_text(), 'unfinished sibling payload\n')
+        self.assertEqual(d.fs.full_commit(self.root / '.p2p/work/tiny/runtime/workspace', 'HEAD'), self.base)
+
+    def test_child_target_advance_and_wrong_explicit_base_block(self):
+        self.planned_child()
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        newer = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base], input=b'Advance target\n').decode().strip()
+        d.fs.git(self.root, 'update-ref', 'refs/heads/epic/tiny', newer)
+        code, value = self.cli()
+        self.assertEqual(code, 1)
+        self.assertIn('comparison base conflicts with approved destination epic/tiny', value['blocker'])
+        self.assertIn(newer, value['blocker'])
+        self.assertEqual(self.fake.calls, [])
+        d.fs.git(self.root, 'update-ref', 'refs/heads/epic/tiny', self.base)
+        self.assertEqual(self.cli()[0], 0)
+        d.fs.git(self.root, 'update-ref', 'refs/heads/epic/tiny', newer)
+        code, value = self.cli('resume')
+        self.assertEqual(code, 1)
+        self.assertIn('destination tip changed', value['blocker'])
+
+    def test_integration_missing_and_unrelated_ref_give_setup_handoff(self):
+        self.planned_child()
+        d.fs.git(self.root, 'branch', '-D', 'epic/tiny')
+        code, value = self.cli()
+        self.assertEqual(code, 1)
+        self.assertIn('setup refs/heads/epic/tiny at ' + self.base, value['blocker'])
+        self.assertEqual(self.fake.calls, [])
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        unrelated = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree], input=b'Unrelated\n').decode().strip()
+        d.fs.git(self.root, 'branch', 'epic/tiny', unrelated)
+        code, value = self.cli()
+        self.assertEqual(code, 1)
+        self.assertIn('conflicts with approved starting commit', value['blocker'])
+        self.assertEqual(d.fs.full_commit(self.root, 'epic/tiny'), unrelated)
+        self.assertEqual(self.fake.calls, [])
+
+    def test_parent_uses_final_destination_and_plan_loss_blocks_resume(self):
+        path = self.planned_child()
+        parent_route = d.routing(self.root, 'work/parent.md')
+        self.assertEqual(parent_route['destination'], 'trunk')
+        self.assertEqual(parent_route['target_tip'], self.base)
+        self.assertEqual(self.cli()[0], 0)
+        workspace = self.root / '.p2p/work/tiny/runtime/workspace'
+        (workspace / path.relative_to(self.root)).unlink()
+        code, value = self.cli('resume')
+        self.assertEqual(code, 1)
+        self.assertIn('missing approved routing', value['blocker'])
 
     def test_success_source_preservation_and_retrieval(self):
         (self.root / 'unrelated').write_text('keep me')

@@ -42,6 +42,16 @@ claiming whole-parent delivery. Capture and recheck parent identity; a material
 unresolved parent change blocks a current-agreement review conclusion and needs
 reconciliation through `plan-acceptance` and the decomposition workflow.
 
+Resolve the active approved plan under the protocol's Epic delivery plans rules
+before accepting a comparison base. Review a child against its resolved target;
+review the assembled parent against its final destination. Unsliced work needs
+no epic plan. Capture the observed full target-tip SHA, inherited agreement, plan
+revision, exact approved text hash, and recoverable plan reference. An advanced
+integration branch or destination change requires fresh review against the current
+tip. A candidate or binding-agreement change also requires fresh proof. Reject a
+convenient unrelated base. Inspect moved integrated work for unfinished sibling
+payload, not just a matching branch name.
+
 Capture the candidate and comparison base before inspecting. Resolve mutable
 references to fixed identities. For branch or PR review, establish the actual
 head, base, merge base, and intended change set. A local branch represents a PR
