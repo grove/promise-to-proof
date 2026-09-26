@@ -1,0 +1,115 @@
+{
+  "actor": "/root/scenario_routing_batch",
+  "case": "S2-default",
+  "original_root": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default",
+  "assertion": "no-effects",
+  "assertion_exit": 0,
+  "assertion_output": "PASS: no-effects effect assertions; separately inspect skill verdicts and identities\n",
+  "retained_files": [
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/tracker.json",
+      "retained": "evidence/scenarios/S2-default/tracker.json",
+      "sha256": "8c03d4d14386745477f3e1ffc7bf90eca00502a521cf136f58fcc6a3de13867f"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/actor-context.txt",
+      "retained": "evidence/scenarios/S2-default/actor-context.txt",
+      "sha256": "aeea368817246558b4d9a981e3c6c5f4c94724b60496b81076d16348a4ec9bdf"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/oracle.json",
+      "retained": "evidence/scenarios/S2-default/oracle.json",
+      "sha256": "0622efe09add05ce1676a1d4b8980d99ccddb50c5ec7f54442fd520a6d63e48c"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/command-evidence.txt",
+      "retained": "evidence/scenarios/S2-default/command-evidence.txt",
+      "sha256": "f5cf7c4a8dd52a2b0a6965481f610259a77d8f93110ce95617eefbb6d3f1ee55"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/actor-report.md",
+      "retained": "evidence/scenarios/S2-default/actor-report.md",
+      "sha256": "af6fa5d29ac99122d90cb73f9f0f200f906d73a4e253cd19176c92b4d53ad801"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/tracker.py",
+      "retained": "evidence/scenarios/S2-default/tracker.py",
+      "sha256": "8ca955a03ceafd32088bc6cd2f83ec2cd7b17bb638124e3edbe9e60c61ac0ac6"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/candidate-validation.json",
+      "retained": "evidence/scenarios/S2-default/candidate-validation.json",
+      "sha256": "e243e36452e1ea388acb6501e9a39e0dc41e2bf01ce71d8118d29874259b8323"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/request.md",
+      "retained": "evidence/scenarios/S2-default/request.md",
+      "sha256": "df81c0005cc9fe00ad1fcfadccec2f330e614872bfd48e4d939591f656848d0e"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/calls.jsonl",
+      "retained": "evidence/scenarios/S2-default/calls.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/stage-slicing-draft.md",
+      "retained": "evidence/scenarios/S2-default/stage-slicing-draft.md",
+      "sha256": "7383b44fd3cdfe465e223f30b5746edf003643e1aeeceb6ae004006c5f1ccba7"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/fixture.bundle",
+      "retained": "evidence/scenarios/S2-default/fixture.bundle",
+      "sha256": "6da566edc152888317c587f513f14e62c826b827c331d4e28221afe5d25205f9"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/repo/.p2p/work/lookup/publication.md",
+      "retained": "evidence/scenarios/S2-default/repo/.p2p/work/lookup/publication.md",
+      "sha256": "7e0918f39b3571263a4b82caa20d6c4e2425089b549d144a8ea41ca298e9a2ea"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/repo/.p2p/work/lookup/implementation.md",
+      "retained": "evidence/scenarios/S2-default/repo/.p2p/work/lookup/implementation.md",
+      "sha256": "534701e7a7eda7ca907842ad4fc27278ebd94ca8b2330f9986c2bf81bdf31e30"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/repo/.p2p/work/lookup/candidate.json",
+      "retained": "evidence/scenarios/S2-default/repo/.p2p/work/lookup/candidate.json",
+      "sha256": "c22189589eae658fa3af85b0fbe395f1712782f76407e852f15c3b5f2ef63d86"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/repo/.p2p/work/parent/slicing-draft.md",
+      "retained": "evidence/scenarios/S2-default/repo/.p2p/work/parent/slicing-draft.md",
+      "sha256": "7383b44fd3cdfe465e223f30b5746edf003643e1aeeceb6ae004006c5f1ccba7"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/repo/.p2p/work/parent/implementation.md",
+      "retained": "evidence/scenarios/S2-default/repo/.p2p/work/parent/implementation.md",
+      "sha256": "bbd06e90cef9bfbffcccaf3aff2b65fd680d9a92ee585ed352d80d1aa6fa535e"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/repo/.p2p/work/parent/approval.md",
+      "retained": "evidence/scenarios/S2-default/repo/.p2p/work/parent/approval.md",
+      "sha256": "7b14282140fcc3f4926cb8a6b78a179b82a90ed1310116ac1bcd486884dfcddd"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/repo/.p2p/work/parent/candidate.json",
+      "retained": "evidence/scenarios/S2-default/repo/.p2p/work/parent/candidate.json",
+      "sha256": "e14d9f288b1d4583aeb61dcf7e7bba6e857dcc78501496121bc2adedb40ce4c5"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/repo/.p2p/work/parent/slicing.md",
+      "retained": "evidence/scenarios/S2-default/repo/.p2p/work/parent/slicing.md",
+      "sha256": "085f32b0e8abf33ff03a0f3ae029c42d1f0857e096aa32f1fd8a91d29d986f12"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/repo/.p2p/work/parent/evidence/scenario-command-evidence.txt",
+      "retained": "evidence/scenarios/S2-default/repo/.p2p/work/parent/evidence/scenario-command-evidence.txt",
+      "sha256": "f5cf7c4a8dd52a2b0a6965481f610259a77d8f93110ce95617eefbb6d3f1ee55"
+    },
+    {
+      "original_path": "/private/tmp/p2p-epic-valid-v1isv6j3/S2-default/repo/.p2p/work/parent/history/28f1fe49365a20b4e1b1f378be1290d25fb34b4d1a151dec8125a705dd8d67de/slicing-draft.md",
+      "retained": "evidence/scenarios/S2-default/repo/.p2p/work/parent/history/28f1fe49365a20b4e1b1f378be1290d25fb34b4d1a151dec8125a705dd8d67de/slicing-draft.md",
+      "sha256": "28f1fe49365a20b4e1b1f378be1290d25fb34b4d1a151dec8125a705dd8d67de"
+    }
+  ]
+}

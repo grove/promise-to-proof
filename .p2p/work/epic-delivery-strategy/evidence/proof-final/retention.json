@@ -1,0 +1,52 @@
+[
+  {
+    "original": "/private/tmp/p2p-final-proof/identity.py",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/proof-final/identity.py",
+    "sha256": "c5855d254a7feb111d32225e19ae0a19ebe6fa750ac3a530f7e5ac97ff9beb5c"
+  },
+  {
+    "original": "/private/tmp/p2p-final-proof/identity-before.txt",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/proof-final/identity-before.txt",
+    "sha256": "ad029df3d523b2941260b3d91b145d4f6f6c64c914edc479530b6dd423db6beb"
+  },
+  {
+    "original": "/private/tmp/p2p-final-proof/identity-after.txt",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/proof-final/identity-after.txt",
+    "sha256": "ad029df3d523b2941260b3d91b145d4f6f6c64c914edc479530b6dd423db6beb"
+  },
+  {
+    "original": "/private/tmp/p2p-final-proof/observe.py",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/proof-final/observe.py",
+    "sha256": "1b791f02845ffa60c0af6feb0709e95f3bb957ba20e0ba187ef44f7a750361fd"
+  },
+  {
+    "original": "/private/tmp/p2p-final-proof/observations.txt",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/proof-final/observations.txt",
+    "sha256": "88c8cd85f7dc08b7e8929c9ac97ba131246024d94a0298276951aa554c73fe75"
+  },
+  {
+    "original": "/private/tmp/p2p-final-proof/evidence_checks.py",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/proof-final/evidence_checks.py",
+    "sha256": "0dc85cc239301c09c1031a2e432f0172e2ccb4652fcf35dabc645783d7aba6c3"
+  },
+  {
+    "original": "/private/tmp/p2p-final-proof/evidence-checks.txt",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/proof-final/evidence-checks.txt",
+    "sha256": "fd0f208cee57c6edda3eaf03f826034cb6bb280e1778d08eb345361c0d47d412"
+  },
+  {
+    "original": "/private/tmp/p2p-final-proof/public-cli.log",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/proof-final/public-cli.log",
+    "sha256": "7da2ad9f21ca25cfc1b559e61e569fc2457593134140a48bdbdc7896ee5fa43e"
+  },
+  {
+    "original": "/private/tmp/p2p-final-proof/fixture-self-check.log",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/proof-final/fixture-self-check.log",
+    "sha256": "822592ead32b7cf3f073c150ba086614340e954aeb7949383324c54ae91c9660"
+  },
+  {
+    "original": "/private/tmp/p2p-final-proof/final-supplement-after.txt",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/proof-final/final-supplement-after.txt",
+    "sha256": "d09923f6435ecaa7e14d07cc6c4c2ec9a33a7c25de55abd71a5b8f40c3fe2e05"
+  }
+]

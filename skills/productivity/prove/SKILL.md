@@ -69,6 +69,13 @@ the current agreement. Capture and recheck applicable parent identities with
 the child contract. For parent proof, evaluate all parent obligations and
 cross-slice interactions on one exact integrated candidate. Historical child
 proofs and closed issues are references, not an aggregated parent verdict.
+Recover the approved delivery plan and parent completion conditions under the
+protocol's Epic delivery plans rules. Include independently landed contributions
+and required final-destination integration in the exact parent candidate. A
+failing interaction leaves the parent unproven even when every child passed.
+All-independent delivery needs combined parent verification, not an empty PR.
+A destination-only change does not change product promises or establish proof
+of a different candidate.
 
 ### 2. Identify the candidate
 

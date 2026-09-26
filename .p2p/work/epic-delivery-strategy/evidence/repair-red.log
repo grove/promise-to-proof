@@ -1,0 +1,20 @@
+E
+======================================================================
+ERROR: test_public_cli_retains_plain_approval_on_transfer_and_fresh_recovery (test_p2p_delivery.DeliveryTests.test_public_cli_retains_plain_approval_on_transfer_and_fresh_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/grove/projects/promise-to-proof2/checks/test_p2p_delivery.py", line 204, in test_public_cli_retains_plain_approval_on_transfer_and_fresh_recovery
+    self.assertEqual((workspace / receipt.relative_to(self.root)).read_bytes(), receipt.read_bytes())
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 777, in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/tmp2p7cccd2/source/.p2p/work/tiny/runtime/workspace/.p2p/work/parent/approval.md'
+
+----------------------------------------------------------------------
+Ran 1 test in 2.357s
+
+FAILED (errors=1)

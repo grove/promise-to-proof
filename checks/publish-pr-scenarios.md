@@ -229,3 +229,13 @@ file, local commit, conflicting destination branch, or failed recovery copy.
 Pass when reconciliation stops before removing or restoring local files, remote
 publication is retained, and the final answer names the local blocker. Repeat
 with publication-only approval: no checkout cleanup or branch switch occurs.
+
+## Epic delivery strategy scenarios
+
+S2–S3, S6–S13: discover targets, reject conflicts/stale previews, retarget only under exact authority, preserve human text, reconcile uncertain effects, and require full parent verification.
+
+Use the [disposable epic fixtures](./epic-delivery-scenarios.md) and its fresh
+installed-skill invocation procedure. Keep its oracle out of actor input. Inspect
+saved plan/report identities, actual Git refs, and controlled tracker call logs
+as well as the response. Follow the listed variants and positive verification
+phases; a baseline blocker alone does not execute the whole source scenario.

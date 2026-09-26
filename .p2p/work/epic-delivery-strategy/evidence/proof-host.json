@@ -1,0 +1,18 @@
+{
+  "stage": "proof",
+  "host_tool": "collaboration.spawn_agent",
+  "context_id": "/root/prove_epic_delivery",
+  "fork_turns": "none",
+  "reasoning_effort": "high",
+  "status": "completed",
+  "skill": "/Users/grove/.agents/skills/prove/SKILL.md",
+  "candidate": "snapshot:sha256:8ff16e4594d451c80b5c1cb7225874bb89b4190a6448dba86ee146e025ab0dd8",
+  "comparison_base": "5e369c1b45ba817b8add6b20a9b7b1c97898fa12",
+  "contract_sha256": "78cad1d7f85183100214da15fdc8418ed2220ce1af80764d648e139fdd899895",
+  "permissions": "default sandbox only; fixed inputs outside writable roots; /private/tmp scratch; no escalation or product changes",
+  "candidate_root": "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-candidate/candidate",
+  "records_root": "/private/var/tmp/p2p-issue33-verifier-8eh45dgs/first-proof-records",
+  "result": "NOT PROVEN",
+  "report": "proof.md",
+  "report_sha256": "dbfd16cb9fdc1fa615c19d4652fc8712b421cec106da1ed239fe49c54ca25a77"
+}

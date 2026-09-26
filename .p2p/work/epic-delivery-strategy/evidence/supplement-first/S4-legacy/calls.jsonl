@@ -1,0 +1,1 @@
+{"argv": ["pr", "view", "17", "--json", "number,state,baseRefName,headRefName,headRefOid"], "effect": null, "exit_code": 0, "result": {"baseRefName": "epic/example", "headRefName": "child/lookup", "headRefOid": "1fb033aa77a643636a0b9aa76f35b921f371ba39", "number": 17, "state": "OPEN"}, "sequence": 1}

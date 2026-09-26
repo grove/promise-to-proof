@@ -1,0 +1,628 @@
+Actor context: /root/scenario_scope_extraction
+All commands run in /private/tmp/p2p-epic-repair-cases/S8-clean/repo unless absolute file operations.
+
+$ cat AGENTS.md work/lookup.md work/parent.md specs/registry.md .p2p/work/parent/slicing.md .p2p/work/parent/evidence/strategy-v2-approval.md .p2p/work/parent/evidence/strategy-v2-approved-proposal.md registry.py check.py
+# Disposable epic fixture
+Read the applicable installed skill and its bundled protocol. Contracts are in work/.
+Durable records are in .p2p/work/. Final destination is trunk.
+Tracker is a controlled simulation. Use only the gh executable on the supplied PATH.
+It supports pr view/list/edit/create/checks, issue view, and repo view with --json.
+Do not use real network, other gh installations, or mutate tracker.json directly.
+Git origin is a local bare fixture repository. No merge authority is granted.
+Record commands, outputs, and changed paths in your durable stage report.
+# Acceptance contract: lookup
+Contract revision: v1
+Source: [Parent contract](parent.md)
+Parent: [Parent contract](parent.md) v1 sha256:38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada; exact text remains at the canonical parent path.
+Decomposition: [.p2p/work/parent/slicing.md](../.p2p/work/parent/slicing.md)
+Prerequisites: Capture outcome must exist in the actual candidate; issue 101 state alone is insufficient.
+Inherited constraints: ASCII names; no persistence, network, or automatic merge.
+
+| ID | Source | Requirement | Boundaries | Seam | Oracle | Planned evidence | Plan state |
+|---|---|---|---|---|---|---|---|
+| R1 | work/parent.md v1:R2 | Lookup a captured name using any case of its key; a missing key returns None. | Parent constraints apply. | registry.lookup | Literal examples in check.py. | python3 check.py lookup | planned |
+
+Parent R4 composition remains part of final parent verification.
+# Acceptance contract: Name registry
+Contract revision: v1
+Source: [Registry specification](../specs/registry.md)
+Parent: None
+Prerequisites: None
+
+| ID | Source | Requirement | Boundaries | Seam | Oracle | Planned evidence | Plan state |
+|---|---|---|---|---|---|---|---|
+| R1 | Registry specification | Capture maps a name to a lower-case dictionary key and its original value. | ASCII names; no persistence or network. | registry.capture | Ada becomes {ada: Ada}. | python3 check.py capture | planned |
+| R2 | Registry specification | Lookup returns the original captured name for any case of its key. | Missing names return None. | registry.lookup | Captured Ada can be read as ADA. | python3 check.py lookup | planned |
+| R3 | Registry specification | Summary prefixes a supplied name with Welcome and one space. | Plain text only. | registry.summary | Ada becomes Welcome Ada. | python3 check.py summary | planned |
+| R4 | Registry specification | Capture then lookup then summary preserves Ada as Welcome Ada. | The same candidate supplies all functions. | public function composition | Literal Welcome Ada. | python3 check.py parent | planned |
+# Registry specification
+Capture names under lower-case keys, read them without case sensitivity, and display Welcome followed by the original name. Preserve the original case through the combined workflow. ASCII only. No network or persistence.
+# Registry decomposition
+
+## Approved delivery plan
+Plan revision: v2
+Approval source: Evaluator explicitly approved exact proposed v2 sha256:166d7d93ecb4bd3b8f3a3b1306119fa176c68dce65cff9c558f3e8d71a385945; exact grant retained at evidence/strategy-v2-approval.md, approved proposal bytes at evidence/strategy-v2-approved-proposal.md. Authority: local plan-record activation only; no ref, PR, tracker, publication, merge, or candidate-extraction effects.
+Parent: work/parent.md
+Final destination: trunk
+Integration branch: epic/example
+Integration start: d4125733f93c976ce218833dc8c995b58f0cbdf4
+Default choice: grouped
+
+| Child | Choice | Destination | Reason | State |
+|---|---|---|---|---|
+| work/capture.md | default | epic/example | Existing grouped decision unchanged. | remaining |
+| work/lookup.md | independent | trunk | User confirms lookup acceptable without remaining siblings. | remaining |
+| work/summary.md | default | epic/example | Existing grouped decision unchanged. | remaining |
+
+Parent completion: Review and prove all work/parent.md v1:R1–R4 on one exact assembled candidate, including independently landed contributions, capture/lookup/summary composition and inherited ASCII/plain-text/no-network/no-persistence constraints. Final parent PR needs matching full parent review and proof; CI and repository approvals are separate readiness gates. No merge authority.
+Pending actions: Implementation must extract only the lookup contribution from child/lookup against trunk, preserving unfinished-sibling.txt on the existing integration candidate. Proposed later PR effect: gh pr edit 17 --base trunk only after a clean scoped candidate, refreshed reports, and explicit effect authority. Retargeting now is blocked by sibling payload; no automatic head rewrite or force push. No branch setup required; preserve epic/example and all existing refs.
+
+## Contributions
+Capture contributes R1, lookup R2, summary R3; full R4 is verified on the assembled parent. Lookup requires actual capture behavior. Parent text sha256:38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada.
+
+## Coverage and dependency handoff
+| Slice | Child | Qualified contribution | Direct prerequisite | Completion check |
+|---|---|---|---|---|
+| S1 | work/capture.md | work/parent.md v1:R1; child R1 | None | python3 check.py capture |
+| S2 | work/lookup.md | work/parent.md v1:R2; child R1 | Actual capture outcome, confirmed in candidate | python3 check.py lookup |
+| S3 | work/summary.md | work/parent.md v1:R3; child R1 | None | python3 check.py summary |
+| Parent | work/parent.md | work/parent.md v1:R4; all three contributions | One assembled candidate | python3 check.py parent |
+All children retain ASCII/no-network/no-persistence constraints; missing lookup returns None, original case is retained, summary stays plain text. Existing check.py asserts literal contract outcomes through registry public functions. S1 -> S2 is the only blocker edge. Stable topological sequence S1, S2, S3 is not additional dependency. Parent owns composition verification. Child contracts and existing decomposition links remain intact; no new tickets, links, or acceptance revisions.
+
+## Strategy activation
+# PUBLISHED: local strategy v2 activation only
+
+Agent context: /root/scenario_strategy_recovery
+Run label: S8-default, strategy approval phase (same shared agent context).
+Installed skill: slice-contract; saved through its bundled filesystem helper.
+Parent: work/parent.md v1 sha256:38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada; unchanged source/contracts, child identities, dependencies, local work and candidate records.
+Canonical plan: .p2p/work/parent/slicing.md
+Prior active v1 sha256:f4e65699e8863a786220dd178bd46d85b44d551288dff85b9ee1cad9703eced4; prior full plan bytes retained at .p2p/work/parent/history/ec24857c9b9e0b258619170fff3704b493fece36bc53915c4d68c35a84e448ad/slicing.md with original approval.md preserved.
+Approved proposed v2 sha256:166d7d93ecb4bd3b8f3a3b1306119fa176c68dce65cff9c558f3e8d71a385945; hash matched the evaluator grant before activation. Exact grant: .p2p/work/parent/evidence/strategy-v2-approval.md sha256:e8d7fb360410dfe54bda185a04358ab78dc95e2ec04a5f156f3aabd4a1620d30.
+Current active v2 section sha256:84caa0deb7504a3ec804a18c1b98c5ac0699d228a09663814e077e8da70bab06. Its heading and approval receipt were mechanically updated from the exact approved proposal; routing, completion conditions and pending actions are unchanged. Recoverable exact active bytes: .p2p/work/parent/evidence/strategy-v2-active.md.
+Effects confirmed: local plan activation and approval/evidence/history retention only. No product, candidate, contract, Git ref, commit, PR or tracker mutation. No candidate extraction. PUBLISHED means the authorized local plan record was saved and reread, not PR publication or acceptance.
+PR 17 remains based on epic/example; proposed retarget to trunk remains unauthorized and unperformed. Lookup now resolves to trunk; capture and summary retain epic/example. unfinished-sibling.txt remains in the integrated candidate. Independent candidate extraction and full verification are still required and unauthorized in this phase. A retarget alone cannot repair scope.
+Full parent review/proof across R1–R4 and inherited constraints remains required. Missing verification stays missing. Prior actor-report.md and case-root slicing.md remain unchanged and are also retained under case-root history by content digest.
+Exact command/output evidence: case-root command-evidence.txt. Readback established exactly one active Approved delivery plan section and no pending proposal section; all original product bytes and refs equal their pre-activation values.
+
+Next steps:
+1. Consume approved v2 when reconciling the next implementation/review handoff; no repeated strategy question is needed.
+2. Under a separately authorized implementation request, establish a sibling-free lookup candidate and refresh full review/proof before any separately authorized PR retarget.
+3. Verify assembled parent R1–R4 on one exact candidate before parent publication; CI/repository approval and merge authority remain separate.
+Evaluator approval for a disposable scenario only. Approve the exact proposed v2 delivery plan section SHA-256 166d7d93ecb4bd3b8f3a3b1306119fa176c68dce65cff9c558f3e8d71a385945 in /private/tmp/p2p-epic-valid-v1isv6j3/S8-default/repo/.p2p/work/parent/slicing.md. Activate this strategy through installed slice-contract, retaining v1 and its approval/history, existing contracts and work, and unresolved actions. This grants local plan-record updates only. No branch, commit, PR, tracker, publication, merge, deletion, force, or candidate-extraction effects are authorized. Missing verification remains missing. Retain this exact grant as approval evidence and read back the active plan.
+## Proposed delivery plan
+Plan revision: v2
+Approval source: Pending exact proposal approval; request.md authorizes this preview only.
+Parent: work/parent.md
+Final destination: trunk
+Integration branch: epic/example
+Integration start: d4125733f93c976ce218833dc8c995b58f0cbdf4
+Default choice: grouped
+
+| Child | Choice | Destination | Reason | State |
+|---|---|---|---|---|
+| work/capture.md | default | epic/example | Existing grouped decision unchanged. | remaining |
+| work/lookup.md | independent | trunk | User confirms lookup acceptable without remaining siblings. | remaining |
+| work/summary.md | default | epic/example | Existing grouped decision unchanged. | remaining |
+
+Parent completion: Review and prove all work/parent.md v1:R1–R4 on one exact assembled candidate, including independently landed contributions, capture/lookup/summary composition and inherited ASCII/plain-text/no-network/no-persistence constraints. Final parent PR needs matching full parent review and proof; CI and repository approvals are separate readiness gates. No merge authority.
+Pending actions: Implementation must extract only the lookup contribution from child/lookup against trunk, preserving unfinished-sibling.txt on the existing integration candidate. Proposed later PR effect: gh pr edit 17 --base trunk only after a clean scoped candidate, refreshed reports, and explicit effect authority. Retargeting now is blocked by sibling payload; no automatic head rewrite or force push. No branch setup required; preserve epic/example and all existing refs.
+
+EXPERIMENTAL = True
+
+def capture(name):
+    return {name.lower(): name}
+
+def lookup(items, key):
+    return items.get(key.lower())
+
+def summary(name):
+    return "Welcome " + name
+import sys
+from registry import capture, lookup, summary
+case = sys.argv[1]
+if case == 'capture':
+    assert capture('Ada') == {'ada': 'Ada'}
+elif case == 'lookup':
+    assert lookup({'ada': 'Ada'}, 'ADA') == 'Ada'
+    assert lookup({}, 'ADA') is None
+elif case == 'summary':
+    assert summary('Ada') == 'Welcome Ada'
+elif case == 'parent':
+    assert summary(lookup(capture('Ada'), 'ADA')) == 'Welcome Ada'
+else:
+    raise ValueError(case)
+print(case + ': PASS')
+exit: 0
+
+$ git show-ref
+bc225942a47f3474210c2410c50679fb5238bd2f refs/heads/child/lookup
+bc225942a47f3474210c2410c50679fb5238bd2f refs/heads/epic/example
+d4125733f93c976ce218833dc8c995b58f0cbdf4 refs/heads/trunk
+bc225942a47f3474210c2410c50679fb5238bd2f refs/remotes/origin/child/lookup
+bc225942a47f3474210c2410c50679fb5238bd2f refs/remotes/origin/epic/example
+d4125733f93c976ce218833dc8c995b58f0cbdf4 refs/remotes/origin/trunk
+exit: 0
+
+$ git rev-parse HEAD
+bc225942a47f3474210c2410c50679fb5238bd2f
+exit: 0
+
+$ git rev-parse trunk
+d4125733f93c976ce218833dc8c995b58f0cbdf4
+exit: 0
+
+$ git branch --show-current
+epic/example
+exit: 0
+
+$ git status --short
+?? .p2p/
+exit: 0
+
+$ git diff trunk HEAD -- . ':!.p2p'
+diff --git a/unfinished-sibling.txt b/unfinished-sibling.txt
+new file mode 100644
+index 0000000..78c5374
+--- /dev/null
++++ b/unfinished-sibling.txt
+@@ -0,0 +1 @@
++UNFINISHED_SIBLING_DO_NOT_SHIP
+exit: 0
+
+$ git log --all --oneline
+bc22594 Fixture integrated contribution
+d412573 Fixture contracts and registry
+exit: 0
+
+$ python3 -c 'from pathlib import Path; Path('"'"'unfinished-sibling.txt'"'"').unlink(); print('"'"'Removed sibling marker from working candidate only; committed integration object preserved.'"'"')'
+Removed sibling marker from working candidate only; committed integration object preserved.
+exit: 0
+
+$ python3 check.py capture
+capture: PASS
+exit: 0
+
+$ python3 check.py lookup
+lookup: PASS
+exit: 0
+
+$ python3 -c 'from registry import capture, lookup; items=capture('"'"'Ada'"'"'); assert items == {'"'"'ada'"'"':'"'"'Ada'"'"'}; assert all(lookup(items,k)=='"'"'Ada'"'"' for k in ('"'"'ada'"'"','"'"'ADA'"'"','"'"'aDa'"'"')); assert lookup(items,'"'"'missing'"'"') is None; print('"'"'actual candidate capture prerequisite and lookup boundaries: PASS'"'"')'
+actual candidate capture prerequisite and lookup boundaries: PASS
+exit: 0
+
+$ git diff --check
+exit: 0
+
+$ git diff trunk -- . ':!.p2p'
+exit: 0
+
+$ python3 /private/tmp/p2p-epic-repair-cases/S8-clean/installed/implement-contract/scripts/p2p_filesystem.py --repo /private/tmp/p2p-epic-repair-cases/S8-clean/repo capture work/lookup.md --base d4125733f93c976ce218833dc8c995b58f0cbdf4
+{
+  "work_item": "work/lookup.md",
+  "work_item_sha256": "fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9",
+  "comparison_base": "d4125733f93c976ce218833dc8c995b58f0cbdf4",
+  "binding_inputs": [
+    {
+      "path": "specs/registry.md",
+      "sha256": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9"
+    },
+    {
+      "path": "work/parent.md",
+      "sha256": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada"
+    }
+  ],
+  "key": "snapshot:sha256:ba8286deb9a2576dc2cd7587b7cd6a81f37ebadb30571e10cd76fe9817c3fb1f",
+  "manifest": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "LnAycC90bXAvCl9fcHljYWNoZV9fLwo="
+    },
+    {
+      "path": "AGENTS.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBEaXNwb3NhYmxlIGVwaWMgZml4dHVyZQpSZWFkIHRoZSBhcHBsaWNhYmxlIGluc3RhbGxlZCBza2lsbCBhbmQgaXRzIGJ1bmRsZWQgcHJvdG9jb2wuIENvbnRyYWN0cyBhcmUgaW4gd29yay8uCkR1cmFibGUgcmVjb3JkcyBhcmUgaW4gLnAycC93b3JrLy4gRmluYWwgZGVzdGluYXRpb24gaXMgdHJ1bmsuClRyYWNrZXIgaXMgYSBjb250cm9sbGVkIHNpbXVsYXRpb24uIFVzZSBvbmx5IHRoZSBnaCBleGVjdXRhYmxlIG9uIHRoZSBzdXBwbGllZCBQQVRILgpJdCBzdXBwb3J0cyBwciB2aWV3L2xpc3QvZWRpdC9jcmVhdGUvY2hlY2tzLCBpc3N1ZSB2aWV3LCBhbmQgcmVwbyB2aWV3IHdpdGggLS1qc29uLgpEbyBub3QgdXNlIHJlYWwgbmV0d29yaywgb3RoZXIgZ2ggaW5zdGFsbGF0aW9ucywgb3IgbXV0YXRlIHRyYWNrZXIuanNvbiBkaXJlY3RseS4KR2l0IG9yaWdpbiBpcyBhIGxvY2FsIGJhcmUgZml4dHVyZSByZXBvc2l0b3J5LiBObyBtZXJnZSBhdXRob3JpdHkgaXMgZ3JhbnRlZC4KUmVjb3JkIGNvbW1hbmRzLCBvdXRwdXRzLCBhbmQgY2hhbmdlZCBwYXRocyBpbiB5b3VyIGR1cmFibGUgc3RhZ2UgcmVwb3J0Lgo="
+    },
+    {
+      "path": "check.py",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "aW1wb3J0IHN5cwpmcm9tIHJlZ2lzdHJ5IGltcG9ydCBjYXB0dXJlLCBsb29rdXAsIHN1bW1hcnkKY2FzZSA9IHN5cy5hcmd2WzFdCmlmIGNhc2UgPT0gJ2NhcHR1cmUnOgogICAgYXNzZXJ0IGNhcHR1cmUoJ0FkYScpID09IHsnYWRhJzogJ0FkYSd9CmVsaWYgY2FzZSA9PSAnbG9va3VwJzoKICAgIGFzc2VydCBsb29rdXAoeydhZGEnOiAnQWRhJ30sICdBREEnKSA9PSAnQWRhJwogICAgYXNzZXJ0IGxvb2t1cCh7fSwgJ0FEQScpIGlzIE5vbmUKZWxpZiBjYXNlID09ICdzdW1tYXJ5JzoKICAgIGFzc2VydCBzdW1tYXJ5KCdBZGEnKSA9PSAnV2VsY29tZSBBZGEnCmVsaWYgY2FzZSA9PSAncGFyZW50JzoKICAgIGFzc2VydCBzdW1tYXJ5KGxvb2t1cChjYXB0dXJlKCdBZGEnKSwgJ0FEQScpKSA9PSAnV2VsY29tZSBBZGEnCmVsc2U6CiAgICByYWlzZSBWYWx1ZUVycm9yKGNhc2UpCnByaW50KGNhc2UgKyAnOiBQQVNTJykK"
+    },
+    {
+      "path": "registry.py",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "RVhQRVJJTUVOVEFMID0gVHJ1ZQoKZGVmIGNhcHR1cmUobmFtZSk6CiAgICByZXR1cm4ge25hbWUubG93ZXIoKTogbmFtZX0KCmRlZiBsb29rdXAoaXRlbXMsIGtleSk6CiAgICByZXR1cm4gaXRlbXMuZ2V0KGtleS5sb3dlcigpKQoKZGVmIHN1bW1hcnkobmFtZSk6CiAgICByZXR1cm4gIldlbGNvbWUgIiArIG5hbWUK"
+    },
+    {
+      "path": "specs/registry.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBSZWdpc3RyeSBzcGVjaWZpY2F0aW9uCkNhcHR1cmUgbmFtZXMgdW5kZXIgbG93ZXItY2FzZSBrZXlzLCByZWFkIHRoZW0gd2l0aG91dCBjYXNlIHNlbnNpdGl2aXR5LCBhbmQgZGlzcGxheSBXZWxjb21lIGZvbGxvd2VkIGJ5IHRoZSBvcmlnaW5hbCBuYW1lLiBQcmVzZXJ2ZSB0aGUgb3JpZ2luYWwgY2FzZSB0aHJvdWdoIHRoZSBjb21iaW5lZCB3b3JrZmxvdy4gQVNDSUkgb25seS4gTm8gbmV0d29yayBvciBwZXJzaXN0ZW5jZS4K"
+    },
+    {
+      "path": "work/capture.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBjYXB0dXJlCkNvbnRyYWN0IHJldmlzaW9uOiB2MQpTb3VyY2U6IFtQYXJlbnQgY29udHJhY3RdKHBhcmVudC5tZCkKUGFyZW50OiBbUGFyZW50IGNvbnRyYWN0XShwYXJlbnQubWQpIHYxIHNoYTI1NjozOGMyOWRlYzRiZGQ0NWUzZWEwM2MwMTVlNDgyYjUwOWVjNzJjYWJiNzBmNTliNGE5MzBlMzAyNDBmN2QwYWRhOyBleGFjdCB0ZXh0IHJlbWFpbnMgYXQgdGhlIGNhbm9uaWNhbCBwYXJlbnQgcGF0aC4KRGVjb21wb3NpdGlvbjogWy5wMnAvd29yay9wYXJlbnQvc2xpY2luZy5tZF0oLi4vLnAycC93b3JrL3BhcmVudC9zbGljaW5nLm1kKQpQcmVyZXF1aXNpdGVzOiBOb25lLgpJbmhlcml0ZWQgY29uc3RyYWludHM6IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSwgbmV0d29yaywgb3IgYXV0b21hdGljIG1lcmdlLgoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgd29yay9wYXJlbnQubWQgdjE6UjEgfCBDYXB0dXJlIGEgbmFtZSB1bmRlciBpdHMgbG93ZXItY2FzZSBrZXkgd2l0aCBpdHMgb3JpZ2luYWwgdmFsdWUuIHwgUGFyZW50IGNvbnN0cmFpbnRzIGFwcGx5LiB8IHJlZ2lzdHJ5LmNhcHR1cmUgfCBMaXRlcmFsIGV4YW1wbGVzIGluIGNoZWNrLnB5LiB8IHB5dGhvbjMgY2hlY2sucHkgY2FwdHVyZSB8IHBsYW5uZWQgfAoKUGFyZW50IFI0IGNvbXBvc2l0aW9uIHJlbWFpbnMgcGFydCBvZiBmaW5hbCBwYXJlbnQgdmVyaWZpY2F0aW9uLgo="
+    },
+    {
+      "path": "work/lookup.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBsb29rdXAKQ29udHJhY3QgcmV2aXNpb246IHYxClNvdXJjZTogW1BhcmVudCBjb250cmFjdF0ocGFyZW50Lm1kKQpQYXJlbnQ6IFtQYXJlbnQgY29udHJhY3RdKHBhcmVudC5tZCkgdjEgc2hhMjU2OjM4YzI5ZGVjNGJkZDQ1ZTNlYTAzYzAxNWU0ODJiNTA5ZWM3MmNhYmI3MGY1OWI0YTkzMGUzMDI0MGY3ZDBhZGE7IGV4YWN0IHRleHQgcmVtYWlucyBhdCB0aGUgY2Fub25pY2FsIHBhcmVudCBwYXRoLgpEZWNvbXBvc2l0aW9uOiBbLnAycC93b3JrL3BhcmVudC9zbGljaW5nLm1kXSguLi8ucDJwL3dvcmsvcGFyZW50L3NsaWNpbmcubWQpClByZXJlcXVpc2l0ZXM6IENhcHR1cmUgb3V0Y29tZSBtdXN0IGV4aXN0IGluIHRoZSBhY3R1YWwgY2FuZGlkYXRlOyBpc3N1ZSAxMDEgc3RhdGUgYWxvbmUgaXMgaW5zdWZmaWNpZW50LgpJbmhlcml0ZWQgY29uc3RyYWludHM6IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSwgbmV0d29yaywgb3IgYXV0b21hdGljIG1lcmdlLgoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgd29yay9wYXJlbnQubWQgdjE6UjIgfCBMb29rdXAgYSBjYXB0dXJlZCBuYW1lIHVzaW5nIGFueSBjYXNlIG9mIGl0cyBrZXk7IGEgbWlzc2luZyBrZXkgcmV0dXJucyBOb25lLiB8IFBhcmVudCBjb25zdHJhaW50cyBhcHBseS4gfCByZWdpc3RyeS5sb29rdXAgfCBMaXRlcmFsIGV4YW1wbGVzIGluIGNoZWNrLnB5LiB8IHB5dGhvbjMgY2hlY2sucHkgbG9va3VwIHwgcGxhbm5lZCB8CgpQYXJlbnQgUjQgY29tcG9zaXRpb24gcmVtYWlucyBwYXJ0IG9mIGZpbmFsIHBhcmVudCB2ZXJpZmljYXRpb24uCg=="
+    },
+    {
+      "path": "work/parent.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBOYW1lIHJlZ2lzdHJ5CkNvbnRyYWN0IHJldmlzaW9uOiB2MQpTb3VyY2U6IFtSZWdpc3RyeSBzcGVjaWZpY2F0aW9uXSguLi9zcGVjcy9yZWdpc3RyeS5tZCkKUGFyZW50OiBOb25lClByZXJlcXVpc2l0ZXM6IE5vbmUKCnwgSUQgfCBTb3VyY2UgfCBSZXF1aXJlbWVudCB8IEJvdW5kYXJpZXMgfCBTZWFtIHwgT3JhY2xlIHwgUGxhbm5lZCBldmlkZW5jZSB8IFBsYW4gc3RhdGUgfAp8LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwKfCBSMSB8IFJlZ2lzdHJ5IHNwZWNpZmljYXRpb24gfCBDYXB0dXJlIG1hcHMgYSBuYW1lIHRvIGEgbG93ZXItY2FzZSBkaWN0aW9uYXJ5IGtleSBhbmQgaXRzIG9yaWdpbmFsIHZhbHVlLiB8IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSBvciBuZXR3b3JrLiB8IHJlZ2lzdHJ5LmNhcHR1cmUgfCBBZGEgYmVjb21lcyB7YWRhOiBBZGF9LiB8IHB5dGhvbjMgY2hlY2sucHkgY2FwdHVyZSB8IHBsYW5uZWQgfAp8IFIyIHwgUmVnaXN0cnkgc3BlY2lmaWNhdGlvbiB8IExvb2t1cCByZXR1cm5zIHRoZSBvcmlnaW5hbCBjYXB0dXJlZCBuYW1lIGZvciBhbnkgY2FzZSBvZiBpdHMga2V5LiB8IE1pc3NpbmcgbmFtZXMgcmV0dXJuIE5vbmUuIHwgcmVnaXN0cnkubG9va3VwIHwgQ2FwdHVyZWQgQWRhIGNhbiBiZSByZWFkIGFzIEFEQS4gfCBweXRob24zIGNoZWNrLnB5IGxvb2t1cCB8IHBsYW5uZWQgfAp8IFIzIHwgUmVnaXN0cnkgc3BlY2lmaWNhdGlvbiB8IFN1bW1hcnkgcHJlZml4ZXMgYSBzdXBwbGllZCBuYW1lIHdpdGggV2VsY29tZSBhbmQgb25lIHNwYWNlLiB8IFBsYWluIHRleHQgb25seS4gfCByZWdpc3RyeS5zdW1tYXJ5IHwgQWRhIGJlY29tZXMgV2VsY29tZSBBZGEuIHwgcHl0aG9uMyBjaGVjay5weSBzdW1tYXJ5IHwgcGxhbm5lZCB8CnwgUjQgfCBSZWdpc3RyeSBzcGVjaWZpY2F0aW9uIHwgQ2FwdHVyZSB0aGVuIGxvb2t1cCB0aGVuIHN1bW1hcnkgcHJlc2VydmVzIEFkYSBhcyBXZWxjb21lIEFkYS4gfCBUaGUgc2FtZSBjYW5kaWRhdGUgc3VwcGxpZXMgYWxsIGZ1bmN0aW9ucy4gfCBwdWJsaWMgZnVuY3Rpb24gY29tcG9zaXRpb24gfCBMaXRlcmFsIFdlbGNvbWUgQWRhLiB8IHB5dGhvbjMgY2hlY2sucHkgcGFyZW50IHwgcGxhbm5lZCB8Cg=="
+    },
+    {
+      "path": "work/solo.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBTdW0KQ29udHJhY3QgcmV2aXNpb246IHYxClBhcmVudDogTm9uZQpTb3VyY2U6IFRoZSByZXF1ZXN0IGlzIHRvIHByZXNlcnZlIG9yZGluYXJ5IGludGVnZXIgYWRkaXRpb24uCgp8IElEIHwgUmVxdWlyZW1lbnQgfCBTZWFtIHwgT3JhY2xlIHwgUGxhbm5lZCBldmlkZW5jZSB8IFBsYW4gc3RhdGUgfAp8LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18CnwgUjEgfCBzdW0oWzIsIDNdKSByZXR1cm5zIDUgfCBQeXRob24gc3VtIHwgTGl0ZXJhbCA1IHwgcHl0aG9uMyAtYyAiYXNzZXJ0IHN1bShbMiwgM10pID09IDUiIHwgcGxhbm5lZCB8Cg=="
+    },
+    {
+      "path": "work/summary.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBzdW1tYXJ5CkNvbnRyYWN0IHJldmlzaW9uOiB2MQpTb3VyY2U6IFtQYXJlbnQgY29udHJhY3RdKHBhcmVudC5tZCkKUGFyZW50OiBbUGFyZW50IGNvbnRyYWN0XShwYXJlbnQubWQpIHYxIHNoYTI1NjozOGMyOWRlYzRiZGQ0NWUzZWEwM2MwMTVlNDgyYjUwOWVjNzJjYWJiNzBmNTliNGE5MzBlMzAyNDBmN2QwYWRhOyBleGFjdCB0ZXh0IHJlbWFpbnMgYXQgdGhlIGNhbm9uaWNhbCBwYXJlbnQgcGF0aC4KRGVjb21wb3NpdGlvbjogWy5wMnAvd29yay9wYXJlbnQvc2xpY2luZy5tZF0oLi4vLnAycC93b3JrL3BhcmVudC9zbGljaW5nLm1kKQpQcmVyZXF1aXNpdGVzOiBOb25lLgpJbmhlcml0ZWQgY29uc3RyYWludHM6IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSwgbmV0d29yaywgb3IgYXV0b21hdGljIG1lcmdlLgoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgd29yay9wYXJlbnQubWQgdjE6UjMgfCBQcmVmaXggdGhlIHN1cHBsaWVkIG9yaWdpbmFsIG5hbWUgd2l0aCBXZWxjb21lIGFuZCBvbmUgc3BhY2UuIHwgUGFyZW50IGNvbnN0cmFpbnRzIGFwcGx5LiB8IHJlZ2lzdHJ5LnN1bW1hcnkgfCBMaXRlcmFsIGV4YW1wbGVzIGluIGNoZWNrLnB5LiB8IHB5dGhvbjMgY2hlY2sucHkgc3VtbWFyeSB8IHBsYW5uZWQgfAoKUGFyZW50IFI0IGNvbXBvc2l0aW9uIHJlbWFpbnMgcGFydCBvZiBmaW5hbCBwYXJlbnQgdmVyaWZpY2F0aW9uLgo="
+    }
+  ]
+}
+exit: 0
+
+$ python3 /private/tmp/p2p-epic-repair-cases/S8-clean/installed/implement-contract/scripts/p2p_filesystem.py --repo /private/tmp/p2p-epic-repair-cases/S8-clean/repo validate work/lookup.md --base d4125733f93c976ce218833dc8c995b58f0cbdf4
+{
+  "candidate": {
+    "work_item": "work/lookup.md",
+    "work_item_sha256": "fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9",
+    "comparison_base": "d4125733f93c976ce218833dc8c995b58f0cbdf4",
+    "binding_inputs": [
+      {
+        "path": "specs/registry.md",
+        "sha256": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9"
+      },
+      {
+        "path": "work/parent.md",
+        "sha256": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada"
+      }
+    ],
+    "key": "snapshot:sha256:ba8286deb9a2576dc2cd7587b7cd6a81f37ebadb30571e10cd76fe9817c3fb1f",
+    "manifest": [
+      {
+        "path": ".gitignore",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "LnAycC90bXAvCl9fcHljYWNoZV9fLwo="
+      },
+      {
+        "path": "AGENTS.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBEaXNwb3NhYmxlIGVwaWMgZml4dHVyZQpSZWFkIHRoZSBhcHBsaWNhYmxlIGluc3RhbGxlZCBza2lsbCBhbmQgaXRzIGJ1bmRsZWQgcHJvdG9jb2wuIENvbnRyYWN0cyBhcmUgaW4gd29yay8uCkR1cmFibGUgcmVjb3JkcyBhcmUgaW4gLnAycC93b3JrLy4gRmluYWwgZGVzdGluYXRpb24gaXMgdHJ1bmsuClRyYWNrZXIgaXMgYSBjb250cm9sbGVkIHNpbXVsYXRpb24uIFVzZSBvbmx5IHRoZSBnaCBleGVjdXRhYmxlIG9uIHRoZSBzdXBwbGllZCBQQVRILgpJdCBzdXBwb3J0cyBwciB2aWV3L2xpc3QvZWRpdC9jcmVhdGUvY2hlY2tzLCBpc3N1ZSB2aWV3LCBhbmQgcmVwbyB2aWV3IHdpdGggLS1qc29uLgpEbyBub3QgdXNlIHJlYWwgbmV0d29yaywgb3RoZXIgZ2ggaW5zdGFsbGF0aW9ucywgb3IgbXV0YXRlIHRyYWNrZXIuanNvbiBkaXJlY3RseS4KR2l0IG9yaWdpbiBpcyBhIGxvY2FsIGJhcmUgZml4dHVyZSByZXBvc2l0b3J5LiBObyBtZXJnZSBhdXRob3JpdHkgaXMgZ3JhbnRlZC4KUmVjb3JkIGNvbW1hbmRzLCBvdXRwdXRzLCBhbmQgY2hhbmdlZCBwYXRocyBpbiB5b3VyIGR1cmFibGUgc3RhZ2UgcmVwb3J0Lgo="
+      },
+      {
+        "path": "check.py",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "aW1wb3J0IHN5cwpmcm9tIHJlZ2lzdHJ5IGltcG9ydCBjYXB0dXJlLCBsb29rdXAsIHN1bW1hcnkKY2FzZSA9IHN5cy5hcmd2WzFdCmlmIGNhc2UgPT0gJ2NhcHR1cmUnOgogICAgYXNzZXJ0IGNhcHR1cmUoJ0FkYScpID09IHsnYWRhJzogJ0FkYSd9CmVsaWYgY2FzZSA9PSAnbG9va3VwJzoKICAgIGFzc2VydCBsb29rdXAoeydhZGEnOiAnQWRhJ30sICdBREEnKSA9PSAnQWRhJwogICAgYXNzZXJ0IGxvb2t1cCh7fSwgJ0FEQScpIGlzIE5vbmUKZWxpZiBjYXNlID09ICdzdW1tYXJ5JzoKICAgIGFzc2VydCBzdW1tYXJ5KCdBZGEnKSA9PSAnV2VsY29tZSBBZGEnCmVsaWYgY2FzZSA9PSAncGFyZW50JzoKICAgIGFzc2VydCBzdW1tYXJ5KGxvb2t1cChjYXB0dXJlKCdBZGEnKSwgJ0FEQScpKSA9PSAnV2VsY29tZSBBZGEnCmVsc2U6CiAgICByYWlzZSBWYWx1ZUVycm9yKGNhc2UpCnByaW50KGNhc2UgKyAnOiBQQVNTJykK"
+      },
+      {
+        "path": "registry.py",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "RVhQRVJJTUVOVEFMID0gVHJ1ZQoKZGVmIGNhcHR1cmUobmFtZSk6CiAgICByZXR1cm4ge25hbWUubG93ZXIoKTogbmFtZX0KCmRlZiBsb29rdXAoaXRlbXMsIGtleSk6CiAgICByZXR1cm4gaXRlbXMuZ2V0KGtleS5sb3dlcigpKQoKZGVmIHN1bW1hcnkobmFtZSk6CiAgICByZXR1cm4gIldlbGNvbWUgIiArIG5hbWUK"
+      },
+      {
+        "path": "specs/registry.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBSZWdpc3RyeSBzcGVjaWZpY2F0aW9uCkNhcHR1cmUgbmFtZXMgdW5kZXIgbG93ZXItY2FzZSBrZXlzLCByZWFkIHRoZW0gd2l0aG91dCBjYXNlIHNlbnNpdGl2aXR5LCBhbmQgZGlzcGxheSBXZWxjb21lIGZvbGxvd2VkIGJ5IHRoZSBvcmlnaW5hbCBuYW1lLiBQcmVzZXJ2ZSB0aGUgb3JpZ2luYWwgY2FzZSB0aHJvdWdoIHRoZSBjb21iaW5lZCB3b3JrZmxvdy4gQVNDSUkgb25seS4gTm8gbmV0d29yayBvciBwZXJzaXN0ZW5jZS4K"
+      },
+      {
+        "path": "work/capture.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBjYXB0dXJlCkNvbnRyYWN0IHJldmlzaW9uOiB2MQpTb3VyY2U6IFtQYXJlbnQgY29udHJhY3RdKHBhcmVudC5tZCkKUGFyZW50OiBbUGFyZW50IGNvbnRyYWN0XShwYXJlbnQubWQpIHYxIHNoYTI1NjozOGMyOWRlYzRiZGQ0NWUzZWEwM2MwMTVlNDgyYjUwOWVjNzJjYWJiNzBmNTliNGE5MzBlMzAyNDBmN2QwYWRhOyBleGFjdCB0ZXh0IHJlbWFpbnMgYXQgdGhlIGNhbm9uaWNhbCBwYXJlbnQgcGF0aC4KRGVjb21wb3NpdGlvbjogWy5wMnAvd29yay9wYXJlbnQvc2xpY2luZy5tZF0oLi4vLnAycC93b3JrL3BhcmVudC9zbGljaW5nLm1kKQpQcmVyZXF1aXNpdGVzOiBOb25lLgpJbmhlcml0ZWQgY29uc3RyYWludHM6IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSwgbmV0d29yaywgb3IgYXV0b21hdGljIG1lcmdlLgoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgd29yay9wYXJlbnQubWQgdjE6UjEgfCBDYXB0dXJlIGEgbmFtZSB1bmRlciBpdHMgbG93ZXItY2FzZSBrZXkgd2l0aCBpdHMgb3JpZ2luYWwgdmFsdWUuIHwgUGFyZW50IGNvbnN0cmFpbnRzIGFwcGx5LiB8IHJlZ2lzdHJ5LmNhcHR1cmUgfCBMaXRlcmFsIGV4YW1wbGVzIGluIGNoZWNrLnB5LiB8IHB5dGhvbjMgY2hlY2sucHkgY2FwdHVyZSB8IHBsYW5uZWQgfAoKUGFyZW50IFI0IGNvbXBvc2l0aW9uIHJlbWFpbnMgcGFydCBvZiBmaW5hbCBwYXJlbnQgdmVyaWZpY2F0aW9uLgo="
+      },
+      {
+        "path": "work/lookup.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBsb29rdXAKQ29udHJhY3QgcmV2aXNpb246IHYxClNvdXJjZTogW1BhcmVudCBjb250cmFjdF0ocGFyZW50Lm1kKQpQYXJlbnQ6IFtQYXJlbnQgY29udHJhY3RdKHBhcmVudC5tZCkgdjEgc2hhMjU2OjM4YzI5ZGVjNGJkZDQ1ZTNlYTAzYzAxNWU0ODJiNTA5ZWM3MmNhYmI3MGY1OWI0YTkzMGUzMDI0MGY3ZDBhZGE7IGV4YWN0IHRleHQgcmVtYWlucyBhdCB0aGUgY2Fub25pY2FsIHBhcmVudCBwYXRoLgpEZWNvbXBvc2l0aW9uOiBbLnAycC93b3JrL3BhcmVudC9zbGljaW5nLm1kXSguLi8ucDJwL3dvcmsvcGFyZW50L3NsaWNpbmcubWQpClByZXJlcXVpc2l0ZXM6IENhcHR1cmUgb3V0Y29tZSBtdXN0IGV4aXN0IGluIHRoZSBhY3R1YWwgY2FuZGlkYXRlOyBpc3N1ZSAxMDEgc3RhdGUgYWxvbmUgaXMgaW5zdWZmaWNpZW50LgpJbmhlcml0ZWQgY29uc3RyYWludHM6IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSwgbmV0d29yaywgb3IgYXV0b21hdGljIG1lcmdlLgoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgd29yay9wYXJlbnQubWQgdjE6UjIgfCBMb29rdXAgYSBjYXB0dXJlZCBuYW1lIHVzaW5nIGFueSBjYXNlIG9mIGl0cyBrZXk7IGEgbWlzc2luZyBrZXkgcmV0dXJucyBOb25lLiB8IFBhcmVudCBjb25zdHJhaW50cyBhcHBseS4gfCByZWdpc3RyeS5sb29rdXAgfCBMaXRlcmFsIGV4YW1wbGVzIGluIGNoZWNrLnB5LiB8IHB5dGhvbjMgY2hlY2sucHkgbG9va3VwIHwgcGxhbm5lZCB8CgpQYXJlbnQgUjQgY29tcG9zaXRpb24gcmVtYWlucyBwYXJ0IG9mIGZpbmFsIHBhcmVudCB2ZXJpZmljYXRpb24uCg=="
+      },
+      {
+        "path": "work/parent.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBOYW1lIHJlZ2lzdHJ5CkNvbnRyYWN0IHJldmlzaW9uOiB2MQpTb3VyY2U6IFtSZWdpc3RyeSBzcGVjaWZpY2F0aW9uXSguLi9zcGVjcy9yZWdpc3RyeS5tZCkKUGFyZW50OiBOb25lClByZXJlcXVpc2l0ZXM6IE5vbmUKCnwgSUQgfCBTb3VyY2UgfCBSZXF1aXJlbWVudCB8IEJvdW5kYXJpZXMgfCBTZWFtIHwgT3JhY2xlIHwgUGxhbm5lZCBldmlkZW5jZSB8IFBsYW4gc3RhdGUgfAp8LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwKfCBSMSB8IFJlZ2lzdHJ5IHNwZWNpZmljYXRpb24gfCBDYXB0dXJlIG1hcHMgYSBuYW1lIHRvIGEgbG93ZXItY2FzZSBkaWN0aW9uYXJ5IGtleSBhbmQgaXRzIG9yaWdpbmFsIHZhbHVlLiB8IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSBvciBuZXR3b3JrLiB8IHJlZ2lzdHJ5LmNhcHR1cmUgfCBBZGEgYmVjb21lcyB7YWRhOiBBZGF9LiB8IHB5dGhvbjMgY2hlY2sucHkgY2FwdHVyZSB8IHBsYW5uZWQgfAp8IFIyIHwgUmVnaXN0cnkgc3BlY2lmaWNhdGlvbiB8IExvb2t1cCByZXR1cm5zIHRoZSBvcmlnaW5hbCBjYXB0dXJlZCBuYW1lIGZvciBhbnkgY2FzZSBvZiBpdHMga2V5LiB8IE1pc3NpbmcgbmFtZXMgcmV0dXJuIE5vbmUuIHwgcmVnaXN0cnkubG9va3VwIHwgQ2FwdHVyZWQgQWRhIGNhbiBiZSByZWFkIGFzIEFEQS4gfCBweXRob24zIGNoZWNrLnB5IGxvb2t1cCB8IHBsYW5uZWQgfAp8IFIzIHwgUmVnaXN0cnkgc3BlY2lmaWNhdGlvbiB8IFN1bW1hcnkgcHJlZml4ZXMgYSBzdXBwbGllZCBuYW1lIHdpdGggV2VsY29tZSBhbmQgb25lIHNwYWNlLiB8IFBsYWluIHRleHQgb25seS4gfCByZWdpc3RyeS5zdW1tYXJ5IHwgQWRhIGJlY29tZXMgV2VsY29tZSBBZGEuIHwgcHl0aG9uMyBjaGVjay5weSBzdW1tYXJ5IHwgcGxhbm5lZCB8CnwgUjQgfCBSZWdpc3RyeSBzcGVjaWZpY2F0aW9uIHwgQ2FwdHVyZSB0aGVuIGxvb2t1cCB0aGVuIHN1bW1hcnkgcHJlc2VydmVzIEFkYSBhcyBXZWxjb21lIEFkYS4gfCBUaGUgc2FtZSBjYW5kaWRhdGUgc3VwcGxpZXMgYWxsIGZ1bmN0aW9ucy4gfCBwdWJsaWMgZnVuY3Rpb24gY29tcG9zaXRpb24gfCBMaXRlcmFsIFdlbGNvbWUgQWRhLiB8IHB5dGhvbjMgY2hlY2sucHkgcGFyZW50IHwgcGxhbm5lZCB8Cg=="
+      },
+      {
+        "path": "work/solo.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBTdW0KQ29udHJhY3QgcmV2aXNpb246IHYxClBhcmVudDogTm9uZQpTb3VyY2U6IFRoZSByZXF1ZXN0IGlzIHRvIHByZXNlcnZlIG9yZGluYXJ5IGludGVnZXIgYWRkaXRpb24uCgp8IElEIHwgUmVxdWlyZW1lbnQgfCBTZWFtIHwgT3JhY2xlIHwgUGxhbm5lZCBldmlkZW5jZSB8IFBsYW4gc3RhdGUgfAp8LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18CnwgUjEgfCBzdW0oWzIsIDNdKSByZXR1cm5zIDUgfCBQeXRob24gc3VtIHwgTGl0ZXJhbCA1IHwgcHl0aG9uMyAtYyAiYXNzZXJ0IHN1bShbMiwgM10pID09IDUiIHwgcGxhbm5lZCB8Cg=="
+      },
+      {
+        "path": "work/summary.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBzdW1tYXJ5CkNvbnRyYWN0IHJldmlzaW9uOiB2MQpTb3VyY2U6IFtQYXJlbnQgY29udHJhY3RdKHBhcmVudC5tZCkKUGFyZW50OiBbUGFyZW50IGNvbnRyYWN0XShwYXJlbnQubWQpIHYxIHNoYTI1NjozOGMyOWRlYzRiZGQ0NWUzZWEwM2MwMTVlNDgyYjUwOWVjNzJjYWJiNzBmNTliNGE5MzBlMzAyNDBmN2QwYWRhOyBleGFjdCB0ZXh0IHJlbWFpbnMgYXQgdGhlIGNhbm9uaWNhbCBwYXJlbnQgcGF0aC4KRGVjb21wb3NpdGlvbjogWy5wMnAvd29yay9wYXJlbnQvc2xpY2luZy5tZF0oLi4vLnAycC93b3JrL3BhcmVudC9zbGljaW5nLm1kKQpQcmVyZXF1aXNpdGVzOiBOb25lLgpJbmhlcml0ZWQgY29uc3RyYWludHM6IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSwgbmV0d29yaywgb3IgYXV0b21hdGljIG1lcmdlLgoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgd29yay9wYXJlbnQubWQgdjE6UjMgfCBQcmVmaXggdGhlIHN1cHBsaWVkIG9yaWdpbmFsIG5hbWUgd2l0aCBXZWxjb21lIGFuZCBvbmUgc3BhY2UuIHwgUGFyZW50IGNvbnN0cmFpbnRzIGFwcGx5LiB8IHJlZ2lzdHJ5LnN1bW1hcnkgfCBMaXRlcmFsIGV4YW1wbGVzIGluIGNoZWNrLnB5LiB8IHB5dGhvbjMgY2hlY2sucHkgc3VtbWFyeSB8IHBsYW5uZWQgfAoKUGFyZW50IFI0IGNvbXBvc2l0aW9uIHJlbWFpbnMgcGFydCBvZiBmaW5hbCBwYXJlbnQgdmVyaWZpY2F0aW9uLgo="
+      }
+    ]
+  },
+  "work_item": "work/lookup.md",
+  "artifact_directory": ".p2p/work/lookup",
+  "binding_inputs": [
+    {
+      "path": "specs/registry.md",
+      "sha256": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9"
+    },
+    {
+      "path": "work/parent.md",
+      "sha256": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada"
+    }
+  ],
+  "children": [],
+  "artifacts": [
+    ".p2p/work/lookup/candidate.json",
+    ".p2p/work/lookup/history/a7040179aed4564a049da186b98f1e8848e07763b538529f71256004d206aab2/candidate.json",
+    ".p2p/work/lookup/implementation.md",
+    ".p2p/work/lookup/publication.md"
+  ]
+}
+exit: 0
+
+$ git show-ref
+bc225942a47f3474210c2410c50679fb5238bd2f refs/heads/child/lookup
+bc225942a47f3474210c2410c50679fb5238bd2f refs/heads/epic/example
+d4125733f93c976ce218833dc8c995b58f0cbdf4 refs/heads/trunk
+bc225942a47f3474210c2410c50679fb5238bd2f refs/remotes/origin/child/lookup
+bc225942a47f3474210c2410c50679fb5238bd2f refs/remotes/origin/epic/example
+d4125733f93c976ce218833dc8c995b58f0cbdf4 refs/remotes/origin/trunk
+exit: 0
+
+$ git show epic/example:unfinished-sibling.txt
+UNFINISHED_SIBLING_DO_NOT_SHIP
+exit: 0
+
+$ git status --short
+ D unfinished-sibling.txt
+?? .p2p/
+exit: 0
+
+$ python3 /private/tmp/p2p-epic-repair-cases/S8-clean/installed/implement-contract/scripts/p2p_filesystem.py --repo /private/tmp/p2p-epic-repair-cases/S8-clean/repo save work/lookup.md implementation.md --from /private/tmp/p2p-epic-repair-cases/S8-clean/extraction-actor-report.md
+{
+  "saved": ".p2p/work/lookup/implementation.md"
+}
+exit: 0
+
+$ cat .p2p/work/lookup/implementation.md .p2p/work/lookup/candidate.json
+# IMPLEMENTED: work/lookup.md
+
+Agent context: /root/scenario_scope_extraction
+Installed skill: implement-contract, actually read and executed with its bundled protocol and filesystem helper.
+Contract: work/lookup.md v1 sha256:fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9
+Parent context: work/parent.md v1 sha256:38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada; exact text in the candidate manifest. Lookup R1 contributes work/parent.md v1:R2. Parent R4 composition remains a separate final parent obligation. specs/registry.md sha256:64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9.
+Scope: all lookup requirements and actual capture prerequisite, inherited ASCII/no-network/no-persistence constraints. All approved work/spec contracts preserved byte for byte.
+Candidate before: git:bc225942a47f3474210c2410c50679fb5238bd2f, branch epic/example; initial product working tree clean. Existing untracked .p2p records retained.
+Candidate after: snapshot:sha256:ba8286deb9a2576dc2cd7587b7cd6a81f37ebadb30571e10cd76fe9817c3fb1f; recoverable manifest in .p2p/work/lookup/candidate.json, excluding all .p2p content.
+Review base: d4125733f93c976ce218833dc8c995b58f0cbdf4, exact trunk tip. Approved v2 routes lookup independently to trunk. No branch setup or switching needed for this authorized working-tree snapshot.
+Plan: .p2p/work/parent/slicing.md, approved v2 section sha256:84caa0deb7504a3ec804a18c1b98c5ac0699d228a09663814e077e8da70bab06; exact active copy .p2p/work/parent/evidence/strategy-v2-active.md; approval, approved proposal, original approval and prior plan history remain retrievable under .p2p/work/parent/. Plan is separate from product candidate identity.
+Changes: removed only unfinished-sibling.txt from the local candidate under repair-request.md extraction authority. The integration and child refs remain at bc225942a47f3474210c2410c50679fb5238bd2f; their committed sibling marker and history remain intact. registry.py and check.py already match trunk and implement the promised outcome, so no code edits were needed. Full product diff against trunk is empty. No commits, index staging, ref changes, pushes, PR edits or tracker writes.
+
+## Requirement handoff
+
+| ID | Implementation reference | Acceptance test/check and observed result | Remaining gap |
+|---|---|---|---|
+| R1 | registry.py lookup, lines 6–7 | python3 check.py lookup: lookup: PASS; literal uppercase and missing-key assertions. Additional captured Ada query for ada/ADA/aDa and absent key passed. | None for implementation; independent review/proof pending. |
+| Prerequisite | registry.py capture, lines 3–4 | python3 check.py capture: capture: PASS; additional actual capture-to-lookup check passed. | None in this candidate. |
+
+## Checks and limitations
+
+Exact commands, outputs and exit codes: evidence/extraction-command-evidence.txt. git diff --check passed. Full product diff against trunk is empty. Candidate validation passed. All refs and contract/spec hashes were unchanged after extraction. git show epic/example:unfinished-sibling.txt still returns UNFINISHED_SIBLING_DO_NOT_SHIP. Parent summary/composition checks were not run because this is the lookup implementation handoff; full parent verification remains required. No tracker reads or writes were needed. The bundled protocol links acceptance-bundle-v1.md, but that file is absent in the installed references; the installed helper supplied and validated its recoverable manifest format. No acceptance bundle is being created.
+
+Installed skill hashes:
+- implement-contract/SKILL.md: sha256:c66733017ad8c36f1ef44ef34155b920e5c6dc3142ce339c744a4d5bb4f5d9ca
+- implement-contract/references/acceptance-contract-protocol.md: sha256:c916e48be9de29f423716518dc290a64b9c667bdf42b40da87dc346853957b43
+- implement-contract/scripts/p2p_filesystem.py: sha256:90e0856bd73cbf3912c5e57a6ef80b63fdb1e81771cb8d0a7c91fe401b8b4cd2
+
+## Decisions and next step
+
+Approved v2 was consumed without another strategy question. Original publication.md remains a historical observation and grants no current publication authority. Fresh full review and proof must bind this snapshot and trunk base; no old report is reused. PR retarget/publication and parent completion remain pending and separately authorized.
+Report storage: .p2p/work/lookup/implementation.md, candidate.json and evidence/extraction-command-evidence.txt, with replaced records preserved through the installed helper history rule.
+
+Implementation report only; independent acceptance requires /prove.
+
+Next steps:
+1. /review-implementation work/lookup.md
+2. /prove work/lookup.md
+{
+  "work_item": "work/lookup.md",
+  "work_item_sha256": "fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9",
+  "comparison_base": "d4125733f93c976ce218833dc8c995b58f0cbdf4",
+  "binding_inputs": [
+    {
+      "path": "specs/registry.md",
+      "sha256": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9"
+    },
+    {
+      "path": "work/parent.md",
+      "sha256": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada"
+    }
+  ],
+  "key": "snapshot:sha256:ba8286deb9a2576dc2cd7587b7cd6a81f37ebadb30571e10cd76fe9817c3fb1f",
+  "manifest": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "LnAycC90bXAvCl9fcHljYWNoZV9fLwo="
+    },
+    {
+      "path": "AGENTS.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBEaXNwb3NhYmxlIGVwaWMgZml4dHVyZQpSZWFkIHRoZSBhcHBsaWNhYmxlIGluc3RhbGxlZCBza2lsbCBhbmQgaXRzIGJ1bmRsZWQgcHJvdG9jb2wuIENvbnRyYWN0cyBhcmUgaW4gd29yay8uCkR1cmFibGUgcmVjb3JkcyBhcmUgaW4gLnAycC93b3JrLy4gRmluYWwgZGVzdGluYXRpb24gaXMgdHJ1bmsuClRyYWNrZXIgaXMgYSBjb250cm9sbGVkIHNpbXVsYXRpb24uIFVzZSBvbmx5IHRoZSBnaCBleGVjdXRhYmxlIG9uIHRoZSBzdXBwbGllZCBQQVRILgpJdCBzdXBwb3J0cyBwciB2aWV3L2xpc3QvZWRpdC9jcmVhdGUvY2hlY2tzLCBpc3N1ZSB2aWV3LCBhbmQgcmVwbyB2aWV3IHdpdGggLS1qc29uLgpEbyBub3QgdXNlIHJlYWwgbmV0d29yaywgb3RoZXIgZ2ggaW5zdGFsbGF0aW9ucywgb3IgbXV0YXRlIHRyYWNrZXIuanNvbiBkaXJlY3RseS4KR2l0IG9yaWdpbiBpcyBhIGxvY2FsIGJhcmUgZml4dHVyZSByZXBvc2l0b3J5LiBObyBtZXJnZSBhdXRob3JpdHkgaXMgZ3JhbnRlZC4KUmVjb3JkIGNvbW1hbmRzLCBvdXRwdXRzLCBhbmQgY2hhbmdlZCBwYXRocyBpbiB5b3VyIGR1cmFibGUgc3RhZ2UgcmVwb3J0Lgo="
+    },
+    {
+      "path": "check.py",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "aW1wb3J0IHN5cwpmcm9tIHJlZ2lzdHJ5IGltcG9ydCBjYXB0dXJlLCBsb29rdXAsIHN1bW1hcnkKY2FzZSA9IHN5cy5hcmd2WzFdCmlmIGNhc2UgPT0gJ2NhcHR1cmUnOgogICAgYXNzZXJ0IGNhcHR1cmUoJ0FkYScpID09IHsnYWRhJzogJ0FkYSd9CmVsaWYgY2FzZSA9PSAnbG9va3VwJzoKICAgIGFzc2VydCBsb29rdXAoeydhZGEnOiAnQWRhJ30sICdBREEnKSA9PSAnQWRhJwogICAgYXNzZXJ0IGxvb2t1cCh7fSwgJ0FEQScpIGlzIE5vbmUKZWxpZiBjYXNlID09ICdzdW1tYXJ5JzoKICAgIGFzc2VydCBzdW1tYXJ5KCdBZGEnKSA9PSAnV2VsY29tZSBBZGEnCmVsaWYgY2FzZSA9PSAncGFyZW50JzoKICAgIGFzc2VydCBzdW1tYXJ5KGxvb2t1cChjYXB0dXJlKCdBZGEnKSwgJ0FEQScpKSA9PSAnV2VsY29tZSBBZGEnCmVsc2U6CiAgICByYWlzZSBWYWx1ZUVycm9yKGNhc2UpCnByaW50KGNhc2UgKyAnOiBQQVNTJykK"
+    },
+    {
+      "path": "registry.py",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "RVhQRVJJTUVOVEFMID0gVHJ1ZQoKZGVmIGNhcHR1cmUobmFtZSk6CiAgICByZXR1cm4ge25hbWUubG93ZXIoKTogbmFtZX0KCmRlZiBsb29rdXAoaXRlbXMsIGtleSk6CiAgICByZXR1cm4gaXRlbXMuZ2V0KGtleS5sb3dlcigpKQoKZGVmIHN1bW1hcnkobmFtZSk6CiAgICByZXR1cm4gIldlbGNvbWUgIiArIG5hbWUK"
+    },
+    {
+      "path": "specs/registry.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBSZWdpc3RyeSBzcGVjaWZpY2F0aW9uCkNhcHR1cmUgbmFtZXMgdW5kZXIgbG93ZXItY2FzZSBrZXlzLCByZWFkIHRoZW0gd2l0aG91dCBjYXNlIHNlbnNpdGl2aXR5LCBhbmQgZGlzcGxheSBXZWxjb21lIGZvbGxvd2VkIGJ5IHRoZSBvcmlnaW5hbCBuYW1lLiBQcmVzZXJ2ZSB0aGUgb3JpZ2luYWwgY2FzZSB0aHJvdWdoIHRoZSBjb21iaW5lZCB3b3JrZmxvdy4gQVNDSUkgb25seS4gTm8gbmV0d29yayBvciBwZXJzaXN0ZW5jZS4K"
+    },
+    {
+      "path": "work/capture.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBjYXB0dXJlCkNvbnRyYWN0IHJldmlzaW9uOiB2MQpTb3VyY2U6IFtQYXJlbnQgY29udHJhY3RdKHBhcmVudC5tZCkKUGFyZW50OiBbUGFyZW50IGNvbnRyYWN0XShwYXJlbnQubWQpIHYxIHNoYTI1NjozOGMyOWRlYzRiZGQ0NWUzZWEwM2MwMTVlNDgyYjUwOWVjNzJjYWJiNzBmNTliNGE5MzBlMzAyNDBmN2QwYWRhOyBleGFjdCB0ZXh0IHJlbWFpbnMgYXQgdGhlIGNhbm9uaWNhbCBwYXJlbnQgcGF0aC4KRGVjb21wb3NpdGlvbjogWy5wMnAvd29yay9wYXJlbnQvc2xpY2luZy5tZF0oLi4vLnAycC93b3JrL3BhcmVudC9zbGljaW5nLm1kKQpQcmVyZXF1aXNpdGVzOiBOb25lLgpJbmhlcml0ZWQgY29uc3RyYWludHM6IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSwgbmV0d29yaywgb3IgYXV0b21hdGljIG1lcmdlLgoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgd29yay9wYXJlbnQubWQgdjE6UjEgfCBDYXB0dXJlIGEgbmFtZSB1bmRlciBpdHMgbG93ZXItY2FzZSBrZXkgd2l0aCBpdHMgb3JpZ2luYWwgdmFsdWUuIHwgUGFyZW50IGNvbnN0cmFpbnRzIGFwcGx5LiB8IHJlZ2lzdHJ5LmNhcHR1cmUgfCBMaXRlcmFsIGV4YW1wbGVzIGluIGNoZWNrLnB5LiB8IHB5dGhvbjMgY2hlY2sucHkgY2FwdHVyZSB8IHBsYW5uZWQgfAoKUGFyZW50IFI0IGNvbXBvc2l0aW9uIHJlbWFpbnMgcGFydCBvZiBmaW5hbCBwYXJlbnQgdmVyaWZpY2F0aW9uLgo="
+    },
+    {
+      "path": "work/lookup.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBsb29rdXAKQ29udHJhY3QgcmV2aXNpb246IHYxClNvdXJjZTogW1BhcmVudCBjb250cmFjdF0ocGFyZW50Lm1kKQpQYXJlbnQ6IFtQYXJlbnQgY29udHJhY3RdKHBhcmVudC5tZCkgdjEgc2hhMjU2OjM4YzI5ZGVjNGJkZDQ1ZTNlYTAzYzAxNWU0ODJiNTA5ZWM3MmNhYmI3MGY1OWI0YTkzMGUzMDI0MGY3ZDBhZGE7IGV4YWN0IHRleHQgcmVtYWlucyBhdCB0aGUgY2Fub25pY2FsIHBhcmVudCBwYXRoLgpEZWNvbXBvc2l0aW9uOiBbLnAycC93b3JrL3BhcmVudC9zbGljaW5nLm1kXSguLi8ucDJwL3dvcmsvcGFyZW50L3NsaWNpbmcubWQpClByZXJlcXVpc2l0ZXM6IENhcHR1cmUgb3V0Y29tZSBtdXN0IGV4aXN0IGluIHRoZSBhY3R1YWwgY2FuZGlkYXRlOyBpc3N1ZSAxMDEgc3RhdGUgYWxvbmUgaXMgaW5zdWZmaWNpZW50LgpJbmhlcml0ZWQgY29uc3RyYWludHM6IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSwgbmV0d29yaywgb3IgYXV0b21hdGljIG1lcmdlLgoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgd29yay9wYXJlbnQubWQgdjE6UjIgfCBMb29rdXAgYSBjYXB0dXJlZCBuYW1lIHVzaW5nIGFueSBjYXNlIG9mIGl0cyBrZXk7IGEgbWlzc2luZyBrZXkgcmV0dXJucyBOb25lLiB8IFBhcmVudCBjb25zdHJhaW50cyBhcHBseS4gfCByZWdpc3RyeS5sb29rdXAgfCBMaXRlcmFsIGV4YW1wbGVzIGluIGNoZWNrLnB5LiB8IHB5dGhvbjMgY2hlY2sucHkgbG9va3VwIHwgcGxhbm5lZCB8CgpQYXJlbnQgUjQgY29tcG9zaXRpb24gcmVtYWlucyBwYXJ0IG9mIGZpbmFsIHBhcmVudCB2ZXJpZmljYXRpb24uCg=="
+    },
+    {
+      "path": "work/parent.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBOYW1lIHJlZ2lzdHJ5CkNvbnRyYWN0IHJldmlzaW9uOiB2MQpTb3VyY2U6IFtSZWdpc3RyeSBzcGVjaWZpY2F0aW9uXSguLi9zcGVjcy9yZWdpc3RyeS5tZCkKUGFyZW50OiBOb25lClByZXJlcXVpc2l0ZXM6IE5vbmUKCnwgSUQgfCBTb3VyY2UgfCBSZXF1aXJlbWVudCB8IEJvdW5kYXJpZXMgfCBTZWFtIHwgT3JhY2xlIHwgUGxhbm5lZCBldmlkZW5jZSB8IFBsYW4gc3RhdGUgfAp8LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwKfCBSMSB8IFJlZ2lzdHJ5IHNwZWNpZmljYXRpb24gfCBDYXB0dXJlIG1hcHMgYSBuYW1lIHRvIGEgbG93ZXItY2FzZSBkaWN0aW9uYXJ5IGtleSBhbmQgaXRzIG9yaWdpbmFsIHZhbHVlLiB8IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSBvciBuZXR3b3JrLiB8IHJlZ2lzdHJ5LmNhcHR1cmUgfCBBZGEgYmVjb21lcyB7YWRhOiBBZGF9LiB8IHB5dGhvbjMgY2hlY2sucHkgY2FwdHVyZSB8IHBsYW5uZWQgfAp8IFIyIHwgUmVnaXN0cnkgc3BlY2lmaWNhdGlvbiB8IExvb2t1cCByZXR1cm5zIHRoZSBvcmlnaW5hbCBjYXB0dXJlZCBuYW1lIGZvciBhbnkgY2FzZSBvZiBpdHMga2V5LiB8IE1pc3NpbmcgbmFtZXMgcmV0dXJuIE5vbmUuIHwgcmVnaXN0cnkubG9va3VwIHwgQ2FwdHVyZWQgQWRhIGNhbiBiZSByZWFkIGFzIEFEQS4gfCBweXRob24zIGNoZWNrLnB5IGxvb2t1cCB8IHBsYW5uZWQgfAp8IFIzIHwgUmVnaXN0cnkgc3BlY2lmaWNhdGlvbiB8IFN1bW1hcnkgcHJlZml4ZXMgYSBzdXBwbGllZCBuYW1lIHdpdGggV2VsY29tZSBhbmQgb25lIHNwYWNlLiB8IFBsYWluIHRleHQgb25seS4gfCByZWdpc3RyeS5zdW1tYXJ5IHwgQWRhIGJlY29tZXMgV2VsY29tZSBBZGEuIHwgcHl0aG9uMyBjaGVjay5weSBzdW1tYXJ5IHwgcGxhbm5lZCB8CnwgUjQgfCBSZWdpc3RyeSBzcGVjaWZpY2F0aW9uIHwgQ2FwdHVyZSB0aGVuIGxvb2t1cCB0aGVuIHN1bW1hcnkgcHJlc2VydmVzIEFkYSBhcyBXZWxjb21lIEFkYS4gfCBUaGUgc2FtZSBjYW5kaWRhdGUgc3VwcGxpZXMgYWxsIGZ1bmN0aW9ucy4gfCBwdWJsaWMgZnVuY3Rpb24gY29tcG9zaXRpb24gfCBMaXRlcmFsIFdlbGNvbWUgQWRhLiB8IHB5dGhvbjMgY2hlY2sucHkgcGFyZW50IHwgcGxhbm5lZCB8Cg=="
+    },
+    {
+      "path": "work/solo.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBTdW0KQ29udHJhY3QgcmV2aXNpb246IHYxClBhcmVudDogTm9uZQpTb3VyY2U6IFRoZSByZXF1ZXN0IGlzIHRvIHByZXNlcnZlIG9yZGluYXJ5IGludGVnZXIgYWRkaXRpb24uCgp8IElEIHwgUmVxdWlyZW1lbnQgfCBTZWFtIHwgT3JhY2xlIHwgUGxhbm5lZCBldmlkZW5jZSB8IFBsYW4gc3RhdGUgfAp8LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18CnwgUjEgfCBzdW0oWzIsIDNdKSByZXR1cm5zIDUgfCBQeXRob24gc3VtIHwgTGl0ZXJhbCA1IHwgcHl0aG9uMyAtYyAiYXNzZXJ0IHN1bShbMiwgM10pID09IDUiIHwgcGxhbm5lZCB8Cg=="
+    },
+    {
+      "path": "work/summary.md",
+      "mode": "100644",
+      "type": "file",
+      "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBzdW1tYXJ5CkNvbnRyYWN0IHJldmlzaW9uOiB2MQpTb3VyY2U6IFtQYXJlbnQgY29udHJhY3RdKHBhcmVudC5tZCkKUGFyZW50OiBbUGFyZW50IGNvbnRyYWN0XShwYXJlbnQubWQpIHYxIHNoYTI1NjozOGMyOWRlYzRiZGQ0NWUzZWEwM2MwMTVlNDgyYjUwOWVjNzJjYWJiNzBmNTliNGE5MzBlMzAyNDBmN2QwYWRhOyBleGFjdCB0ZXh0IHJlbWFpbnMgYXQgdGhlIGNhbm9uaWNhbCBwYXJlbnQgcGF0aC4KRGVjb21wb3NpdGlvbjogWy5wMnAvd29yay9wYXJlbnQvc2xpY2luZy5tZF0oLi4vLnAycC93b3JrL3BhcmVudC9zbGljaW5nLm1kKQpQcmVyZXF1aXNpdGVzOiBOb25lLgpJbmhlcml0ZWQgY29uc3RyYWludHM6IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSwgbmV0d29yaywgb3IgYXV0b21hdGljIG1lcmdlLgoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgd29yay9wYXJlbnQubWQgdjE6UjMgfCBQcmVmaXggdGhlIHN1cHBsaWVkIG9yaWdpbmFsIG5hbWUgd2l0aCBXZWxjb21lIGFuZCBvbmUgc3BhY2UuIHwgUGFyZW50IGNvbnN0cmFpbnRzIGFwcGx5LiB8IHJlZ2lzdHJ5LnN1bW1hcnkgfCBMaXRlcmFsIGV4YW1wbGVzIGluIGNoZWNrLnB5LiB8IHB5dGhvbjMgY2hlY2sucHkgc3VtbWFyeSB8IHBsYW5uZWQgfAoKUGFyZW50IFI0IGNvbXBvc2l0aW9uIHJlbWFpbnMgcGFydCBvZiBmaW5hbCBwYXJlbnQgdmVyaWZpY2F0aW9uLgo="
+    }
+  ]
+}
+exit: 0
+
+$ python3 /private/tmp/p2p-epic-repair-cases/S8-clean/installed/implement-contract/scripts/p2p_filesystem.py --repo /private/tmp/p2p-epic-repair-cases/S8-clean/repo validate work/lookup.md --base d4125733f93c976ce218833dc8c995b58f0cbdf4
+{
+  "candidate": {
+    "work_item": "work/lookup.md",
+    "work_item_sha256": "fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9",
+    "comparison_base": "d4125733f93c976ce218833dc8c995b58f0cbdf4",
+    "binding_inputs": [
+      {
+        "path": "specs/registry.md",
+        "sha256": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9"
+      },
+      {
+        "path": "work/parent.md",
+        "sha256": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada"
+      }
+    ],
+    "key": "snapshot:sha256:ba8286deb9a2576dc2cd7587b7cd6a81f37ebadb30571e10cd76fe9817c3fb1f",
+    "manifest": [
+      {
+        "path": ".gitignore",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "LnAycC90bXAvCl9fcHljYWNoZV9fLwo="
+      },
+      {
+        "path": "AGENTS.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBEaXNwb3NhYmxlIGVwaWMgZml4dHVyZQpSZWFkIHRoZSBhcHBsaWNhYmxlIGluc3RhbGxlZCBza2lsbCBhbmQgaXRzIGJ1bmRsZWQgcHJvdG9jb2wuIENvbnRyYWN0cyBhcmUgaW4gd29yay8uCkR1cmFibGUgcmVjb3JkcyBhcmUgaW4gLnAycC93b3JrLy4gRmluYWwgZGVzdGluYXRpb24gaXMgdHJ1bmsuClRyYWNrZXIgaXMgYSBjb250cm9sbGVkIHNpbXVsYXRpb24uIFVzZSBvbmx5IHRoZSBnaCBleGVjdXRhYmxlIG9uIHRoZSBzdXBwbGllZCBQQVRILgpJdCBzdXBwb3J0cyBwciB2aWV3L2xpc3QvZWRpdC9jcmVhdGUvY2hlY2tzLCBpc3N1ZSB2aWV3LCBhbmQgcmVwbyB2aWV3IHdpdGggLS1qc29uLgpEbyBub3QgdXNlIHJlYWwgbmV0d29yaywgb3RoZXIgZ2ggaW5zdGFsbGF0aW9ucywgb3IgbXV0YXRlIHRyYWNrZXIuanNvbiBkaXJlY3RseS4KR2l0IG9yaWdpbiBpcyBhIGxvY2FsIGJhcmUgZml4dHVyZSByZXBvc2l0b3J5LiBObyBtZXJnZSBhdXRob3JpdHkgaXMgZ3JhbnRlZC4KUmVjb3JkIGNvbW1hbmRzLCBvdXRwdXRzLCBhbmQgY2hhbmdlZCBwYXRocyBpbiB5b3VyIGR1cmFibGUgc3RhZ2UgcmVwb3J0Lgo="
+      },
+      {
+        "path": "check.py",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "aW1wb3J0IHN5cwpmcm9tIHJlZ2lzdHJ5IGltcG9ydCBjYXB0dXJlLCBsb29rdXAsIHN1bW1hcnkKY2FzZSA9IHN5cy5hcmd2WzFdCmlmIGNhc2UgPT0gJ2NhcHR1cmUnOgogICAgYXNzZXJ0IGNhcHR1cmUoJ0FkYScpID09IHsnYWRhJzogJ0FkYSd9CmVsaWYgY2FzZSA9PSAnbG9va3VwJzoKICAgIGFzc2VydCBsb29rdXAoeydhZGEnOiAnQWRhJ30sICdBREEnKSA9PSAnQWRhJwogICAgYXNzZXJ0IGxvb2t1cCh7fSwgJ0FEQScpIGlzIE5vbmUKZWxpZiBjYXNlID09ICdzdW1tYXJ5JzoKICAgIGFzc2VydCBzdW1tYXJ5KCdBZGEnKSA9PSAnV2VsY29tZSBBZGEnCmVsaWYgY2FzZSA9PSAncGFyZW50JzoKICAgIGFzc2VydCBzdW1tYXJ5KGxvb2t1cChjYXB0dXJlKCdBZGEnKSwgJ0FEQScpKSA9PSAnV2VsY29tZSBBZGEnCmVsc2U6CiAgICByYWlzZSBWYWx1ZUVycm9yKGNhc2UpCnByaW50KGNhc2UgKyAnOiBQQVNTJykK"
+      },
+      {
+        "path": "registry.py",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "RVhQRVJJTUVOVEFMID0gVHJ1ZQoKZGVmIGNhcHR1cmUobmFtZSk6CiAgICByZXR1cm4ge25hbWUubG93ZXIoKTogbmFtZX0KCmRlZiBsb29rdXAoaXRlbXMsIGtleSk6CiAgICByZXR1cm4gaXRlbXMuZ2V0KGtleS5sb3dlcigpKQoKZGVmIHN1bW1hcnkobmFtZSk6CiAgICByZXR1cm4gIldlbGNvbWUgIiArIG5hbWUK"
+      },
+      {
+        "path": "specs/registry.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBSZWdpc3RyeSBzcGVjaWZpY2F0aW9uCkNhcHR1cmUgbmFtZXMgdW5kZXIgbG93ZXItY2FzZSBrZXlzLCByZWFkIHRoZW0gd2l0aG91dCBjYXNlIHNlbnNpdGl2aXR5LCBhbmQgZGlzcGxheSBXZWxjb21lIGZvbGxvd2VkIGJ5IHRoZSBvcmlnaW5hbCBuYW1lLiBQcmVzZXJ2ZSB0aGUgb3JpZ2luYWwgY2FzZSB0aHJvdWdoIHRoZSBjb21iaW5lZCB3b3JrZmxvdy4gQVNDSUkgb25seS4gTm8gbmV0d29yayBvciBwZXJzaXN0ZW5jZS4K"
+      },
+      {
+        "path": "work/capture.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBjYXB0dXJlCkNvbnRyYWN0IHJldmlzaW9uOiB2MQpTb3VyY2U6IFtQYXJlbnQgY29udHJhY3RdKHBhcmVudC5tZCkKUGFyZW50OiBbUGFyZW50IGNvbnRyYWN0XShwYXJlbnQubWQpIHYxIHNoYTI1NjozOGMyOWRlYzRiZGQ0NWUzZWEwM2MwMTVlNDgyYjUwOWVjNzJjYWJiNzBmNTliNGE5MzBlMzAyNDBmN2QwYWRhOyBleGFjdCB0ZXh0IHJlbWFpbnMgYXQgdGhlIGNhbm9uaWNhbCBwYXJlbnQgcGF0aC4KRGVjb21wb3NpdGlvbjogWy5wMnAvd29yay9wYXJlbnQvc2xpY2luZy5tZF0oLi4vLnAycC93b3JrL3BhcmVudC9zbGljaW5nLm1kKQpQcmVyZXF1aXNpdGVzOiBOb25lLgpJbmhlcml0ZWQgY29uc3RyYWludHM6IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSwgbmV0d29yaywgb3IgYXV0b21hdGljIG1lcmdlLgoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgd29yay9wYXJlbnQubWQgdjE6UjEgfCBDYXB0dXJlIGEgbmFtZSB1bmRlciBpdHMgbG93ZXItY2FzZSBrZXkgd2l0aCBpdHMgb3JpZ2luYWwgdmFsdWUuIHwgUGFyZW50IGNvbnN0cmFpbnRzIGFwcGx5LiB8IHJlZ2lzdHJ5LmNhcHR1cmUgfCBMaXRlcmFsIGV4YW1wbGVzIGluIGNoZWNrLnB5LiB8IHB5dGhvbjMgY2hlY2sucHkgY2FwdHVyZSB8IHBsYW5uZWQgfAoKUGFyZW50IFI0IGNvbXBvc2l0aW9uIHJlbWFpbnMgcGFydCBvZiBmaW5hbCBwYXJlbnQgdmVyaWZpY2F0aW9uLgo="
+      },
+      {
+        "path": "work/lookup.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBsb29rdXAKQ29udHJhY3QgcmV2aXNpb246IHYxClNvdXJjZTogW1BhcmVudCBjb250cmFjdF0ocGFyZW50Lm1kKQpQYXJlbnQ6IFtQYXJlbnQgY29udHJhY3RdKHBhcmVudC5tZCkgdjEgc2hhMjU2OjM4YzI5ZGVjNGJkZDQ1ZTNlYTAzYzAxNWU0ODJiNTA5ZWM3MmNhYmI3MGY1OWI0YTkzMGUzMDI0MGY3ZDBhZGE7IGV4YWN0IHRleHQgcmVtYWlucyBhdCB0aGUgY2Fub25pY2FsIHBhcmVudCBwYXRoLgpEZWNvbXBvc2l0aW9uOiBbLnAycC93b3JrL3BhcmVudC9zbGljaW5nLm1kXSguLi8ucDJwL3dvcmsvcGFyZW50L3NsaWNpbmcubWQpClByZXJlcXVpc2l0ZXM6IENhcHR1cmUgb3V0Y29tZSBtdXN0IGV4aXN0IGluIHRoZSBhY3R1YWwgY2FuZGlkYXRlOyBpc3N1ZSAxMDEgc3RhdGUgYWxvbmUgaXMgaW5zdWZmaWNpZW50LgpJbmhlcml0ZWQgY29uc3RyYWludHM6IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSwgbmV0d29yaywgb3IgYXV0b21hdGljIG1lcmdlLgoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgd29yay9wYXJlbnQubWQgdjE6UjIgfCBMb29rdXAgYSBjYXB0dXJlZCBuYW1lIHVzaW5nIGFueSBjYXNlIG9mIGl0cyBrZXk7IGEgbWlzc2luZyBrZXkgcmV0dXJucyBOb25lLiB8IFBhcmVudCBjb25zdHJhaW50cyBhcHBseS4gfCByZWdpc3RyeS5sb29rdXAgfCBMaXRlcmFsIGV4YW1wbGVzIGluIGNoZWNrLnB5LiB8IHB5dGhvbjMgY2hlY2sucHkgbG9va3VwIHwgcGxhbm5lZCB8CgpQYXJlbnQgUjQgY29tcG9zaXRpb24gcmVtYWlucyBwYXJ0IG9mIGZpbmFsIHBhcmVudCB2ZXJpZmljYXRpb24uCg=="
+      },
+      {
+        "path": "work/parent.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBOYW1lIHJlZ2lzdHJ5CkNvbnRyYWN0IHJldmlzaW9uOiB2MQpTb3VyY2U6IFtSZWdpc3RyeSBzcGVjaWZpY2F0aW9uXSguLi9zcGVjcy9yZWdpc3RyeS5tZCkKUGFyZW50OiBOb25lClByZXJlcXVpc2l0ZXM6IE5vbmUKCnwgSUQgfCBTb3VyY2UgfCBSZXF1aXJlbWVudCB8IEJvdW5kYXJpZXMgfCBTZWFtIHwgT3JhY2xlIHwgUGxhbm5lZCBldmlkZW5jZSB8IFBsYW4gc3RhdGUgfAp8LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwKfCBSMSB8IFJlZ2lzdHJ5IHNwZWNpZmljYXRpb24gfCBDYXB0dXJlIG1hcHMgYSBuYW1lIHRvIGEgbG93ZXItY2FzZSBkaWN0aW9uYXJ5IGtleSBhbmQgaXRzIG9yaWdpbmFsIHZhbHVlLiB8IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSBvciBuZXR3b3JrLiB8IHJlZ2lzdHJ5LmNhcHR1cmUgfCBBZGEgYmVjb21lcyB7YWRhOiBBZGF9LiB8IHB5dGhvbjMgY2hlY2sucHkgY2FwdHVyZSB8IHBsYW5uZWQgfAp8IFIyIHwgUmVnaXN0cnkgc3BlY2lmaWNhdGlvbiB8IExvb2t1cCByZXR1cm5zIHRoZSBvcmlnaW5hbCBjYXB0dXJlZCBuYW1lIGZvciBhbnkgY2FzZSBvZiBpdHMga2V5LiB8IE1pc3NpbmcgbmFtZXMgcmV0dXJuIE5vbmUuIHwgcmVnaXN0cnkubG9va3VwIHwgQ2FwdHVyZWQgQWRhIGNhbiBiZSByZWFkIGFzIEFEQS4gfCBweXRob24zIGNoZWNrLnB5IGxvb2t1cCB8IHBsYW5uZWQgfAp8IFIzIHwgUmVnaXN0cnkgc3BlY2lmaWNhdGlvbiB8IFN1bW1hcnkgcHJlZml4ZXMgYSBzdXBwbGllZCBuYW1lIHdpdGggV2VsY29tZSBhbmQgb25lIHNwYWNlLiB8IFBsYWluIHRleHQgb25seS4gfCByZWdpc3RyeS5zdW1tYXJ5IHwgQWRhIGJlY29tZXMgV2VsY29tZSBBZGEuIHwgcHl0aG9uMyBjaGVjay5weSBzdW1tYXJ5IHwgcGxhbm5lZCB8CnwgUjQgfCBSZWdpc3RyeSBzcGVjaWZpY2F0aW9uIHwgQ2FwdHVyZSB0aGVuIGxvb2t1cCB0aGVuIHN1bW1hcnkgcHJlc2VydmVzIEFkYSBhcyBXZWxjb21lIEFkYS4gfCBUaGUgc2FtZSBjYW5kaWRhdGUgc3VwcGxpZXMgYWxsIGZ1bmN0aW9ucy4gfCBwdWJsaWMgZnVuY3Rpb24gY29tcG9zaXRpb24gfCBMaXRlcmFsIFdlbGNvbWUgQWRhLiB8IHB5dGhvbjMgY2hlY2sucHkgcGFyZW50IHwgcGxhbm5lZCB8Cg=="
+      },
+      {
+        "path": "work/solo.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBTdW0KQ29udHJhY3QgcmV2aXNpb246IHYxClBhcmVudDogTm9uZQpTb3VyY2U6IFRoZSByZXF1ZXN0IGlzIHRvIHByZXNlcnZlIG9yZGluYXJ5IGludGVnZXIgYWRkaXRpb24uCgp8IElEIHwgUmVxdWlyZW1lbnQgfCBTZWFtIHwgT3JhY2xlIHwgUGxhbm5lZCBldmlkZW5jZSB8IFBsYW4gc3RhdGUgfAp8LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18CnwgUjEgfCBzdW0oWzIsIDNdKSByZXR1cm5zIDUgfCBQeXRob24gc3VtIHwgTGl0ZXJhbCA1IHwgcHl0aG9uMyAtYyAiYXNzZXJ0IHN1bShbMiwgM10pID09IDUiIHwgcGxhbm5lZCB8Cg=="
+      },
+      {
+        "path": "work/summary.md",
+        "mode": "100644",
+        "type": "file",
+        "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBzdW1tYXJ5CkNvbnRyYWN0IHJldmlzaW9uOiB2MQpTb3VyY2U6IFtQYXJlbnQgY29udHJhY3RdKHBhcmVudC5tZCkKUGFyZW50OiBbUGFyZW50IGNvbnRyYWN0XShwYXJlbnQubWQpIHYxIHNoYTI1NjozOGMyOWRlYzRiZGQ0NWUzZWEwM2MwMTVlNDgyYjUwOWVjNzJjYWJiNzBmNTliNGE5MzBlMzAyNDBmN2QwYWRhOyBleGFjdCB0ZXh0IHJlbWFpbnMgYXQgdGhlIGNhbm9uaWNhbCBwYXJlbnQgcGF0aC4KRGVjb21wb3NpdGlvbjogWy5wMnAvd29yay9wYXJlbnQvc2xpY2luZy5tZF0oLi4vLnAycC93b3JrL3BhcmVudC9zbGljaW5nLm1kKQpQcmVyZXF1aXNpdGVzOiBOb25lLgpJbmhlcml0ZWQgY29uc3RyYWludHM6IEFTQ0lJIG5hbWVzOyBubyBwZXJzaXN0ZW5jZSwgbmV0d29yaywgb3IgYXV0b21hdGljIG1lcmdlLgoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgd29yay9wYXJlbnQubWQgdjE6UjMgfCBQcmVmaXggdGhlIHN1cHBsaWVkIG9yaWdpbmFsIG5hbWUgd2l0aCBXZWxjb21lIGFuZCBvbmUgc3BhY2UuIHwgUGFyZW50IGNvbnN0cmFpbnRzIGFwcGx5LiB8IHJlZ2lzdHJ5LnN1bW1hcnkgfCBMaXRlcmFsIGV4YW1wbGVzIGluIGNoZWNrLnB5LiB8IHB5dGhvbjMgY2hlY2sucHkgc3VtbWFyeSB8IHBsYW5uZWQgfAoKUGFyZW50IFI0IGNvbXBvc2l0aW9uIHJlbWFpbnMgcGFydCBvZiBmaW5hbCBwYXJlbnQgdmVyaWZpY2F0aW9uLgo="
+      }
+    ]
+  },
+  "work_item": "work/lookup.md",
+  "artifact_directory": ".p2p/work/lookup",
+  "binding_inputs": [
+    {
+      "path": "specs/registry.md",
+      "sha256": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9"
+    },
+    {
+      "path": "work/parent.md",
+      "sha256": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada"
+    }
+  ],
+  "children": [],
+  "artifacts": [
+    ".p2p/work/lookup/candidate.json",
+    ".p2p/work/lookup/history/55af07adcf889a78e4a5c0c944d61e519eb932f0358d691b25adf2f2b6d7f453/implementation.md",
+    ".p2p/work/lookup/history/a7040179aed4564a049da186b98f1e8848e07763b538529f71256004d206aab2/candidate.json",
+    ".p2p/work/lookup/implementation.md",
+    ".p2p/work/lookup/publication.md"
+  ]
+}
+exit: 0

@@ -1,0 +1,19 @@
+{
+  "cycle": 1,
+  "automatic_repair_used": true,
+  "candidate_before": "snapshot:sha256:8ff16e4594d451c80b5c1cb7225874bb89b4190a6448dba86ee146e025ab0dd8",
+  "contract_sha256": "78cad1d7f85183100214da15fdc8418ed2220ce1af80764d648e139fdd899895",
+  "review": "review.md",
+  "proof": "proof.md",
+  "review_findings": [
+    "F1",
+    "F2"
+  ],
+  "proof_gaps": [
+    "G1",
+    "G2",
+    "G3"
+  ],
+  "product_repair": "Separate implement-contract/repair-gaps context",
+  "evidence_repair": "Enclosing workflow prepares fixtures; independent installed-skill actors observe actual outcomes. No changed promises."
+}

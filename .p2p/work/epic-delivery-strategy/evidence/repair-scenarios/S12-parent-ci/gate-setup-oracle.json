@@ -1,0 +1,27 @@
+{
+  "fixture_initial_pr": {
+    "number": 18,
+    "url": "https://fixture.invalid/epic/pull/18",
+    "state": "OPEN",
+    "baseRefName": "trunk",
+    "headRefName": "parent/complete",
+    "headRefOid": "159b5f50400479e1e5429b26b6c75e6d5f45682f",
+    "title": "Complete registry",
+    "body": "Work item: work/parent.md\n<!-- grove:publish-pr repo=fixture/epic candidate=git:159b5f50400479e1e5429b26b6c75e6d5f45682f contract=sha256:38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada -->\nHuman note: preserve.\n",
+    "isDraft": true,
+    "updatedAt": "fixture-revision-0",
+    "statusCheckRollup": [
+      {
+        "name": "required-ci",
+        "status": "IN_PROGRESS",
+        "conclusion": null
+      }
+    ],
+    "reviewDecision": "APPROVED",
+    "mergeable": "MERGEABLE",
+    "baseRefOid": "159b5f50400479e1e5429b26b6c75e6d5f45682f"
+  },
+  "head": "159b5f50400479e1e5429b26b6c75e6d5f45682f",
+  "refs": "159b5f50400479e1e5429b26b6c75e6d5f45682f refs/heads/child/lookup\n159b5f50400479e1e5429b26b6c75e6d5f45682f refs/heads/epic/example\n159b5f50400479e1e5429b26b6c75e6d5f45682f refs/heads/parent/complete\n159b5f50400479e1e5429b26b6c75e6d5f45682f refs/heads/trunk\n159b5f50400479e1e5429b26b6c75e6d5f45682f refs/remotes/origin/child/lookup\n159b5f50400479e1e5429b26b6c75e6d5f45682f refs/remotes/origin/epic/example\n159b5f50400479e1e5429b26b6c75e6d5f45682f refs/remotes/origin/parent/complete\n159b5f50400479e1e5429b26b6c75e6d5f45682f refs/remotes/origin/trunk\n",
+  "note": "Existing parent PR is evaluator-seeded initial state; no actor creation requested or inferred."
+}

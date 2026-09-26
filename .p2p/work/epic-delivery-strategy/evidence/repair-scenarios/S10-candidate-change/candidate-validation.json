@@ -1,0 +1,34 @@
+[
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "/private/tmp/p2p-epic-valid-v1isv6j3/S9-default/installed/implement-contract/scripts/p2p_filesystem.py",
+      "--repo",
+      "/private/tmp/p2p-epic-valid-v1isv6j3/S9-default/repo",
+      "validate",
+      "work/lookup.md",
+      "--base",
+      "c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f"
+    ],
+    "exit": 0,
+    "stdout": "{\n  \"candidate\": {\n    \"commit\": \"c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f\",\n    \"comparison_base\": \"c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f\",\n    \"work_item\": \"work/lookup.md\",\n    \"work_item_sha256\": \"fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9\",\n    \"binding_inputs\": [\n      {\n        \"path\": \"specs/registry.md\",\n        \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n      },\n      {\n        \"path\": \"work/parent.md\",\n        \"sha256\": \"38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada\"\n      }\n    ]\n  },\n  \"work_item\": \"work/lookup.md\",\n  \"artifact_directory\": \".p2p/work/lookup\",\n  \"binding_inputs\": [\n    {\n      \"path\": \"specs/registry.md\",\n      \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n    },\n    {\n      \"path\": \"work/parent.md\",\n      \"sha256\": \"38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada\"\n    }\n  ],\n  \"children\": [],\n  \"artifacts\": [\n    \".p2p/work/lookup/candidate.json\",\n    \".p2p/work/lookup/implementation.md\",\n    \".p2p/work/lookup/publication.md\"\n  ]\n}\n",
+    "stderr": "",
+    "intentional_difference": null
+  },
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "/private/tmp/p2p-epic-valid-v1isv6j3/S9-default/installed/implement-contract/scripts/p2p_filesystem.py",
+      "--repo",
+      "/private/tmp/p2p-epic-valid-v1isv6j3/S9-default/repo",
+      "validate",
+      "work/parent.md",
+      "--base",
+      "c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f"
+    ],
+    "exit": 0,
+    "stdout": "{\n  \"candidate\": {\n    \"commit\": \"c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f\",\n    \"comparison_base\": \"c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f\",\n    \"work_item\": \"work/parent.md\",\n    \"work_item_sha256\": \"38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada\",\n    \"binding_inputs\": [\n      {\n        \"path\": \"specs/registry.md\",\n        \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n      }\n    ]\n  },\n  \"work_item\": \"work/parent.md\",\n  \"artifact_directory\": \".p2p/work/parent\",\n  \"binding_inputs\": [\n    {\n      \"path\": \"specs/registry.md\",\n      \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n    }\n  ],\n  \"children\": [],\n  \"artifacts\": [\n    \".p2p/work/parent/approval.md\",\n    \".p2p/work/parent/candidate.json\",\n    \".p2p/work/parent/implementation.md\",\n    \".p2p/work/parent/slicing.md\"\n  ]\n}\n",
+    "stderr": "",
+    "intentional_difference": null
+  }
+]

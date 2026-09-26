@@ -1,0 +1,18 @@
+{
+  "installed/prove/SKILL.md": "5318975b96357bb6faa2c77f8ddf418cb4920fce9af5453e298b678fcb53f158",
+  "installed/prove/agents/openai.yaml": "b9d7966c3786306109edfad087ef1d30ecb024b8c2038de057fd66189519a871",
+  "installed/prove/references/acceptance-contract-protocol.md": "209562cadbad5a945998fe1fb370ffab5ab4ea648fc4ac720888c2d3a3ca634d",
+  "installed/prove/scripts/p2p_filesystem.py": "90e0856bd73cbf3912c5e57a6ef80b63fdb1e81771cb8d0a7c91fe401b8b4cd2",
+  "installed/review-implementation/SKILL.md": "eabc51ad2ec4cb31aee379cc89a10b200f186cff730cc62ec25568a895a9b5ca",
+  "installed/review-implementation/agents/openai.yaml": "5c3c9ba03d77243ee9bff1fa6bd1c6d5145dddd3d7152950119e77f05194a4a8",
+  "installed/review-implementation/references/acceptance-contract-protocol.md": "209562cadbad5a945998fe1fb370ffab5ab4ea648fc4ac720888c2d3a3ca634d",
+  "installed/review-implementation/scripts/p2p_filesystem.py": "90e0856bd73cbf3912c5e57a6ef80b63fdb1e81771cb8d0a7c91fe401b8b4cd2",
+  "installed/publish-pr/SKILL.md": "c1c0c65b5d588bba53f464a2b52ca2c4eb239d390d2c470e89b4f2a7ce8f0884",
+  "installed/publish-pr/agents/openai.yaml": "b285275d57f932bec2077fffa9adb02767907d4818e70abc9145fd7d5c3ce6e2",
+  "installed/publish-pr/references/acceptance-contract-protocol.md": "209562cadbad5a945998fe1fb370ffab5ab4ea648fc4ac720888c2d3a3ca634d",
+  "installed/publish-pr/scripts/p2p_filesystem.py": "90e0856bd73cbf3912c5e57a6ef80b63fdb1e81771cb8d0a7c91fe401b8b4cd2",
+  "installed/merge-readiness/SKILL.md": "a8c589ea69886b023f5a6d5553d72759029423a6fc1121a9a3a831ef2a2225ad",
+  "installed/merge-readiness/agents/openai.yaml": "d0dc5a2d51b93cf0561f4f63997b657a18223a991a81792befe9b36e8e90aa1e",
+  "installed/merge-readiness/references/acceptance-contract-protocol.md": "209562cadbad5a945998fe1fb370ffab5ab4ea648fc4ac720888c2d3a3ca634d",
+  "installed/merge-readiness/scripts/p2p_filesystem.py": "90e0856bd73cbf3912c5e57a6ef80b63fdb1e81771cb8d0a7c91fe401b8b4cd2"
+}

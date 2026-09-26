@@ -1,0 +1,49 @@
+{
+  "prs": {
+    "17": {
+      "number": 17,
+      "url": "https://fixture.invalid/epic/pull/17",
+      "state": "OPEN",
+      "baseRefName": "epic/example",
+      "headRefName": "child/lookup",
+      "headRefOid": "f62b5329a22f996af6bb550cc1c7d75223af303c",
+      "title": "Lookup names",
+      "body": "Human note: keep this sentence byte-for-byte.\n<!-- grove:publish-pr repo=fixture/epic candidate=git:f62b5329a22f996af6bb550cc1c7d75223af303c contract=sha256:fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9 -->\n",
+      "isDraft": true,
+      "updatedAt": "fixture-revision-0",
+      "statusCheckRollup": [
+        {
+          "name": "required-ci",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        }
+      ],
+      "reviewDecision": "APPROVED",
+      "mergeable": "MERGEABLE",
+      "baseRefOid": "f62b5329a22f996af6bb550cc1c7d75223af303c"
+    },
+    "19": {
+      "number": 19,
+      "url": "https://fixture.invalid/epic/pull/19",
+      "state": "OPEN",
+      "baseRefName": "trunk",
+      "headRefName": "solo",
+      "headRefOid": "f62b5329a22f996af6bb550cc1c7d75223af303c",
+      "title": "Standalone capture",
+      "body": "Work item: work/solo.md\n<!-- grove:publish-pr repo=fixture/epic candidate=git:f62b5329a22f996af6bb550cc1c7d75223af303c contract=sha256:294bc01757864083fefd58e5f95e3ffd357a4d83201394d1eac39018aaccac23 -->\nHuman note: preserve standalone context.\n",
+      "isDraft": true,
+      "updatedAt": "fixture-revision-0",
+      "statusCheckRollup": [
+        {
+          "name": "required-ci",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        }
+      ],
+      "reviewDecision": "APPROVED",
+      "mergeable": "MERGEABLE",
+      "baseRefOid": "f62b5329a22f996af6bb550cc1c7d75223af303c"
+    }
+  },
+  "calls": 4
+}

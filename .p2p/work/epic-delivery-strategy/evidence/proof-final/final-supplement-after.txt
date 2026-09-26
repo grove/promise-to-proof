@@ -1,0 +1,1 @@
+Final supplement stability: all 180 retained file SHA-256 identities unchanged.

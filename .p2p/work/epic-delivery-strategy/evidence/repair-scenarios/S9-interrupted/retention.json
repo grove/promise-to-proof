@@ -1,0 +1,304 @@
+{
+  "case": "/private/tmp/p2p-epic-repair-cases/S9-interrupted",
+  "phase": "single repair-cycle behavioral evidence",
+  "files": [
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/calls.jsonl",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/calls.jsonl",
+      "sha256": "f069382017886c014730b29e4664026312e9451880d4e40a237d08a9a1ef1e20"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/candidate-validation.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/candidate-validation.json",
+      "sha256": "a1735646c366d802781326228fa18b6a29a37df1479e062d8414eccc68e67253"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/effect-actor-report.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/effect-actor-report.md",
+      "sha256": "ba652859d93c89261a1fee2077a28fadb898af0688f12832ebd313c096d48b43"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/effect-command-evidence.jsonl",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/effect-command-evidence.jsonl",
+      "sha256": "9de86e054dbb13a928797071143422eccaa3872700b7949f823715fc541497da"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/evaluator-effect-grant.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/evaluator-effect-grant.md",
+      "sha256": "420a81affe1027daf53ddce561423e3ec53344e7fa09fbb8cf17d58ddb51ca0f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/oracle.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/oracle.json",
+      "sha256": "16367ab0d23eab66372b603b44c2381a3fda72f24610df4774a41e798193900a"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/publication-actor-report.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/publication-actor-report.md",
+      "sha256": "07e4f0f78cf0521c1bd939f533d6505746ac1b8357042ca0b24cf170e0ef1963"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/publication-draft.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/publication-draft.md",
+      "sha256": "6101aecfb5a9d96570c178d75af992ff45d931151e24dde820a2846dd2244b7f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repair-effect-grant.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repair-effect-grant.md",
+      "sha256": "277b523d65b98fbbb2056035080df9eb06d63839da4fa361ebd0b9bbb98cb5fb"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repair-preview/approved-plan.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repair-preview/approved-plan.md",
+      "sha256": "b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repair-preview/inspection.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repair-preview/inspection.json",
+      "sha256": "38d83fb2acd4858b69dd0db38d851602008d95c90eee786507e17d2c79af5195"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repair-preview/publication-draft.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repair-preview/publication-draft.md",
+      "sha256": "d3b6528e3635fd9f1b91daf7f13267ecd19fe304a33181e10146cf437b8997c4"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repair-preview/result.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repair-preview/result.json",
+      "sha256": "cda9a352c54f6a183750c8d99c799f743778123d2966605ff2a5e9c1964224e0"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repair-preview/retarget-preview.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repair-preview/retarget-preview.json",
+      "sha256": "a083ca106d45955427bde61633277b21347e853089798ab3fbbf282a9ff30152"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repair-request.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repair-request.md",
+      "sha256": "2c25a387e8a90f94ee185efd9edd852bd30883ed5a114936309f165ec010f84f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repaired-package-hashes.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repaired-package-hashes.json",
+      "sha256": "7055d26b21392876fadda97475cc81cdbe5e8c2ee33a0befd36429567476d801"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.gitignore",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.gitignore",
+      "sha256": "558a311bf6e3de3bda72820da17901722974931e58dc600a0bdee4d0fddfbf0f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/candidate.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/candidate.json",
+      "sha256": "b0cd299b9b80d0d792cf373cccbb1b53dc21b67d4aed43fc5c7dbac82cc306bb"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/evidence/approved-plan.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/evidence/approved-plan.md",
+      "sha256": "b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/evidence/common-identity.txt",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/evidence/common-identity.txt",
+      "sha256": "c047ac1703e5a2244f3495b15b9d4eefafbb67bb05dbdee248bf2c93420d0bb7"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/evidence/proof-commands.txt",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/evidence/proof-commands.txt",
+      "sha256": "221489aac2e13cdb1f072620322d8288912d512fbeac56f5d272880ddfb3e291"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/evidence/publication-inspection.txt",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/evidence/publication-inspection.txt",
+      "sha256": "0cb3fa4e696406c4d4c74752aa54d1d6cceccd6109a488c7c866e2aba4368242"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/evidence/resume-approved-plan.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/evidence/resume-approved-plan.md",
+      "sha256": "b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/evidence/retarget-preview.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/evidence/retarget-preview.json",
+      "sha256": "2db3b2bbd545f144f87974d9f0aa70411efae90f883749b91369a53ded2e98e2"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/evidence/retry-command-log.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/evidence/retry-command-log.json",
+      "sha256": "1031c0963d94e99fa444f2de7806e697c6be006c00a7e54527691127c21cf08b"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/evidence/review-commands.txt",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/evidence/review-commands.txt",
+      "sha256": "5ba667a692599ef25236872c7f6fe396aa0c9978a9aabd891e9114148d080fda"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/history/6101aecfb5a9d96570c178d75af992ff45d931151e24dde820a2846dd2244b7f/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/history/6101aecfb5a9d96570c178d75af992ff45d931151e24dde820a2846dd2244b7f/publication.md",
+      "sha256": "6101aecfb5a9d96570c178d75af992ff45d931151e24dde820a2846dd2244b7f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/history/999ebe002c1ce7bb6767ee587234f948a9987dcd8e6bffcea946a20ca8888401/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/history/999ebe002c1ce7bb6767ee587234f948a9987dcd8e6bffcea946a20ca8888401/publication.md",
+      "sha256": "999ebe002c1ce7bb6767ee587234f948a9987dcd8e6bffcea946a20ca8888401"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/history/ba652859d93c89261a1fee2077a28fadb898af0688f12832ebd313c096d48b43/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/history/ba652859d93c89261a1fee2077a28fadb898af0688f12832ebd313c096d48b43/publication.md",
+      "sha256": "ba652859d93c89261a1fee2077a28fadb898af0688f12832ebd313c096d48b43"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/history/d3b6528e3635fd9f1b91daf7f13267ecd19fe304a33181e10146cf437b8997c4/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/history/d3b6528e3635fd9f1b91daf7f13267ecd19fe304a33181e10146cf437b8997c4/publication.md",
+      "sha256": "d3b6528e3635fd9f1b91daf7f13267ecd19fe304a33181e10146cf437b8997c4"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/history/dcc06525940357283ffde291a1d2852d433ac70afef6bf41d4961a10cca999a1/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/history/dcc06525940357283ffde291a1d2852d433ac70afef6bf41d4961a10cca999a1/publication.md",
+      "sha256": "dcc06525940357283ffde291a1d2852d433ac70afef6bf41d4961a10cca999a1"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/implementation.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/implementation.md",
+      "sha256": "880d02464af80dbe99ad90470c9bc52855698b3fac72f93036a68a12a36b7daf"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/proof.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/proof.md",
+      "sha256": "1b2f31d7bd4444bcb1beca9c4ee37296320a9bb5507297f78fe42b59936c9afa"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/publication.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/publication.md",
+      "sha256": "10162ff539ed66200cf058da904fa929653e85b96b1678c4096e804840cba731"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/review.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/lookup/review.md",
+      "sha256": "cfd128e974196ba5b9f9820306ebe27eb74b306b10428b09e64db9397e109af2"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/parent/approval.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/parent/approval.md",
+      "sha256": "7b14282140fcc3f4926cb8a6b78a179b82a90ed1310116ac1bcd486884dfcddd"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/parent/candidate.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/parent/candidate.json",
+      "sha256": "0126bfc8ac6977613b8457f85844fea99b418e9b88460b8ab443bf6ed7cb9495"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/parent/implementation.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/parent/implementation.md",
+      "sha256": "afd33903cbdb344a0ba5de2f9d285021e20b3e3a469d5c1481493c6ad7bf0a79"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/parent/slicing.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/.p2p/work/parent/slicing.md",
+      "sha256": "64ff1e1837c2600fe816fff70614377a3aa63dd7113d252c584d2e8de9718597"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/AGENTS.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/AGENTS.md",
+      "sha256": "cfaa83d558fa9bfc5ddf294b69b74813d0410f784546bc2b9d65c1354116c091"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/check.py",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/check.py",
+      "sha256": "c5bfa41c62e909fc0aef10ead60d7df529b943a0b347e5a2b0123c7b4daa92d7"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/registry.py",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/registry.py",
+      "sha256": "cbb96814f5e8ff7b006cab70623351f01a0833f9e0d18df7f91182557d240d6d"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/specs/registry.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/specs/registry.md",
+      "sha256": "64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/work/capture.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/work/capture.md",
+      "sha256": "fb7eaa80f5385b531cb598ba642eeb2ede2a32a75ce3faca2bb1c7e92c25877b"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/work/lookup.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/work/lookup.md",
+      "sha256": "fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/work/parent.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/work/parent.md",
+      "sha256": "38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/work/solo.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/work/solo.md",
+      "sha256": "294bc01757864083fefd58e5f95e3ffd357a4d83201394d1eac39018aaccac23"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/work/summary.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/repo/work/summary.md",
+      "sha256": "9331848c629b895d42bbcc6e5e1411e4c0c983c8be3e799485b2b9e9fba57e42"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/request.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/request.md",
+      "sha256": "961ed55b993534c2a7f24799075427e79b02b6c32e1a54964743855e09a34532"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/resume-actor-report.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/resume-actor-report.md",
+      "sha256": "10162ff539ed66200cf058da904fa929653e85b96b1678c4096e804840cba731"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/resume-approved-plan.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/resume-approved-plan.md",
+      "sha256": "b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/resume-command-evidence.jsonl",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/resume-command-evidence.jsonl",
+      "sha256": "4664a0e0f060d9d035e521104487fb9c781e355f6587f44ec3c02e5ff5b85247"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/retained-fixture.bundle",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/retained-fixture.bundle",
+      "sha256": "bbd18b750a4a182f8ff6600d29fc51de5baf77ac62439f20a86b43b4bca8c845"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/retry-actor-report.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/retry-actor-report.md",
+      "sha256": "dcc06525940357283ffde291a1d2852d433ac70afef6bf41d4961a10cca999a1"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/retry-command-log.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/retry-command-log.json",
+      "sha256": "1031c0963d94e99fa444f2de7806e697c6be006c00a7e54527691127c21cf08b"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/supplement-fixture.bundle",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/supplement-fixture.bundle",
+      "sha256": "bbd18b750a4a182f8ff6600d29fc51de5baf77ac62439f20a86b43b4bca8c845"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/tracker.json",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/tracker.json",
+      "sha256": "cd28eb7906aa39449bf2b59665a435bea92e59a974548e9a3c552eb9d3036933"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/tracker.py",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/tracker.py",
+      "sha256": "5475141668955aa9121cb61201fb49bd94d959699d550de089ce04288655a08f"
+    },
+    {
+      "original": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/verification-actor-report.md",
+      "saved": ".p2p/work/epic-delivery-strategy/evidence/repair-scenarios/S9-interrupted/verification-actor-report.md",
+      "sha256": "275d39aefe21d984b6666229906466f5c8537c26c68faaa40d530adb73387233"
+    }
+  ],
+  "simulation": "Controlled local tracker and real disposable Git; live GitHub effects unexecuted",
+  "refs": "c2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f refs/heads/child/lookup\nc2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f refs/heads/epic/example\nc2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f refs/heads/trunk\nc2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f refs/remotes/origin/child/lookup\nc2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f refs/remotes/origin/epic/example\nc2e77a15fe58ecbd3a7b6b32be5516e4bf78d52f refs/remotes/origin/trunk\n",
+  "status": "?? .p2p/\n"
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "original": "/private/tmp/p2p-final-review/inventory.py",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/inventory.py",
+    "sha256": "fa8dcf7c641f4111da4eca0e65c3a49335552c0f6ff2e51b4d1681c8c7b6140f"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/inventory-before.log",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/inventory-before.log",
+    "sha256": "1f5b8e314b4f2f109e68570e475ff912ee3016845d404c381ac9b84679a9d034"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/inventory-after.log",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/inventory-after.log",
+    "sha256": "1f5b8e314b4f2f109e68570e475ff912ee3016845d404c381ac9b84679a9d034"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/protected-inventory.py",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/protected-inventory.py",
+    "sha256": "49db801639e1586ea9754c41beeab871a9efa7238a912895f8e549ef8e82f92f"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/protected-inventory.json",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/protected-inventory.json",
+    "sha256": "445dbce47b2b7d89bb0e219773c86aca6ffb0aa9bd476b1e04f2cf98d3004c79"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/protected-before.log",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/protected-before.log",
+    "sha256": "9019d43e24c78a63ab03e79a693f2ee10aee3e9a36b5307bb0784ce162c48ce9"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/protected-after.log",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/protected-after.log",
+    "sha256": "9019d43e24c78a63ab03e79a693f2ee10aee3e9a36b5307bb0784ce162c48ce9"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/evidence-check.py",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/evidence-check.py",
+    "sha256": "bab80b8fdb4527d63d46a71e1d9bad41fff2426ce7db24e8d3378e4a662f188d"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/evidence-check.log",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/evidence-check.log",
+    "sha256": "189a7d197b7a06c6d53ff05ddecb366d018ccf526a2fa1478d75f8ac2f01b2a0"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/final-evidence-check.py",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/final-evidence-check.py",
+    "sha256": "a97a7e4c18694cf6fefaac6899a495e656d9f758a988586c46db6502fb25f933"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/final-evidence-check.log",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/final-evidence-check.log",
+    "sha256": "955fbfb8cb8fa14b58de981e857f2ac4f0bed978d39e477e8b612309132f9d30"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/receipt-regression.log",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/receipt-regression.log",
+    "sha256": "d3e0c329107986947ee8689166c5722e4c2fda16127c839d328ba79791b7a68f"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/child-regressions.log",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/child-regressions.log",
+    "sha256": "bbb7332cfc49594de4c1b143d5c34f5f1f4cd9558969ddbf159a550ed95f297a"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/setup-regression.log",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/setup-regression.log",
+    "sha256": "6975822c4957e2a02c7141ce31bd8b2006c12f286fdd2998954e5daf74e96c3a"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/unsliced-regression.log",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/unsliced-regression.log",
+    "sha256": "5778466270f47da8d051b4ca9aa547da9c30b1dd040d182418381919f566be48"
+  },
+  {
+    "original": "/private/tmp/p2p-final-review/fixture-regression.log",
+    "saved": ".p2p/work/epic-delivery-strategy/evidence/review-final/fixture-regression.log",
+    "sha256": "a7de481a38474a359ceae8d7837fcbf6610d8b0b33a6fc71a2aafb6a0124b3f4"
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "actor": "/root/scenario_post_effect_preview",
+  "status": "DRAFT",
+  "preview": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repair-preview/retarget-preview.json",
+  "preview_sha256": "a083ca106d45955427bde61633277b21347e853089798ab3fbbf282a9ff30152",
+  "publication": "/private/tmp/p2p-epic-repair-cases/S9-interrupted/repo/.p2p/work/lookup/publication.md",
+  "publication_sha256": "d3b6528e3635fd9f1b91daf7f13267ecd19fe304a33181e10146cf437b8997c4",
+  "plan_sha256": "b86ffd9b9b6ccbd0615efbcc57d3da023e1a8a0c185303a28832aafc0490ffe2",
+  "readback": "Exact section and hash retained and reread successfully; prior receipt preserved by helper.",
+  "writes": 0
+}

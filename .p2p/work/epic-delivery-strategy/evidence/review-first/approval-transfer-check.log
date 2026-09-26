@@ -1,0 +1,11 @@
+WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+{
+  "transport": "explicit existing FakeTransport; controller diagnostic only",
+  "initial_exit": 0,
+  "transferred_paths": [
+    ".p2p/work/parent/slicing.md"
+  ],
+  "approval_copied": false,
+  "status_after_source_receipt_deletion": 0,
+  "status": "REVIEWED_AND_PROVEN"
+}

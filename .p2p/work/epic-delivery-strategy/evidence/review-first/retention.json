@@ -1,0 +1,72 @@
+[
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/prepare-s4.log",
+    "retained": "evidence/review-first/prepare-s4.log",
+    "sha256": "feb195d8cfd40d647dbfdebeb5ae13df653bb629d00854a14526897d524f079a"
+  },
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/child-tests.log",
+    "retained": "evidence/review-first/child-tests.log",
+    "sha256": "188bb62d20827f443b9871f41c3d3f058baf564b6579b6ea3fffe650930b8a71"
+  },
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/stability-check.log",
+    "retained": "evidence/review-first/stability-check.log",
+    "sha256": "8fb97b8d72f2d8a7a11bdcc4d46d13c7d90e088613256f4eb6e84e1cca7500d5"
+  },
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/prepare-s11.log",
+    "retained": "evidence/review-first/prepare-s11.log",
+    "sha256": "aaccbcf698c4d23ad08930a70d5b1887cba8115f7287e019933d7ed7bb87a097"
+  },
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/approval-transfer-check.py",
+    "retained": "evidence/review-first/approval-transfer-check.py",
+    "sha256": "f12b15f3df6f9d4a30ff2d52d7c5ca77df18d732f8ceab5d18e6549f747296a7"
+  },
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/stability-check.py",
+    "retained": "evidence/review-first/stability-check.py",
+    "sha256": "2bbdf49e1466c0917bed325fc93105e36d63a5adbb66149f2071dc1a86e9dc37"
+  },
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/approval-transfer-check.log",
+    "retained": "evidence/review-first/approval-transfer-check.log",
+    "sha256": "f34dc4cd69cd9756361bfd0ad31c47020dbe6e46339c78740fb4e73136156a82"
+  },
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/child-tests-python314.log",
+    "retained": "evidence/review-first/child-tests-python314.log",
+    "sha256": "5649244ced5b990bbf230cda0273eeac5ccbaa580b27e12e3d4d9374ec383ded"
+  },
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/parent-test.log",
+    "retained": "evidence/review-first/parent-test.log",
+    "sha256": "498d9a501f8fef7cf1b0c09879b36d14d3171ac93a09e402b6c6793ff6560295"
+  },
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/setup-test.log",
+    "retained": "evidence/review-first/setup-test.log",
+    "sha256": "77c0af7040408c593cbf2d3591bdad17ed0b7b5411e97467d26729b4aac6f30c"
+  },
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/unsliced-test.log",
+    "retained": "evidence/review-first/unsliced-test.log",
+    "sha256": "546486d9c33e789a3e192f2dfa28fd88d8a2b69e48d8f612600695ae70183c9f"
+  },
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/initial-identities.json",
+    "retained": "evidence/review-first/initial-identities.json",
+    "sha256": "4a659bfb10ffad15873c0b261be975f44df700696ca50a67dcff1037a9a5c5f4"
+  },
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/review.md",
+    "retained": "evidence/review-first/review.md",
+    "sha256": "2d26c4f6050867af74fcbc2195bc9711d0a12fdaee66159ff013c489b5abbe69"
+  },
+  {
+    "original": "/private/tmp/p2p-review-epic-delivery/s11-check.log",
+    "retained": "evidence/review-first/s11-check.log",
+    "sha256": "a34ec3d311053756a43e5a841ccd89f9a95d6d7ef64254fef4885508fa3d80fd"
+  }
+]

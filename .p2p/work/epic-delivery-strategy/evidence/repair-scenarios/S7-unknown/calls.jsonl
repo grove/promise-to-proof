@@ -1,0 +1,1 @@
+{"argv": ["pr", "view", "17", "--json", "number,url,state,headRefName,baseRefName,headRefOid"], "effect": null, "exit_code": 1, "result": {"error": "'17'"}, "sequence": 1}

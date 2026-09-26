@@ -1,0 +1,19 @@
+# Independent first-candidate observations
+
+Verifier: /root/prove_epic_delivery. No subagent, escalation, real network, GitHub call, candidate mutation, or contract mutation.
+
+Host: macOS 26.6.2 build 25G83 arm64; Python 3.14.7 (/opt/homebrew/bin/python3.14); git 2.54.0 (Apple Git-157). Bytecode disabled.
+
+Boundary probe: Path('/private/var/tmp/p2p-issue33-verifier-8eh45dgs/prove-harmless-boundary-probe').mkdir() raised PermissionError [Errno 1] Operation not permitted. It did not create a sibling.
+
+Identity check before and after checks: candidate 130 entries and base 127 entries match complete paths, bytes, executable modes, symlink targets. Snapshot canonical JSON digest 8ff16e4594d451c80b5c1cb7225874bb89b4190a6448dba86ee146e025ab0dd8. Contract hash 78cad1d7f85183100214da15fdc8418ed2220ce1af80764d648e139fdd899895. Source hash 7a231d84f739a459f770870d23038fbc4946c759f04241c87f2a6322d9a1645e. Full comparison base 5e369c1b45ba817b8add6b20a9b7b1c97898fa12. Independent git ls-tree blob hashes and modes match every base manifest entry; root tree a9f5312ae61f62db2e16b65af369cee390036cb7. All 17 resolved protocol copies have SHA-256 c916e48be9de29f423716518dc290a64b9c667bdf42b40da87dc346853957b43.
+
+Ran PYTHONDONTWRITEBYTECODE=1 /opt/homebrew/bin/python3.14 -B -m unittest discover -s checks -p 'test_*.py' in frozen candidate. 29 tests passed in 141.448s; filesystem checks passed. Full output unit.log. Controller substitute-worker tests establish controller state behavior, not real agent stage decisions or live host enforcement.
+
+Ran /opt/homebrew/bin/python3.14 -B checks/epic_delivery_fixture.py self-check. PASS persisted edit, lost response, readback, exact effect count, concurrent change. This checks simulator behavior only.
+
+Recomputed all 307 initial retention entries: zero missing files or hash mismatches. Installed source/skill/protocol file hashes match frozen candidate for initial cases except unused deliver-issue/scripts/p2p_delivery.py in S11 and S12. Their invoked prove skill, filesystem helper and protocol match. __pycache__ binary entries excluded from source-byte comparison.
+
+Replayed S11, S12, S14 absent/present from retained fixture.bundle into fresh scratch checkouts. S11 capture/lookup/summary check.py exit 0; parent exits 1. Independent literal capture('Ada') == {'ada': 'Ada'} also fails. Thus the recorded failure is real but S11 does not isolate parent-only interaction failure with fully satisfied child contracts. S12 all four checks and independent literal original-case/composition checks exit 0. S14 absent capture and parent exit 1, lookup/summary exit 0. S14 present all four exit 0. All initial case tracker logs have no effects, and final PR state equals independent oracle original PR state. S5 pending and S13 missing/conflicting/advanced bundles retain the exact recorded initial refs.
+
+Counterexample: transfer.py creates a valid tiny parent/child agreement with an accepted plan naming approval.md as the approval receipt. Actual public controller run with --authorize-local --max-dispatches 0 creates the isolated workspace then blocks before preflight-1 with zero attempts. The approved plan transfers; the original receipt does not. See transfer-output.txt and transfer-public-cli.json. The production routing_records implementation follows Markdown links and planning-handoff.md, omitting accepted plain local receipt references. This disproves required transfer/retention, R4 and R27. No actor or mock contributes to this observation. Initial diagnostic on the retained S3 fixture was blocked by its missing acceptance-matrix heading; the valid tiny fixture removes that confound. A first diagnostic assertion expected abbreviated blocker text; it was corrected to the actual exact blocker and rerun successfully. Product code stayed fixed.

@@ -1,0 +1,7 @@
+{
+  "repo": "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/epic-tracker-check-o4nr5wc2/s11/repo",
+  "request": "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/epic-tracker-check-o4nr5wc2/s11/request.md",
+  "oracle_withhold": "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/epic-tracker-check-o4nr5wc2/s11/oracle.json",
+  "tracker_log": "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/epic-tracker-check-o4nr5wc2/s11/calls.jsonl"
+}
+PASS: persisted edit, lost response, readback, effect counts, post-edit plan change, complete children and parent-only failure

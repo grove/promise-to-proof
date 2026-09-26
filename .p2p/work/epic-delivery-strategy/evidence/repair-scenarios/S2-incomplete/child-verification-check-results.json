@@ -1,0 +1,268 @@
+[
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "python3",
+      "/private/tmp/p2p-epic-repair-cases/S2-incomplete/installed-repair/prove/scripts/p2p_filesystem.py",
+      "--repo",
+      "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+      "resolve",
+      "work/capture.md"
+    ],
+    "stdout": "{\n  \"work_item\": \"work/capture.md\",\n  \"artifact_directory\": \".p2p/work/capture\",\n  \"binding_inputs\": [\n    {\n      \"path\": \"specs/registry.md\",\n      \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n    },\n    {\n      \"path\": \"work/parent.md\",\n      \"sha256\": \"38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada\"\n    }\n  ],\n  \"children\": [],\n  \"artifacts\": [\n    \".p2p/work/capture/candidate.json\"\n  ]\n}\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "python3",
+      "/private/tmp/p2p-epic-repair-cases/S2-incomplete/installed-repair/prove/scripts/p2p_filesystem.py",
+      "--repo",
+      "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+      "validate",
+      "work/capture.md",
+      "--base",
+      "66a04c3617995cce9bf4cbd282e28d8f09cfd906"
+    ],
+    "stdout": "{\n  \"candidate\": {\n    \"work_item\": \"work/capture.md\",\n    \"work_item_sha256\": \"fb7eaa80f5385b531cb598ba642eeb2ede2a32a75ce3faca2bb1c7e92c25877b\",\n    \"comparison_base\": \"66a04c3617995cce9bf4cbd282e28d8f09cfd906\",\n    \"binding_inputs\": [\n      {\n        \"path\": \"specs/registry.md\",\n        \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n      },\n      {\n        \"path\": \"work/parent.md\",\n        \"sha256\": \"38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada\"\n      }\n    ],\n    \"commit\": \"194af4c2baba22b019b76bb36be64bf7c3b1b589\"\n  },\n  \"work_item\": \"work/capture.md\",\n  \"artifact_directory\": \".p2p/work/capture\",\n  \"binding_inputs\": [\n    {\n      \"path\": \"specs/registry.md\",\n      \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n    },\n    {\n      \"path\": \"work/parent.md\",\n      \"sha256\": \"38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada\"\n    }\n  ],\n  \"children\": [],\n  \"artifacts\": [\n    \".p2p/work/capture/candidate.json\"\n  ]\n}\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "git",
+      "rev-parse",
+      "epic/example"
+    ],
+    "stdout": "66a04c3617995cce9bf4cbd282e28d8f09cfd906\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "git",
+      "merge-base",
+      "epic/example",
+      "HEAD"
+    ],
+    "stdout": "66a04c3617995cce9bf4cbd282e28d8f09cfd906\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "git",
+      "diff",
+      "epic/example",
+      "--",
+      ":(exclude).p2p"
+    ],
+    "stdout": "diff --git a/registry.py b/registry.py\nindex 6f30f76..f18613d 100644\n--- a/registry.py\n+++ b/registry.py\n@@ -1,10 +1,10 @@\n EXPERIMENTAL = True\n \n def capture(name):\n-    raise NotImplementedError(\"capture not integrated\")\n+    return {name.lower(): name}\n \n def lookup(items, key):\n-    raise NotImplementedError(\"lookup not integrated\")\n+    raise NotImplementedError(\"lookup unfinished\")\n \n def summary(name):\n     return \"Welcome \" + name\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "python3",
+      "/private/tmp/p2p-epic-repair-cases/S2-incomplete/installed-repair/prove/scripts/p2p_filesystem.py",
+      "--repo",
+      "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+      "resolve",
+      "work/lookup.md"
+    ],
+    "stdout": "{\n  \"work_item\": \"work/lookup.md\",\n  \"artifact_directory\": \".p2p/work/lookup\",\n  \"binding_inputs\": [\n    {\n      \"path\": \"specs/registry.md\",\n      \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n    },\n    {\n      \"path\": \"work/parent.md\",\n      \"sha256\": \"38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada\"\n    }\n  ],\n  \"children\": [],\n  \"artifacts\": [\n    \".p2p/work/lookup/candidate.json\",\n    \".p2p/work/lookup/history/18871a16e658c44a0dd8532fbdd42d48b312bdd1a5460ea41f35696596918297/candidate.json\",\n    \".p2p/work/lookup/implementation.md\",\n    \".p2p/work/lookup/publication.md\"\n  ]\n}\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "python3",
+      "/private/tmp/p2p-epic-repair-cases/S2-incomplete/installed-repair/prove/scripts/p2p_filesystem.py",
+      "--repo",
+      "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+      "validate",
+      "work/lookup.md",
+      "--base",
+      "66a04c3617995cce9bf4cbd282e28d8f09cfd906"
+    ],
+    "stdout": "{\n  \"candidate\": {\n    \"work_item\": \"work/lookup.md\",\n    \"work_item_sha256\": \"fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9\",\n    \"comparison_base\": \"66a04c3617995cce9bf4cbd282e28d8f09cfd906\",\n    \"binding_inputs\": [\n      {\n        \"path\": \"specs/registry.md\",\n        \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n      },\n      {\n        \"path\": \"work/parent.md\",\n        \"sha256\": \"38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada\"\n      }\n    ],\n    \"commit\": \"194af4c2baba22b019b76bb36be64bf7c3b1b589\"\n  },\n  \"work_item\": \"work/lookup.md\",\n  \"artifact_directory\": \".p2p/work/lookup\",\n  \"binding_inputs\": [\n    {\n      \"path\": \"specs/registry.md\",\n      \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n    },\n    {\n      \"path\": \"work/parent.md\",\n      \"sha256\": \"38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada\"\n    }\n  ],\n  \"children\": [],\n  \"artifacts\": [\n    \".p2p/work/lookup/candidate.json\",\n    \".p2p/work/lookup/history/18871a16e658c44a0dd8532fbdd42d48b312bdd1a5460ea41f35696596918297/candidate.json\",\n    \".p2p/work/lookup/implementation.md\",\n    \".p2p/work/lookup/publication.md\"\n  ]\n}\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "git",
+      "rev-parse",
+      "epic/example"
+    ],
+    "stdout": "66a04c3617995cce9bf4cbd282e28d8f09cfd906\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "git",
+      "merge-base",
+      "epic/example",
+      "HEAD"
+    ],
+    "stdout": "66a04c3617995cce9bf4cbd282e28d8f09cfd906\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "git",
+      "diff",
+      "epic/example",
+      "--",
+      ":(exclude).p2p"
+    ],
+    "stdout": "diff --git a/registry.py b/registry.py\nindex 6f30f76..f18613d 100644\n--- a/registry.py\n+++ b/registry.py\n@@ -1,10 +1,10 @@\n EXPERIMENTAL = True\n \n def capture(name):\n-    raise NotImplementedError(\"capture not integrated\")\n+    return {name.lower(): name}\n \n def lookup(items, key):\n-    raise NotImplementedError(\"lookup not integrated\")\n+    raise NotImplementedError(\"lookup unfinished\")\n \n def summary(name):\n     return \"Welcome \" + name\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "python3",
+      "check.py",
+      "capture"
+    ],
+    "stdout": "capture: PASS\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "python3",
+      "check.py",
+      "lookup"
+    ],
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo/check.py\", line 7, in <module>\n    assert lookup({'ada': 'Ada'}, 'ADA') == 'Ada'\n           ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo/registry.py\", line 7, in lookup\n    raise NotImplementedError(\"lookup unfinished\")\nNotImplementedError: lookup unfinished\n",
+    "returncode": 1
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "python3",
+      "-c",
+      "from registry import capture; assert capture('Ada') == {'ada':'Ada'}; assert capture('') == {'':''}; assert capture('xY-19') == {'xy-19':'xY-19'}; print('capture original/empty/ASCII: PASS')"
+    ],
+    "stdout": "capture original/empty/ASCII: PASS\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "python3",
+      "-c",
+      "from registry import capture,lookup; items=capture('Ada'); assert all(lookup(items,k)=='Ada' for k in ['ada','ADA','aDa']); assert lookup({},'ADA') is None; assert lookup(items,'missing') is None; assert lookup(capture(''),'')==''; multi=dict(items,bob='Bob'); before=multi.copy(); assert lookup(multi,'BOB')=='Bob'; assert multi==before; print('lookup actual capture/mixed/missing/empty/many/no mutation: PASS')"
+    ],
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    from registry import capture,lookup; items=capture('Ada'); assert all(lookup(items,k)=='Ada' for k in ['ada','ADA','aDa']); assert lookup({},'ADA') is None; assert lookup(items,'missing') is None; assert lookup(capture(''),'')==''; multi=dict(items,bob='Bob'); before=multi.copy(); assert lookup(multi,'BOB')=='Bob'; assert multi==before; print('lookup actual capture/mixed/missing/empty/many/no mutation: PASS')\n                                                                      ^^^\n  File \"<string>\", line 1, in <genexpr>\n    from registry import capture,lookup; items=capture('Ada'); assert all(lookup(items,k)=='Ada' for k in ['ada','ADA','aDa']); assert lookup({},'ADA') is None; assert lookup(items,'missing') is None; assert lookup(capture(''),'')==''; multi=dict(items,bob='Bob'); before=multi.copy(); assert lookup(multi,'BOB')=='Bob'; assert multi==before; print('lookup actual capture/mixed/missing/empty/many/no mutation: PASS')\n                                                                          ~~~~~~^^^^^^^^^\n  File \"/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo/registry.py\", line 7, in lookup\n    raise NotImplementedError(\"lookup unfinished\")\nNotImplementedError: lookup unfinished\n",
+    "returncode": 1
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "git",
+      "ls-remote",
+      "origin"
+    ],
+    "stdout": "e178ae560d8e8720598fcd825f007d63b86f51a1\trefs/heads/child/lookup\n66a04c3617995cce9bf4cbd282e28d8f09cfd906\trefs/heads/epic/example\n194af4c2baba22b019b76bb36be64bf7c3b1b589\trefs/heads/shared/lookup\ne178ae560d8e8720598fcd825f007d63b86f51a1\trefs/heads/trunk\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "gh",
+      "pr",
+      "list",
+      "--state",
+      "all",
+      "--json",
+      "number,url,headRefName,headRefOid,baseRefName,title,body,isDraft"
+    ],
+    "stdout": "[\n  {\n    \"number\": 17,\n    \"url\": \"https://fixture.invalid/epic/pull/17\",\n    \"headRefName\": \"shared/lookup\",\n    \"headRefOid\": \"194af4c2baba22b019b76bb36be64bf7c3b1b589\",\n    \"baseRefName\": \"epic/example\",\n    \"title\": \"Lookup names\",\n    \"body\": \"Work item: work/lookup.md\\nHuman note: keep this sentence byte-for-byte.\\n<!-- grove:publish-pr repo=fixture/epic candidate=git:194af4c2baba22b019b76bb36be64bf7c3b1b589 contract=sha256:fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9 -->\\n\",\n    \"isDraft\": true\n  }\n]\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "gh",
+      "repo",
+      "view",
+      "--json",
+      "nameWithOwner,defaultBranchRef,url"
+    ],
+    "stdout": "{\n  \"nameWithOwner\": \"fixture/epic\",\n  \"defaultBranchRef\": {\n    \"name\": \"trunk\"\n  },\n  \"url\": \"https://fixture.invalid/epic\"\n}\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "python3",
+      "/private/tmp/p2p-epic-repair-cases/S2-incomplete/installed-repair/prove/scripts/p2p_filesystem.py",
+      "--repo",
+      "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+      "validate",
+      "work/capture.md",
+      "--base",
+      "66a04c3617995cce9bf4cbd282e28d8f09cfd906"
+    ],
+    "stdout": "{\n  \"candidate\": {\n    \"work_item\": \"work/capture.md\",\n    \"work_item_sha256\": \"fb7eaa80f5385b531cb598ba642eeb2ede2a32a75ce3faca2bb1c7e92c25877b\",\n    \"comparison_base\": \"66a04c3617995cce9bf4cbd282e28d8f09cfd906\",\n    \"binding_inputs\": [\n      {\n        \"path\": \"specs/registry.md\",\n        \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n      },\n      {\n        \"path\": \"work/parent.md\",\n        \"sha256\": \"38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada\"\n      }\n    ],\n    \"commit\": \"194af4c2baba22b019b76bb36be64bf7c3b1b589\"\n  },\n  \"work_item\": \"work/capture.md\",\n  \"artifact_directory\": \".p2p/work/capture\",\n  \"binding_inputs\": [\n    {\n      \"path\": \"specs/registry.md\",\n      \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n    },\n    {\n      \"path\": \"work/parent.md\",\n      \"sha256\": \"38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada\"\n    }\n  ],\n  \"children\": [],\n  \"artifacts\": [\n    \".p2p/work/capture/candidate.json\"\n  ]\n}\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "actor": "/root/scenario_child_verification",
+    "cwd": "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+    "argv": [
+      "python3",
+      "/private/tmp/p2p-epic-repair-cases/S2-incomplete/installed-repair/prove/scripts/p2p_filesystem.py",
+      "--repo",
+      "/private/tmp/p2p-epic-repair-cases/S2-incomplete/repo",
+      "validate",
+      "work/lookup.md",
+      "--base",
+      "66a04c3617995cce9bf4cbd282e28d8f09cfd906"
+    ],
+    "stdout": "{\n  \"candidate\": {\n    \"work_item\": \"work/lookup.md\",\n    \"work_item_sha256\": \"fae82a64da6322f136f724c54d4d8377332d3a632a9444a58d229e2758a8d0d9\",\n    \"comparison_base\": \"66a04c3617995cce9bf4cbd282e28d8f09cfd906\",\n    \"binding_inputs\": [\n      {\n        \"path\": \"specs/registry.md\",\n        \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n      },\n      {\n        \"path\": \"work/parent.md\",\n        \"sha256\": \"38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada\"\n      }\n    ],\n    \"commit\": \"194af4c2baba22b019b76bb36be64bf7c3b1b589\"\n  },\n  \"work_item\": \"work/lookup.md\",\n  \"artifact_directory\": \".p2p/work/lookup\",\n  \"binding_inputs\": [\n    {\n      \"path\": \"specs/registry.md\",\n      \"sha256\": \"64f91b9c11cbd07a51679bf23ed50b70201e51622cd38d011ee0f46d936fedb9\"\n    },\n    {\n      \"path\": \"work/parent.md\",\n      \"sha256\": \"38c29dec4bdd45e3ea03c015e482b509ec72cabb70f59b4a930e30240f7d0ada\"\n    }\n  ],\n  \"children\": [],\n  \"artifacts\": [\n    \".p2p/work/lookup/candidate.json\",\n    \".p2p/work/lookup/history/18871a16e658c44a0dd8532fbdd42d48b312bdd1a5460ea41f35696596918297/candidate.json\",\n    \".p2p/work/lookup/implementation.md\",\n    \".p2p/work/lookup/publication.md\"\n  ]\n}\n",
+    "stderr": "",
+    "returncode": 0
+  }
+]

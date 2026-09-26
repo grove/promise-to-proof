@@ -1,0 +1,48 @@
+[
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "check.py",
+      "capture"
+    ],
+    "exit": 0,
+    "stdout": "capture: PASS\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "check.py",
+      "lookup"
+    ],
+    "exit": 0,
+    "stdout": "lookup: PASS\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "check.py",
+      "summary"
+    ],
+    "exit": 0,
+    "stdout": "summary: PASS\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "check.py",
+      "parent"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/p2p-review-epic-delivery/s11-interaction/repo/check.py\", line 12, in <module>\n    assert summary(lookup(capture('Ada'), 'ADA')) == 'Welcome Ada'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  },
+  {
+    "command": "assert capture('Ada') == {'ada':'Ada'}",
+    "exit": 1,
+    "stdout": "{'ada': 'ADA'}\n",
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    from registry import capture; print(capture('Ada')); assert capture('Ada') == {'ada':'Ada'}\n                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  }
+]

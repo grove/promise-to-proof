@@ -1,0 +1,29 @@
+{
+  "observed_at_utc": "2026-09-26T23:09:25+0000",
+  "remote": "git@github.com:grove/promise-to-proof.git",
+  "repository": "grove/promise-to-proof",
+  "remote_ref_command": "git ls-remote --symref origin HEAD refs/heads/main refs/heads/issue/33",
+  "remote_ref_output": "ref: refs/heads/main\tHEAD\n5e369c1b45ba817b8add6b20a9b7b1c97898fa12\tHEAD\n5e369c1b45ba817b8add6b20a9b7b1c97898fa12\trefs/heads/main\n",
+  "remote_default": "main",
+  "remote_target": "5e369c1b45ba817b8add6b20a9b7b1c97898fa12",
+  "remote_head_absent": true,
+  "local_head_absent": true,
+  "pr_search": {
+    "all_states": true,
+    "returned": 8,
+    "limit": 100,
+    "matching_head_or_marker": [],
+    "response_sha256": "52351819e9079a0b3ac851bf053fb3dea0906e9ab090e10eda680174a81d037e"
+  },
+  "source_issue_unchanged": true,
+  "record_audit": {
+    "files_scanned": 1756,
+    "bytes": 19038853,
+    "fixture_bundles": 62,
+    "unique_fixture_blobs_scanned": 22,
+    "sensitive_pattern_matches": [],
+    "method": "Read retained UTF-8/JSON/scripts and decompress fixture bundle blobs into scratch object storage with no refs, commits, checkout or network; no authentication configuration read."
+  },
+  "checks": "Exact fs.validate; report identities and full scope; empty staged diff; no active Git hooks or additional contribution/PR templates; signing unset.",
+  "execution_equivalence": "No publication build, dependency resolution, generated assets, Git-derived product version, timestamps or signing transformation. Runtime Git reads belong to the invocation repositories; fixture checks create their own Git objects. Product files, symlinks and modes remain exact. Reports retain original snapshot identity."
+}
