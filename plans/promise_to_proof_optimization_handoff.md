@@ -22,7 +22,7 @@
 
 We want software delivery that is reliable, affordable, and easy to follow. First we check the rules. Then we make the running software enforce them. Only after that do we try to make delivery faster or cheaper.
 
-We have delivered the first executable check of the completion rules in [issue #24](https://github.com/grove/promise-to-proof/issues/24). [PR #25](https://github.com/grove/promise-to-proof/pull/25) is open and awaiting merge as of September 26, 2026. Its 43 checks include deliberately broken versions that the checker correctly rejects. This checks a simplified model; it does not establish that real agents always follow the rules.
+Issue #24 is closed. Its completion-integrity model and publication safety work were merged in [PR #25](https://github.com/grove/promise-to-proof/pull/25), [PR #26](https://github.com/grove/promise-to-proof/pull/26), and [PR #27](https://github.com/grove/promise-to-proof/pull/27). The model has 43 checks, including deliberately broken versions that it correctly rejects. It checks a simplified lifecycle; it does not establish that real agents always follow the rules.
 
 The next delivery is a small program that enforces those rules on one supported agent host. A host is the application that starts agents and controls their access to files and tools.
 
@@ -675,8 +675,8 @@ This roadmap sets the order. It does not approve future product decisions, spend
 
 | Phase | What we deliver | What it gives us | Position as of September 26, 2026 |
 |---|---|---|---|
-| 0 | A recorded starting point | Everyone uses the same rules and definitions | Baseline recorded for issue #24; confirm its remaining limits before Phase 2 |
-| 1 | An executable model of completion rules | We can find cases where the rules could wrongly allow “done” | Selected scope delivered in PR #25; merge assessment remains |
+| 0 | A recorded starting point | Everyone uses the same rules and definitions | Baseline recorded for issue #24; confirm host capabilities and remaining definitions before Phase 2 |
+| 1 | An executable model of completion rules | We can find cases where the rules could wrongly allow “done” | Complete for issue #24; PRs #25–#27 merged September 26, 2026 |
 | 2 | A small program that enforces the rules | A real delivery cannot bypass the required checks | Next development phase |
 | 3 | Tests that compare the program with the model | We can catch differences between the design and the running program | After Phase 2 |
 | 4 | A repeatable comparison of delivery strategies | We can see which choices save time or money and at what cost | After Phase 3 |
@@ -708,9 +708,9 @@ Deliver:
 
 Done when valid examples can finish, invalid examples are rejected for the expected reason, and another person can reproduce the results.
 
-Delivered for the scope selected by issue #24: 43 checks passed, including 14 deliberately broken variants. Separate review and proof covered all ten requirements. [The delivered README](https://github.com/grove/promise-to-proof/blob/3ef1651418b44c3d0ee59e81cf3aec3c22e36454/checks/delivery-model/README.md) explains the command and limits. [The proof report](https://github.com/grove/promise-to-proof/blob/3ef1651418b44c3d0ee59e81cf3aec3c22e36454/.p2p/work/delivery-completion-integrity/proof.md) retains the observations.
+Issue #24 is complete. PR #25 merged the model with 43 passing checks, including 14 deliberately broken variants, and separate review and proof for all ten requirements. PRs #26 and #27 completed the publication handoff and safety scenarios. [The delivered README](https://github.com/grove/promise-to-proof/blob/3ef1651418b44c3d0ee59e81cf3aec3c22e36454/checks/delivery-model/README.md) explains the command and model limits. [The proof report](https://github.com/grove/promise-to-proof/blob/3ef1651418b44c3d0ee59e81cf3aec3c22e36454/.p2p/work/delivery-completion-integrity/proof.md) retains the observations.
 
-This model covers a limited set of failures and one restart. It assumes that the host really provides separate, protected verification runs. It does not prove that assumption. Assess PR #25 for merge before using it as the integrated foundation for Phase 2.
+This model covers a limited set of failures and one restart. It assumes that the host really provides separate, protected verification runs. It does not prove that assumption. The model is now merged and can inform Phase 2, but the selected host's protections still need direct evidence.
 
 ## Phase 2: Make the running workflow enforce the rules
 
@@ -875,9 +875,7 @@ Resolve these before the relevant phase, not necessarily before building the ini
 
 # 24. The next delivery to prepare
 
-First, assess PR #25 for merge using its saved review and proof. Do not treat the model as an integrated dependency until that step is complete.
-
-Then prepare the first Phase 2 work item: demonstrate an enforceable delivery process on one named host. Read the current repository instructions and protocol, the delivered model's limits, and the existing filesystem helper before proposing new code.
+Issue #24 is closed, and PRs #25–#27 are merged. Phase 1 is complete. Prepare the first Phase 2 work item: demonstrate an enforceable delivery process on one named host. Read the current repository instructions and protocol, the delivered model's limits, and the existing filesystem helper before proposing new code.
 
 The proposal must answer these questions in plain language:
 
