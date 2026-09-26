@@ -19,6 +19,22 @@ the source checkout untouched. A successful result identifies that workspace's
 recoverable candidate and matching full `REVIEWED` and `PROVEN` reports. Applying
 the result to the source checkout or publishing it is a separate operation.
 
+For sliced work, resolve the approved plan through the child's Parent link before
+running the controller. Use the resolved destination's current local tip for
+`--comparison-base`. The controller starts from that destination tree, retains
+the plan and history outside product identity, and binds the approved plan text
+to stage inputs. It rejects a missing decision, conflicting base, missing ref,
+or integration ref unrelated to the approved starting commit. An assembled
+parent uses its own plan's final destination. Unsliced work keeps its existing
+starting-point behavior.
+
+Use the ordinary delivery skill to normalize an explicitly approved older plan
+or arrange missing branch setup under covering authority. The controller creates
+no destination branch and infers no approval. On resume, an approved-plan change,
+target advance, or missing transferred plan evidence blocks further dispatch.
+A pending proposal alone leaves the active decision applicable. Preserve the
+prior run and reconcile routing and verification before a new delivery.
+
 Dirty agreement inputs enter the candidate. Other dirty paths block admission.
 Use repeated `--exclude-dirty relative/path` options only for work you explicitly
 identify as unrelated. The controller records that inventory, uses comparison-base

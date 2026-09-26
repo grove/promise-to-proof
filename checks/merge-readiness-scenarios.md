@@ -89,3 +89,13 @@ unauthorized Git or external effects. Remove temporary files and resume from the
 work-item path in a fresh checkout after an authorized transfer; the saved report
 and its required evidence remain retrievable. Historical scenario run records
 above remain observations of their original versions, not claims about this run.
+
+## Epic delivery strategy scenarios
+
+S2, S6–S7, S9–S13: compare the actual PR target with the exact active plan; preserve historical identities and enforce parent verification, CI, and repository approvals without retargeting.
+
+Use the [disposable epic fixtures](./epic-delivery-scenarios.md) and its fresh
+installed-skill invocation procedure. Keep its oracle out of actor input. Inspect
+saved plan/report identities, actual Git refs, and controlled tracker call logs
+as well as the response. Follow the listed variants and positive verification
+phases; a baseline blocker alone does not execute the whole source scenario.
