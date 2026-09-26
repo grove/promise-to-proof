@@ -15,7 +15,7 @@ remain recorded below.
 | --- | --- | --- |
 | D1-D2 | Local delivery and separate GitHub tracker delivery reached matching reports. | These historical successes use the same Python fixture and include recovery steps described below. |
 | D3 | Ambiguity, approval, and pending-amendment blockers. | Approved amendment through a completed new delivery. |
-| D4 | Conflicting contracts and denied report storage. | Interrupted canonical save and live uncertain-write readback. |
+| D4 | Conflicting contracts, denied report storage, and live uncertain-write readback. | Interrupted canonical save. |
 | D5 | Unrelated work exclusion, overlapping-work blocker, and concurrent-change preflight blocker. | Concurrent edits during capture. |
 | D6 | Full candidate reconstruction, cross-checkout resume, and missing-artifact handling. | One capture combining staged, unstaged, deleted, and untracked changes; interrupted storage. |
 | D7 | Stale reports, same-label contract drift, between-stage drift, and in-flight proof drift. | Complete enclosing workflow runs for every variant. |
@@ -588,7 +588,7 @@ files, while the candidate and contract were outside its write scope; the
 driver made the only candidate change. This is a controlled D7 in-flight
 drift observation, not a completed delivery.
 
-## Remaining external-write gate
+## Earlier external-write gate
 
 D4's uncertain-result tracker-write variant is unexecuted. The existing
 approval covered the exact canonical v1 contract/link on the private
@@ -662,3 +662,40 @@ skill frontmatter, the explicit-invocation metadata check, protocol-reference
 resolution, and `git diff --check`. No typechecker is configured. The bundled
 skill validator could not run because its PyYAML dependency was unavailable;
 the YAML and metadata checks above were run separately.
+
+## Live uncertain-write recovery and closure assessment
+
+On 2026-09-26, the developer approved one exact diagnostic comment on the
+existing private disposable issue. The test driver checked that its unique
+marker was absent, posted the comment once through `gh`, and retained the
+successful response outside the resumed workflow's scope. This is controlled
+response loss after a real GitHub write, not a simulated tracker or a claim
+that a network failure occurred.
+
+A fresh native agent, `/root/uncertain_write_resume` with `fork_turns: none`,
+used `deliver-issue #1` to reconcile only the pending tracker-write handoff.
+It received the approved body and an uncertain-result record, but no returned
+comment ID. It read the configured tracker and found the
+[exact comment once](https://github.com/grove/p2p-issue23-validation/issues/1#issuecomment-5844641925).
+It returned `RECONCILED` without repeating the write. The enclosing host then
+independently confirmed exactly one new comment, unchanged prior comments,
+unchanged issue body and canonical contract, and unchanged fixture files.
+The canonical v1 SHA-256 remained
+`ed0114a867dcb420caf0320fbb0b6cb49c6ab89de5bd7c6b4ba3dbd0007e2755`.
+
+The exact response, before/after source snapshots, pending handoff, independent
+readback, and returned report were copied and reread under
+`.git/promise-to-proof/issue23-validation/2026-09-26-uncertain-write/`.
+Its `index.json` identifies the host context and evidence. The reconciliation
+report SHA-256 is
+`e07f39b482507eef942e5e8c80e0ea42593d0d4e369093c6a0be78f929577c9e`.
+This passes the targeted D4 lost-response recovery check. It does not claim a
+full delivery run or an interrupted canonical-contract save.
+
+The closure audit compared the original issue's testing decisions with the
+recorded observations, rather than requiring every additional scenario
+permutation. The named delivery, authority, drift, repair, and recovery behaviors
+now have observations on supported hosts. Implementation commit `650ef02` was
+confirmed on remote `main`. Remaining variants in the coverage table are
+additional validation work; this assessment does not claim exhaustive coverage,
+OS-enforced isolation for native agents, or a formal `PROVEN` report for #23.
