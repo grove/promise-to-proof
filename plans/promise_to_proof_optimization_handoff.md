@@ -24,7 +24,7 @@ We want software delivery that is reliable, affordable, and easy to follow. Firs
 
 Issue #24 is closed. Its completion-integrity model and publication safety work were merged in [PR #25](https://github.com/grove/promise-to-proof/pull/25), [PR #26](https://github.com/grove/promise-to-proof/pull/26), and [PR #27](https://github.com/grove/promise-to-proof/pull/27). The model has 43 checks, including deliberately broken versions that it correctly rejects. It checks a simplified lifecycle; it does not establish that real agents always follow the rules.
 
-Phase 2 is complete. [PR #29](https://github.com/grove/promise-to-proof/pull/29) merged the single-work-item delivery controller on September 26, 2026. Its supported host is macOS Codex CLI. The next delivery is Phase 3: tests that compare the real controller with the model.
+Phases 2 and 3 are complete. [PR #29](https://github.com/grove/promise-to-proof/pull/29) merged the single-work-item delivery controller, and [PR #31](https://github.com/grove/promise-to-proof/pull/31) merged the model-based conformance tests on September 26, 2026. The supported host is macOS Codex CLI. Phase 4 is next: compare fixed delivery strategies on that host after agreeing on the task set, independent correctness judge, and improvement threshold.
 
 Read [the delivery phases in order](#19-delivery-phases-in-order) for what we will build and how we will know each phase is finished. That section is the implementation order and takes precedence over earlier research suggestions about doing work in parallel. The remaining technical sections explain the background and possible designs.
 
@@ -678,8 +678,8 @@ This roadmap sets the order. It does not approve future product decisions, spend
 | 0 | A recorded starting point | Everyone uses the same rules and definitions | Baseline recorded for issue #24; host capabilities and invocation semantics recorded in issue #28's delivery |
 | 1 | An executable model of completion rules | We can find cases where the rules could wrongly allow “done” | Complete for issue #24; PRs #25–#27 merged September 26, 2026 |
 | 2 | A small program that enforces the rules | A real delivery cannot bypass the required checks | Complete for issue #28; PR #29 merged September 26, 2026 |
-| 3 | Tests that compare the program with the model | We can catch differences between the design and the running program | Next development phase; acceptance planning and FizzBee test-adapter compatibility demonstration remain |
-| 4 | A repeatable comparison of delivery strategies | We can see which choices save time or money and at what cost | After Phase 3; results will be scoped to the first supported host |
+| 3 | Tests that compare the program with the model | We can catch differences between the design and the running program | Complete for issue #30; PR #31 merged September 26, 2026 |
+| 4 | A repeatable comparison of delivery strategies | We can see which choices save time or money and at what cost | Next; Phase 3 is integrated. Agree on the task set, independent correctness judge, and improvement threshold before evaluation. Results are scoped to the first supported host |
 | 4.1 | Support for a second agent host | The same delivery rules can work with another host | After Phase 4; target host and enforceable capabilities remain to be selected |
 | 5 | Clearly described levels of checking | Users can make an informed, authorized choice | After Phase 4.1 |
 | 6 | Safe execution of several related tasks | Independent tasks can run together without losing the final combined check | After Phase 5 |
@@ -730,7 +730,7 @@ Decision before implementation: name the host and the controls it can actually e
 
 ## Phase 3: Test the real program against the model
 
-Phase 2's prerequisite is integrated in PR #29. The [controller documentation](../docs/p2p-delivery-controller.md) describes the supported host and limits. Its [proof report](../.p2p/work/single-work-item-delivery/proof.md) records all 14 requirements proven, a real successful delivery, and host isolation checks. The controller, filesystem, and acceptance-bundle suites passed all 23 tests again at repository commit `5c2c6b64b997dd2c04ac8ba85dcad8e08047eac2`. These fixture tests do not establish model-to-controller conformance. Phase 3 has not been implemented.
+Phase 3 is complete. [PR #31](https://github.com/grove/promise-to-proof/pull/31) merged the FizzBee-to-controller conformance suite on September 26, 2026. The [proof report](../.p2p/work/delivery-model-conformance/proof.md) records all eight requirements proven. It separates bounded model checks, substitute-backed controller tests, and a small serial live-host run. The proof does not establish every controller execution or live-host concurrency.
 
 Connect model actions to the controller's real operations. For example, a modeled restart must restart the controller and inspect what it recovered from saved records.
 
@@ -899,19 +899,17 @@ Resolve these before the relevant phase, not necessarily before building the ini
 
 # 24. The next delivery to prepare
 
-Phases 1 and 2 are complete through PRs #25–#27 and PR #29. Prepare Phase 3: connect the delivered FizzBee model to the actual single-work-item controller. Read the current repository instructions and protocol, the model's limits, the controller, and its existing tests before proposing new code.
+Phases 1–3 are complete through PRs #25–#27, #29, and #31. Prepare Phase 4: compare fixed delivery strategies on the first supported host while keeping the full checking requirements. Read the current repository instructions and protocol, the Phase 4 scope, the controller's available cost and timing records, and existing representative fixtures before proposing the evaluation.
 
-The proposal must answer these questions in plain language:
+Before evaluation, settle these decisions in plain language:
 
-1. Can the pinned FizzBee tools drive a minimal controller operation, and which adapter language does that demonstration support?
-2. How do model actions map to controller operations, returned results, and saved state, including a real process restart?
-3. Which existing fixtures can be reused, which cases require the real host, and which overlapping operations does the controller support?
-4. How will failures be retained and replayed, and which deliberate controller defects must the tests detect?
-5. Which required behaviors need extensions to the bounded model?
+1. Which representative tasks belong in the comparison?
+2. Who independently judges whether each result is correct, including missed defects?
+3. What improvement would justify the cost of the comparison and any added machinery?
 
-Save the agreed Phase 3 scope and its concrete checks in a canonical `work/` contract before implementation. Choose the adapter language only after the pinned-tool demonstration. Inspect actual controller results and saved state; another execution of the model alone does not establish conformance.
+Save the agreed Phase 4 scope and checks in a canonical `work/` contract before implementation or evaluation. Compare review-first, proof-first, and concurrent checking where the host permits it. Include failed attempts, repairs, waiting, human work, and comparison costs. Keep estimates distinct from measurements and count overlapping time correctly.
 
-Keep cost comparisons, optional checking levels, child-task scheduling, and automatic strategy selection in their later phases. This planning update does not create issues, authorize publication, or change the current acceptance rules.
+Phase 4 recommends choices; it does not change how live tasks run. Keep optional checking levels, child-task scheduling, and automatic strategy selection in their later phases. This planning update does not create issues, authorize publication, or change the current acceptance rules.
 
 # Appendix A. Illustrative policy schema
 
