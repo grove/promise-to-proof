@@ -1,0 +1,22 @@
+{
+  "candidate": "snapshot:sha256:4ad7a1d6086cc3032d3b4ad67eba7d129b2398121cefdfeb84f2ae2e374f47de",
+  "comparison_base": "69c02fe5a0e876b104baacca2e4075f801974d40",
+  "stages": [
+    {
+      "agent_id": "/root/review26",
+      "invocation": "collaboration.followup_task after independent initial spawn",
+      "status": "completed",
+      "report_sha256": "c76afde6e16dfd2cad22c016e27cdcbde6acdcd2b91f08bc6d1ab5d979e09803",
+      "permissions": "Default sandbox, readonly fixed inputs outside writable roots; scratch only; no escalation or edits"
+    },
+    {
+      "agent_id": "/root/proof26",
+      "invocation": "collaboration.followup_task after independent initial spawn",
+      "status": "completed",
+      "report_sha256": "866232cfbd223f5b5c60e2fb5a8436415b49fa3816d41b0c780ed52c711014f6",
+      "permissions": "Default sandbox, readonly fixed inputs outside writable roots; scratch only; no escalation or edits"
+    }
+  ],
+  "readonly_inputs": "/Users/Shared/p2p-issue-24-6krj8of_/followup26-main69",
+  "storage": "Exact report and evidence bytes saved and reread; stage storage-pending text retained verbatim."
+}

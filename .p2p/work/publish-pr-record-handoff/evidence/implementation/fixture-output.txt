@@ -1,0 +1,2 @@
+PASS: equal/changed/mode/symlink classification; recoverable matching-only archive; changed/local-only/unrelated preservation; records-only Git ancestry and unchanged product/reports.
+Fixture checks filesystem and Git facts only; instruction compliance requires the recorded walkthroughs, not this fixture alone.

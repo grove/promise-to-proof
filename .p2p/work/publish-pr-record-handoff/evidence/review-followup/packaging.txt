@@ -1,0 +1,1 @@
+PASS standalone dereferenced protocol, regular readable files, frontmatter and agent YAML parse, implicit invocation true
