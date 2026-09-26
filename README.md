@@ -16,26 +16,29 @@ asked for. Promise to Proof grew out of that experience: give the developer
 responsible for the result a way to check that the agreed behavior was delivered,
 without unapproved scope, on the exact code being accepted.
 
-## Where we want to go
+## Current status and next steps
 
-The ambition is to automate the entire Promise to Proof process, from the
-acceptance contract through implementation, review, proof, and repair, and to
-verify that the automation cannot claim success on stale evidence or take
-unauthorized actions. `/deliver-issue` coordinates these steps today, but the
-workflow is not yet formally verified or fully automated.
+The project now has an executable delivery controller and model-based checks:
 
-A first step is to model the `/deliver-issue` lifecycle in
-[FizzBee](https://fizzbee.io/design/tutorials/getting-started/). Its state-machine
-model could check that review and proof refer to the same contract and candidate,
-that stale proof never yields success, and that blocked or repairable paths do
-not silently become done. It could also check for deadlocks and whether delivery
-can make progress. FizzBee's
-[model-based testing](https://fizzbee.io/testing/tutorials/quick-start/) could
-then exercise a deterministic orchestration layer against paths from the model.
-That integration still needs to be built: verifying a model does not prove that
-the running workflow follows it. TLA+ offers a more mature path to mechanically
-checked proofs, but a maintained FizzBee model connected to executable tests is
-the first goal here.
+- A [bounded FizzBee model](./checks/delivery-model/README.md) checks completion
+  rules for contract and candidate identity, durable evidence, repair, and restart.
+- The [delivery controller](./docs/p2p-delivery-controller.md) runs one established
+  local agreement through implementation, independent review and proof, and at
+  most one automatic repair. It supports macOS with Codex CLI and retains progress
+  for resume in an isolated workspace.
+- [Conformance tests](./checks/delivery-model/README.md#controller-conformance-phase-3)
+  drive the controller's public CLI against FizzBee-generated action sequences.
+  They check restart, stale reports, interrupted storage, repair limits, and
+  overlapping resume attempts, including deliberately broken controller variants.
+
+Model exploration is bounded, and conformance tests use substitute worker replies.
+Real host checks separately exercise isolation and stage execution. These checks
+do not establish the quality of agent judgments or prove every controller execution.
+
+The next planned step is to compare fixed delivery strategies on the supported
+host, with agreed tasks, independent correctness judgments, and an improvement
+threshold. Additional hosts and automatic strategy selection remain later work.
+See the [optimization plan](./plans/promise_to_proof_optimization_handoff.md).
 
 Specifications live in `specs/`, acceptance contracts in `work/`, and generated
 records in `.p2p/work/`. Commit durable records; ignore only `.p2p/tmp/`.
@@ -145,6 +148,31 @@ for import. It coordinates independent review and proof when the host supports
 them. It does not commit, publish, or update trackers without separate authority.
 See the [delivery checks](./checks/deliver-issue-scenarios.md).
 
+For direct CLI execution on macOS, follow the
+[controller guide](./docs/p2p-delivery-controller.md). It requires Python 3.11 or
+newer, Git, an authenticated Codex CLI, and installed delivery stage skills.
+The controller exposes `run`, `status`, and `resume`; a successful run returns
+an isolated candidate with matching full `REVIEWED` and `PROVEN` reports.
+Applying that candidate to the source checkout or publishing it is a separate step.
+
+## Plan on an issue before delivery
+
+Run `/plan-acceptance <issue>` to save a local proposal and post its exact text
+as a comment on that existing issue. Add `local-only` or `draft-only` to suppress
+the comment. The handoff includes the work-item path, revision, text hash, and
+retrievable binding inputs. Posting the proposal does not approve it.
+
+Approve the specific proposal on the issue, then run `/deliver-issue <issue>`
+in the same or another checkout. Delivery imports the exact approved contract
+and binding inputs into the local workflow. Matching inputs retain their approval;
+changed or conflicting inputs require reconciliation. If approval exists only
+in conversation, transfer the saved approval receipt to the delivery checkout.
+No preliminary planning PR is required.
+
+Planning inside `/deliver-issue` stays local unless issue publication has separate
+authorization. See [Plan on an issue before delivery](./docs/how-to.md#plan-on-an-issue-before-delivery)
+for the handoff procedure.
+
 ## Use the stage skills
 
 Start with these four skills in order:
@@ -240,6 +268,21 @@ PR near merge, `/merge-readiness` checks the current review, proof, CI, and
 repository merge conditions without merging the PR. Read the
 [FAQ](./docs/faq.md) for the distinction between acceptance and merge readiness.
 
+## Keep durable records small
+
+Run exploratory checks and dependency installs in `.p2p/tmp/` or an OS temporary
+directory. Save the command, assertion, result, and environment in the report;
+retain separate evidence files when the report cannot carry the required evidence.
+Reuse the candidate snapshot across stages. When replacing a record whose exact
+old bytes already exist at the same path in `HEAD`, Git supplies its history.
+Preserve uncommitted versions before replacement.
+
+Bulky inactive records can also move out of the checkout when their exact bytes
+and modes are recoverable from Git. Keep the reports, candidate record, directly
+referenced sources, and an `archive.md` recovery index. Preserve active and
+interrupted-run records. See [Reduce retained work data](./docs/how-to.md#reduce-retained-work-data)
+before archiving or restoring evidence.
+
 ## Detailed docs
 
 New here? Start with the [HOW-TO](./docs/how-to.md) to choose and run a delivery
@@ -281,19 +324,23 @@ skills/productivity/
 ```
 
 Each skill has a `SKILL.md`. Some also have an `agents/openai.yaml` display
-metadata file. The [`checks/`](./checks/) directory contains human-runnable
-workflow scenarios, disposable-repository filesystem checks, and the
-dependency-free acceptance bundle checker.
+metadata file. The [`checks/`](./checks/) directory contains workflow scenarios,
+filesystem and controller tests, the acceptance bundle checker, and the
+FizzBee model and conformance suite.
 
 Shared protocol references are symlinks to `docs/acceptance-contract-protocol.md`.
 The installer copies their contents into each selected skill, so individual
 installs keep the protocol. Shared `scripts/p2p_filesystem.py` links likewise
 resolve to the implementation in `deliver-issue/scripts/`. Edit the canonical
-files to change shared behavior. Run the checks with:
+files to change shared behavior. Run the Python fixture tests with:
 
 ```bash
 python3 -m unittest discover -s checks -p 'test_*.py'
 ```
+
+The [model and conformance checks](./checks/delivery-model/README.md) have separate
+commands and pinned tool requirements. The [live host check](./docs/p2p-delivery-controller.md#host-boundary-and-checks)
+runs separately and makes real model calls.
 
 ## Contributing
 
