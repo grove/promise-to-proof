@@ -1,5 +1,5 @@
 interface:
   display_name: "Create Parent Issue"
-  short_description: "Create one source issue from a local specification"
+  short_description: "Optionally mirror a specification to one source issue"
 policy:
   allow_implicit_invocation: false

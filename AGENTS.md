@@ -2,7 +2,10 @@
 
 ### Issue tracker
 
-Issues and specs live in GitHub Issues. See `docs/agents/issue-tracker.md`.
+Specifications live in `specs/`, acceptance contracts in `work/`, and durable
+workflow records in `.p2p/work/`. Read `docs/acceptance-contract-protocol.md`
+for planning, delivery, verification, or resume. GitHub is an optional import
+and publication destination. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 

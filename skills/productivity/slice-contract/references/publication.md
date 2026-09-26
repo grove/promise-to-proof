@@ -1,8 +1,9 @@
 # Publish or reconcile a decomposition
 
 Use this procedure for authorized publication, reconciliation, and publication
-previews that need destination capability checks. Follow configured tracker tools
-and triage conventions. Inspect the installed interface and permissions rather
+previews that need destination capability checks. Local work uses the filesystem
+procedure below. For explicitly requested external publication, follow configured
+tracker tools and triage conventions. Inspect the installed interface and permissions rather
 than assuming CLI flags or API support.
 
 ## Reconcile identity before writing
@@ -89,12 +90,14 @@ marker pair; on reruns update only the managed section and reread it. Multiple o
 mismatched marker pairs need reconciliation. If the section cannot be safely
 written and read back, do not report complete publication.
 
-For local publication, follow the configured layout. If none exists and local
-publication was explicitly selected, use `.scratch/<work-id>/plan.md` and
-`.scratch/<work-id>/issues/S<n>-<slug>.md`. Resolve relative links from the saved
-artifact. Contract storage still follows the protocol. Transfer required files
-in a commit or snapshot before another checkout receives the handoff. Saving
-alone does not authorize committing.
+For local publication, use `work/<parent>-<slice>.md` and save the plan in
+`.p2p/work/<parent>/slicing.md`. Link parent and children using relative Markdown
+paths and preserve contribution mappings in the parent. Inspect existing files
+before writing; reuse matching work and report unrelated filename collisions.
+The child file is its canonical agreement: planning normalizes it in place.
+Local publication is the default and needs no tracker. Transfer required files
+through an authorized commit before another checkout receives the handoff.
+Saving alone does not authorize staging or committing.
 
 Reread tickets, relationships, and the canonical index. Confirm destination,
 content, identifiers, and edge directions. Return actual persisted references.

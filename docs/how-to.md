@@ -7,33 +7,26 @@ phase in depth. The [FAQ](./faq.md) answers questions about what the results mea
 
 ## Choose a starting point
 
-If you have a small, coherent GitHub issue, start with
-[`/deliver-issue`](../skills/productivity/deliver-issue/SKILL.md) and its issue
-number. It uses the configured tracker and coordinates the direct path when
-the host supports separate stage invocations and independent read-only review
-and proof contexts. A missing capability produces a named blocker; use
-[the manual stage path](#complete-a-github-issue) when needed.
-If the issue needs several independently useful outcomes, plan its parent contract
-first and then [divide the work](#divide-a-large-issue). You can give
-`plan-acceptance` a local specification or an agreed outcome too. A GitHub issue
-is not a prerequisite for those inputs, though this repository records its own
-issues and specifications in GitHub Issues.
+Run `/setup-promise-to-proof` in a new project. It creates `specs/`, `work/`,
+`.p2p/work/`, and `.p2p/tmp/` and checks Git ignore rules. Only temporary P2P
+files are ignored. Tracker configuration is optional.
+
+For one coherent delivery, start with `/deliver-issue work/<slug>.md`. If you
+have a specification instead, run `/plan-acceptance specs/<slug>.md` first.
+An agreed outcome can go directly into a standalone work item without a spec.
+For large work, plan the parent contract and then divide it into local children.
 
 ```text
-Existing, coherent issue  → deliver-issue (agreement → implementation → review + proof)
-						  → optional separately authorized publish-pr
-Existing, large issue     → plan-acceptance → slice-contract → child workflows
-Local spec in this repo   → create-parent-issue → plan-acceptance → direct or sliced path
-Other project's local spec → plan-acceptance → direct path or approved slicing
+Local work item → deliver-issue → optional separately authorized publish-pr
+Local spec      → plan-acceptance → direct delivery or slice-contract
+Tracker issue   → import into work/<slug>.md → same local workflow
 ```
 
-If your source is still an idea, settle the outcome before planning acceptance.
-Use `interrogate` when you want to question a proposed approach, or request
-`critique` when you want an independent assessment. Neither skill creates a
-ticket or an acceptance contract.
-
-For an existing issue that still needs a next action or owner, start with
-[triage](#triage-an-existing-issue).
+The coordinated path needs separate stage invocations and independent review
+and proof contexts. Use the [manual stages](#complete-a-local-work-item) if the
+host cannot provide them. Settle unclear outcomes with `interrogate` or an
+explicit `critique` before planning. For optional tracker triage, use the next
+procedure.
 
 ## Choose a model
 
@@ -98,10 +91,10 @@ If the issue is clear but has no saved acceptance contract, the next action is
 issue ready for implementation. Triage does not create a contract or implement
 the request.
 
-## Complete a GitHub issue
+## Complete a local work item
 
-On a supported host, `/deliver-issue #123` runs the local direct path from the
-issue reference and returns the current result and saved references. It asks for
+On a supported host, `/deliver-issue work/retry-safe-uploads.md` runs the direct
+path from the work-item reference and returns the current result and saved references. It asks for
 unresolved outcome decisions and required approval of the exact proposed
 agreement. It does not imply authority to commit, push, publish, or edit triage
 labels. The [workflow scenarios](../checks/deliver-issue-scenarios.md) describe
@@ -112,8 +105,8 @@ invocations. Each stage skill returns a handoff for the next phase; it does not
 call the next skill for you.
 
 ```text
-/plan-acceptance #123
-/implement-contract #123
+/plan-acceptance work/retry-safe-uploads.md
+/implement-contract work/retry-safe-uploads.md
 /review-implementation <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
 ```
@@ -129,8 +122,8 @@ After any required approval, save and reread the acceptance contract at its
 canonical location. Pass its location, revision, and exact text identity to implementation.
 After `implement-contract`, save the report and capture the candidate as a full
 commit SHA or a reproducible snapshot that includes relevant uncommitted files.
-Give review a fixed comparison base. Save the review and proof reports outside
-the candidate, with the identities and evidence needed to read them in another
+Give review a fixed comparison base. Save `review.md` and `proof.md` under
+`.p2p/work/retry-safe-uploads/`, which is excluded from the candidate, with the identities and evidence needed to read them in another
 session. The [durable handoff rules](./acceptance-contract-protocol.md#durable-contract-handoff)
 give the storage convention.
 
@@ -165,7 +158,7 @@ preview, then explicitly authorize its complete effects:
 ```
 
 The skill uses a matching commit or creates one in an isolated publication
-workspace, verifies that its complete tree preserves the candidate content,
+workspace, verifies that its complete tree outside `.p2p/` preserves the candidate,
 requires the target tip to match the review comparison base, pushes without
 force, and rereads the draft PR. It does not change the candidate or assess merge
 readiness. The model may prepare the read-only preview on its own; publication
@@ -183,8 +176,8 @@ After a full `PROVEN` result, use [`/retrospect`](../skills/productivity/retrosp
 with the saved proof, exact candidate and contract references, and retrievable
 use or maintenance observations. A matching review is useful when available,
 but no PR or green unrelated CI is required. The skill proposes an evaluation
-report outside the evaluated candidate; give it an authorized destination and
-reread it from a fresh session. No learning is a valid outcome.
+report at `.p2p/work/<slug>/retrospective.md`; save it under existing authority
+and reread it from a fresh session. No learning is a valid outcome.
 
 ```text
 /retrospect <saved PROVEN proof>; candidate <exact proven candidate>; experience <retrievable observations>
@@ -201,85 +194,51 @@ Promoting advice to a binding rule is a separate human-authorized change through
 the source's owning workflow. If a later candidate is evaluated retrospectively,
 it needs its own proof and evaluation; an old report stays historical.
 
-## Divide a large issue
+## Divide large work
 
-Save the parent contract before asking for a split. A draft shows the proposed
-child outcomes, coverage of each parent promise, dependencies, and the plan for
-checking the integrated result.
+Plan the parent acceptance contract, then request a split:
 
 ```text
-/plan-acceptance #123
-/slice-contract #123; draft only
+/plan-acceptance work/retry-safe-uploads.md
+/slice-contract work/retry-safe-uploads.md
 ```
 
-Review the draft's coverage, destination, labels, links, and any exception for
-work that cannot be independently green. Approve a consequential breakdown and
-authorize its publication to the named destination before publishing it. If
-separate tickets add no useful boundary, keep the direct path when the result is
-`NO SPLIT`.
+The default result is local child files such as
+`work/retry-safe-uploads-api.md` and `work/retry-safe-uploads-browser.md`.
+The parent lists children and contributions. Each child links to the parent
+and states a complete outcome, inherited constraints, and prerequisites.
+Slicing creates no extra specifications by default. `NO SPLIT` means the parent
+can use the direct delivery path.
+
+Resolve consequential outcome or dependency decisions before dependent work.
+Run `/plan-acceptance` on each child to complete its contract in place, then
+implement, review, and prove that child. Select working branches under the
+repository's normal rules. For dependent children, use a shared integrated
+candidate or wait for prerequisites; draft PR publication does not support
+stacked PRs.
+
+Finally, capture one integrated candidate and review and prove the full parent.
+Child proofs do not combine into parent proof.
+
+## Create a tracker mirror when you need one
+
+Local work does not require a GitHub issue. To publish a specification summary,
+preview and explicitly authorize that separate action:
 
 ```text
-/slice-contract #123; publish the approved breakdown as GitHub issues
-/plan-acceptance <each published child issue>
+/create-parent-issue specs/retry-safe-uploads.md; draft only
+/create-parent-issue <approved preview>; publish the approved single issue to GitHub
 ```
 
-Each child receives its own saved contract before implementation. Run the direct
-implementation, review, and proof path for each child. Choose the delivery path
-in the breakdown: one parent branch named `issue/<parent-number>` and one PR for
-sequential child work, or a branch named `issue/<child-number>` and PR for each
-independently publishable child, subject to repository branch rules.
-For a child that needs unmerged sibling work, use the shared candidate or wait
-for its prerequisite to land; `publish-pr` does not support stacked PRs. Select
-the intended working branch before local writes; skills that save contracts or
-plans do not create or switch branches. Repository files must travel in a commit
-or transferred snapshot, while review and proof reports stay outside the candidate.
-Assemble the work in one exact integrated candidate
-and run `/prove` against the full parent contract. Review the integrated candidate
-if it differs from the reviewed child candidates or contains shared integration
-code. Child proofs do not combine into parent proof.
+The remote source reference must be durable and retrievable. Publishing an issue
+does not commit or push local files. Keep the canonical acceptance contract in
+`work/retry-safe-uploads.md` and use the issue as a link or mirror.
 
-## Create an originating issue when you need one
-
-For work **in this repository** that starts from a local specification, use
-`create-parent-issue` to draft exactly one originating GitHub issue. Review its
-summary and durable spec reference, then explicitly authorize publication. The
-skill does not split the specification into tickets or write the acceptance
-contract.
-
-```text
-/create-parent-issue path/to/spec.md; draft only
-/create-parent-issue path/to/spec.md; publish the approved single issue to GitHub
-/plan-acceptance #123
-```
-
-The spec must be retrievable from an immutable reference, such as a
-commit-pinned GitHub file URL. The skill will not commit or push it for you.
-`plan-acceptance` turns the issue and exact source spec into the contract. Keep
-that contract on the originating issue or link it directly from the issue; do
-not create a second issue merely to store it.
-
-When the source spec changes, use the same path and destination. The skill finds
-the existing issue and previews an update; approve that update separately from
-the original publication. It preserves the issue's contract or contract link
-and unrelated labels. If the source promises changed, run `plan-acceptance` on
-the same issue to reconcile its contract before continuing. An uncertain match
-or a change detected before editing stops the update for another review.
-
-For a small agreed outcome without a local spec, create one source issue with
-`gh issue create` before starting the tracked workflow. Put the outcome and
-boundaries in the issue, then run `plan-acceptance` on it.
-
-```bash
-gh issue create --title "Retry failed uploads" --body "Users can retry a failed upload after restarting the app."
-```
-
-For a project using Promise to Proof, follow that project's issue-tracker rules.
-`plan-acceptance` also accepts a specification path or agreed outcome, so a local
-specification can remain the source when no tracker issue is required. If you
-later publish a decomposition from a local source, `slice-contract` may create
-approved child issues. Creating a tracker parent for that source needs explicit
-approval; slicing does not create it by default. The [publication procedure](../skills/productivity/slice-contract/references/publication.md#save-tickets-and-relationships)
-defines how to keep the source, parent index, and children linked.
+To mirror an approved decomposition, explicitly request tracker publication
+from `slice-contract`. Local child paths remain their identities, and their
+work files remain canonical. Retain remote issue references in those files.
+Read back every remote write and resolve uncertain outcomes before retrying.
+A pending remote mirror does not prevent a complete local handoff.
 
 ## Fix a review finding
 
@@ -320,8 +279,7 @@ candidate as well.
 
 When implementation, review, or proof reveals that the agreement must change,
 pause work that depends on it. Do not edit a requirement to match behavior that
-happens to be implemented. Record the proposal on the originating issue (or in
-the source specification), or link it directly from there. For example:
+happens to be implemented. Record the proposal in the canonical work item or link it directly from there. For example:
 
 ```text
 Proposed amendment to v1:R2
@@ -334,20 +292,18 @@ Authorization: Pending owner decision.
 Name every affected requirement ID, the old and proposed agreement, the reason
 for the change, and who authorized it. If authorization is pending, keep the
 proposal visible but do not proceed with work that depends on it. Once the
-owner approves the change, record that decision on the source and run
-`/plan-acceptance #123` on the same source. Only `plan-acceptance` revises the
+owner approves the change, record that decision in the work item and run
+`/plan-acceptance work/retry-safe-uploads.md`. Only `plan-acceptance` revises the
 contract; a comment proposing or approving a change is not itself the new
 contract.
 
 Save and reread the returned contract at its canonical location. A material
 change increments the revision (for example, v1 to v2) and keeps v1 available
 as history. A new test path, more evidence, or clearer wording with the same
-meaning does not increment it. If the issue points to a specific older revision,
-update its current-contract link to the newly saved revision; if it points to a
-stable location, confirm that the location now resolves to the new text. Keep
-older revisions retrievable, and reread the issue link before handing off the
-current location, revision, and exact text. A changed promise needs fresh proof
-against the new contract and an exact candidate.
+meaning does not increment it. Exact byte changes still invalidate old agreement
+hashes. Preserve older revisions in Git or the work item's artifact history.
+Update optional remote mirrors only under tracker-write authority. A changed
+promise requires fresh proof against the new contract and exact candidate.
 
 ## Repair failing CI
 
@@ -366,28 +322,39 @@ review requirements still apply after proof succeeds.
 
 ## Carry work to another session or checkout
 
-Transfer the canonical contract location, revision, and exact text or retrievable
-snapshot. Transfer the saved implementation report, a full candidate commit SHA
-or reproducible snapshot, and the comparison base used for review. Include the
-saved review and proof reports with their evidence. For sliced work, include the
-parent contract snapshot, decomposition, child contributions, and prerequisites.
+Commit durable work files and `.p2p/work/` records when authorized, then transfer
+or clone the repository. Include candidate Git objects and the comparison base,
+or retain the recoverable snapshot manifest. Keep secrets out of both snapshots
+and evidence. Delete scratch files only after durable artifacts are saved.
 
-A path available only in the old checkout or a digest without recoverable
-content cannot restore the handoff. If storage is pending, say so and save and
-reread the artifact before asking another session to use it. The
-[candidate and report rules](./acceptance-contract-protocol.md#implementation-and-review-handoffs)
-describe the required identities.
+In the new checkout, resume with the work-item path:
+
+```text
+/deliver-issue work/retry-safe-uploads.md
+```
+
+The workflow discovers linked specifications, parent and children, candidate,
+reports, and evidence. It checks current identities before reusing results.
+A later commit containing only `.p2p/` records leaves reports bound to their
+original candidate. Product, agreement, or comparison-base changes require
+fresh applicable verification. File presence alone is not acceptance.
+
+For manual inspection, use the installed skill's `scripts/p2p_filesystem.py`
+with `resolve` to list records or `resume` with the intended comparison base to
+validate candidate currency. This helper does not judge proof or grant approval.
+The [protocol](./acceptance-contract-protocol.md#candidate-identity-and-resume)
+defines the identity and recovery rules.
 
 ## Pick a command
 
 | Command | Use it to |
 |---|---|
-| `/setup-promise-to-proof` | Configure GitHub issue, triage-label, and domain-doc pointers for a new project before tracker-writing or triage work. |
-| `/create-parent-issue` | Draft one source issue from a local spec in this repository; publish only after explicit approval. |
+| `/setup-promise-to-proof` | Establish local storage and Git rules, with optional tracker configuration. |
+| `/create-parent-issue` | Preview an optional GitHub mirror of a specification; publish only with authority. |
 | `/triage-issue` | Recommend the next action for an existing issue; apply only approved label or closure changes. |
 | `/plan-acceptance` | Define and revise the acceptance contract. |
 | `/audit-acceptance` | Independently audit an exact proposed contract before human approval. |
-| `/slice-contract` | Draft a breakdown and publish approved child tickets. |
+| `/slice-contract` | Create linked local child work items; optionally publish approved tracker mirrors. |
 | `/implement-contract` | Build the agreed scope or correct review findings. |
 | `/review-implementation` | Inspect a fixed candidate against a comparison base. |
 | `/prove` | Check every contract promise on one exact candidate. |

@@ -8,6 +8,23 @@ disable-model-invocation: true
 earliest causal failure, classifies its cause, applies the smallest durable
 repair, and verifies the repaired commit against every required check.
 
+## Local work and durable records
+
+Use the [filesystem protocol](references/acceptance-contract-protocol.md) and
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve work/<slug>.md`
+to resolve paths. Save reports with `save work/<slug>.md <report-name> --from <file>`
+to retain history before replacement.
+
+When a canonical `work/<slug>.md` applies, discover its saved candidate and
+reports in `.p2p/work/<slug>/`. Save diagnosis, repair outcome, retained safe
+evidence, and exact old/new candidate identities to
+`.p2p/work/<slug>/ci-repair.md`, preserving prior records under the protocol
+retention rule. Put disposable logs in `.p2p/tmp/`; retain needed evidence before
+claiming a handoff. Redact secrets, and use the protocol durable reference and
+checksum record for evidence unsuitable for Git. Local report saving alone does
+not grant Git authority; the explicit `/fix-pr` invocation authority below remains
+separate. Candidate changes require fresh review/proof; never rewrite old verdicts.
+
 ## Invocation
 
 Accept one repository target:

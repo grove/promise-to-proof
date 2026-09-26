@@ -1,6 +1,10 @@
 # Issue tracker: GitHub
 
-Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
+Canonical acceptance contracts live in `work/<slug>.md`; lasting specifications
+live in `specs/`. GitHub Issues are optional import, mirror, and publication
+destinations. Local planning, slicing, delivery, and resume need no tracker.
+Use the `gh` CLI for explicitly authorized GitHub operations. Importing an issue
+does not authorize comments, labels, links, or other remote writes.
 
 ## Conventions
 

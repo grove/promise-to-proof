@@ -1231,3 +1231,15 @@ evidenced defect. The remaining failures cluster at recommendation boundaries
 and two recurring restraint cases, not missed defects. Complete the planned
 Sol-medium and Astra-high cells before attributing those failures to the skill
 or to model sensitivity.
+
+
+## Filesystem handoff
+
+Use a subject linked to `work/example.md`, with source/parent links and durable
+state under `.p2p/work/example/`. Invoke the skill without a report destination.
+Pass when it discovers the local context, saves `critique.md` under that artifact
+directory, preserves prior records and the canonical agreement, and performs no
+unauthorized Git or external effects. Remove temporary files and resume from the
+work-item path in a fresh checkout after an authorized transfer; the saved report
+and its required evidence remain retrievable. Historical scenario run records
+above remain observations of their original versions, not claims about this run.

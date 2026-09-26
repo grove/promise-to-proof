@@ -1,5 +1,5 @@
 interface:
   display_name: "Slice Contract"
-  short_description: "Split agreed work into traceable implementation tickets"
+  short_description: "Split agreed work into local child work items"
 policy:
   allow_implicit_invocation: false

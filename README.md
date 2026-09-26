@@ -37,7 +37,10 @@ the running workflow follows it. TLA+ offers a more mature path to mechanically
 checked proofs, but a maintained FizzBee model connected to executable tests is
 the first goal here.
 
-Issues and specifications for this repository live in [GitHub Issues](https://github.com/grove/promise-to-proof/issues).
+Specifications live in `specs/`, acceptance contracts in `work/`, and generated
+records in `.p2p/work/`. Commit durable records; ignore only `.p2p/tmp/`.
+[GitHub Issues](https://github.com/grove/promise-to-proof/issues) are optional
+import and publication destinations.
 
 ## How Promise to Proof works
 
@@ -82,7 +85,7 @@ Each stage answers a different question:
 - **Publication:** Does the draft PR preserve the exact reviewed and proven candidate?
 - **Retrospective (optional):** What did the accepted delivery teach us for later work?
 
-For one coherent existing issue, `/deliver-issue` coordinates these distinct
+For one coherent work item, `/deliver-issue` coordinates these distinct
 skills and their saved handoffs when the host supports separate stage and
 independent review/proof contexts. Each stage remains available on its own.
 Capture the candidate as a commit or reproducible snapshot so review and proof
@@ -92,8 +95,8 @@ refer to the same exact implementation and contract. Start with the
 ## Install and update
 
 The skills work with agent-skill-compatible coding tools. A saved acceptance
-contract carries the source ticket's promises through implementation, review,
-and proof. Issue-first delivery needs a host capable of separate stage invocations
+contract carries the work item's promises through implementation, review,
+and proof. Coordinated delivery needs a host capable of separate stage invocations
 and independent read-only review and proof contexts; otherwise it reports a blocker.
 
 Install the full collection:
@@ -119,23 +122,28 @@ install `plan-acceptance`, `review-implementation`, and `repair-gaps` as
 applicable, then remove the old copies using your installer's normal removal
 mechanism.
 
-For a new project using GitHub issues, run
-[`/setup-promise-to-proof`](./skills/productivity/setup-promise-to-proof/SKILL.md)
-before tracker-writing or triage work. It proposes issue-tracker, triage-label,
-and domain-doc pointers for your approval; it does not create GitHub labels,
-issues, or domain documents. Skip it if compatible `docs/agents/` files already
-exist for your GitHub repository and labels, for example after running Matt
-Pocock's `/setup-matt-pocock-skills`. The core workflow can start from a local
-specification without this setup.
+For a new project, run
+[`/setup-promise-to-proof`](./skills/productivity/setup-promise-to-proof/SKILL.md).
+It establishes the local directories and ignore convention, detects conflicts,
+and preserves existing configuration. Configure GitHub only when you want its
+optional import, triage, or publication flows.
 
-## Start with an issue
+## Start with a local work item
 
-For one coherent existing issue, run [`/deliver-issue`](./skills/productivity/deliver-issue/SKILL.md)
-with its reference (for example, `/deliver-issue #123` in a GitHub-configured
-project). It saves and rereads the agreement, captures a fixed candidate, and
-returns matching review and proof reports or a named blocker. It does not commit,
-publish, or update triage labels without separate authority. See the
-[issue-first checks](./checks/deliver-issue-scenarios.md) for test cases.
+```text
+/plan-acceptance specs/retry-safe-uploads.md
+/deliver-issue work/retry-safe-uploads.md
+```
+
+A separate specification is optional. Give `plan-acceptance` an agreed outcome
+to create a standalone work item. The work file holds the acceptance contract;
+implementation, candidate identity, review, proof, and evidence go under
+`.p2p/work/retry-safe-uploads/`. Resume with the same work-item path.
+
+`deliver-issue` retains its command name and also accepts a tracker reference
+for import. It coordinates independent review and proof when the host supports
+them. It does not commit, publish, or update trackers without separate authority.
+See the [delivery checks](./checks/deliver-issue-scenarios.md).
 
 ## Use the stage skills
 
@@ -150,13 +158,13 @@ Start with these four skills in order:
 
 | Skill | Use it when | It gives you |
 |---|---|---|
-| [`/setup-promise-to-proof`](./skills/productivity/setup-promise-to-proof/SKILL.md) | A new project's GitHub issue and domain-doc pointers need configuring | An approved local configuration for tracker, triage labels, and domain docs |
+| [`/setup-promise-to-proof`](./skills/productivity/setup-promise-to-proof/SKILL.md) | A project needs local P2P storage | Local directories, validated Git rules, and optional tracker configuration |
 | [`/audit-acceptance`](./skills/productivity/audit-acceptance/SKILL.md) | A proposed contract needs an independent check before human approval | Read-only source, scope, identity, and evidence-plan findings |
 | [`/create-parent-issue`](./skills/productivity/create-parent-issue/SKILL.md) | A local specification needs one originating GitHub issue | One source issue with a durable reference to the exact spec |
 | [`/triage-issue`](./skills/productivity/triage-issue/SKILL.md) | An existing issue needs a next action or triage label | A recommendation and, when explicitly approved, a verified issue update |
 | [`/critique`](./skills/productivity/critique/SKILL.md) | You explicitly request an independent review of a proposal against its intended outcome | Evidence-backed advice and a recommendation |
 | [`/interrogate`](./skills/productivity/interrogate/SKILL.md) | You want to question the agent's proposal and reasoning | Evidence-backed answers, a revised approach, and explicit unknowns |
-| [`/slice-contract`](./skills/productivity/slice-contract/SKILL.md) | A parent contract is too large for one coherent task | A traceable breakdown and, when authorized, published child tickets |
+| [`/slice-contract`](./skills/productivity/slice-contract/SKILL.md) | A parent contract is too large for one coherent task | Linked local child work items and optional authorized tracker mirrors |
 | [`/repair-gaps`](./skills/productivity/repair-gaps/SKILL.md) | Proof found specific repairable gaps | A scoped repair report; fresh proof is still required |
 | [`/retrospect`](./skills/productivity/retrospect/SKILL.md) | A proven delivery has concrete post-acceptance experience worth examining | A historical evaluation and optional human-accepted advice for future planning |
 | [`/publish-pr`](./skills/productivity/publish-pr/SKILL.md) | A reviewed and proven candidate should become a draft PR | An exact preview or a content-verified remote PR |
@@ -166,8 +174,8 @@ Start with these four skills in order:
 ## Use a skill
 
 ```text
-/plan-acceptance #123
-/implement-contract #123
+/plan-acceptance work/retry-safe-uploads.md
+/implement-contract work/retry-safe-uploads.md
 /review-implementation <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
 ```
@@ -181,7 +189,7 @@ Start with these four skills in order:
 /critique <idea, document path, or GitHub issue reference>
 /interrogate Walk me through your proposal so I can question it.
 /audit-acceptance <exact proposed contract> against <source>
-/slice-contract #123; draft only
+/slice-contract work/retry-safe-uploads.md; draft only
 /publish-pr <verified candidate and reports>; target <branch>; draft only
 /merge-readiness <PR URL>; review <saved report>; proof <saved report>
 /repair-gaps <matching proof report>; candidate <saved candidate handoff>; requirements <IDs>
@@ -216,12 +224,11 @@ flowchart TD
   rerun --> problem
 ```
 
-Before planning, use `/triage-issue` for an issue needing a next action, or
-`/create-parent-issue` for a local spec in this repo needing an originating
-issue. `/critique` and `/interrogate` can help settle a proposal first.
+For optional tracker work, use `/triage-issue` for an issue needing a next
+action or `/create-parent-issue` to preview a spec mirror. `/critique` and `/interrogate` can help settle a proposal first.
 
-For published child issues, save a contract and run the direct path for each
-child. Child proof does not replace `/prove` for the integrated parent. Review
+For local children, plan acceptance in each child work file and run the direct
+path for that child. Child proof does not replace `/prove` for the integrated parent. Review
 the integrated candidate if it differs from the reviewed child candidates or
 contains shared integration code. After any repair, capture the changed candidate
 and refresh review and proof. `/fix-pr` addresses failed CI. If a promise changes,
@@ -248,7 +255,7 @@ The [acceptance bundle format](./docs/acceptance-bundle-v1.md) defines optional
 deterministic inspection of matching review and proof artifacts.
 Each skill ends with numbered next steps so you can refer to a specific action.
 Some completed results need no further action; stage skills do not call one
-another automatically. `/deliver-issue` coordinates them for one issue.
+another automatically. `/deliver-issue` coordinates them for one work item.
 
 ## Repository structure
 
@@ -275,16 +282,23 @@ skills/productivity/
 
 Each skill has a `SKILL.md`. Some also have an `agents/openai.yaml` display
 metadata file. The [`checks/`](./checks/) directory contains human-runnable
-workflow scenarios and the dependency-free acceptance bundle checker.
+workflow scenarios, disposable-repository filesystem checks, and the
+dependency-free acceptance bundle checker.
 
 Shared protocol references are symlinks to `docs/acceptance-contract-protocol.md`.
 The installer copies their contents into each selected skill, so individual
-installs keep the protocol. Edit the canonical document to change shared rules.
+installs keep the protocol. Shared `scripts/p2p_filesystem.py` links likewise
+resolve to the implementation in `deliver-issue/scripts/`. Edit the canonical
+files to change shared behavior. Run the checks with:
+
+```bash
+python3 -m unittest discover -s checks -p 'test_*.py'
+```
 
 ## Contributing
 
 1. Read [AGENTS.md](./AGENTS.md).
-2. Find or create the relevant GitHub issue.
+2. Find or plan the relevant `work/<slug>.md` acceptance contract.
 3. Change the smallest relevant skill.
 4. Run the checks described by that skill.
 5. Open a pull request that explains the behavior and evidence.

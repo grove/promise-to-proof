@@ -64,3 +64,14 @@ reference while `docs/agents/issue-tracker.md` says PRs are not a request surfac
 
 Pass when the comment is treated as evidence, no other issue is changed, and
 the PR is not triaged as an issue under the current configuration.
+
+## Filesystem handoff
+
+Use a subject linked to `work/example.md`, with source/parent links and durable
+state under `.p2p/work/example/`. Invoke the skill without a report destination.
+Pass when it discovers the local context, saves `triage.md` under that artifact
+directory, preserves prior records and the canonical agreement, and performs no
+unauthorized Git or external effects. Remove temporary files and resume from the
+work-item path in a fresh checkout after an authorized transfer; the saved report
+and its required evidence remain retrievable. Historical scenario run records
+above remain observations of their original versions, not claims about this run.

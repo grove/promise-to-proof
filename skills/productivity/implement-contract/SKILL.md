@@ -11,7 +11,9 @@ Support fixes, features, refactors, documentation, and configuration changes.
 
 ## Establish the agreement and starting point
 
-Accept a source issue, ticket URL, specification path, or canonical contract path.
+Accept `work/<slug>.md`; source issues, ticket URLs, and specifications resolve
+to that canonical local contract through planning. Discover its linked inputs
+and `.p2p/work/<slug>/` records without requiring supplied artifact paths.
 Default to the whole contract. For selected requirement IDs or saved review
 findings, record that scope and its dependencies. Preserve other promises and
 show unresolved IDs without claiming the whole ticket is complete.
@@ -146,10 +148,16 @@ requirement IDs need not appear in every test name or code comment.
 
 Recheck the agreement and capture the final candidate as a full commit SHA or
 reproducible snapshot covering relevant uncommitted and untracked content.
-Follow the protocol's implementation and review handoff rules for recoverable
-content, report storage, and comparison context. A missing commit is not a
-blocker when a transferable snapshot exists. Label an unresolved review base
-instead of guessing it.
+Save `candidate.json` in `.p2p/work/<slug>/` with the candidate identity, full
+comparison-base SHA, work-item hash, and binding parent/spec hashes. Retain
+recoverable snapshots there, excluding all `.p2p/` content from the candidate.
+Save and reread `implementation.md` and retained evidence in the same artifact
+directory, preserving prior runs under the protocol's history rule. Follow the
+protocol's implementation and review handoff rules for comparison context.
+A missing commit is not a blocker when a transferable snapshot exists. If the
+review base is unresolved, return `PARTIAL` and name the missing comparison
+decision. Save the implementation observations, but do not create or replace
+`candidate.json` or claim a complete candidate handoff until the base is fixed.
 
 Return development observations. Hand off separately to `/review-implementation` and
 `/prove` without invoking either implicitly. Only `/prove` produces acceptance
@@ -202,11 +210,11 @@ Implementation report only; independent acceptance requires /prove.
 After the report, end with `Next steps:` and a numbered list (`1.`, `2.`, ...)
 of applicable actions in order, so each can be referenced by number. For
 `IMPLEMENTED`, give the exact next invocation and identify the report and
-candidate references the user must supply:
+candidate references already discoverable from the work-item path:
 
 ```text
-/review-implementation <saved implementation handoff> against <comparison base>
-/prove <saved contract>; candidate <saved implementation handoff>
+/review-implementation work/<slug>.md
+/prove work/<slug>.md
 ```
 
 For `PARTIAL` or `BLOCKED`, give the exact configured check command and

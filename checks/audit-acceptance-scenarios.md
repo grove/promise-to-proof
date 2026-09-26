@@ -112,3 +112,14 @@ checkout into a disposable root. Invoke scenario 2 with no access to sibling
 skill directories. Record the CLI version, command, installed files, response,
 and before/after hashes. A copy check alone does not establish installed agent
 behavior.
+
+## Filesystem handoff
+
+Use a subject linked to `work/example.md`, with source/parent links and durable
+state under `.p2p/work/example/`. Invoke the skill without a report destination.
+Pass when it discovers the local context, saves `audit.md` under that artifact
+directory, preserves prior records and the canonical agreement, and performs no
+unauthorized Git or external effects. Remove temporary files and resume from the
+work-item path in a fresh checkout after an authorized transfer; the saved report
+and its required evidence remain retrievable. Historical scenario run records
+above remain observations of their original versions, not claims about this run.

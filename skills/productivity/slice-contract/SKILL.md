@@ -1,19 +1,46 @@
 ---
 name: slice-contract
-description: Divide a versioned parent acceptance contract into complete, traceable implementation tickets and publish an approved breakdown to the configured tracker.
+description: Divide a parent work item into complete local child work items with contribution mappings; optionally mirror an approved breakdown to a tracker.
 disable-model-invocation: true
 ---
 
 Split large work into the fewest useful implementation tickets while preserving
 the agreement. Read the [acceptance contract protocol](references/acceptance-contract-protocol.md)
-before planning. This skill owns decomposition and authorized ticket publication.
+before planning. This skill owns decomposition and local child creation;
+tracker publication is optional.
 `plan-acceptance` alone authors parent and child contracts and revisions.
+
+## Local work and durable records
+
+Use the [filesystem protocol](references/acceptance-contract-protocol.md) and
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve work/<slug>.md`
+to resolve paths. Save reports with `save work/<slug>.md <report-name> --from <file>`
+to retain history before replacement.
+
+Resolve the canonical parent as `work/<slug>.md`. Save the decomposition and
+coverage map as `.p2p/work/<slug>/slicing.md`. Create each child as
+`work/<parent>-<slice>.md`, with a relative Parent link, complete child outcome,
+qualified parent contributions, inherited constraints, and evidence approach.
+Add relative child links and contribution mappings to the parent Children section.
+Preserve unrelated content and existing mappings; inspect collisions and reuse
+only the same logical work. Do not overwrite an unrelated file. Record updated
+parent identity after these edits; any changed binding input invalidates old results.
+
+Children are their own canonical work items. `plan-acceptance` normalizes their
+criteria into versioned matrices in those same files, never a second contract.
+A split creates no extra specs unless a child represents a reusable product or
+design concept. No tracker credentials, issues, or labels are needed for local
+slicing. Treat tracker records as optional mirrors linking to the work files.
+Preserve prior durable records using the protocol retention rule before replacement.
+Reread all relative links, contribution mappings, and prerequisites; a saved local
+plan with verified child files qualifies as `PUBLISHED` without any Git operation.
 
 ## Resolve the agreement
 
 Accept an issue number in a resolved repository, ticket URL, specification path,
-canonical contract path, or saved decomposition. Use configured tracker, triage,
-and domain conventions. Missing optional domain documents need no setup step.
+canonical contract path, or saved decomposition. Use domain conventions, and
+tracker/triage conventions only for tracker inputs. Missing optional domain
+documents need no setup step.
 
 Read the source body and relevant comments, saved parent contract, pending
 amendments, existing plan and tickets, and applicable repository instructions.
@@ -53,7 +80,7 @@ Produce one coverage map in both directions:
   each contributes, allocation of material boundaries, and the completion check
   location. Include source promises, negative requirements, and exclusions.
 - Trace every child outcome and enabling task to a parent promise or binding
-  constraint. Use qualified references such as `grove/project#123 v2:R4`.
+  constraint. Use qualified references such as `work/retry-safe-uploads.md v2:R4`.
   Keep planning IDs such as `S1` distinct from acceptance IDs.
 - Apply shared constraints to every affected slice. For a requirement spanning
   slices, name an accountable delivery ticket or parent completion plan. Repeating
@@ -92,9 +119,9 @@ integration work without creating a branch, weakening CI, or promising standalon
 merge readiness.
 
 Record the intended delivery path separately from the dependency graph. One
-parent PR may collect sequential child work on an issue-named parent branch;
+parent PR may collect sequential child work on a parent-slug branch;
 independently publishable children may use separate branches named for their
-child issues and be integrated before final parent proof. Do not require one
+child work items and be integrated before final parent proof. Do not require one
 branch for all children by default. A child PR with an unmerged prerequisite
 needs a shared integration candidate or must wait for that prerequisite to land;
 `publish-pr` does not publish stacked PRs. Name the chosen path and any exception
@@ -128,16 +155,17 @@ For intended publication, include the destination, relationship and index change
 and proposed labels. Preview known native-relationship limitations using the
 [publication procedure](references/publication.md).
 
-Default invocation authorizes inspection and a draft. Saving local planning
-artifacts needs user authority. Creating or updating tickets, labels, relationships,
-or index content needs publication authority for the destination and approved
-changes. Obtain approval of a consequential split unless explicitly delegated
-within bounds that this plan satisfies. Approval and publication permission can
+Default invocation authorizes inspection, a saved decomposition, and local child
+work items. Obtain approval of consequential allocation decisions unless already
+delegated. An explicit draft-only request saves the draft report but leaves
+parent and child work items unchanged. Creating or updating external tickets,
+labels, relationships, or index content needs publication authority for the
+destination and approved changes. Approval and publication permission can
 be given together. Preserve existing authority for an unchanged approved plan.
 Material allocation, dependency, destination, or exception changes need renewed
 approval unless delegated. Replacing `S1` with its actual URL is mechanical.
 
-Draft-only requests create no tracker items or local ticket set. Publication
+Draft-only requests create no tracker items or local child set. Publication
 authority covers approved tickets, planning metadata, and necessary links only.
 It does not authorize contract rewrites, unrelated tracker edits, assignments,
 closures, deletions, commits, pushes, product code, PRs, merges, or deployment.
@@ -175,7 +203,7 @@ status must be explicit. A chat draft is not a durable handoff. The report inclu
 - Parent requirement, contributors, boundary allocation, and completion check
   location for each obligation.
 - Parent completion plan and its accountable ticket or parent workflow.
-- Intended delivery path and issue-based branch name for a parent PR or each
+- Intended delivery path and work-slug or issue-based branch name for a parent PR or each
   independently publishable child PR, subject to repository branch rules.
 - Created, reused, or updated records, relationship fallbacks, readback results,
   unresolved decisions, and pending or uncertain actions.
@@ -190,15 +218,17 @@ or authorized publication. Name the next step without simulating it.
 
 End with `Next steps:` and a numbered list (`1.`, `2.`, ...) of applicable
 actions in order, so each can be referenced by number. For `PUBLISHED`, give
-`/plan-acceptance <ready child issue>`; if none is ready, name the exact
+`/plan-acceptance work/<parent>-<slice>.md`; if none is ready, name the exact
 prerequisite outcome and its reference. For `NO SPLIT`, give
 `/plan-acceptance <source>` if no saved contract exists; with an approved,
 saved contract and no blocking gaps, give `/implement-contract <saved contract>`.
 Otherwise name the pending approval or gap. For `DRAFT`, ask for approval of
 the exact breakdown or, after approval, give `/slice-contract <parent reference>;
 publish the approved breakdown to <configured destination>`. For `PARTIAL` or
-`BLOCKED`, give the configured tracker readback command for an uncertain
-write. For GitHub CLI, use `gh issue view <issue number> --comments`, then
+`BLOCKED`, reread the local parent, child files, and
+`.p2p/work/<parent>/slicing.md` to reconcile an uncertain local write. For an
+uncertain external write, give the configured tracker readback command.
+For GitHub CLI, use `gh issue view <issue number> --comments`, then
 verify the issue, labels, source links, and relationships against the approved
 plan. Otherwise give the exact read command from the configured tracker
 instructions. Name the exact decision or missing input when a readback cannot

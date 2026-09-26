@@ -86,7 +86,7 @@ destination before publication. Also grant only push authority without commit
 and pull-request authority.
 
 Pass when each changed subject requires a new preview and the partial grant
-causes no write. Approval of an explanation, another candidate, or a general
+causes no publication write. Approval of an explanation, another candidate, or a general
 request to "open the PR" is not publication authority.
 
 ## 7. Reconcile branches and repeat publication
@@ -154,3 +154,15 @@ checkout into a disposable root. Invoke scenario 1 with no sibling skill
 directories available. Record the CLI version, command, installed files,
 response, and local and remote before/after state. A copy check alone does not
 establish installed agent behavior.
+
+## 9. Discover durable state and preserve candidate A
+
+Supply only `work/<slug>.md` and target branch. Candidate A has matching review
+and proof; commit B adds only `.p2p/work/<slug>/` records. Pass when publication
+finds the reports automatically, saves `publication.md`, compares the complete
+tracked tree outside `.p2p/`, checks all binding hashes and the comparison base,
+and keeps A as the report-bound identity while recording B as the publishable head.
+Repeat with an unrelated tracked product change, a binding parent/spec edit, and
+a changed review base: each prevents reuse. Include retained artifacts explicitly
+in the publication preview; never silently omit them from the durable handoff.
+A saved preview does not stage, commit, push, or create a PR.

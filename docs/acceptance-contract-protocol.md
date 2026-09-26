@@ -10,7 +10,7 @@ for one exact candidate.
 
 | Artifact | Contents | Identity |
 |---|---|---|
-| Acceptance contract | Requirements, boundaries, seams, oracles, planned evidence, gaps, and exclusions | Source and contract revision, such as `#124 v3` |
+| Acceptance contract | Requirements, boundaries, seams, oracles, planned evidence, gaps, and exclusions | Source and contract revision, such as `work/retry-safe-uploads.md v3` |
 | Proof report | Observations, durable evidence references, and requirement verdicts | Exact contract revision and exact candidate commit or snapshot |
 
 The contract is candidate-independent. Its acceptance matrix uses only `planned`
@@ -54,32 +54,120 @@ them. Satisfying them does not constitute product scope expansion.
 
 ## Durable contract handoff
 
-Keep one canonical contract location per work item. With a configured tracker,
-the originating ticket holds the contract or a direct reference to its repository
-file. Otherwise use the repository's documented location, defaulting to
-`docs/acceptance-contracts/<work-id>.md`. Use a stable ticket key or source slug
-for `<work-id>`. Preserve prior contract text in version history or saved revisions.
+Keep one canonical acceptance contract in `work/<lowercase-kebab-case-slug>.md`.
+The repository-relative path is its durable identity. A lasting specification
+may live in `specs/<slug>.md`; small work needs no separate specification.
+Use relative Markdown links on `Source:` and `Parent:` lines for local binding
+inputs. A parent lists child links and their contributions in `## Children`.
+Children normally use the parent stem plus a slice name. Preserve existing
+requirement IDs and human edits. Check a destination before creating it; an
+unrelated existing file is a collision, not permission to overwrite it.
 
-The workflow invoking `plan-acceptance` owns saving its returned text under
-existing authorization. For tracker storage, attach or link it on the originating
-ticket without creating a separate issue. Reread the saved destination before
-handing off its location and revision. If saving is unavailable, return the
-proposed destination and mark storage pending. A chat response alone is not a
-completed durable handoff.
+`plan-acceptance` authors or normalizes the contract in this same work-item file.
+Keep the acceptance matrix and semantic revision defined below. A minimal work
+item with acceptance bullets is valid planning input; enrich it in place before
+handoff instead of creating another contract file. Planning saves and rereads
+its local result under the invoking request's authority. Required approval of
+an agreement remains separate from permission to save its proposal.
 
-If the ticket's current-contract reference names an older revision, update it
-to the newly saved revision under existing authorization and reread the ticket.
-Keep earlier revisions retrievable as history, but make the current one clear
-at the source. If the reference cannot be updated, report the handoff as pending
-instead of directing consumers to the old agreement.
+External trackers are optional import, mirror, and publication destinations.
+Import source promises and relevant amendments into the local work item, retaining
+attribution. After import, tracker edits are proposed amendments, not silent
+changes to the canonical agreement. Local delivery requires no tracker access.
+Only explicitly authorized tracker operations update remote links or mirrors;
+a pending mirror update does not block a complete local handoff.
 
-Repository files must travel with the work in a commit or transferred snapshot
-when the next session uses another checkout.
+For an existing tracker or `docs/acceptance-contracts/` contract, explicitly
+migrate the agreement to `work/<slug>.md` under local write authority. Preserve
+its revision, IDs, source identity, and prior text, and replace the old local
+entry with a pointer if authorized. A tracker copy becomes historical or a
+mirror. Resolve conflicting copies before proceeding. Migration changes the
+contract location and candidate inputs, so old results remain historical until
+fresh matching review and proof establish the new handoff.
 
-Consumers resolve that location and read the source and authorized amendments
-before implementation, review, proof, or repair. Report missing or conflicting inputs
-instead of reconstructing an agreement from memory. The location finds the
-contract; proof still captures its exact text under the identity rules below.
+## Durable generated records
+
+Save work-item output under `.p2p/work/<slug>/`: `implementation.md`,
+`candidate.json`, `review.md`, `proof.md`, and `evidence/`. Other stages use
+`audit.md`, `repair.md`, `publication.md`, and `retrospective.md` as applicable.
+Use descriptive kebab-case evidence names. Read back every saved artifact before
+claiming a durable handoff. These files are committed project records, although
+writing them does not authorize staging, committing, pushing, tracker writes,
+publishing a PR, merging, or deploying.
+
+Ignore only `/.p2p/tmp/` under the P2P convention. Setup detects conflicting
+repository, local, and global ignores affecting `specs/`, `work/`, or
+`.p2p/work/`; report the actual conflict rather than overriding unrelated rules.
+Git does not retain empty directories. Setup creates them locally; their first
+real files carry them into a checkout, so placeholder files are unnecessary.
+
+Use `.p2p/tmp/` or OS temporary directories only for disposable work. Before
+handoff, copy required evidence into the work item's artifact directory or
+retain its meaningful command, assertion, observation, and environment in a
+report. Never retain secrets in reports, snapshots, history, or logs. Redact
+secret-bearing output before saving. For large, sensitive, or machine-specific
+evidence, retain a description, safe durable reference, SHA-256 checksum, and
+access limitations. Without a safe durable copy, mark evidence unavailable.
+A checksum or inaccessible old temporary path alone is insufficient.
+
+Before replacing a report, candidate, evidence, or uncommitted agreement, retain
+its previous bytes in Git history or `.p2p/work/<slug>/history/<sha256>/<name>`.
+Retain related evidence and snapshots so historical reports remain interpretable.
+Rerunning the owning stage updates verdicts and identities. A manually edited
+verdict does not establish acceptance. Acceptance is derived from matching
+current reports, never from an authoritative `accepted: true` flag.
+
+## Candidate identity and resume
+
+`candidate.json` identifies one fixed candidate and the exact agreement:
+
+- `commit`: full candidate commit SHA, or `key`: the existing
+  `snapshot:sha256:<digest>` key with its recoverable `manifest`.
+- `comparison_base`: full commit SHA, captured from the intended review base.
+- `work_item` and `work_item_sha256`: canonical path and hash of exact file bytes.
+- `binding_inputs`: repository paths and SHA-256 hashes of the binding local
+  sources and parents, including their transitive sources and parents.
+
+Use simple relative Markdown links on `Source:`, `Parent:`, or `Parent contract:` lines.
+Capture additional binding documents referenced elsewhere explicitly as binding
+links on these lines. Retain externally sourced binding text locally with its
+attribution before capture; an external URL alone cannot establish its currency.
+Historical copies in `.p2p/` identify previous agreements but are not live inputs.
+The work item, binding inputs, and reports must all agree on these identities.
+
+Exclude the entire `.p2p/` directory from candidate trees and snapshots. Capture
+all relevant tracked, staged, unstaged, deleted, and untracked product content,
+including executable modes and symlink targets. Reuse the recoverable manifest
+format in the [acceptance bundle specification](./acceptance-bundle-v1.md).
+Resolve mixed staged and unstaged versions explicitly; checks must examine the
+same bytes that the snapshot retains. The helper rejects partially staged
+content or mode differences and unsupported submodules instead of dropping
+inputs. Resolve those inputs before capture. Isolate unrelated changes before capture
+without resetting, stashing, or discarding the user's work.
+
+A product candidate A can be followed by commit B recording `.p2p/` artifacts.
+Review and proof remain bound to A. To reuse them for B, compare the complete
+tracked tree outside `.p2p/`, check relevant uncommitted content, and recheck the
+exact work item, every binding input, and the requested comparison base. A
+product or agreement difference invalidates reuse. A base change requires fresh
+review and prevents claiming a matching pair under the old base. Do not replace
+a report's candidate identity with `HEAD` merely because artifacts were committed.
+If Git metadata affects the build, also establish execution-input equivalence
+under the publication rules below.
+
+Given only `work/<slug>.md`, resolve its source and parent links, children,
+artifact directory, candidate, reports, and evidence. Recompute their identities
+before reuse and resume the earliest incomplete or stale stage. Missing evidence
+or recoverable candidate content is a blocked handoff, not a reason to infer
+success from chat or file existence. A fresh checkout needs the committed records
+and candidate Git objects or retained snapshot. An authorized transfer must
+include them before the previous checkout or temporary files are removed.
+
+The dependency-free `scripts/p2p_filesystem.py` shipped with the skills implements
+setup, path resolution, safe creation and replacement, candidate capture,
+validation, and resume inventory. Read its `--help` for arguments. It checks
+storage and identities, not evidence adequacy or approval, and never invokes
+Git writes or external services. Stages still own their reports and verdicts.
 
 ## Pre-approval audit
 
@@ -90,7 +178,8 @@ evidence plans can establish the stated outcomes. An honestly marked evidence
 gap may remain when the outcome is settled; an unresolved outcome decision does
 not pass the audit.
 
-The audit is read-only and candidate-independent. `READY_FOR_APPROVAL` means the
+The audit leaves the proposal and product files unchanged and is candidate-independent.
+It saves its findings as `.p2p/work/<slug>/audit.md` under existing local authority. `READY_FOR_APPROVAL` means the
 exact proposal is fit for a human approval decision, not that approval was
 granted. Findings return to `plan-acceptance`, the sole contract author. The
 auditor does not revise, save, approve, publish, implement, or prove the contract.
@@ -124,9 +213,11 @@ rewriting it.
 ## Parent and child contracts
 
 `slice-contract` owns decomposition, coverage allocation, dependency planning,
-and authorized ticket publication. It consumes an established parent contract;
+local child work items, and optional authorized ticket publication. It consumes an established parent contract;
 `plan-acceptance` alone authors parent and child contracts and revisions.
-Child ticket criteria are source material for that planning, not a child contract.
+Draft child criteria are source material for planning in the child work file.
+The planner enriches that file in place; it does not create a second contract.
+Slicing creates no extra specifications by default.
 Small work can retain the direct contract, implementation, review, and proof path.
 
 A sliced child records the parent's canonical location, revision, and exact text
@@ -134,7 +225,7 @@ as an immutable reference or retrievable captured text with a digest. Link the
 canonical decomposition and record the child's precise contribution and
 prerequisite outcomes. These references must be retrievable in a fresh checkout.
 Use qualified obligations in durable cross-ticket references, for example
-`grove/project#123 v2:R4`, or an unambiguous repository/source path, revision,
+`work/retry-safe-uploads.md v2:R4`, or an unambiguous repository/source path, revision,
 and ID for local work. Child IDs are local to the child contract. Its `R1` does
 not mean parent `R1`; map each child row through its `Source` to the qualified
 parent obligations it refines. Planning IDs such as `S1` are separate from both.
@@ -209,9 +300,8 @@ content is insufficient for transfer to another checkout. Review also preserves
 the comparison base or merge base and included working-tree scope. Implementation
 labels an unresolved review base instead of guessing it.
 
-Keep reports outside the candidate. Use a supplied or documented destination;
-otherwise propose a destination and mark storage pending until the authorized
-workflow saves and rereads it. A prior-session path alone is not a completed
+Save and reread reports under `.p2p/work/<slug>/`, outside the candidate
+by definition. Mark storage pending only when saving or retrieval fails. A prior-session path alone is not a completed
 handoff. Transfer the report and recoverable candidate when the next session uses
 another checkout. Do not add another canonical contract store or require one
 artifact per requirement.
@@ -253,8 +343,8 @@ and provide a retrievable reference; a command without its result is not evidenc
 
 Overall `PROVEN` requires every material requirement to be proven, no unresolved
 contract discrepancy, and unchanged candidate and contract throughout the run.
-Otherwise the result is `NOT PROVEN`. Proof leaves the candidate, worktree, and
-contract unchanged. Save evidence outside the candidate. Drift invalidates the
+Otherwise the result is `NOT PROVEN`. Proof leaves product files and the
+contract unchanged. Save its report and evidence under `.p2p/work/<slug>/`. Drift invalidates the
 run rather than authorizing a repair during proof.
 
 Repair means the smallest complete repair for the named requirements: narrow in
@@ -288,8 +378,9 @@ reports, destination, target and head refs, commit inputs, title, body, and
 authorized commit, push, and pull-request effects. Changed inputs require a new
 preview. Publication does not grant merge readiness or merge authority.
 
-The model may invoke `publish-pr` to prepare its read-only `DRAFT` preview after
-matching review and proof exist. Model invocation grants no publication effect;
+The model may invoke `publish-pr` to prepare its `DRAFT` preview without changing product files or remote state after
+matching review and proof exist. Saving `.p2p/work/<slug>/publication.md` is a local report write, not a
+publication effect. Model invocation grants no publication effect;
 commit creation, push, and pull-request creation require the exact authority
 bound by that preview.
 
@@ -306,7 +397,10 @@ normalization. A content-equivalent commit does not replace a report-bound
 snapshot key.
 
 When a snapshot needs a commit, create it in an isolated publication workspace
-and compare its complete Git tree with the captured candidate. Record the exact
+and compare its complete Git tree outside `.p2p/` with the captured candidate.
+Include authorized durable `.p2p/work/` records in the publication commit and
+inspect them separately for secrets and consistency. Record their exact commit
+inputs in the preview; they do not change the report-bound product identity. Record the exact
 snapshot-to-commit mapping. A content-equivalent commit preserves candidate-bound
 review and proof only when behaviorally relevant build and execution inputs are
 unchanged or explicitly shown equivalent. These inputs include Git metadata when

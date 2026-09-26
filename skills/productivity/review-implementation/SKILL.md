@@ -9,7 +9,8 @@ Review an implementation against the agreement. `/critique` reviews proposals;
 [acceptance contract protocol](references/acceptance-contract-protocol.md)
 for agreement ownership, the spec envelope, identities, and durable handoffs.
 
-Invocation authorizes inspection and safe, isolated diagnostics only. Do not
+Invocation authorizes inspection, safe isolated diagnostics, and saving the
+review report and evidence under `.p2p/work/<slug>/`. Do not
 repair code, tests, configuration, or the contract, even when the surrounding
 workflow permits later implementation. Do not commit, push, publish comments,
 submit approvals, change labels, merge, deploy, or edit external systems.
@@ -17,8 +18,10 @@ Publication belongs to a separately authorized enclosing workflow.
 
 ## Capture the agreement and review scope
 
-Accept an issue or contract reference with an identifiable candidate, a PR URL,
-or a saved implementation handoff. Accept an explicit comparison base,
+Accept `work/<slug>.md` and discover `candidate.json`, linked binding inputs,
+and `implementation.md` under its matching `.p2p/work/<slug>/` directory.
+Also accept a PR URL or saved handoff that resolves to this local work item.
+Accept an explicit comparison base,
 working-tree scope, and requirement subset. Resolve explicit inputs first, then
 PR metadata or the handoff. Ask only for material inputs that cannot be resolved.
 Never silently choose an unrelated issue or convenient comparison base.
@@ -144,6 +147,12 @@ authority given or needed, and dependent work. Do not revise the contract or
 invoke a downstream skill. A review report does not satisfy `/repair-gaps`'s
 requirement for a matching `NOT PROVEN` proof.
 
+Save and reread `.p2p/work/<slug>/review.md` and retained evidence, preserving
+prior runs under the protocol's history rule. In a read-only stage context,
+return exact report text for the enclosing workflow to save and reread.
+Validate work-item and binding parent/spec hashes and the comparison-base SHA
+against `candidate.json`; product changes outside `.p2p/` invalidate reuse.
+Reports keep the original candidate identity after an artifact-only commit.
 Follow the protocol's report storage and transfer rules. Preserve the report,
 contract identity, and captured comparison identities across sessions. Refresh
 review and any stale proof after candidate changes. Leave canonical contract

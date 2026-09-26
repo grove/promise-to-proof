@@ -11,6 +11,20 @@ Before auditing, read the [acceptance contract protocol](references/acceptance-c
 It defines agreement ownership, revisions, requirement structure, seams,
 oracles, evidence plans, and parent/child rules.
 
+## Local work and durable records
+
+Use the [filesystem protocol](references/acceptance-contract-protocol.md) and
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve work/<slug>.md`
+to resolve paths. Save reports with `save work/<slug>.md <report-name> --from <file>`
+to retain history before replacement.
+
+Accept `work/<slug>.md` directly and discover its source, parent, children, and
+saved planning context from repository links. The work file is the sole canonical
+contract. Automatically save this audit to `.p2p/work/<slug>/audit.md`, recording
+the exact work-item bytes and binding source/parent identities. Preserve prior
+records using the protocol retention rule. Saving this report grants no agreement
+approval or Git/tracker authority.
+
 ## Establish the audit subject
 
 Accept the exact proposed contract and its source reference. Resolve and read
@@ -92,9 +106,9 @@ Use these outcomes:
   outcome-defining decision is unavailable or conflicting, so the proposal
   cannot be judged ready. Name the smallest external resolution needed.
 
-Leave the source, proposed and canonical contracts, repository, and external
-systems unchanged. Do not save planner output, publish findings, grant approval,
-or invoke another skill.
+Leave the source and contract unchanged. Save only the audit record locally;
+do not save planner output as an approved contract, publish findings externally,
+grant approval, or invoke another skill.
 
 ## Output
 
