@@ -1,96 +1,111 @@
-# PROVEN: issue #24, delivery completion integrity
+# PROVEN: delivery completion integrity
 
 Requirements: 10/10
-Counterexamples tested: 14 deliberate mutations, each producing its named violation; 15 blocker witnesses and 3 successful witnesses
-Contract: `work/delivery-completion-integrity.md`, v1
-Contract snapshot: exact bytes recoverable from `candidate.json` manifest; SHA-256 `7cfbf6558846415b06b130d4989ca88a93ea73f06cb341eb02b30e7ac4b02956`
-Candidate: `snapshot:sha256:09373011d141a5cbc78a0ea855d257eb456b31246d2875bb32c17e436e44bb25`
-Comparison base: `41bebc726a8cc71c1d2f22d822ade006f4e78121`
-Candidate stability: unchanged
-Contract stability: unchanged
-Verification context: independent invocation `/root/prove`; macOS 26.6.2 arm64, Python 3.9.6, FizzBee v0.5.3 macOS arm64
-Storage: pending enclosing workflow save and readback of this exact report and evidence
+Counterexamples tested: 14 deliberately broken variants, plus 18 reachable success/blocker witnesses and 11 finite baseline explorations.
+Contract: `work/delivery-completion-integrity.md`, v1.
+Contract snapshot: exact retained candidate manifest bytes, SHA-256 `7cfbf6558846415b06b130d4989ca88a93ea73f06cb341eb02b30e7ac4b02956`.
+Candidate: `snapshot:sha256:036ec8df3613b46dd20cb5ea20f001549f4d031f16bac1526e5a91cf19ddad52`.
+Comparison base: `5a98bbcbeed9bbddce40d1b8158e0592bb10d13f`.
+Candidate stability: unchanged, complete inventory/bytes/modes/symlink targets validated before and after.
+Contract stability: unchanged, exact bytes rehashed before and after.
+Invocation: `/root/proof25_refresh`, independent installed `/Users/grove/.agents/skills/prove/SKILL.md` invocation.
+Verification context: macOS-26.6.2-arm64-arm-64bit; Python 3.9.6; pinned FizzBee v0.5.3 macOS arm64. Candidate, base, and records were outside writable sandbox roots; no escalation, delegation, product writes, or contract writes. All generated files were confined to `/private/tmp`.
+Storage: pending enclosing workflow retention and readback. Exact report returned at `/private/tmp/p2p-proof25-refresh.md`; fresh evidence at `/private/tmp/p2p-proof25-refresh-evidence`. Intended durable evidence root is `.p2p/work/delivery-completion-integrity/evidence/proof-refresh/`, abbreviated `E/` below. Preserve this report verbatim and record storage confirmation separately.
 
 ## Outcome
 
-The executable bounded model satisfies the full R1–R10 agreement. I independently ran its documented public command against the fixed candidate, checked all retained traces, and reconciled the properties with the imported issue and binding protocol. Eleven finite baseline explorations passed. Eighteen witness searches produced their intended outcomes. Fourteen deliberately broken variants produced actual corresponding counterexamples, not parser errors or unrelated failures.
+The bounded model demonstrates successful initial delivery, repair with both fresh verifications, restart with durable repair accounting, and rejection of missing or stale completion evidence. Every deliberately weakened protection produced its corresponding concrete counterexample. These observations establish the requested model capability; they do not prove live-agent conformance or host isolation in the running workflow.
 
-This proves the requested modeled completion rules within the disclosed finite scenarios. It does not establish that running agents follow the instructions, execute independent verification, or retain adequate real-world evidence.
+## Agreement and identity reconciliation
 
-## Contract reconciliation and identities
+I read the entire v1 contract including its imported issue #24 text, the acceptance protocol, delivery skill, selected roadmap sections, README, model, runner, and planner reconciliation. No parent or prerequisite applies. The planner report says the updated roadmap preserves the selected completion-integrity promises and excludes later roadmap phases. I independently compared roadmap sections 8, 9, and 10 with the original source at `bb53d2472b37ef6c441c8121cecfd7e16814d465`; they are byte-identical. Current Phase 1 preserves the same outcomes. Its links to old results are historical attribution, not evidence for this proof. No material discrepancy remains and no requirement was narrowed.
 
-The imported issue scope maps completely to R1–R10. There are no parent contracts or prerequisites and no pending amendment in the captured agreement. The wider optimization handoff is limited by the issue to completion integrity; routing, budgets, scheduling, runtime controllers, host adapters and live-agent conformance remain excluded. I found no omitted or conflicting source promise within that scope.
+The modeled protocol and delivery skill match the exact Git bytes at `41bebc726a8cc71c1d2f22d822ade006f4e78121`. The historical source handoff digest remains attribution to the earlier roadmap, while the captured live input has its new digest below. The README describes the older `f5917ce0471d56aac01711e720426748626c99d0` baseline and the current local work/record conventions.
 
-I read the installed `/Users/grove/.agents/skills/prove/SKILL.md` and its protocol, applicable repository AGENTS instructions, and the candidate's protocol, delivery skill, relevant handoff sections and contract. Candidate instructions were inspected as specification data, not adopted as authority to mutate or publish.
+Before and after execution, an independent inventory check compared all 112 candidate entries and all 108 base entries to the recoverable manifests, including exact file bytes, executable modes, symlink targets, and absence of extra files. The full base manifest also matched `git ls-tree` and every blob at the comparison-base SHA. Canonical JSON hashing of the complete candidate manifest reproduced the full candidate key. The work-item hash and every binding-input hash matched:
 
-Before and after execution I independently recomputed the canonical manifest SHA-256, checked the exact file inventory of all 112 candidate entries and all 108 base entries, and compared every file's bytes, executable mode and symlink target. I compared the complete retained base manifest to the Git blobs and modes at the full comparison-base SHA. Both audits passed. Base canonical-manifest SHA-256: `ae5ada5e7b0d2826f56126c9c40e924fd0b66b25c1e8c89d96f7df1f291fd5f5`.
-
-The following binding hashes matched before and after:
-
-| Binding input | SHA-256 |
+| Input | SHA-256 |
 |---|---|
 | `docs/acceptance-contract-protocol.md` | `bec3503abc6ebc40356e662ca0b279be73a4da482eb1616a5c5b435509184351` |
-| `plans/promise_to_proof_optimization_handoff.md` | `35c38d7acbaf645d4f9ac577cc40953cef79a5cda38cd776419984284e2dfdec` |
+| `plans/promise_to_proof_optimization_handoff.md` | `c09ae44b02d167ae136cf173f3c8611115e4ee0eaeb295dcf2b9269e36b9a928` |
 | `skills/productivity/deliver-issue/SKILL.md` | `9ecacf205eb6f399b9f487867cd1ddf2ec55155a9fef9878c79ae2ec8a41fbf1` |
 
-The candidate and base were read from `/Users/Shared/p2p-issue-24-6krj8of_/round1/candidate` and its sibling `base`, outside this stage's writable roots. I used only default-sandbox calls, requested no escalation and wrote diagnostics only under `/private/tmp`. The enclosing workflow supplied its successful write-denial probe; I did not attempt a candidate write. No candidate, contract, product, test, CI or repository record was changed by this stage. Product identity includes every file outside `.p2p/`, and both audits found no additions or drift.
+The candidate/base metadata and reconciliation records were also hashed before and after; both inventories are identical. Evidence: `E/p2p-proof25-before.txt`, `E/p2p-proof25-after.txt`, and `E/p2p-proof25-identities.py`. Recoverable candidate and base metadata came from the enclosing workflow's refresh25 records, not a mutable branch name.
 
-## Actual checks and retained evidence
+## Fresh execution and independent observations
 
-Executed from the immutable candidate root, exit status 0:
+From `/Users/Shared/p2p-issue-24-6krj8of_/refresh25/candidate`, I executed:
 
 ```sh
-python3 checks/delivery-model/check.py --fizz /private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz --output-dir /private/tmp/p2p-proof-24-evidence
+TMPDIR=/private/tmp python3 checks/delivery-model/check.py --fizz /private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz --output-dir /private/tmp/p2p-proof25-refresh-evidence
 ```
 
-The runner created a fresh evidence directory and scratch model copies. It observed 43,079 baseline graph nodes across 11 scenarios, with maximum action depth 20 below the configured 64-action cutoff. The sum of checker subprocess runtimes was 48.304 seconds. All baseline outputs reported successful completion; none timed out or hit the cutoff. Witness and mutation searches intentionally stopped at their first specified invariant counterexample and do not establish exhaustive coverage.
+The command exited 0 and printed `PASS: 43 checks. Model evidence only; no live-agent conformance claim.` FizzBee subprocess time totaled 48.282 seconds. The runner verified all three executable pins, recorded in `E/summary.json`. The source model SHA-256 was `4ac1ae31fed4764475d582a563a294401830b99b7d844a0c45f8c14d660e6753`.
 
-I inspected the model's separate safety assertions and operational completion guard, then audited all 32 returned trace endpoints and their actions. My additional trace check verified both fresh launches and returns after repair, distinct verifier identities, complete durable artifacts at successful completion, current candidate/contract/base bindings, and repair → restart → second repair in the broken reset variant. Evidence is based on a fresh public command and actual checker output, not the implementation report's prior run.
+I inspected all 32 fresh ordered traces, their terminal states, model actions and mutation mechanisms. I also ran the separate `E/p2p-proof25-inspect.py` audit, which asserted completion facts against the contract, checked that repair cleared old bindings and launched/returned both fresh stages, checked each mutation's concrete violation, and confirmed that retained models differ from the candidate model only in scenario/mutation/witness constants. Its result is retained in `E/p2p-proof25-audit.txt`. No prior proof was used as an observation.
 
-Model SHA-256: `4ac1ae31fed4764475d582a563a294401830b99b7d844a0c45f8c14d660e6753`.
+Each baseline returned successful finite exploration and stayed below the configured 64-action bound:
 
-Verified checker hashes:
-
-| Executable | SHA-256 |
-|---|---|
-| `fizz` | `8e8f905864b1781a3960f44fb654fc4455ef633e45556adf3fae586b652480a6` |
-| `fizzbee` | `f0746cd47d13f268835fc0d8c1e85ec28a8ad0034e080cff6ec49a26304c1bf3` |
-| `parser/parser_bin` | `54eb014c1cc7cb874faccfe22e4f93e78dbb3d633a9f496d71e21f5997a8f3fd` |
-
-All evidence references below are relative to intended durable directory `.p2p/work/delivery-completion-integrity/evidence/proof/`. The enclosing workflow must copy the complete `/private/tmp/p2p-proof-24-evidence/` directory there and reread it before claiming durable handoff. It contains `summary.json`, `command.log`, before/after identity audits, independent `trace-audit.txt` and its script, plus every check's exact generated model, output and observation. All 32 witness/mutation directories retain ordered JSON and text traces. The report itself preserves the meaningful command, environment, assertions and observations; full replayable traces also require this directory's transfer. Scratch paths inside command metadata record original execution, not a prerequisite for resume. Replay uses the retained model with the pinned checker in fresh scratch, as documented by the candidate README.
+| Scenario | Nodes | Maximum actions |
+|---|---:|---:|
+| initial | 1575 | 15 |
+| repair | 3148 | 20 |
+| exhausted | 3148 | 20 |
+| identity | 1699 | 15 |
+| text | 7281 | 16 |
+| candidate | 7281 | 16 |
+| base | 7281 | 16 |
+| report-lost | 2534 | 16 |
+| report-access | 2534 | 16 |
+| evidence-lost | 3299 | 20 |
+| evidence-access | 3299 | 20 |
 
 ## Requirement verdicts
 
+References below are beneath `E/`. Each named run retains its generated model, command, output, and observation. Witnesses and mutations additionally retain `trace.json` and `trace.txt`.
+
 | ID | Observation and independent oracle | Evidence reference | Verdict |
 |---|---|---|---|
-| R1 | `Implement`, separate `Launch`/`Return` for review and proof, `Save`, `ReadBack`, `Repair`, `Restart`, and `Complete` are exercised. Persistence and volatile state are distinct. Oracle is the issue lifecycle and current delivery steps 6–10. Stage independence is expressly an assumed host property represented by separate invocation IDs. | `summary.json`; initial, repair, restart and exhausted witness traces; candidate README | proven |
-| R2 | Initial success binds both reports to contract 0/candidate 0 with distinct invocation IDs 1/2. Mismatched proof contract 2 produces `identity`, absent stages produce `missing-stage`; removing agreement permits completion with bindings 0 versus 2 and fails `SameReports`. Baselines check current bindings and full stages at every completion. Oracle is exact current agreement/candidate in protocol handoffs. | `witness-initial/trace.json`, `witness-identity/trace.json`, `witness-missing-stage/trace.json`, `mutation-identity/trace.json` | proven |
-| R3 | Base changes to 1 while review remains bound to 0. Baseline blocks with `base`; broken variant completes and fails `ComparisonBase`. Oracle is review's exact comparison-base requirement. | `baseline-base/observation.json`, `witness-base/trace.json`, `mutation-base/trace.json` | proven |
-| R4 | `Environment` changes contract identity to 1 with revision still `v1`, leaving reports on text identity 0. Baseline blocks with `text`; broken variant completes and fails `CurrentText`. Oracle is protocol exact text identity independent of revision label. | `witness-text/trace.json`, `mutation-text/trace.json` | proven |
-| R5 | Candidate drift leaves both old reports at 0 and current candidate at 1, causing `candidate`. Removing that check causes `CurrentCandidate` failure. Repair clears old reports and both stages launch/return again before successful completion on candidate 1 with invocation IDs 3/4. Oracle is mandatory fresh review and proof after changes. | `witness-candidate/trace.json`, `mutation-candidate/trace.json`, `witness-repair/trace.json`, `trace-audit.txt` | proven |
-| R6 | Named blockers cover unsaved state 1, saved/unread state 2, lost state 4 and inaccessible state 5 for both report and evidence, plus evidence absent after interrupted persistence/restart. Each corresponding mutation actually completes with the bad artifact state and fails `DurableReports` or `DurableEvidence`. Missing stages cover absent reports. Successful traces require all four artifacts in state 3. Oracle is saved, reread, retrievable reports and evidence. | `witness-report-*`, `witness-evidence-*`, corresponding `mutation-*` traces; `trace-audit.txt` | proven |
-| R7 | Exhausted witness executes repair then restart and retains `repair_used=repairs_actual=1`, returning `repair-exhausted` after the failed fresh proof. Broken reset executes repair → restart → repair and fails `RepairBound` at actual count 2. Oracle is one automatic repair per same invocation. | `witness-exhausted/trace.json`, `witness-restart/trace.json`, `mutation-repair-reset/trace.json` | proven |
-| R8 | Concrete initial, repaired and resumed success traces reach `complete`; all 15 blocker traces reach their named outcome. Initial success is not a declaration alone: checker produces action/state sequence with passed stages and four durable artifacts. Oracle is the issue's required reachable outcomes. | All `witness-*/trace.json`; independent `trace-audit.txt` | proven |
-| R9 | All 14 operational weakenings produce the expected named safety violation and concrete violating terminal facts. Identity, base, text, candidate, report/evidence persistence and repair reset are covered. Assertions themselves remain unchanged across mutations. Oracle is each issue protection, rather than expected exit status alone. | All `mutation-*/model.fizz`, `output.txt`, `observation.json`, `trace.json`; `trace-audit.txt` | proven |
-| R10 | README pins repository and FizzBee, documents the one command, mappings, bounds, assumptions, limits, historical baseline and lack of live-agent inference. Fresh execution records version/hash, runtime, graph count and cutoff status. I compared the historical protocol at `f5917ce0471d56aac01711e720426748626c99d0` with current binding text and confirmed the stated tracker/local-contract storage differences. Oracle is issue reproducibility and truthful limit reporting. | candidate README; `summary.json`; this report's command, identities and limits | proven |
+| R1 | Actions separately implement, launch/return two verifier roles, save/read back each artifact, repair, restart, and complete. Fresh traces exercise all lifecycle actions. Stage invocation IDs differ; trusted read-only isolation is explicitly an abstraction. This matches the issue's lifecycle scope. | `summary.json`, `baseline-*`, `witness-initial`, `witness-repair`, `witness-restart`; candidate model and README | proven |
+| R2 | `SameReports`, `CurrentText`, `CurrentCandidate`, and `IndependentFullStages` hold in all baselines. Missing stages block; mismatched proof text identity 2 versus review 0 yields `identity`. Removing agreement checking reaches completion with those distinct bindings. Oracle is exact current contract/candidate agreement required by the protocol. | `witness-missing-stage`, `witness-identity`, `mutation-identity`, `baseline-*` | proven |
+| R3 | Changing base to 1 leaves review base 0 and blocks with `base`. The weakened variant completes with that mismatch and fails `ComparisonBase`. | `baseline-base`, `witness-base`, `mutation-base` | proven |
+| R4 | The text fault changes contract identity to 1 while `revision` remains `v1` and both reports bind 0. The intact model blocks with `text`; the weakened variant completes and fails `CurrentText`. Exact text, not revision label, is the independent protocol oracle. | `baseline-text`, `witness-text`, `mutation-text` | proven |
+| R5 | Candidate drift to 1 leaves both report candidate identities at 0 and blocks. Its mutation completes illegally. Successful repair clears both bindings, then launches and returns both stages for candidate 1 with invocation IDs 3 and 4 before completion. | `baseline-candidate`, `witness-candidate`, `mutation-candidate`, `witness-repair`, independent audit | proven |
+| R6 | Baselines assert reports/evidence both equal `[3,3]` at completion. Named witnesses block unsaved, unread, lost, inaccessible report/evidence states and evidence absent after interrupted saving plus restart. Each corresponding mutation completes with the deficient state and fails the artifact property. Absent reports also imply missing stages. Oracle is saved, reread, retrievable content, not path existence. | `witness-report-*`, `witness-evidence-*`, `witness-missing-stage`, `mutation-report-*`, `mutation-evidence-*` | proven |
+| R7 | Restart success retains one actual/used repair and rereads saved artifacts. Repeated proof failure after repair and restart yields `repair-exhausted` with both counters 1. Resetting allowance on restart permits an actual second repair and fails `RepairBound`. | `witness-restart`, `witness-exhausted`, `mutation-repair-reset`, `baseline-exhausted` | proven |
+| R8 | Initial success ends with both reports/evidence `[3,3]`, current bindings and distinct stages. Repair success and restart success are reachable. All 15 other witnesses expose the requested specific blockers. This is observed reachability, not a declared predicate alone. | All 18 `witness-*` runs, independent audit | proven |
+| R9 | All 14 deliberate variants fail the expected named assertion with a concrete corresponding violation, never a parser error or unrelated assertion. The retained models preserve independent assertions; only operational mutation constants change. | All 14 `mutation-*` runs, `p2p-proof25-audit.txt` | proven |
+| R10 | Documented public command reproduced all checks with pinned tool and modeled repository revision. README maps properties to protocol and documents historical baseline differences, finite fault families, timing/cutoff handling, atomicity, lack of fairness, trusted stage judgments, and excluded live behavior. Actual environment, runtimes, node counts and maximum depths are retained. | README, runner, `summary.json`, baseline observations, `p2p-proof25-run.txt` | proven |
 
-## Counterexamples and limits
+## Mutation results
 
-Fourteen deliberate violations were observed: mismatched reports, stale text under unchanged `v1`, stale candidate, wrong base, restart-reset repair allowance, four report durability states and five evidence durability states. They are expected failures of the weakened variants, not defects observed in the baseline.
+The retained traces demonstrate these exact failing facts:
 
-Each of the eleven finite scenario families was exhausted within its configured model. Baseline node counts were 1,575 initial; 3,148 repair; 3,148 exhausted; 1,699 identity; 7,281 each for text/candidate/base; 2,534 each for report loss/access; and 3,299 each for evidence loss/access. Atomic actions, one restart and at most one environment fault constrain exploration. Distinct fault families are not combined. Repeated churn, identity hashing/collisions, post-completion changes and arbitrary storage implementations are unchecked. The model assumes trusted full stage judgments and host isolation; it does not test evidence adequacy, fabricated results or actual agent judgment.
+| Variant | Assertion | Violating observation |
+|---|---|---|
+| identity | SameReports | Completion with review binding `[0,0]`, proof `[2,0]` |
+| text | CurrentText | Completion with current contract 1, reports 0, revision still v1 |
+| candidate | CurrentCandidate | Completion with current candidate 1, both reports 0 |
+| base | ComparisonBase | Completion with current base 1, review base 0 |
+| repair-reset | RepairBound | Restart followed by second actual repair; actual count 2, scheduler count 1 |
+| report-save | DurableReports | Completion with reports `[1,1]` |
+| report-read | DurableReports | Completion with reports `[2,2]` |
+| report-lost | DurableReports | Completion with reports `[4,3]` |
+| report-access | DurableReports | Completion with reports `[5,3]` |
+| evidence-absent | DurableEvidence | Completion with evidence `[0,0]` after restart |
+| evidence-save | DurableEvidence | Completion with evidence `[1,1]` |
+| evidence-read | DurableEvidence | Completion with evidence `[2,2]` |
+| evidence-lost | DurableEvidence | Completion with evidence `[4,3]` |
+| evidence-access | DurableEvidence | Completion with evidence `[5,3]` |
 
-No fairness or eventual-delivery claim is made, and deadlock detection is disabled. Success witnesses prove reachability, not progress on every schedule. Restart may deliberately block unrecoverable evidence instead of rerunning a stage. These are disclosed bounds consistent with the bounded-model contract, not grounds for a live-workflow completion claim.
+## Bounds and unresolved gaps
 
-## Unresolved gaps
-
-None in R1–R10. Durable report and full evidence storage await the enclosing workflow's copy and readback. This historical storage statement must remain unchanged when that workflow completes storage.
+No unresolved acceptance gap. Exploration is exhaustive within the eleven finite scenario families, not across every combination of faults or unbounded executions. One work item, two verifier roles, two artifacts per verifier, one restart and one repair are modeled. The broken reset variant reaches two repairs. Atomic actions abstract storage and threads; exact identities are integers rather than cryptographic hashes. Stage correctness and isolation are assumed. No fairness or universal eventual completion is claimed; deadlock detection is disabled. One environment fault can interleave with enabled work; repeated churn and post-completion changes are excluded. Witness/mutation searches stop at the first relevant failure and are not exhaustive enumerations. No timeout or cutoff occurred; no live-agent, host-adapter or real filesystem-conformance claim is made.
 
 ## Repairs needed
 
-None. Any subsequent candidate repair requires fresh `/prove` and separate `/review-implementation` for that new candidate.
+None. Any changed candidate requires fresh full proof and separate review.
 
 Next steps:
-
-1. Save and reread this exact report as `.p2p/work/delivery-completion-integrity/proof.md`, and retain the full proof evidence directory at the specified durable path.
-2. Reconcile this proof with the independent full review on the same exact contract, candidate and comparison base. If that review is missing, run `/review-implementation` on this saved candidate against `41bebc726a8cc71c1d2f22d822ade006f4e78121`. Matching full reports complete local acceptance evidence; no publication action is required.
+1. Enclosing workflow saves this exact report and fresh evidence under the work item's durable records, rereads them, and confirms retention separately.
+2. Compare this full proof with the independent full review for the same candidate and base; assess PR #25 through `/merge-readiness` with those saved references before merge.

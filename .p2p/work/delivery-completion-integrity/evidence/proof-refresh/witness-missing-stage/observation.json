@@ -1,0 +1,18 @@
+{
+  "kind": "witness",
+  "name": "missing-stage",
+  "scenario": "initial",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/private/tmp/p2p-delivery-model-run-kr2k6o4_/witness-missing-stage",
+    "/private/tmp/p2p-delivery-model-run-kr2k6o4_/witness-missing-stage.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.406,
+  "model_sha256": "f22c28df7138d8b57896a2a15dee99c8d14bcadd106f3b0d1e358665ecb146d6",
+  "property": "Witness",
+  "steps": 2,
+  "result": "reachable witness"
+}

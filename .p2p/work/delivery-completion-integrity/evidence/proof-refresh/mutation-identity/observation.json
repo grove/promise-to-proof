@@ -1,0 +1,18 @@
+{
+  "kind": "mutation",
+  "name": "identity",
+  "scenario": "identity",
+  "mutation": "identity",
+  "command": [
+    "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/private/tmp/p2p-delivery-model-run-kr2k6o4_/mutation-identity",
+    "/private/tmp/p2p-delivery-model-run-kr2k6o4_/mutation-identity.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.889,
+  "model_sha256": "cc1b26e8fb7e11165e29c70559b4b59a44eb1a1629353d906f2fec5d16db0143",
+  "property": "SameReports",
+  "steps": 34,
+  "result": "expected counterexample"
+}

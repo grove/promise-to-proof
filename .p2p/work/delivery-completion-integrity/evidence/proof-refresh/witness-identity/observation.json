@@ -1,0 +1,18 @@
+{
+  "kind": "witness",
+  "name": "identity",
+  "scenario": "identity",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/p2p-fizzbee-24/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/private/tmp/p2p-delivery-model-run-kr2k6o4_/witness-identity",
+    "/private/tmp/p2p-delivery-model-run-kr2k6o4_/witness-identity.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.441,
+  "model_sha256": "b982575dfd3e021e0e49607d0bd61311de3031c4cb1dbc1e6d29ed8d0f53d061",
+  "property": "Witness",
+  "steps": 10,
+  "result": "reachable witness"
+}
