@@ -181,8 +181,9 @@ branch, and create a draft PR. Its readback confirms publication, not merge
 readiness.
 
 `merge-readiness` inspects the current PR head, matching reports, required CI,
-repository approvals, and merge conditions near the merge decision. It does not
-publish or merge the PR.
+repository approvals, and merge conditions near the merge decision. It updates
+the PR description's readiness entry unless the user requests a read-only
+assessment. It does not publish or merge the PR.
 
 ## Workflow choices
 
