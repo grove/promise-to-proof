@@ -4,41 +4,25 @@ Requirements: 3/3
 Counterexamples tested: 9  
 Contract: `work/delivery-review-report-contract.md`, revision v3  
 Contract snapshot: SHA-256 `b490dc25a68ba6521282128bcf60bc3f77e8a11b907b0c9b385402fa230677cb`  
-Candidate: `snapshot:sha256:049685d89b12994ec0ba84cf9bc451badba0de16c147c5e911a093a0f83f6d31`  
-Comparison base: `18bab308a297b9af978d6dcf3e1107cd5eaedce5`
-Candidate stability: unchanged; before/after validation matched the same recorded snapshot  
+Candidate: `git:495bb1899b82f9d5c1b7c05d78fb15922b330a11`  
+Comparison base: `9384d662d425d222df3f5547bcbf84ba7cd10973`  
+Candidate stability: unchanged; the candidate record validated to the same commit before and after testing  
 Contract stability: unchanged; before/after SHA-256 matched  
-Verification context: Candidate root `/Users/grove/projects/promise-to-proof/.p2p/tmp/p2p-delivery-report-contract-candidate-v6`; Python 3.14; requested `TMPDIR`, `PYTHONPYCACHEPREFIX`, and `PYTHONDONTWRITEBYTECODE` settings. Suite output included sandbox PATH-alias warnings; tests passed.
+Verification context: macOS, Python 3.14.7. Test environment set `TMPDIR=/private/tmp/p2p-delivery-report-contract-refresh-proof-scratch-938/.p2p/tmp`, `PYTHONPYCACHEPREFIX=/private/tmp/p2p-delivery-report-contract-refresh-proof-scratch-938/pycache`, and `PYTHONDONTWRITEBYTECODE=1`.
 
 ## Outcome
 
-The v3 contract reconciles with its linked review skill. The skill requires complete review coverage, three review axes, findings and handoff, checks and limitations, a review-only statement, and numbered next steps. The contract specifies how the controller validates structured inputs and renders those required sections. Its boundary that the controller checks structure and nonblank text, while review and proof assess meaning, is consistent with the skill.
+The v3 contract remains satisfied on the rebased candidate. The candidate is the exact commit recorded above, based on the current `main` tip. Validation before and after the test run confirmed the candidate, contract, binding skill, and comparison base identities. The product diff contains the same three scoped paths as the prior candidate; the upstream `plans/right-sized-slicing-spec.md` change is part of the comparison base and is not part of this candidate's change set.
 
-The candidate is the exact recorded working-tree snapshot. Its comparison base is `18bab308a297b9af978d6dcf3e1107cd5eaedce5`, also the candidate’s `HEAD`. Comparing the captured snapshot with that base yielded exactly:
-
-- `checks/test_p2p_delivery.py`
-- `skills/productivity/deliver-issue/scripts/p2p_delivery.py`
-- `work/delivery-review-report-contract.md`
-
-The renderer derives included scope from the base and current snapshots. Fixture evidence checks that the rendered comparison includes the expected fixture paths and candidate identity. This establishes controller behavior through fixtures, not live-host behavior.
-
-Checks run:
-
-- Before and after: `/opt/homebrew/opt/python@3.14/bin/python3.14 skills/productivity/deliver-issue/scripts/p2p_filesystem.py --repo /Users/grove/projects/promise-to-proof/.p2p/tmp/p2p-delivery-report-contract-candidate-v6 validate work/delivery-review-report-contract.md --base 18bab308a297b9af978d6dcf3e1107cd5eaedce5` — both validations passed; after-validation confirmed the expected candidate key and base.
-- `/opt/homebrew/opt/python@3.14/bin/python3.14 -m unittest checks.test_p2p_delivery -v` — 35 tests passed.
-- `git diff --check 18bab308a297b9af978d6dcf3e1107cd5eaedce5` — passed.
-
-The suite log is retained at `/private/tmp/p2p-delivery-report-contract-v6-proof-scratch/unittest.log`; validation output is at `/private/tmp/p2p-delivery-report-contract-v6-proof-scratch/validate-after.json`. The contract, binding skill, and candidate snapshot matched their captured identities after verification.
+The full focused controller suite passed: `/opt/homebrew/opt/python@3.14/bin/python3.14 -m unittest checks.test_p2p_delivery -v` ran 35 tests in 218.464 seconds and returned `OK`. The complete output is retained at `.p2p/work/delivery-review-report-contract/evidence/host/proof-main-938-unittest.log` (SHA-256 `e6e75119032f97e5a0fc749081ad368490e97fdb4f7108a166f08287a17945ac`). Test subprocesses emitted the sandbox PATH-alias warning; it did not affect the test results.
 
 ## Requirement verdicts
 
 | ID | Observation and oracle | Evidence reference | Verdict |
 |---|---|---|---|
-| R1 | The review prompt requests a substantive observation for every requirement; receipt rejects blank observations and review rows carrying proof verdicts. This matches the contract’s explicit boundary: receipt validates structure and nonblank text, while review/proof assess meaning. | `checks.test_p2p_delivery.DeliveryTests.test_review_prompt_requires_substantive_observations`, `test_review_rejects_blank_observation`, and `test_review_rejects_proof_verdict_at_receipt`; source in `p2p_delivery.py` stage prompt and receipt validation. Full suite log above. | proven |
-| R2 | Receipt rejects unsupported outcomes, extra/free-text fields and contradictory status/findings. It enforces status relationships and required structured fields. The renderer builds the complete review report from validated data and controller identities, including comparison base and included scope. Fixture assertions check all required headings, review-only text, candidate identity, and included scope. | `checks.test_p2p_delivery.DeliveryTests.test_review_rejects_unsupported_status`, `test_review_rejects_free_text_status_conflict`, `test_reviewed_report_cannot_contain_findings`, and `test_success_source_preservation_and_retrieval`; source in `p2p_delivery.py` `review_markdown`, `stage`, and `read_report`. Candidate/base scope independently compared as listed above. | proven |
-| R3 | A `BLOCKED` review renders its missing input and expected result, stops before proof or repair, and remains blocked on resume. A `plan-acceptance` finding also stops before proof or automatic repair. These outcomes match the contract’s state and handoff rules. | `checks.test_p2p_delivery.DeliveryTests.test_blocked_review_stops_before_proof_and_repair` and `test_plan_acceptance_handoff_stops_before_proof_and_repair`; source in `p2p_delivery.py` `Delivery.run()`. Full suite log above. | proven |
-
-**Counterexamples tested (fixture evidence):** blank observation; proof verdict on review row; unsupported status; free-text/status conflict; `REVIEWED` with findings; incomplete coverage/evidence; `BLOCKED` initial run and resume; `plan-acceptance` handoff; complete report sections, candidate identity, and included comparison scope.
+| R1 | The review prompt requires a substantive observation for every requirement. Receipt checks nonblank observations and rejects review verdict/proof fields, matching the contract's boundary between structural validation and semantic judgment. | Saved suite log above: `test_review_prompt_requires_substantive_observations`, `test_review_rejects_blank_observation`, and `test_review_rejects_proof_verdict_at_receipt`; assertions exercise prompt and receipt behavior. | proven |
+| R2 | Receipt rejects unsupported outcomes, unsupported/free-text fields, contradictory status/findings, and incomplete coverage/evidence. The renderer derives the required review sections and identities from structured data. | Saved suite log above: `test_review_rejects_unsupported_status`, `test_review_rejects_free_text_status_conflict`, `test_reviewed_report_cannot_contain_findings`, `test_missing_coverage_and_evidence`, and `test_success_source_preservation_and_retrieval`; full suite command and environment are recorded above. | proven |
+| R3 | A blocked review records its missing input and expected result, stops before proof or repair, and remains blocked on resume; a `plan-acceptance` handoff also stops before proof and repair. | Saved suite log above: `test_blocked_review_stops_before_proof_and_repair` exercises initial run and resume; `test_plan_acceptance_handoff_stops_before_proof_and_repair` checks the planning handoff. | proven |
 
 ## Unresolved gaps
 
@@ -53,6 +37,5 @@ Refresh `/review-implementation` for the changed candidate as a separate phase.
 
 Next steps:
 
-1. Acceptance evidence is complete for this candidate; no further action is required unless publication is wanted.
-
-Durable evidence: the unedited host transcript is at `evidence/host/proof-v6-final.jsonl`; the complete unittest output is at `evidence/host/proof-v6-unittest.log`. The scratch paths in the original host report were staging paths.
+1. Acceptance evidence is complete for candidate `git:495bb1899b82f9d5c1b7c05d78fb15922b330a11`; no further acceptance work is needed unless the candidate or contract changes.
+2. Use `/publish-pr work/delivery-review-report-contract.md; review .p2p/work/delivery-review-report-contract/review.md; proof .p2p/work/delivery-review-report-contract/proof.md; target main; draft only` to prepare the requested draft publication preview.
