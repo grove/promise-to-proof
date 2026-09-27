@@ -309,17 +309,127 @@ def report_schema(stage):
     def obj(properties):
         return {'type': 'object', 'properties': properties, 'required': list(properties), 'additionalProperties': False}
     evidence = obj({'assertion': string, 'observation': string, 'artifact': string})
+    status = {'type': 'string'}
     if stage == 'review':
+        status['enum'] = ['REVIEWED', 'CHANGES NEEDED', 'BLOCKED']
         row = obj({'id': string, 'observation': string})
+        finding = obj({'id': string, 'source': string,
+                       'axis': {'type': 'string', 'enum': ['Contract fidelity', 'Scope and simplicity', 'Engineering quality']},
+                       'location': string, 'evidence': string, 'consequence': string, 'correction': string,
+                       'handoff': {'type': 'string', 'enum': ['implement-contract', 'plan-acceptance']}})
+        check = obj({'command': string,
+                     'result': {'type': 'string', 'enum': ['passed', 'failed', 'observed', 'unavailable']},
+                     'observation': string})
     else:
         row = obj({'id': string, 'verdict': string, 'observation': string,
                    'evidence': {'type': 'array', 'items': evidence}})
-    properties = {'status': string, 'input_identity_json': string, 'details': string,
-                  'requirements': {'type': 'array', 'items': row},
-                  'gaps': {'type': 'array', 'items': string}}
+    properties = {'status': status, 'input_identity_json': string}
+    if stage != 'review':
+        properties['details'] = string
+    properties.update(requirements={'type': 'array', 'items': row},
+                      gaps={'type': 'array', 'items': string})
     if stage == 'review':
-        properties['findings'] = {'type': 'array', 'items': string}
+        properties.update(coverage=string, checks={'type': 'array', 'items': check},
+                          limitations={'type': 'array', 'items': string},
+                          findings={'type': 'array', 'items': finding},
+                          missing_input=string, expected_result=string)
     return obj(properties)
+
+
+def report_markdown(report):
+    lines = [f"# {report['status']}", '', '## Requirements', '']
+    for row in report['requirements']:
+        lines.extend([f"### {row['id']}", '', row['observation'], ''])
+        if 'verdict' in row:
+            lines.append('Verdict: ' + row['verdict'])
+        for evidence in row.get('evidence', []):
+            lines.extend(['', '#### Evidence', '- Assertion: ' + evidence['assertion'],
+                          '- Observation: ' + evidence['observation'],
+                          '- Artifact: ' + evidence['artifact']])
+        lines.append('')
+    if 'findings' in report:
+        lines.extend(['## Findings', ''])
+        lines.extend('- ' + item for item in report['findings'])
+        if not report['findings']:
+            lines.append('None.')
+        lines.append('')
+    lines.extend(['## Gaps', ''])
+    lines.extend('- ' + item for item in report['gaps'])
+    if not report['gaps']:
+        lines.append('None.')
+    return '\n'.join(lines).rstrip() + '\n'
+
+
+REVIEW_AXES = ('Contract fidelity', 'Scope and simplicity', 'Engineering quality')
+
+
+def review_markdown(report, work, contract, candidate, base_manifest):
+    key = candidate_key(candidate)
+    base = {entry['path']: entry for entry in base_manifest}
+    current = {entry['path']: entry for entry in candidate.get('manifest', [])}
+    scope = sorted(path for path in base.keys() | current.keys()
+                   if base.get(path) != current.get(path))
+    included = ', '.join(f'`{path}`' for path in scope) or '(no working-tree changes)'
+    lines = [f"# {report['status']}: {work}", '',
+             f"Contract: {work}, {contract['revision']}; SHA-256 `{contract['sha256']}`",
+             f"Candidate: `{key}`; recoverable snapshot `{work.replace('work/', '.p2p/work/', 1)}/candidate.json`",
+             f"Comparison: base `{candidate['comparison_base']}`; included working-tree scope: {included}",
+             'Stability: candidate and contract unchanged at report receipt.',
+             f"Coverage: {report['coverage']}"]
+    for axis in REVIEW_AXES:
+        lines.extend(['', '## ' + axis, ''])
+        if axis == 'Contract fidelity':
+            lines.extend(['Requirement coverage:', ''])
+            lines.extend(f"- **{row['id']}**: {row['observation']}" for row in report['requirements'])
+            lines.append('')
+        findings = [item for item in report['findings'] if item['axis'] == axis]
+        if not findings:
+            lines.append('No material findings.')
+        for item in findings:
+            lines.extend([f"- **{item['id']} ({item['source']})** — {item['location']}",
+                          f"  Evidence: {item['evidence']}",
+                          f"  Consequence: {item['consequence']}",
+                          f"  Smallest correction or next check: {item['correction']}",
+                          f"  Handoff: `{item['handoff']}`"])
+    lines.extend(['', '## Checks and limitations', '', 'Checks:'])
+    lines.extend(f"- `{check['command']}` — {check['result']}: {check['observation']}"
+                 for check in report['checks'])
+    if not report['checks']:
+        lines.append('No checks were run.')
+    lines.extend(['', 'Limitations:'])
+    lines.extend('- ' + item for item in report['limitations'])
+    if not report['limitations']:
+        lines.append('None.')
+    lines.extend(['', 'Gaps:'])
+    lines.extend('- ' + item for item in report['gaps'])
+    if not report['gaps']:
+        lines.append('None.')
+    lines.extend(['', '## Handoff', ''])
+    if report['status'] == 'BLOCKED':
+        lines.extend([f"Missing input or command: {report['missing_input']}",
+                      f"Expected result: {report['expected_result']}"])
+    elif report['findings']:
+        for item in report['findings']:
+            lines.append(f"{item['id']} ({item['source']}): `{item['handoff']}`")
+    else:
+        lines.append('No change handoff is required; acceptance proof remains separate.')
+    lines.extend(['', 'Review only; acceptance proof and merge readiness are separate.', '', '## Next steps', ''])
+    if report['status'] == 'BLOCKED':
+        lines.append(f"1. Resolve `{report['missing_input']}` and establish `{report['expected_result']}`, then resume for a fresh review. Proof and repair remain stopped while review is blocked.")
+    elif report['status'] == 'REVIEWED':
+        lines.append(f"1. `/prove {work}; candidate {key}`")
+    else:
+        handoffs = {item['handoff'] for item in report['findings']}
+        step = 1
+        if 'plan-acceptance' in handoffs:
+            lines.append(f"{step}. `/plan-acceptance {work}; amendment {work.replace('work/', '.p2p/work/', 1)}/review.md`; resume implementation only after the revised contract is approved and saved.")
+            step += 1
+        if 'implement-contract' in handoffs:
+            lines.append(f"{step}. `/implement-contract {work}; findings {work.replace('work/', '.p2p/work/', 1)}/review.md`")
+            step += 1
+        if 'implement-contract' in handoffs:
+            lines.append(f"{step}. Capture the changed candidate, then refresh review and full proof.")
+    return '\n'.join(lines).rstrip() + '\n'
 
 
 class Delivery:
@@ -552,9 +662,16 @@ assert results['scratch'] == 'ok'
         inputs = self.stage_inputs(self.state['candidate'])
         prior = self.state.get('reports', {})
         skill_stage = self.state.get('repair_skill', 'repair') if name == 'repair' else name
-        report_format = ('Review rows contain only id and observation. Put every review-local finding in the '
-                         'top-level findings array with its ID and summary. REVIEWED requires empty findings '
-                         'and gaps; CHANGES NEEDED requires a finding. Do not assign review verdicts. '
+        report_format = ('Review rows contain only id and observation. Include nonblank coverage; checks with '
+                         'command, result (passed, failed, observed, or unavailable), and observation; and '
+                         'limitations. Each finding has id, source (requirement ID or binding source), primary '
+                         'axis (Contract fidelity, Scope and simplicity, or Engineering quality), location, '
+                         'evidence, consequence, smallest correction or next check, and handoff '
+                         '(implement-contract or plan-acceptance). REVIEWED requires empty findings and gaps; '
+                         'CHANGES NEEDED requires a finding. For BLOCKED, name the exact missing input or '
+                         'configured command and expected result in missing_input and expected_result; leave '
+                         'both blank otherwise. Give a substantive observation for every requirement. Do not '
+                         'assign review verdicts. '
                          if name == 'review' else
                          'Each row needs a substantive observation. Proof rows need command/output evidence in '
                          'artifact, an assertion, and observation. Use verdict proven for established proof rows; '
@@ -571,7 +688,8 @@ assert results['scratch'] == 'ok'
                   'Use fresh independent observations, do not trust previous judgments. '
                   f'Exact input_identity_json must encode this object: {json.dumps(inputs)}. '
                   f'Every requirement must occur exactly once: {self.state["requirements"]}. '
-                  f'{report_format}Status uses normal skill vocabulary. details contains the full human report. '
+                  f'{report_format}Status uses normal skill vocabulary. '
+                  f'{"The controller renders review text from structured fields. Do not add free-text details or other top-level fields." if name == "review" else "details contains the full human report."} '
                   'Keep generated fixtures and verbose debug output in scratch. Return the relevant command, '
                   'assertion, result, and environment in the report; do not dump entire logs or workspaces. '
                   'Never fabricate results. '
@@ -590,23 +708,54 @@ assert results['scratch'] == 'ok'
         if name in ('review', 'proof'):
             self.current()
         report = json.loads(host['message'])
+        expected_fields = {'status', 'input_identity_json', 'requirements', 'gaps'}
+        if name == 'review':
+            expected_fields.update({'findings', 'coverage', 'checks', 'limitations', 'missing_input', 'expected_result'})
+        else:
+            expected_fields.add('details')
+        if not isinstance(report, dict) or set(report) != expected_fields:
+            raise ValueError('stage report contains unsupported or missing fields: ' + attempt['id'])
+        if name == 'review' and report['status'] not in ('REVIEWED', 'CHANGES NEEDED', 'BLOCKED'):
+            raise ValueError('review report has unsupported status')
         if json.loads(report['input_identity_json']) != inputs:
             raise ValueError('stage returned stale or mistyped input identity: ' + attempt['id'])
         rows = report['requirements']
         if sorted(row['id'] for row in rows) != sorted(self.state['requirements']):
             raise ValueError('stage omitted/duplicated full requirement coverage: ' + attempt['id'])
-        if not report['details'].strip() or any(not row['observation'].strip() for row in rows):
+        if (name != 'review' and not report['details'].strip()) or any(not row['observation'].strip() for row in rows):
             raise ValueError('stage returned incomplete report observations: ' + attempt['id'])
         if name == 'review':
             if any(set(row) != {'id', 'observation'} for row in rows):
                 raise ValueError('review report rows must not contain verdicts or proof evidence')
+            if not isinstance(report['coverage'], str) or not report['coverage'].strip():
+                raise ValueError('review report coverage is incomplete')
             findings = report.get('findings')
-            if not isinstance(findings, list) or any(not isinstance(item, str) or not item.strip() for item in findings):
-                raise ValueError('review report findings must be nonempty strings')
+            finding_fields = {'id', 'source', 'axis', 'location', 'evidence', 'consequence', 'correction', 'handoff'}
+            if not isinstance(findings, list) or any(not isinstance(item, dict) or set(item) != finding_fields or
+                    any(not isinstance(item[key], str) or not item[key].strip() for key in finding_fields) or
+                    item['axis'] not in REVIEW_AXES or item['handoff'] not in ('implement-contract', 'plan-acceptance')
+                    for item in findings):
+                raise ValueError('review report findings are incomplete')
+            if len({item['id'] for item in findings}) != len(findings):
+                raise ValueError('review report finding IDs are duplicated')
+            check_fields = {'command', 'result', 'observation'}
+            if not isinstance(report['checks'], list) or any(not isinstance(item, dict) or set(item) != check_fields or
+                    any(not isinstance(item[key], str) or not item[key].strip() for key in check_fields) or
+                    item['result'] not in ('passed', 'failed', 'observed', 'unavailable') for item in report['checks']):
+                raise ValueError('review report checks are incomplete')
+            for field in ('gaps', 'limitations'):
+                if not isinstance(report[field], list) or any(not isinstance(item, str) or not item.strip() for item in report[field]):
+                    raise ValueError('review report ' + field + ' are incomplete')
             if report['status'] == 'REVIEWED' and (findings or report['gaps']):
                 raise ValueError('REVIEWED review report contains findings or gaps')
             if report['status'] == 'CHANGES NEEDED' and not findings:
                 raise ValueError('CHANGES NEEDED review report has no findings')
+            if report['status'] == 'BLOCKED':
+                if any(not isinstance(report[field], str) or not report[field].strip()
+                       for field in ('missing_input', 'expected_result')):
+                    raise ValueError('BLOCKED review report must name the missing input and expected result')
+            elif report['missing_input'] or report['expected_result']:
+                raise ValueError('non-blocked review report contains blocked-only details')
         if name == 'proof' and report['status'] == 'PROVEN':
             if not host['executions'] or any(row['verdict'] != 'proven' or not row['evidence'] for row in rows):
                 raise ValueError('proof lacks full independently exercised evidence')
@@ -619,8 +768,11 @@ assert results['scratch'] == 'ok'
         if stored.exists() and stored.read_bytes() != encoded(report):
             raise ValueError('conflicting duplicate stage result: ' + attempt['id'])
         retained(self.root, self.work, path, encoded(report))
-        retained(self.root, self.work, f'attempts/{attempt["id"]}/report.md', report['details'].encode())
-        retained(self.root, self.work, name + '.md', report['details'].encode())
+        summary = (review_markdown(report, self.work, self.state['contract'], self.state['candidate'],
+                                   fs.snapshot(self.root, self.state['comparison_base']))
+                   if name == 'review' else report['details']).encode()
+        retained(self.root, self.work, f'attempts/{attempt["id"]}/report.md', summary)
+        retained(self.root, self.work, name + '.md', summary)
         attempt.update(status='complete', report=path, report_sha256=fs.digest(encoded(report)))
         self.state.setdefault('reports', {})[name] = {'path': path, 'sha256': attempt['report_sha256'],
                                                      'attempt_id': attempt['id'], 'inputs': inputs}
@@ -637,8 +789,20 @@ assert results['scratch'] == 'ok'
         if encoded(json.loads(host['message'])) != data:
             raise ValueError('report differs from host return: ' + name)
         report = json.loads(data)
-        if (self.directory / (name + '.md')).read_bytes() != report['details'].encode():
+        if name == 'review' and 'coverage' in report:
+            summary = review_markdown(report, self.work, self.state['contract'], self.state['candidate'],
+                                      fs.snapshot(self.root, self.state['comparison_base']))
+        elif name == 'review' and 'details' in report:
+            summary = report['details']
+            if not isinstance(summary, str):
+                raise ValueError('legacy review report details are invalid')
+        else:
+            summary = report_markdown(report) if name == 'review' else report['details']
+        if (self.directory / (name + '.md')).read_bytes() != summary.encode():
             raise ValueError('canonical report content changed or lost: ' + name)
+        if name == 'review' and 'coverage' not in report:
+            summary = report_markdown(report)
+        report['details'] = summary
         return report
 
     def complete(self):
@@ -699,10 +863,22 @@ assert results['scratch'] == 'ok'
             self.state['implementation_complete'] = True
             self.save()
         while True:
-            for name in ('review', 'proof'):
-                if name not in self.state.get('reports', {}):
-                    self.stage(name)
-            review, proof = self.read_report('review'), self.read_report('proof')
+            if 'review' not in self.state.get('reports', {}):
+                self.stage('review')
+            review = self.read_report('review')
+            if review['status'] == 'BLOCKED':
+                if self.state['status'] == 'BLOCKED':
+                    self.state['reports'].pop('review')
+                    self.save()
+                    review = self.stage('review')
+                if review['status'] == 'BLOCKED':
+                    raise ValueError('review BLOCKED: missing input/command: ' + review['missing_input'] +
+                                     '; expected result: ' + review['expected_result'])
+            if any(item['handoff'] == 'plan-acceptance' for item in review.get('findings', [])):
+                raise ValueError('review requires plan-acceptance before automatic repair')
+            if 'proof' not in self.state.get('reports', {}):
+                self.stage('proof')
+            proof = self.read_report('proof')
             if review['status'] == 'REVIEWED' and proof['status'] == 'PROVEN' and not review['gaps'] and not proof['gaps']:
                 self.complete()
                 return

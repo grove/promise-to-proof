@@ -1,0 +1,67 @@
+test_admission_no_new_effects (checks.test_p2p_delivery.DeliveryTests.test_admission_no_new_effects) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_agreement_and_candidate_drift (checks.test_p2p_delivery.DeliveryTests.test_agreement_and_candidate_drift) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_atomic_storage_preserves_old_bytes_on_replace_failure (checks.test_p2p_delivery.DeliveryTests.test_atomic_storage_preserves_old_bytes_on_replace_failure) ... ok
+test_authority_hard_cap_and_expired_admission (checks.test_p2p_delivery.DeliveryTests.test_authority_hard_cap_and_expired_admission) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_blocked_review_stops_before_proof_and_repair (checks.test_p2p_delivery.DeliveryTests.test_blocked_review_stops_before_proof_and_repair) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_child_missing_conflicting_and_proposed_routing_never_dispatch (checks.test_p2p_delivery.DeliveryTests.test_child_missing_conflicting_and_proposed_routing_never_dispatch) ... ok
+test_child_routing_transfers_plan_and_binds_stage_inputs (checks.test_p2p_delivery.DeliveryTests.test_child_routing_transfers_plan_and_binds_stage_inputs) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_child_starting_tree_is_target_not_unrelated_head (checks.test_p2p_delivery.DeliveryTests.test_child_starting_tree_is_target_not_unrelated_head) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_child_target_advance_and_wrong_explicit_base_block (checks.test_p2p_delivery.DeliveryTests.test_child_target_advance_and_wrong_explicit_base_block) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_concurrent_controller_cannot_reserve (checks.test_p2p_delivery.DeliveryTests.test_concurrent_controller_cannot_reserve) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_contested_dirty_blocks (checks.test_p2p_delivery.DeliveryTests.test_contested_dirty_blocks) ... ok
+test_fresh_process_recovers_known_completion_once (checks.test_p2p_delivery.DeliveryTests.test_fresh_process_recovers_known_completion_once) ... ok
+test_fresh_process_uncertain_launch_blocks (checks.test_p2p_delivery.DeliveryTests.test_fresh_process_uncertain_launch_blocks) ... ok
+test_integration_missing_and_unrelated_ref_give_setup_handoff (checks.test_p2p_delivery.DeliveryTests.test_integration_missing_and_unrelated_ref_give_setup_handoff) ... ok
+test_legacy_review_readback_uses_structured_summary (checks.test_p2p_delivery.DeliveryTests.test_legacy_review_readback_uses_structured_summary) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_missing_authority_dispatches_nothing (checks.test_p2p_delivery.DeliveryTests.test_missing_authority_dispatches_nothing) ... ok
+test_missing_coverage_and_evidence (checks.test_p2p_delivery.DeliveryTests.test_missing_coverage_and_evidence) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_parent_uses_final_destination_and_plan_loss_blocks_resume (checks.test_p2p_delivery.DeliveryTests.test_parent_uses_final_destination_and_plan_loss_blocks_resume) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_persisted_scope_cannot_widen (checks.test_p2p_delivery.DeliveryTests.test_persisted_scope_cannot_widen) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_plan_acceptance_handoff_stops_before_proof_and_repair (checks.test_p2p_delivery.DeliveryTests.test_plan_acceptance_handoff_stops_before_proof_and_repair) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_public_cli_retains_plain_approval_on_transfer_and_fresh_recovery (checks.test_p2p_delivery.DeliveryTests.test_public_cli_retains_plain_approval_on_transfer_and_fresh_recovery) ... ok
+test_reconstruct_candidate_with_retained_base (checks.test_p2p_delivery.DeliveryTests.test_reconstruct_candidate_with_retained_base) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_repair_refreshes_both_and_exhaustion_persists (checks.test_p2p_delivery.DeliveryTests.test_repair_refreshes_both_and_exhaustion_persists) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_review_prompt_requires_substantive_observations (checks.test_p2p_delivery.DeliveryTests.test_review_prompt_requires_substantive_observations) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_review_rejects_blank_observation (checks.test_p2p_delivery.DeliveryTests.test_review_rejects_blank_observation) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_review_rejects_free_text_status_conflict (checks.test_p2p_delivery.DeliveryTests.test_review_rejects_free_text_status_conflict) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_review_rejects_proof_verdict_at_receipt (checks.test_p2p_delivery.DeliveryTests.test_review_rejects_proof_verdict_at_receipt) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_review_rejects_unsupported_status (checks.test_p2p_delivery.DeliveryTests.test_review_rejects_unsupported_status) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_reviewed_report_cannot_contain_findings (checks.test_p2p_delivery.DeliveryTests.test_reviewed_report_cannot_contain_findings) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_source_agreement_binding_base_and_report_loss (checks.test_p2p_delivery.DeliveryTests.test_source_agreement_binding_base_and_report_loss) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_stale_and_missing_coverage_rejected (checks.test_p2p_delivery.DeliveryTests.test_stale_and_missing_coverage_rejected) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_storage_failure_is_recoverable_from_exact_host_return (checks.test_p2p_delivery.DeliveryTests.test_storage_failure_is_recoverable_from_exact_host_return) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_success_source_preservation_and_retrieval (checks.test_p2p_delivery.DeliveryTests.test_success_source_preservation_and_retrieval) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_successful_repair_rereviews_and_reproves (checks.test_p2p_delivery.DeliveryTests.test_successful_repair_rereviews_and_reproves) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+test_uncertain_launch_never_repeats (checks.test_p2p_delivery.DeliveryTests.test_uncertain_launch_never_repeats) ... WARNING: proceeding, even though we could not create PATH aliases: Operation not permitted (os error 1)
+ok
+
+----------------------------------------------------------------------
+Ran 35 tests in 170.263s
+
+OK
