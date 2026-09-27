@@ -26,6 +26,7 @@ spec.loader.exec_module(bundle)
 STAGES = {'implementation': 'implement-contract', 'review': 'review-implementation',
           'proof': 'prove', 'repair': 'repair-gaps'}
 POLICY = 'macos-codex-local-v1'
+HEARTBEAT_SECONDS = 30
 
 
 def now():
@@ -266,22 +267,44 @@ def command(executable, scratch, schema=None):
 def launch(args, prompt, event_path, error_path, deadline):
     """Only transport seam. Tests replace it; the CLI has no fake-host switch."""
     started = time.monotonic()
+    remaining = None if deadline is None else max(0, deadline - time.time())
+    stop = None if remaining is None else started + remaining
     with event_path.open('xb') as events, error_path.open('xb') as errors:
         process = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=events, stderr=errors,
                                    start_new_session=True)
         outcome = 'finished'
-        try:
-            timeout = None if deadline is None else max(0, deadline - time.time())
-            process.communicate(prompt.encode(), timeout=timeout)
-        except subprocess.TimeoutExpired:
+        payload = prompt.encode()
+        while True:
+            remaining = None if stop is None else max(0, stop - time.monotonic())
+            try:
+                process.communicate(payload, timeout=HEARTBEAT_SECONDS if remaining is None else min(HEARTBEAT_SECONDS, remaining))
+                break
+            except subprocess.TimeoutExpired:
+                payload = None  # communicate resumes the original input after a timeout.
+                if stop is None or time.monotonic() < stop:
+                    activity = max(os.fstat(events.fileno()).st_mtime, os.fstat(errors.fileno()).st_mtime)
+                    print(f'[{event_path.parent.name}] running {time.monotonic() - started:.0f}s; '
+                          f'last log activity {max(0, time.time() - activity):.0f}s ago '
+                          '(activity is not verified progress)', file=sys.stderr, flush=True)
+                    continue
+                break
+        if process.poll() is None:
             outcome = 'interrupted'
             import signal
-            os.killpg(process.pid, signal.SIGTERM)
+            try:
+                os.killpg(process.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
             try:
                 process.wait(timeout=5)
             except subprocess.TimeoutExpired:
+                pass
+            # The parent can exit while descendants ignore TERM.
+            try:
                 os.killpg(process.pid, signal.SIGKILL)
-                process.wait()
+            except ProcessLookupError:
+                pass
+            process.wait()
         events.flush()
         errors.flush()
         os.fsync(events.fileno())
@@ -516,6 +539,8 @@ class Delivery:
             raise ValueError('dispatch-count limit exhausted before ' + stage)
         if self.state['deadline'] is not None and time.time() >= self.state['deadline']:
             raise ValueError('elapsed-time limit exhausted before ' + stage)
+        if limits.get('stage_seconds') == 0:
+            raise ValueError('stage elapsed-time limit exhausted before ' + stage)
         if stage == 'repair':
             if self.state['repair_used']:
                 raise ValueError('one automatic repair already consumed')
@@ -524,6 +549,10 @@ class Delivery:
                    'status': 'reserved', 'started': now(), 'started_epoch': time.time(),
                    'finished': None, 'elapsed_seconds': 'unknown', 'usage': 'unknown',
                    'cost': 'unknown', 'scratch': str(scratch), 'session_id': None}
+        deadlines = [self.state['deadline']]
+        if limits.get('stage_seconds') is not None:
+            deadlines.append(attempt['started_epoch'] + limits['stage_seconds'])
+        attempt['deadline'] = min((value for value in deadlines if value is not None), default=None)
         self.state['attempts'].append(attempt)
         self.save()  # Admission and repair consumption precede any subprocess.
         return attempt
@@ -539,6 +568,11 @@ class Delivery:
         if end.get('event_sha256') != fs.digest((folder / 'events.jsonl').read_bytes()):
             raise ValueError('host event content changed: ' + attempt['id'])
         attempt.update({k: end[k] for k in ('exit_code', 'outcome', 'finished', 'elapsed_seconds')})
+        if end['outcome'] == 'interrupted':
+            attempt['status'] = 'failed'
+            if not self.read_only:
+                self.save()
+            raise ValueError(f'{attempt["stage"]} elapsed-time limit exhausted; host interrupted: {attempt["id"]}')
         try:
             host = host_events(folder / 'events.jsonl')
         except ValueError:
@@ -573,16 +607,25 @@ class Delivery:
         if schema:
             retained(self.root, self.work, f'attempts/{attempt["id"]}/schema.json', encoded(schema))
         args = command(self.state['host']['executable'], scratch, folder / 'schema.json' if schema else None)
+        if attempt['deadline'] is not None:
+            prompt += (f' Effective host deadline: Unix timestamp {attempt["deadline"]}; '
+                       f'{max(0, attempt["deadline"] - time.time()):.1f} seconds remain. '
+                       'Return an honest incomplete report with remaining gaps before this deadline '
+                       'if the required work cannot finish. Do not weaken coverage or claim unverified success.')
         retained(self.root, self.work, f'attempts/{attempt["id"]}/launch.json', encoded({
             'attempt_id': attempt['id'], 'stage': stage, 'inputs': inputs, 'command': args, 'prompt': prompt,
             'configuration': host_config(scratch), 'model_provenance': 'inherited configured preference'}))
+        print(f'{stage} started [{attempt["id"]}]; deadline {attempt["deadline"]}', file=sys.stderr, flush=True)
         try:
-            result = launch(args, prompt, folder / 'events.jsonl', folder / 'stderr.txt', self.state['deadline'])
+            result = launch(args, prompt, folder / 'events.jsonl', folder / 'stderr.txt', attempt['deadline'])
             result.update(attempt_id=attempt['id'], inputs=inputs,
                           event_sha256=fs.digest((folder / 'events.jsonl').read_bytes()))
             retained(self.root, self.work, f'attempts/{attempt["id"]}/exit.json', encoded(result))
+            print(f'{stage} {result["outcome"]} [{attempt["id"]}]; '
+                  f'{result["elapsed_seconds"]:.1f}s elapsed; exit {result["exit_code"]}', file=sys.stderr, flush=True)
         except BaseException:
             # No retry: a saved reservation with no exit receipt is intentionally uncertain.
+            print(f'{stage} stopped [{attempt["id"]}]; completion receipt unavailable', file=sys.stderr, flush=True)
             raise
         return attempt, self.receipt(attempt)
 
@@ -971,7 +1014,8 @@ def create(root, args):
              'excluded_dirty': sorted(excluded), 'skills': installed,
              'routing': decision, 'routing_records': records, 'starting_commit': starting,
              'authority': {'local_stages': True, 'external_effects': False},
-             'limits': {'dispatches': args.max_dispatches, 'elapsed_seconds': args.max_seconds},
+             'limits': {'dispatches': args.max_dispatches, 'elapsed_seconds': args.max_seconds,
+                        'stage_seconds': args.max_stage_seconds},
              'deadline': None if args.max_seconds is None else time.time() + args.max_seconds,
              'created': now(), 'repair_used': False, 'attempts': [], 'reports': {},
              'host': {'name': 'Codex CLI on macOS', 'executable': executable,
@@ -989,11 +1033,49 @@ def create(root, args):
     return delivery
 
 
+def controller_running(delivery):
+    try:
+        with (delivery.directory / 'delivery.lock').open('rb') as lock:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                return True
+    except FileNotFoundError:
+        pass
+    except OSError:
+        return None  # Unavailable progress metadata must not hide a delivery blocker.
+    return False
+
+
 def result(delivery):
     state = delivery.state
+    attempt = state['attempts'][-1] if state['attempts'] else None
+    activity = []
+    if attempt:
+        for name in ('events.jsonl', 'stderr.txt'):
+            path = delivery.directory / 'attempts' / attempt['id'] / name
+            try:
+                activity.append(path.stat().st_mtime)
+            except OSError:
+                pass
+    latest = max(activity) if activity else None
+    running = controller_running(delivery)
+    pending = running and attempt and attempt['status'] == 'reserved' and attempt['stage'] in ('implementation', 'repair')
+    progress = {'stage': attempt['stage'] if attempt else None,
+                'attempt_id': attempt['id'] if attempt else None,
+                'status': attempt['status'] if attempt else None,
+                'controller_running': running,
+                'candidate_validation': 'pending active implementation or repair' if pending else 'not deferred',
+                'elapsed_seconds': (max(0, time.time() - attempt['started_epoch']) if attempt['finished'] is None
+                                    else attempt['elapsed_seconds']) if attempt else None,
+                'deadline': attempt.get('deadline', state['deadline']) if attempt else state['deadline'],
+                'last_activity_at': datetime.datetime.fromtimestamp(latest, datetime.timezone.utc).isoformat() if latest is not None else None,
+                'last_activity_age_seconds': max(0, time.time() - latest) if latest is not None else None,
+                'activity_meaning': 'Log file activity only; not verified useful progress.'}
     return {key: state[key] for key in ('status', 'blocker', 'invocation_id', 'work_item', 'comparison_base',
                                       'limits', 'repair_used', 'host')} | {
         'routing': state.get('routing'),
+        'progress': progress,
         'starting_commit': state.get('starting_commit'),
         'candidate': identity(state['candidate']) if state.get('candidate') else None,
         'reports': state.get('reports', {}), 'attempts': state['attempts'],
@@ -1012,8 +1094,11 @@ def main(argv=None):
             child.add_argument('--comparison-base', required=True)
             child.add_argument('--authorize-local', action='store_true')
             child.add_argument('--exclude-dirty', action='append', default=[])
-            child.add_argument('--max-dispatches', type=int)
-            child.add_argument('--max-seconds', type=float)
+            child.add_argument('--max-dispatches', type=int, default=8, help='dispatch limit (default: 8)')
+            child.add_argument('--max-seconds', type=float, default=1800,
+                               help='elapsed seconds from admission (default: 1800)')
+            child.add_argument('--max-stage-seconds', type=float, default=600,
+                               help='seconds per stage, capped by the overall deadline (default: 600)')
             child.add_argument('--hard-cost-cap', type=float)
     args = parser.parse_args(argv)
     delivery = None
@@ -1027,12 +1112,20 @@ def main(argv=None):
                 raise ValueError('no delivery invocation exists')
             delivery = Delivery(root, args.work, json.loads(state_path.read_text()))
             delivery.read_only = True
-            # Read-only status rechecks retained claims without creating a lock or records.
-            delivery.current()
+            # A live writer legitimately changes the candidate before its next capture.
+            progress = result(delivery)['progress']
+            pending = progress['candidate_validation'] == 'pending active implementation or repair'
+            if pending:
+                delivery.source_stable()
+            else:
+                delivery.current()
             for name in delivery.state.get('reports', {}):
                 delivery.read_report(name)
-            print(json.dumps(result(delivery), indent=2))
-            return 0 if delivery.state['status'] == 'REVIEWED_AND_PROVEN' else 1
+            output = result(delivery)
+            if pending:
+                output.update(status='RUNNING', blocker=None)
+            print(json.dumps(output, indent=2))
+            return 0 if output['status'] == 'REVIEWED_AND_PROVEN' else 1
         directory.mkdir(parents=True, exist_ok=True)
         lock = (directory / 'delivery.lock').open('a')
         try:
@@ -1042,7 +1135,8 @@ def main(argv=None):
         if state_path.exists():
             delivery = Delivery(root, args.work, json.loads(state_path.read_text()))
             if args.action == 'run':
-                requested = {'dispatches': args.max_dispatches, 'elapsed_seconds': args.max_seconds}
+                requested = {'dispatches': args.max_dispatches, 'elapsed_seconds': args.max_seconds,
+                             'stage_seconds': args.max_stage_seconds}
                 if (not args.authorize_local or args.hard_cost_cap is not None or
                     requested != delivery.state['limits'] or args.comparison_base != delivery.state['comparison_base'] or
                     sorted(args.exclude_dirty) != delivery.state['excluded_dirty']):
@@ -1050,7 +1144,8 @@ def main(argv=None):
         elif args.action == 'resume':
             raise ValueError('missing delivery invocation; no effects can be reconciled')
         else:
-            if args.max_dispatches is not None and args.max_dispatches < 0 or args.max_seconds is not None and (not math.isfinite(args.max_seconds) or args.max_seconds < 0):
+            if args.max_dispatches < 0 or any(not math.isfinite(value) or value < 0
+                                            for value in (args.max_seconds, args.max_stage_seconds)):
                 raise ValueError('resource limits must be finite and nonnegative')
             delivery = create(root, args)
         if delivery.state['status'] == 'REVIEWED_AND_PROVEN':
