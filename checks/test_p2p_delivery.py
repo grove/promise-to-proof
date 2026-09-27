@@ -52,13 +52,14 @@ def repo(path):
 class FakeTransport:
     """Clearly labeled fixture that supplies host-shaped records, never host proof."""
     def __init__(self, mode='success'):
-        self.mode, self.calls = mode, []
+        self.mode, self.calls, self.prompts = mode, [], []
 
     def __call__(self, args, prompt, event_path, error_path, deadline):
         attempt = json.loads((event_path.parent / 'launch.json').read_text())
         inputs = attempt['inputs']
         stage = 'preflight' if 'probe_sha256' in inputs else attempt['stage']
         self.calls.append(stage)
+        self.prompts.append((stage, prompt))
         workspace = Path(args[args.index('-C') + 1])
         if self.mode == 'uncertain' and stage == 'implementation':
             raise OSError('fixture crash after durable reservation')
@@ -84,13 +85,39 @@ class FakeTransport:
                                 'artifact':'FIXTURE command python3 greet.py; stdout hello\\n; exit 0'}]}
             if stage == 'review': row = {'id':'R1','observation':'Fixture observes hello newline and exit zero.'}
             report = {'status':status, 'input_identity_json':json.dumps(inputs),
-                      'requirements':[row], 'details':'# ' + status + '\n\nFIXTURE ONLY; full R1 observation retained.',
+                      'requirements':[row],
                       'gaps':['fixture gap'] if gap else []}
-            if stage == 'review': report['findings'] = []
+            if stage == 'review':
+                report.update(findings=[], coverage='R1; inspected greet.py and the delivery checks.',
+                              checks=[{'command':'python3 greet.py','result':'passed',
+                                       'observation':'Fixture output hello newline, exit zero.'}],
+                              limitations=['Fixture transport does not establish live-host behavior.'],
+                              missing_input='', expected_result='')
+                if self.mode == 'blocked':
+                    report.update(status='BLOCKED', missing_input='configured command `python3 greet.py`',
+                                  expected_result='exit zero and print `hello\\n`')
+                if self.mode == 'review-plan-handoff':
+                    report.update(status='CHANGES NEEDED', findings=[{
+                        'id':'F1','source':'R2','axis':'Contract fidelity','location':'work/tiny.md',
+                        'evidence':'The fixture requires a contract decision.',
+                        'consequence':'Implementation must wait for the agreement.',
+                        'correction':'Revise and approve the acceptance contract.',
+                        'handoff':'plan-acceptance'}])
+            else: report['details'] = '# ' + status + '\n\nFIXTURE ONLY; full R1 observation retained.'
             if self.mode == 'review-proof-verdict' and stage == 'review':
                 row['verdict'] = 'proven'
             if self.mode == 'review-conflict' and stage == 'review':
-                report['findings'] = ['F1: fixture finding contradicts REVIEWED']
+                report['findings'] = [{'id':'F1','source':'R1','axis':'Contract fidelity',
+                                      'location':'greet.py:1','evidence':'Fixture found an omitted requirement.',
+                                      'consequence':'The reviewed outcome is incomplete.',
+                                      'correction':'Implement the missing behavior.',
+                                      'handoff':'implement-contract'}]
+            if self.mode == 'review-prose-conflict' and stage == 'review':
+                report['details'] = '# CHANGES NEEDED\n\nF1: contradictory free-text summary'
+            if self.mode == 'review-invalid-status' and stage == 'review':
+                report['status'] = 'PROVEN'
+            if self.mode == 'review-blank-observation' and stage == 'review':
+                row['observation'] = '  \n'
             if self.mode == 'omit' and stage == 'proof': report['requirements'] = []
             if self.mode == 'stale' and stage == 'proof':
                 report['input_identity_json'] = json.dumps(dict(inputs, work_item_sha256='0'*64))
@@ -317,6 +344,15 @@ Pending actions: none.
         self.assertEqual(code, 0, value)
         self.assertEqual(value['status'], 'REVIEWED_AND_PROVEN')
         self.assertEqual(self.fake.calls, ['preflight','preflight','implementation','review','proof'])
+        review=(self.root/'.p2p/work/tiny/review.md').read_text()
+        for heading in ('## Contract fidelity','## Scope and simplicity','## Engineering quality',
+                        '## Checks and limitations','## Handoff','## Next steps',
+                        'Review only; acceptance proof and merge readiness are separate.'):
+            self.assertIn(heading,review)
+        self.assertIn(f"Candidate: `{self.state()['candidate']['key']}`",review)
+        self.assertIn('included working-tree scope:', review)
+        self.assertIn('`greet.py`', review)
+        self.assertIn('`work/tiny.md`', review)
         self.assertFalse((self.root / 'greet.py').exists())
         self.assertEqual((self.root / 'unrelated').read_text(), 'keep me')
         self.assertEqual((self.root / 'unrelated').stat().st_mode & 0o777, 0o755)
@@ -337,6 +373,47 @@ Pending actions: none.
         code, value = self.cli('resume')
         self.assertEqual(code,1)
         self.assertIn('report/evidence content changed',value['blocker'])
+
+    def test_legacy_review_readback_uses_structured_summary(self):
+        code,value=self.cli()
+        self.assertEqual(code,0,value)
+        state=self.state()
+        report_record=state['reports']['review']
+        attempt=next(a for a in state['attempts'] if a['id']==report_record['attempt_id'])
+        folder=self.root/'.p2p/work/tiny/attempts'/attempt['id']
+        report_path=self.root/'.p2p/work/tiny'/report_record['path']
+        current=json.loads(report_path.read_bytes())
+        legacy={'status':'REVIEWED','input_identity_json':current['input_identity_json'],
+                'requirements':[dict(row,verdict='reviewed') for row in current['requirements']],
+                'gaps':[],'details':'# REVIEWED\n\nLegacy free-text summary.'}
+        report_bytes=d.encoded(legacy)
+        report_path.write_bytes(report_bytes)
+        for path in (self.root/'.p2p/work/tiny/review.md',folder/'report.md'):
+            path.write_bytes(legacy['details'].encode())
+        events_path=folder/'events.jsonl'
+        events=[json.loads(line) for line in events_path.read_text().splitlines() if line]
+        for event in events:
+            item=event.get('item',{})
+            if event.get('type')=='item.completed' and item.get('type')=='agent_message':
+                item['text']=report_bytes.decode()
+        events_bytes=(''.join(json.dumps(event)+'\n' for event in events)).encode()
+        events_path.write_bytes(events_bytes)
+        exit_path=folder/'exit.json'
+        receipt=json.loads(exit_path.read_bytes())
+        receipt['event_sha256']=d.fs.digest(events_bytes)
+        exit_path.write_bytes(d.encoded(receipt))
+        digest=d.fs.digest(report_bytes)
+        report_record['sha256']=digest
+        attempt['report_sha256']=digest
+        (self.root/'.p2p/work/tiny/delivery.json').write_bytes(d.encoded(state))
+        calls=len(self.fake.calls)
+        self.assertEqual(self.cli('status')[0],0)
+        self.assertEqual(self.cli('resume')[0],0)
+        self.assertEqual(len(self.fake.calls),calls)
+        bundle=json.loads((self.root/'.p2p/work/tiny/acceptance-bundle.json').read_bytes())
+        summary=bundle['review']['details']['content']
+        self.assertIn('## Requirements',summary)
+        self.assertNotIn('Legacy free-text summary.',summary)
 
     def test_admission_no_new_effects(self):
         code, value = self.cli('run','--max-dispatches','0')
@@ -402,6 +479,58 @@ Pending actions: none.
         self.assertEqual(code,1,value)
         self.assertIn('review report',value['blocker'])
         self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review'])
+
+    def test_review_rejects_free_text_status_conflict(self):
+        self.fake.mode='review-prose-conflict'
+        code,value=self.cli()
+        self.assertEqual(code,1,value)
+        self.assertIn('unsupported or missing fields',value['blocker'])
+        self.assertNotIn('review',self.state().get('reports',{}))
+        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review'])
+
+    def test_review_rejects_unsupported_status(self):
+        self.fake.mode='review-invalid-status'
+        code,value=self.cli()
+        self.assertEqual(code,1,value)
+        self.assertIn('unsupported status',value['blocker'])
+        self.assertNotIn('review',self.state().get('reports',{}))
+        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review'])
+
+    def test_review_rejects_blank_observation(self):
+        self.fake.mode='review-blank-observation'
+        code,value=self.cli()
+        self.assertEqual(code,1,value)
+        self.assertIn('incomplete report observations',value['blocker'])
+        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review'])
+
+    def test_blocked_review_stops_before_proof_and_repair(self):
+        self.fake.mode='blocked'
+        code,value=self.cli()
+        self.assertEqual(code,1,value)
+        self.assertIn('review BLOCKED',value['blocker'])
+        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review'])
+        report=(self.root/'.p2p/work/tiny/review.md').read_text()
+        self.assertIn('configured command `python3 greet.py`',report)
+        self.assertIn('exit zero and print `hello\\n`',report)
+        code,value=self.cli('resume')
+        self.assertEqual(code,1,value)
+        self.assertIn('review BLOCKED',value['blocker'])
+        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review','review'])
+        self.assertNotIn('proof',self.fake.calls)
+        self.assertNotIn('repair',self.fake.calls)
+
+    def test_plan_acceptance_handoff_stops_before_proof_and_repair(self):
+        self.fake.mode='review-plan-handoff'
+        code,value=self.cli()
+        self.assertEqual(code,1,value)
+        self.assertIn('requires plan-acceptance',value['blocker'])
+        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review'])
+
+    def test_review_prompt_requires_substantive_observations(self):
+        code,value=self.cli()
+        self.assertEqual(code,0,value)
+        prompt=next(prompt for stage,prompt in self.fake.prompts if stage=='review')
+        self.assertIn('Give a substantive observation for every requirement.',prompt)
 
     def test_missing_coverage_and_evidence(self):
         self.fake.mode='omit'
