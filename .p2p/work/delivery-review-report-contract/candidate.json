@@ -1,0 +1,12 @@
+{
+  "work_item": "work/delivery-review-report-contract.md",
+  "work_item_sha256": "b490dc25a68ba6521282128bcf60bc3f77e8a11b907b0c9b385402fa230677cb",
+  "comparison_base": "9384d662d425d222df3f5547bcbf84ba7cd10973",
+  "binding_inputs": [
+    {
+      "path": "skills/productivity/review-implementation/SKILL.md",
+      "sha256": "eabc51ad2ec4cb31aee379cc89a10b200f186cff730cc62ec25568a895a9b5ca"
+    }
+  ],
+  "commit": "495bb1899b82f9d5c1b7c05d78fb15922b330a11"
+}

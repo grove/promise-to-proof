@@ -1,0 +1,17 @@
+Review this fixed candidate against the complete contract. Follow the candidate's `skills/productivity/review-implementation/SKILL.md` and `docs/acceptance-contract-protocol.md`.
+
+Contract: `work/delivery-review-report-contract.md`, revision v3, SHA-256 `b490dc25a68ba6521282128bcf60bc3f77e8a11b907b0c9b385402fa230677cb`.
+Candidate root: `/Users/grove/projects/promise-to-proof/.p2p/tmp/p2p-delivery-review-report-contract-candidate-v5`.
+Exact candidate key: `snapshot:sha256:ba332bf48e9ff1a00853a6b6ecc3d604016cb2be5c2ce5354c8b1ac8962610f4`.
+Comparison base: `d0467b7bbaed2078e7e677b6ce3be407d4fb2058`.
+Recoverable candidate record: `/Users/grove/projects/promise-to-proof/.p2p/tmp/p2p-delivery-review-report-contract-candidate-v5/.p2p/work/delivery-review-report-contract/candidate.json`.
+
+Independently inspect the full candidate and its diff from the comparison base. Read the contract and its linked review skill. Verify all three requirements, especially (1) substantive observation prompts and structural-only validation, (2) complete controller-rendered required review template and status/findings consistency, including the plan-acceptance handoff stop, and (3) exact BLOCKED details, durable state, no proof/repair dispatch, and resume behavior. Inspect callers and status/readback/repair paths. Treat prior reports outside this candidate as historical, not current evidence.
+
+Before and after review, run this identity check from the candidate root:
+`/opt/homebrew/opt/python@3.14/bin/python3.14 skills/productivity/deliver-issue/scripts/p2p_filesystem.py --repo /Users/grove/projects/promise-to-proof/.p2p/tmp/p2p-delivery-review-report-contract-candidate-v5 validate work/delivery-review-report-contract.md --base d0467b7bbaed2078e7e677b6ce3be407d4fb2058`
+
+Do not edit or create files under the candidate root or source checkout. Run the tests with the candidate root as the working directory so they inspect the fixed files; set `TMPDIR=/private/tmp/p2p-delivery-report-contract-v5-review-scratch/.p2p/tmp`, `PYTHONPYCACHEPREFIX=/private/tmp/p2p-delivery-report-contract-v5-review-scratch/pycache`, and `PYTHONDONTWRITEBYTECODE=1` so temporary writes stay in scratch. Run focused review-behavior tests:
+`/opt/homebrew/opt/python@3.14/bin/python3.14 -m unittest checks.test_p2p_delivery.DeliveryTests.test_review_prompt_requires_substantive_observations checks.test_p2p_delivery.DeliveryTests.test_review_rejects_blank_observation checks.test_p2p_delivery.DeliveryTests.test_review_rejects_proof_verdict_at_receipt checks.test_p2p_delivery.DeliveryTests.test_review_rejects_unsupported_status checks.test_p2p_delivery.DeliveryTests.test_review_rejects_free_text_status_conflict checks.test_p2p_delivery.DeliveryTests.test_reviewed_report_cannot_contain_findings checks.test_p2p_delivery.DeliveryTests.test_success_source_preservation_and_retrieval checks.test_p2p_delivery.DeliveryTests.test_blocked_review_stops_before_proof_and_repair checks.test_p2p_delivery.DeliveryTests.test_plan_acceptance_handoff_stops_before_proof_and_repair -v`
+
+Return a review report using the skill's exact required sections and numbered `Next steps`, bound to these identities. Do not issue proof verdicts. If sound, return REVIEWED with no material findings; if not, provide evidence-based findings and the correct handoff. Include test output, limitations, and actual candidate stability. Never claim a command you did not run.
