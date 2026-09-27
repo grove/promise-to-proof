@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest.mock import patch
 
@@ -546,7 +547,7 @@ Pending actions: none.
             self.assertIn(expected,value['blocker'])
             self.assertEqual(self.fake.calls,[])
         state=self.state()
-        self.assertIsNone(state['limits']['dispatches'])
+        self.assertEqual(state['limits']['dispatches'],8)
         self.assertEqual(state['host']['cost'],'unknown')
 
     def test_persisted_scope_cannot_widen(self):
@@ -559,6 +560,150 @@ Pending actions: none.
         self.assertEqual(code,1)
         self.assertIn('persisted admission changed: limits',value['blocker'])
         self.assertEqual(self.fake.calls,[])
+
+    def test_finite_defaults_progress_and_read_only_status(self):
+        progress=io.StringIO()
+        with contextlib.redirect_stderr(progress):
+            code,value=self.cli()
+        self.assertEqual(code,0,value)
+        self.assertEqual(value['limits'],{'dispatches':8,'elapsed_seconds':1800,'stage_seconds':600})
+        self.assertIn('implementation started',progress.getvalue())
+        self.assertIn('proof finished',progress.getvalue())
+        self.assertEqual(value['progress']['stage'],'proof')
+        self.assertIsNotNone(value['progress']['last_activity_at'])
+        self.assertEqual(value['progress']['elapsed_seconds'],0.01)
+        before=(self.root/'.p2p/work/tiny/delivery.json').read_bytes()
+        self.assertEqual(self.cli('status')[0],0)
+        self.assertEqual(before,(self.root/'.p2p/work/tiny/delivery.json').read_bytes())
+
+    def test_stage_deadline_uses_smaller_remaining_allowance(self):
+        code,value=self.cli('run','--max-seconds','900','--max-stage-seconds','20')
+        self.assertEqual(code,0,value)
+        state=self.state()
+        for attempt in state['attempts']:
+            self.assertEqual(attempt['deadline'],attempt['started_epoch']+20)
+        self.assertTrue(all('Effective host deadline:' in prompt for _,prompt in self.fake.prompts))
+        original=state['deadline']
+        self.assertEqual(self.cli('resume')[0],0)
+        self.assertEqual(self.state()['deadline'],original)
+
+    def test_overall_deadline_caps_stage_and_interruption_does_not_repeat(self):
+        original=self.fake
+        def interrupted(*args):
+            result=original(*args)
+            result.update(exit_code=-15,outcome='interrupted')
+            args[2].write_text('')
+            return result
+        with patch.object(d,'launch',interrupted):
+            code,value=self.cli('run','--max-seconds','20','--max-stage-seconds','900')
+        self.assertEqual(code,1,value)
+        self.assertIn('elapsed-time limit',value['blocker'])
+        state=self.state()
+        self.assertEqual(state['attempts'][0]['deadline'],state['deadline'])
+        calls=len(self.fake.calls)
+        self.assertEqual(self.cli('resume')[0],1)
+        self.assertEqual(len(self.fake.calls),calls)
+
+    def test_invalid_stage_limits_never_admit(self):
+        for limit in ('-1','nan','inf'):
+            code,value=self.cli('run','--max-stage-seconds',limit)
+            self.assertEqual(code,1,value)
+            self.assertIn('finite and nonnegative',value['blocker'])
+            self.assertFalse((self.root/'.p2p/work/tiny/delivery.json').exists())
+
+    def test_zero_stage_limit_never_dispatches(self):
+        code,value=self.cli('run','--max-stage-seconds','0')
+        self.assertEqual(code,1,value)
+        self.assertIn('stage elapsed-time limit',value['blocker'])
+        self.assertEqual(self.fake.calls,[])
+
+    def test_unavailable_progress_does_not_hide_identity_blocker(self):
+        self.cli('run','--max-dispatches','0')
+        path=self.root/'.p2p/work/tiny/delivery.json'
+        state=self.state()
+        state['attempts']=[{'id':'pending','stage':'implementation','status':'reserved',
+                            'started_epoch':time.time(),'finished':None,'elapsed_seconds':'unknown'}]
+        path.write_bytes(d.encoded(state))
+        (self.root/'spec.txt').write_text('changed source')
+        original_open,original_stat=Path.open,Path.stat
+        def unavailable_open(path,*args,**kwargs):
+            if path.name=='delivery.lock':
+                raise PermissionError('fixture lock inaccessible')
+            return original_open(path,*args,**kwargs)
+        def unavailable_stat(path,*args,**kwargs):
+            if path.name in ('events.jsonl','stderr.txt'):
+                raise PermissionError('fixture logs inaccessible')
+            return original_stat(path,*args,**kwargs)
+        with patch.object(Path,'open',unavailable_open),patch.object(Path,'stat',unavailable_stat):
+            code,value=self.cli('status')
+        self.assertEqual(code,1,value)
+        self.assertIn('source checkout changed',value['blocker'])
+        self.assertIsNone(value['progress']['controller_running'])
+        self.assertIsNone(value['progress']['last_activity_at'])
+
+    def test_status_during_active_implementation_defers_candidate_check(self):
+        original=self.fake
+        observed=[]
+        def inspect(*args):
+            result=original(*args)
+            if self.fake.calls[-1]=='implementation':
+                path=self.root/'.p2p/work/tiny/delivery.json'
+                before=path.read_bytes()
+                code,value=self.cli('status')
+                self.assertEqual(code,1)
+                self.assertEqual(value['status'],'RUNNING',value)
+                self.assertTrue(value['progress']['controller_running'])
+                self.assertEqual(value['progress']['candidate_validation'],'pending active implementation or repair')
+                self.assertGreaterEqual(value['progress']['elapsed_seconds'],0)
+                self.assertEqual(before,path.read_bytes())
+                observed.append(value)
+            return result
+        with patch.object(d,'launch',inspect):
+            code,value=self.cli()
+        self.assertEqual(code,0,value)
+        self.assertEqual(len(observed),1)
+
+    def test_completed_legacy_admission_keeps_limits_on_readback(self):
+        self.assertEqual(self.cli()[0],0)
+        directory=self.root/'.p2p/work/tiny'
+        for name in ('delivery.json','admission.json'):
+            path=directory/name
+            state=json.loads(path.read_bytes())
+            state['limits']={'dispatches':None,'elapsed_seconds':None}
+            state['deadline']=None
+            for attempt in state.get('attempts',[]):
+                attempt.pop('deadline',None)
+            path.write_bytes(d.encoded(state))
+        before=(directory/'delivery.json').read_bytes()
+        self.assertEqual(self.cli('status')[0],0)
+        self.assertEqual(before,(directory/'delivery.json').read_bytes())
+        count=len(self.fake.calls)
+        self.assertEqual(self.cli('resume')[0],0)
+        self.assertEqual(len(self.fake.calls),count)
+        self.assertEqual(self.state()['limits'],{'dispatches':None,'elapsed_seconds':None})
+        self.assertIsNone(self.state()['deadline'])
+
+    def test_real_transport_timeout_and_heartbeat(self):
+        folder=Path(self.temp.name)
+        events,errors=folder/'events.jsonl',folder/'stderr.txt'
+        progress=io.StringIO()
+        # This invokes the actual transport, never the fixture host.
+        self.patch.stop()
+        started=time.monotonic()
+        marker=folder/'child-survived'
+        child='import pathlib,signal,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); print("child-ready",flush=True); time.sleep(0.8); pathlib.Path('+repr(str(marker))+').touch()'
+        command='import subprocess,sys,time; subprocess.Popen([sys.executable,"-c",'+repr(child)+']); print("activity",flush=True); time.sleep(10)'
+        with patch.object(d,'HEARTBEAT_SECONDS',0.03), contextlib.redirect_stderr(progress):
+            result=d.launch([sys.executable,'-c',command],
+                            '',events,errors,time.time()+0.3)
+        self.assertEqual(result['outcome'],'interrupted')
+        self.assertLess(time.monotonic()-started,3)
+        self.assertNotEqual(result['exit_code'],0)
+        self.assertIn('log activity',progress.getvalue())
+        self.assertIn('activity\n',events.read_text())
+        self.assertIn('child-ready\n',events.read_text())
+        time.sleep(0.9)
+        self.assertFalse(marker.exists(),'worker child survived process-group termination')
 
     def test_successful_repair_rereviews_and_reproves(self):
         self.fake.mode='repair'

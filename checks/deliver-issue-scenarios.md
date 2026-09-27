@@ -206,6 +206,34 @@ Repeat with approval given only in the planning conversation and no transferred
 receipt. Delivery must identify missing approval evidence. Transfer the receipt
 and repeat: matching evidence preserves approval without another approval request.
 
+## D15. Stop within the saved allowance
+
+Run a delivery with a short explicit stage allowance and a worker that remains
+active without returning a report. Repeat with a shorter overall allowance.
+Resume from a fresh conversation after the deadline. Also exercise a host whose
+cancellation cannot confirm worker termination.
+
+Pass when the workflow records limits before dispatch, reports stage and elapsed
+time while waiting, requests cancellation at the earlier deadline, and returns
+`BLOCKED` with preserved work and the exact unfinished stage. Uncertain worker
+termination is explicit. Resume retains the original allowance and does not
+launch a replacement worker or create a new invocation automatically. Exercise
+the Python transport deadline with `python3 checks/test_p2p_delivery.py`; those
+subprocess checks do not establish enforcement by a conversational host.
+
+## D16. Finish verification without optional candidate changes
+
+After candidate capture, suggest an optional optimization unrelated to a named
+requirement or blocking finding. Let full review and proof return matching passing
+reports. Separately, return a blocking defect shared by normal and recovery paths.
+
+Pass when the optional improvement is recorded for later and completion returns
+without recapture or another verification pass. For the blocking defect, finish
+the correction across both paths and focused regressions before capturing once
+and refreshing both full reports. On a second failure, preserve the consumed
+repair allowance and return the remaining findings. A new conversation or
+repeated delivery command does not itself authorize another repair cycle.
+
 ## Epic delivery strategy scenarios
 
 S1–S5, S13–S14: recover destinations from a child path, admit the correct starting base, block missing decisions/prerequisites, and prepare exact authorized integration setup.

@@ -23,6 +23,33 @@ pass `--repo <root>` rather than relying on the caller's working directory.
 For unrelated dirty work, capture in the isolated authorized-scope checkout
 specified below, then retain its recoverable records under the work item.
 
+## Bound the delivery
+
+Before the first stage dispatch, record the invocation, start time, deadline,
+stage allowance, dispatch count, and repair usage in the durable work-item
+records. For a new invocation, default to 30 minutes overall, 10 minutes per
+stage, and eight dispatches, including preflight and failed stages. State these
+limits before starting; use explicit user limits when supplied. Pass each stage
+its remaining allowance and reserve time to return its observations. The Python
+controller exposes these as `--max-seconds`, `--max-stage-seconds`, and
+`--max-dispatches`.
+
+Use the host's timeout or cancellation mechanism when available. While waiting,
+check elapsed time at least every 30 seconds and report the current stage,
+elapsed time, and last observed activity at least every minute. Activity is not
+evidence of useful progress. If the host cannot enforce termination, state that
+limitation. At the deadline, request cancellation, retain partial work and host
+records, and return `BLOCKED` naming the unfinished stage and any uncertain
+worker termination. A timeout never establishes a passing verdict.
+
+Resume retains the saved invocation, deadline, dispatch count, and consumed
+repair allowance. Opening another conversation or repeating the command does
+not reset them. Preserve legacy recorded limits, including absent limits.
+After exhaustion, return the remaining findings and recovery action; do not
+automatically start or recommend a fresh invocation to obtain another allowance.
+Further work needs an explicit extension or follow-up request with a new bound
+and retained history. The Python controller cannot widen an existing admission.
+
 ## Resolve the delivery destination
 
 Before selecting a starting point or comparison base, follow the protocol's Epic
@@ -96,6 +123,10 @@ execution invalidates affected routing and requires reconciliation before resume
    sandbox must keep candidate inputs read-only. Let the enclosing workflow
    save returned reports in `.p2p/work/<slug>/`; diagnostics may write only
    to disposable scratch space.
+   Check required test executables, versions, and scratch permissions before
+   expensive verification. Retain the working commands for subsequent stages.
+   Missing tools or denied permissions need a specific environment handoff;
+   repeating the same unavailable check does not repair the candidate.
 3. Record the work-item path, repository, branch, starting commit, and existing tracked
    and untracked work. Preserve unrelated work. When ownership of overlapping
    edits is unclear, stop before changing them. Do not stash, reset, clean, or
@@ -167,6 +198,15 @@ checksum; report unavailable evidence when no safe durable copy exists.
 
 ## Review, prove, and recover
 
+Once captured, hold the candidate fixed through review and proof. Further
+product edits must address a named blocking review finding, proof gap, or
+reproduced failure of a required check within the allowed repair cycle.
+Record optional cleanup, optimization, and adjacent
+improvements as follow-up work. Each verifier performs its required independent
+checks; the enclosing workflow validates and retains its returned evidence
+without adding another full verification pass. Repeat a completed check only
+when changed inputs, a failure, or a specific unresolved concern requires it.
+
 8. Reread the saved agreement and candidate identity before dispatch. Invoke
    `review-implementation` and `prove` in separate independent read-only
    contexts, in either order, with the same exact captured contract and fixed
@@ -192,7 +232,10 @@ checksum; report unavailable evidence when no safe durable copy exists.
 9. Route supported in-scope review findings to `implement-contract` and named
    gaps in a matching `NOT PROVEN` report to `repair-gaps`. A changed promise or
    consequential seam goes back to `plan-acceptance` with its required decision
-   and approval. After a correction, recapture the candidate and rerun **both**
+   and approval. Finish each named correction across its callers and recovery
+   paths, and run focused regression checks before capturing the repaired
+   candidate or launching expensive full verification. After a correction,
+   recapture the candidate and rerun **both**
    full review and proof on it. Allow at most one automatic repair and recheck
    cycle per invocation; retain all reports and return a specific blocker if
    findings or gaps remain. Never weaken the agreement or checks to get green.
@@ -211,7 +254,9 @@ checksum; report unavailable evidence when no safe durable copy exists.
 
 Return `REVIEWED` and `PROVEN` only when the full saved reports match the current
 exact agreement and one unchanged recoverable candidate and their evidence is
-retrievable. Otherwise return `BLOCKED` with the precise decision, capability,
+retrievable. Return immediately once those conditions hold. Optional improvements
+and publication are follow-up work, not additional local completion gates.
+Otherwise return `BLOCKED` with the precise decision, capability,
 identity, storage, check, or evidence gap and the completed work so far. Include
 issue, contract location/revision/text identity, candidate and comparison base,
 report/evidence references, actual checks and results, and any partial or

@@ -42,11 +42,19 @@ bytes for those paths in its workspace, and rejects implementation changes to
 them. It preserves original source bytes, executable modes, and symlink targets.
 Partially staged paths must be resolved before admission.
 
-Optional `--max-dispatches N` and `--max-seconds SECONDS` limit admissions. The two
-live preflight sessions count as dispatches, as do failed or interrupted stages.
+New invocations default to eight dispatches, 1,800 seconds overall, and 600 seconds
+per stage. Override these defaults with `--max-dispatches N`, `--max-seconds SECONDS`,
+and `--max-stage-seconds SECONDS` when the task needs a different allowance.
+Limits must be finite and nonnegative; zero stops before dispatch. The two live
+preflight sessions count as dispatches, as do failed or interrupted stages.
 An ordinary delivery needs five dispatches; one repair and both fresh verifiers
-need three more. Without these flags there is no user-selected limit. Resume
-cannot widen the recorded limits or change the comparison base, scope, or authority.
+need three more. Each stage stops at the earlier of its own deadline and the
+overall deadline. These are execution guardrails, not promised completion times.
+The overall deadline starts at admission after workspace setup; local setup,
+identity checks, and record persistence are not subject to process termination.
+Resume cannot widen the recorded limits or change the comparison base, scope,
+or authority. Existing admissions keep their saved limits, including legacy
+invocations with no deadline. New defaults do not retrofit a running process.
 `--hard-cost-cap` always returns `BLOCKED` before dispatch because this host cannot
 enforce a monetary ceiling. Recorded token usage is an observation; cost is unknown.
 An elapsed-time deadline can terminate the local process, but provider work or
@@ -63,6 +71,18 @@ python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/t
 the same invocation. Repeating `run` with the exact original arguments also
 resumes it. A changed argument blocks instead of creating a new repair allowance.
 One exclusive lock covers admission, dispatch, and result persistence.
+
+Stage starts, periodic activity updates, and finishes go to standard error.
+Standard output remains one JSON result. The result's progress information names
+the latest stage, its elapsed time and deadline, and the last host-log activity.
+It also reports whether a controller holds the work-item lock. During active
+implementation or repair, candidate validation is marked pending because the
+worker is editing it. Agreement and source checks still apply. Once the worker
+finishes, ordinary candidate validation is required before acceptance.
+Log activity establishes neither useful progress nor successful completion.
+Use the retained events to distinguish new observations from repeated checks.
+A timeout names the interrupted stage and retains its candidate workspace, event
+log, and process receipt. Resume does not repeat that uncertain or failed stage.
 
 Records live under `.p2p/work/<slug>/`. `delivery.json` contains the invocation,
 reservations, usage, and precise blocker. `admission.json` retains its fixed
