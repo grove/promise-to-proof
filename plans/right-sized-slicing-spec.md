@@ -1,379 +1,774 @@
-# Proposal: Choose the delivery shape and minimize child issues
+# Proposal: Self-routing, right-sized, adaptively refinable delivery
 
-**Status:** Proposed specification, version 2.0 — not an approved acceptance contract.  
+**Status:** Proposed specification, version 3.0 — not an approved acceptance contract.  
 **Date:** 27 September 2026.  
 **Repository location:** Replace `plans/right-sized-slicing-spec.md`.  
-**Supersedes:** Version 1.0, “Fewer, right-sized child issues,” in that same file.  
-**Inspected baseline:** `grove/promise-to-proof` at commit `bac5aa15345514416f3f7244f48c88c4edd7daa1`.  
+**Supersedes:** Version 2.0, “Choose the delivery shape and minimize child issues.”  
+**Inspected baseline:** `grove/promise-to-proof` `main` at `357bf61992d960d60014c6531152330021847139`.  
 **Execution status:** Specification only. Implementation and behavioral validation have not been performed.
 
 ## 1. Objective
 
-Make Promise to Proof recommend the right delivery shape without requiring the developer to decide whether slicing is necessary:
+Make Promise to Proof choose and maintain sensible delivery-unit boundaries without requiring the developer to predict the workflow shape in advance.
 
-> **Deliver the work directly when it is clearly manageable. Otherwise inspect it through `slice-contract`, and create the fewest children that remain coherent and realistically deliverable.**
+The user should supply the work, resolve product decisions, and approve consequential changes. P2P should decide whether the current work item should move forward directly, be inspected for slicing, or be re-sliced when later evidence shows that an earlier boundary was wrong.
 
-This is one feature with two decisions. `plan-acceptance` makes a lightweight routing judgment using the contract and context it has inspected. `slice-contract`, only when warranted, makes the deeper decision about whether and how to split.
+The governing rule is:
 
-Every additional child must earn the overhead of a separate delivery cycle. Prefer combining related work; split only when the combined work would be materially harder to implement, review, or prove, or would violate a binding constraint. This applies to canonical local child work items as well as optional GitHub issues. Hiding multiple local delivery units behind one tracker issue is not a reduction.
+> **Use the fewest delivery units that can still be delivered reliably. Right-size before delivery when possible; re-size locally when evidence proves a boundary wrong.**
 
-### Decision priority
+Every additional child pays for another acceptance-planning and delivery cycle, including implementation context, independent review, proof, durable handoffs, and eventual parent verification. Therefore prefer fewer children. Split only when another boundary materially improves deliverability, verification, compatibility, recovery, or another binding constraint.
 
-Preserve the full agreement and safety rules first. Require coherent, manageable delivery units second. Among alternatives meeting those conditions, prefer fewer children; at equal child count, prefer less duplicated context, verification setup, and coordination.
+This proposal has three connected goals:
 
-If the whole work item is manageable, deliver it directly. `slice-contract` may return `NO SPLIT`; it must not create one child that merely restates the parent. Neither stage must claim a mathematically optimal partition or predict successful delivery with certainty.
+1. **Self-routing:** `plan-acceptance` recommends direct delivery or deeper sizing inspection so the user does not need to know whether to invoke `slice-contract`.
+2. **Right-sizing on the first attempt:** `slice-contract` produces the smallest defensible decomposition before creating children.
+3. **Adaptive refinement:** if actual delivery later reveals an outlier child that is materially too broad, re-slice only that affected work item while preserving the rest of the tree and all prior work.
 
-“First complete proposal” means the slicer inspects and refines boundaries within the original invocation, before presenting the finished breakdown or creating children. It does not mean accepting the first grouping considered, banning later evidence-based changes, or requiring another audit or user-operated correction loop.
+The goal is not perfect effort prediction or a mathematically optimal partition. It is a grounded engineering judgment that reduces avoidable delivery overhead while keeping work tractable.
 
-## 2. Workflow and ownership
+## 2. Core principles
 
-The normal flow is:
+### 2.1 Minimize child count subject to reliable delivery
+
+The optimization order is:
+
+1. Preserve the complete agreement, safety constraints, authority, and verification requirements.
+2. Keep each leaf work item coherent and realistically deliverable.
+3. Among decompositions satisfying 1–2, choose fewer children.
+4. At equal child count, prefer less duplicated context, setup, proof work, coordination, and integration burden.
+
+Do not split merely because requirements, files, layers, tests, actors, or UI/API surfaces can be named separately.
+
+### 2.2 Delivery difficulty is not the same as delivery size
+
+A difficult algorithm, tricky concurrency defect, or stubborn proof gap may still be one coherent delivery unit. Re-slicing must not become an escape hatch from hard implementation, failed tests, review findings, or a failed proof.
+
+Create a new boundary only when evidence shows a useful separable unit whose isolation makes delivery materially more manageable.
+
+### 2.3 Decomposition is revisable planning, not a promise rewrite
+
+Changing how an unchanged promise is divided changes the decomposition, not the promise itself. `plan-acceptance` remains the sole owner of acceptance-contract revisions. A changed product outcome, boundary, exclusion, or consequential seam still returns to acceptance planning.
+
+### 2.4 Correction should be local
+
+When one child turns out to be oversized, reconsider that child and the smallest affected subtree. Do not reopen unaffected siblings or recreate the whole epic unless the new evidence actually changes their contribution, prerequisites, or agreement.
+
+### 2.5 The workflow should tell the user what to do next
+
+Every relevant stage should identify one immediate next workflow action from current evidence. The user should not be asked to choose between `deliver-issue`, `slice-contract`, or re-slicing based on internal P2P mechanics.
+
+Routing advice does not grant approval or external write authority.
+
+## 3. Terminology
+
+**Delivery cycle**  
+The existing work-item workflow: acceptance planning as needed, implementation, candidate capture, independent review, independent proof, durable evidence, and any permitted repair/recheck. Publication and merge readiness remain separate.
+
+**Leaf work item**  
+A work item with no active child decomposition. It is eligible for direct implementation/delivery when its other gates are satisfied.
+
+**Parent work item**  
+A work item with an active approved decomposition into children. Its own contract and contribution remain authoritative, but implementation proceeds through its descendants plus any explicitly assigned integration work. Child proofs do not establish parent acceptance.
+
+**Sizing inspection**  
+The deeper inspection performed by `slice-contract` to decide `NO SPLIT` versus decomposition and, when decomposed, the smallest defensible boundaries.
+
+**Sizing signal**  
+Concrete evidence discovered after initial planning that could change whether the current work item is a viable leaf—for example, two substantially different recovery mechanisms whose implementation and verification are independently bounded. “This is hard” is not a sufficient sizing signal.
+
+**Re-slicing**  
+Running `slice-contract` on an existing work item whose current decomposition or leaf status is being reconsidered from new evidence.
+
+**Affected subtree**  
+The smallest work-item hierarchy whose contribution, prerequisites, routing, or work allocation must change because of a re-slice.
+
+## 4. Workflow and ownership
+
+The normal path is:
 
 ```text
-create-parent-issue (optional source publication)
+create-parent-issue (optional)
     → plan-acceptance
-        → clearly manageable: direct delivery after required approval/gates
+        → clearly manageable: deliver-issue
         → too broad or materially uncertain: slice-contract
-            → NO SPLIT: direct delivery after required approval/gates
-            → decomposition: approve the necessary planning decisions,
-               establish child contracts, and deliver ready children
+            → NO SPLIT: deliver-issue
+            → split: plan children → deliver ready children → parent completion
 ```
 
-These arrows are handoffs, not automatic calls. Stage skills do not invoke each other merely because the next step appears in a report. An already authorized enclosing `deliver-issue` workflow retains its existing orchestration responsibilities.
-
-| Owner | Responsibility in this feature | Not its responsibility |
-|---|---|---|
-| `create-parent-issue` | Preserve the source and give the existing `plan-acceptance` handoff. | Decide child count, author contracts, or determine implementation readiness. |
-| `plan-acceptance` | Establish the contract, assess whether direct delivery is clearly manageable, and recommend the next action. | Produce candidate children, a dependency graph, or a detailed decomposition. |
-| `slice-contract` | Inspect sizing in depth; return `NO SPLIT` or the smallest defensible decomposition. | Author acceptance-contract revisions or waive approvals. |
-| `deliver-issue` | Deliver one ready work item and retain its guard against oversized or unresolved work. | Automatically split a parent or recursively restart itself. |
-
-At the inspected baseline, `plan-acceptance` recommends delivery for an approved issue handoff, or implementation for a local contract, without an explicit delivery-shape decision. Its contract template also contains an unconditional implementation handoff. Both surfaces must be aligned with the proposed routing behavior. [S8]
-
-The existing slicer already prefers few useful, outcome-oriented children. Existing `create-parent-issue`, contract ownership, local-first storage, and delivery authority rules remain the foundation of this change. [S1] [S2] [S3]
-
-A **delivery cycle** is the existing work-item workflow: implementation, candidate capture, independent review, independent proof, durable evidence, and any permitted repair/recheck. It is not one agent context, a guaranteed uninterrupted run, or a promise to finish without a blocker. Publication and merge readiness remain separate. Verification obligations and the repair limit do not change. [S4] [S5]
-
-A **delivery-shape recommendation** chooses direct delivery versus sizing inspection. It is not the **approved delivery plan** that chooses final or integration-branch destinations. Keep these concepts, records, and authority separate. A child may have real prerequisites or an approved grouped destination; neither excuses an oversized child or incomplete verification. [S3]
-
-The R identifiers below are proposed source requirements, not approved acceptance rows. R1–R8 retain their version 1.0 identities; R9–R12 add routing and handoff behavior. They appear in workflow order rather than numeric order.
-
-## 3. Choose whether to slice
-
-### R9. Perform a lightweight delivery-shape assessment
-
-After forming the complete proposed contract and before issuing its next-step recommendation, `plan-acceptance` asks:
-
-> Can this complete work item reasonably be implemented, independently reviewed, and proven as one bounded delivery unit?
-
-Reuse the source, relevant implementation, interfaces, evidence plans, constraints, and applicable history already inspected during acceptance planning. Do only additional focused inspection that could change the route. Do not run delivery, probe host isolation, design child boundaries, or perform an exhaustive sizing exercise here.
-
-| Assessment | Recommendation | Explanation required |
-|---|---|---|
-| Clearly coherent and manageable | Direct delivery | Name the bounded outcome and implementation/evidence context that make a single delivery plausible. |
-| Clearly too broad | Sizing inspection | Name the substantial mechanisms, interactions, uncertainty, or verification burden that make direct delivery unsuitable. |
-| Materially uncertain whether it fits | Sizing inspection | Name the specific sizing question deeper inspection must resolve. |
-
-Recommend direct delivery only when the inspected evidence supports it. However, ordinary implementation unknowns, several acceptance rows, or the absence of historical measurements are not sufficient reasons to send every work item through slicing. An uncertainty is material here when resolving it could reasonably change the direct-versus-sliced decision.
-
-Use the dimensions in R3 without turning them into scores, thresholds, or time estimates. Several closely related behaviors may form one outcome. Conversely, a short contract can conceal substantial recovery or concurrency work.
-
-Keep outcome decisions separate from sizing uncertainty. An unresolved promise must be resolved through acceptance planning; slicing is not a way to guess it. Missing permissions, unavailable hosts, and unmet prerequisites are readiness or execution blockers, not evidence that the work needs more children.
-
-### R10. Give one clear next action while preserving gates
-
-For an ordinary unsliced work item, present the recommendation, a short grounded reason, and the exact next command once its preconditions are satisfied.
-
-For direct delivery, the normal standalone handoff becomes `/deliver-issue work/<slug>.md`. A published issue reference may be used when the existing issue-only handoff is actually recoverable. An explicitly chosen manual implementation/review/proof workflow remains supported; this change does not remove `/implement-contract`. [S4] [S8]
-
-For sizing inspection, give `/slice-contract work/<slug>.md`. Do not present direct delivery as an equally recommended alternative for a work item already judged too broad or materially uncertain. The slicer remains free to return `NO SPLIT` after deeper inspection.
-
-A recommendation is not approval, a readiness label, execution authority, or a verification result. If contract storage, required approval, or an outcome decision is pending, name that as the immediate next action and make the subsequent command conditional. Preserve existing handling of evidence-plan gaps: a missing credible seam or oracle remains visible, while merely needing to implement a known harness does not itself require another ticket. Preliminary sizing may proceed only where current authority and the state of the agreement allow it.
-
-Update both the final `Next steps:` guidance and the contract template's generic implementation-handoff prose. The template must no longer unconditionally direct every completed contract to implementation. Keep the selected route outside the acceptance matrix, and do not rewrite an already approved contract just to change routing advice.
-
-For a saved, approved, unblocked contract, example outputs are:
+If later evidence shows a leaf is oversized:
 
 ```text
-Delivery shape: Direct delivery.
-Reason: One bounded update through the existing report-writing path,
-with a credible public-interface evidence plan.
-Next: /deliver-issue work/save-report.md
+... → deliver-issue work/C.md
+        → concrete sizing signal
+        → BLOCKED with /slice-contract work/C.md
+            → NO SPLIT: resume work/C.md with the concrete disagreement resolved
+            → split: C becomes a parent; create C1..Cn; unaffected siblings continue
 ```
+
+The hierarchy may therefore evolve from:
 
 ```text
-Delivery shape: Sizing inspection.
-Reason: This combines server recovery and a browser offline queue;
-their state and proof burden need deeper inspection before delivery.
-Next: /slice-contract work/retry-safe-uploads.md
+Parent
+├── A
+├── B
+└── C
 ```
 
-When approval is pending, the immediate next action instead identifies the exact proposal needing approval. Do not claim that the displayed later command is already authorized.
+to:
 
-### R11. Retain the recommendation without changing the contract
+```text
+Parent
+├── A
+├── B
+└── C
+    ├── C1
+    └── C2
+```
 
-Save a short advisory report at `.p2p/work/<slug>/delivery-shape.md`, using existing filesystem resolution, history-preserving save, and readback conventions. No new helper command, database, configuration, or acceptance state is required.
+`C` continues to represent the same contribution to `Parent`. `C1` and `C2` explain how that contribution will be delivered.
 
-The report records the work-item path, exact contract revision and hash, relevant binding-input identities, recommendation and reason, inspected context references, material assumptions, applicable earlier slicing result, and next action with outstanding gates. Record code/history references only as needed to support the judgment; this is not a product-candidate snapshot or a second contract.
+| Owner | Responsibility | Must not do |
+|---|---|---|
+| `create-parent-issue` | Preserve one originating source issue and hand off to acceptance planning. | Size work or create children. |
+| `plan-acceptance` | Author the contract and make a lightweight direct-vs-sizing recommendation. | Design child boundaries. |
+| `slice-contract` | Perform sizing inspection, initial decomposition, and authorized local re-slicing. | Rewrite acceptance promises or treat hard work as evidence for arbitrary fragmentation. |
+| `implement-contract` | Implement one leaf contribution; preserve partial work and report a grounded sizing concern when implementation exposes one. | Create children or silently redefine scope. |
+| `deliver-issue` | Coordinate one ready leaf, consume routing/decomposition state, and stop with a precise sizing handoff when a leaf is no longer defensible. | Automatically create children, retry routing indefinitely, or use slicing to avoid a defect. |
+| `review-implementation` / `prove` | Provide implementation and acceptance evidence. Their findings may become sizing evidence for the enclosing workflow. | Own decomposition or transform a failed verdict into a split by themselves. |
 
-Keep the report compact. Do not expose internal deliberation, duplicate the acceptance matrix, or calculate a numerical sizing score. An unchanged recommendation on unchanged inputs should reuse the report rather than manufacture history churn. If saving is unavailable, report storage pending and hand off the exact report to the authorized enclosing workflow; do not claim durable storage.
+Stage skills remain separate. This proposal improves handoffs and routing; it does not introduce automatic recursive slash-command invocation.
 
-Include the concise recommendation outside the exact contract block when publishing an authorized new standalone planning handoff. Preserve approved contract bytes, existing comments, and publication/readback rules. Do not post an extra tracker comment solely to refresh routine routing advice; a local-only or draft-only invocation remains local. [S9]
+## 5. Existing requirements retained from version 2
 
-Given only the work-item path, a later session can find this report and any applicable `slicing.md`. Check applicability before reuse: a matching revision label alone is insufficient. Changed scope, binding inputs, or consequential implementation facts require reassessment, not blind replay. A recommendation-only change does not revise acceptance promises. Existing candidate, agreement, and proof invalidation rules remain unchanged.
+R1–R12 retain their version 2 identities and intent. This version restates them so it is a complete replacement specification.
 
-This report is advisory, not a new delivery-admission requirement. Missing or unsaved routing advice is a reporting limitation, not by itself a reason to block otherwise valid delivery; missing required agreement or evidence still blocks under existing rules. Older approved work without the report remains usable, subject to the existing contract and delivery checks.
+### R1. Inspect enough context to make a grounded sizing judgment
 
-### R12. Avoid repeated routing, recursive delivery, and accidental re-slicing
+`slice-contract` reads the source, canonical agreement, existing decomposition, repository instructions, relevant implementation paths, interfaces, state transitions, tests, evidence facilities, and applicable retained history that could materially change a boundary decision.
 
-**After `NO SPLIT`.** When a canonical work item exists, the slicer saves and rereads its result, exact agreement identity, relevant inspected context, and direct-delivery rationale in the existing `slicing.md`. A fresh planner or delivery session must consider that deeper finding before repeating the same routing judgment. Do not send unchanged work back to slicing solely because an earlier lightweight assessment was uncertain.
+Use relevant prior delivery observations as evidence, with attribution. Do not infer that a prior failure was caused by ticket size merely because it occurred. Missing history is not a blocker.
 
-`NO SPLIT` does not grant approval or remove unrelated blockers. With an approved, saved contract and no blocking gaps, the slicer's normal handoff becomes `/deliver-issue work/<slug>.md`. Without a contract, retain the existing acceptance-planning handoff. Do not create a wrapper child or an approved branch-destination plan just to record `NO SPLIT`.
-
-**Conflicting assessments.** A current `NO SPLIT` result informs delivery but does not override its safety guard. If delivery still rejects the scope, it must identify a concrete omitted burden, changed fact, or unresolved disagreement and give a focused reconciliation handoff. It must not repeat a generic “too large” message in an endless plan/slice/deliver loop. No additional automatic calls or retry cycles are introduced.
-
-**Planning inside delivery.** If an existing `deliver-issue` invocation calls `plan-acceptance` and the result recommends direct delivery, the enclosing invocation continues under its existing gates; it does not launch another `deliver-issue`. If planning establishes that sizing inspection is needed, retain the contract and recommendation and return a precise blocker before implementation. Do not automatically invoke slicing or create children. If no established contract exists at an earlier delivery guard, retain the existing planning-first handoff rather than sending the slicer an invented agreement.
-
-**Existing children and parents.** Planning a child assesses only its precise contribution and inherited constraints, not unrelated sibling outcomes. A manageable child follows its existing plan. A newly exposed oversized child returns to reconciliation of that decomposition with a concrete reason; it does not automatically gain grandchildren. Planning an already sliced parent preserves its applicable approved child plan and completion workflow rather than recommending delivery of the entire original scope as new work. A final parent review/proof handoff is not a new decomposition request. Material scope changes and authorized re-slicing follow R8.
-
-Missing downstream packages produce an honest installation/handoff message, not a false completion claim or a new mandatory dependency for standalone planning or slicing.
-
-## 4. Produce the fewest right-sized children
-
-### R1. Inspect enough context to make a grounded judgment
-
-Read the source, parent agreement when present, existing decomposition, and relevant repository instructions. Preserve the existing `NO SPLIT` path for a clearly small source without manufacturing a contract; a complete decomposition still requires an established parent agreement. Inspect the implementation paths, interfaces, state changes, tests, and evidence facilities that materially affect candidate boundaries.
-
-Use relevant, retrievable delivery history and applicable accepted advisory learnings when available: for example, a linked earlier work item with similar implementation or proof difficulties. Advice remains nonbinding and must not add unsupported requirements. [S8] Distinguish observed facts from an interpretation of why a delivery succeeded or failed. A repair or failed test alone is not evidence that the child was too large.
-
-Do not scan unrelated history, invent past experience, or require an experience-recording feature. When history is absent, use current evidence and identify material assumptions. Inspection should stop when additional investigation is unlikely to change the boundaries; sizing must not turn into implementation or an exhaustive architecture study.
+Stop when additional inspection is unlikely to change the proposed boundaries. Sizing must not become implementation or an exhaustive architecture exercise.
 
 ### R2. Start with the broadest plausible grouping
 
-First consider whether the parent can remain unsliced. Otherwise propose a small number of broad, coherent contributions rather than generating a ticket for each requirement and merging them afterward.
+First consider whether the entire work item should remain one leaf. Otherwise start from a small number of broad, coherent contributions.
 
-A coherent contribution can contain several closely related behaviors. Validation, persistence, authorization, failure handling, tests, and necessary documentation may all belong to the same outcome.
+Do not create one ticket per requirement, file, layer, test, subsystem label, or available agent and then call that the natural decomposition.
 
-Separate requirement IDs, files, software layers, actors, or test cases are not reasons to create separate children. Neither a suggested ticket list nor the number of available agents establishes the appropriate count. An existing approved plan is handled under R8, not silently replaced.
+Related validation, persistence, authorization, failure behavior, tests, migration steps, and necessary documentation normally stay with the outcome they establish.
 
 ### R3. Assess the full delivery burden
 
-For each candidate child, consider these questions together:
+For every candidate leaf, consider these dimensions together:
 
 | Dimension | Question |
 |---|---|
-| Outcome | Does this form one understandable contribution rather than a bundle of unrelated changes? |
-| Implementation context | Can the relevant mechanisms and interactions be understood and changed as one bounded piece of work? |
-| Uncertainty | Are remaining unknowns routine implementation choices, or decisions likely to change the scope or approach substantially? |
-| Prerequisites and compatibility | Are dependencies explicit, and are transition states and inherited constraints manageable? |
-| Review and proof | Can independent reviewers and verifiers establish the complete child outcome using a bounded, credible evidence approach? |
-| Added-cycle overhead | Would separating this work duplicate substantial context, setup, review, proof, or handoff work? |
+| Outcome coherence | Is this one understandable contribution rather than unrelated changes bundled together? |
+| Implementation context | Can the relevant mechanisms and interactions be understood and changed as one bounded unit? |
+| Uncertainty | Are unknowns ordinary implementation choices, or do they materially threaten the boundary? |
+| Prerequisites / compatibility | Are dependencies, transition states, and inherited constraints tractable? |
+| Review and proof | Can independent review and proof establish this outcome with a bounded credible evidence approach? |
+| Extra-cycle overhead | Would another child duplicate significant context, setup, proof, handoff, or integration work? |
 
-Support consequential judgments with inspected facts. “Large,” “complex,” “agent-sized,” or “fits one session” alone are not sufficient explanations.
+Support consequential judgments with inspected facts. Do not use scores, story points, file counts, requirement counts, token counts, or fixed time limits as substitutes for reasoning.
 
-Do not turn these dimensions into scores, story points, fixed time budgets, requirement limits, file-count thresholds, or model-token arithmetic. A broad mechanical edit can be easier than a small change to a concurrency invariant. Reading the parent to recover inherited constraints is required context, not itself evidence of oversizing.
+### R4. Challenge additional boundaries with a merge test
 
-### R4. Challenge every plausible additional boundary with a merge test
-
-Before presenting the breakdown, examine related children and plausible groups of children—not only neighbors in the display order. Prioritize groups sharing a production path, state transition, evidence setup, or tightly coupled prerequisite.
+Before presenting a decomposition, examine related children and plausible groups, including non-adjacent ones.
 
 Ask:
 
-> Could these be delivered together without materially compromising coherence, manageability, verification, or a binding constraint?
+> Could these be one delivery unit without materially compromising coherence, manageability, verification, compatibility, or another binding constraint?
 
-When the answer is yes, combine them. The fact that two behaviors can be named or tested separately does not by itself justify paying for two delivery cycles.
+If yes, merge them before presenting the first complete proposal.
 
-When retaining a boundary, name the concrete reason and supporting context: for example, substantially different recovery mechanisms, a necessary compatibility transition, or an independently bounded verification problem that would otherwise overload the combined work.
-
-A small child is permitted when its separation is necessary. An evidenced enabling step or required migration stage must not be merged merely to improve the count. Conversely, generic statements about parallelism, cleanliness, or possible independent value are not enough to create another child.
+When retaining a boundary, name the concrete reason it earns another delivery cycle. Generic parallelism, cleanliness, organizational ownership, or the ability to test things separately are not enough by themselves.
 
 ### R5. Split only to solve an identified delivery problem
 
-When a candidate is too broad, identify the source of the burden before dividing it. State what becomes simpler to implement, review, or prove after the split, and why the remaining children are still complete contributions.
+When a candidate is too broad, identify the actual burden first. Explain what becomes materially easier to implement, review, prove, recover, or migrate after the split.
 
-Choose the least additional fragmentation that resolves the problem. Do not split all remaining candidates merely because one needed division. Reassess the resulting children and their plausible merges before finalizing.
+Choose the least additional fragmentation that resolves that burden, then re-run the merge test on the resulting children.
 
-Keep ordinary tests, failure handling, security boundaries, compatibility behavior, and necessary documentation with the behavior they establish. Preserve justified preparatory work and migration exceptions under the existing protocol. Do not create a standalone proof or integration ticket for ordinary workflow bookkeeping; assign actual integration work where it belongs.
+If the underlying work is simply difficult but not usefully separable, keep it intact and expose the actual blocker rather than generating artificial sub-tickets.
 
-If a difficult outcome has no defensible split, do not invent layer tickets or label it manageable without evidence. Identify the missing decision or concrete feasibility question through the existing draft/blocker handoff. A normal implementation unknown or missing test harness is not automatically such a blocker.
+### R6. Finish sizing before creating the child set
 
-### R6. Finish the sizing judgment before creating children
+The first complete proposal must already reflect the merge and split checks. Do not rely on the user to notice over-slicing or under-slicing after the proposed children are created.
 
-Before the first complete proposal, establish that every child has a credible full-delivery approach, every retained boundary has a material reason, no obvious feasible merge remains, and all parent promises and shared constraints are allocated.
+Before creation, establish that every proposed leaf has a credible delivery approach, every retained boundary has a material reason, no obvious feasible merge remains, and all parent obligations and shared constraints are accounted for.
 
-This is reasoning inside `slice-contract`, not another slash command, mandatory audit, delegated review, or user-operated iteration loop. Evaluate plausible alternatives without enumerating every possible partition. Stop when the remaining decisions are defensible or a material blocker is identified.
+### R7. Retain a concise sizing rationale
 
-Outcome-defining ambiguity must not be concealed by choosing either one oversized child or many speculative children. Route changed promises and unresolved agreement decisions through `plan-acceptance` as today. A clear outcome with missing evidence tooling normally keeps that tooling in the necessary implementation work. [S1]
+Store a `## Sizing rationale` in `.p2p/work/<parent>/slicing.md`, outside the exact `## Approved delivery plan` byte range.
 
-### R7. Save a short, evidence-backed sizing rationale
+Record:
 
-Add a `## Sizing rationale` section to the existing `.p2p/work/<parent>/slicing.md`. Keep it outside the `## Approved delivery plan` section, preferably before it, without altering the approved section’s exact bytes or the machine-consumed routing format. The current protocol binds that approved section by its exact bytes. [S3]
+- why the parent is or is not kept whole;
+- why each proposed leaf is manageable;
+- why the strongest plausible merges were rejected;
+- relevant implementation/evidence references;
+- material assumptions or unknowns.
 
-The rationale should explain why an unsliced parent is or is not appropriate, why each child is manageable, why plausible merges were rejected, and which material assumptions remain. Use concise decision summaries and source references, not a transcript of internal deliberation.
+This is a decision summary, not chain-of-thought, another acceptance contract, or a numeric score.
 
-For example:
+For `NO SPLIT`, retain the direct-delivery reason and exact agreement identity without manufacturing a child or delivery plan.
 
-```markdown
-## Sizing rationale
+### R8. Preserve authority, history, and downstream semantics
 
-Decision: Keep S1 and S2 separate.
-Unsplit alternative: Would combine server-side retry persistence with a new
-browser offline queue, each requiring different recovery-state verification.
+New sizing behavior does not invalidate approved legacy plans merely because they lack new rationale fields.
 
-| Slice | Why manageable | Why keep this boundary? |
-|---|---|---|
-| S1 | Existing upload path; bounded persistence and restart checks. | Server recovery can be established before the new browser state machine. |
-| S2 | One browser retry flow using S1's confirmed behavior. | Combining both recovery mechanisms would broaden implementation and proof substantially. |
+Material allocation changes follow existing approval rules. External issue, relationship, branch, PR, label, or publication effects retain their own authority and readback requirements.
 
-Evidence: <inspected implementation, checks, and applicable history references>.
-Assumptions: <material assumptions, or none identified>.
+Preserve work-item identities, human edits, agreement history, completed work, routing history, and exact report meaning. Regrouping unchanged promises does not silently revise the parent acceptance contract.
+
+Full parent verification remains required on one exact assembled candidate. Historical child proof never composes into a parent verdict.
+
+### R9. `plan-acceptance` performs a lightweight delivery-shape assessment
+
+After building the proposed contract, `plan-acceptance` asks:
+
+> Can this complete work item reasonably be implemented, independently reviewed, and proven as one bounded delivery unit?
+
+Use context already inspected for acceptance planning plus only focused additional inspection that could change the route.
+
+Return one advisory result:
+
+| Assessment | Route |
+|---|---|
+| Clearly coherent and manageable | Direct delivery |
+| Clearly too broad | Sizing inspection |
+| Materially uncertain whether it fits | Sizing inspection |
+
+Ordinary implementation unknowns, several acceptance rows, missing historical measurements, or a difficult algorithm do not by themselves trigger slicing.
+
+An unresolved product outcome remains an acceptance-planning question, not a sizing question.
+
+### R10. Give one clear immediate next action
+
+For a saved, approved, unblocked unsliced work item:
+
+- direct route → `/deliver-issue work/<slug>.md`;
+- sizing route → `/slice-contract work/<slug>.md`.
+
+If approval, storage, an outcome decision, or another gate is pending, that gate is the immediate next action. The later route may be stated conditionally, but do not present multiple competing workflow choices.
+
+The contract template and final `Next steps:` guidance must agree. Do not leave an unconditional implementation handoff that contradicts the delivery-shape recommendation.
+
+### R11. Retain the delivery-shape recommendation without changing the contract
+
+Save `.p2p/work/<slug>/delivery-shape.md` using existing history-preserving storage and readback rules.
+
+Record the exact work-item and binding-input identities, recommendation, concise reason, relevant inspected context, material assumptions, applicable prior `NO SPLIT`/decomposition result, and immediate next action.
+
+The report is advisory. It is not a second contract, a readiness state, a candidate snapshot, or a new admission requirement for old work.
+
+### R12. Prevent routing loops and accidental re-slicing
+
+A current `NO SPLIT` finding is consumed by later planning and delivery so unchanged work is not sent back to `slice-contract` merely because the earlier lightweight assessment was uncertain.
+
+If `deliver-issue` disagrees with a current `NO SPLIT` result, it must name new or previously omitted evidence. A generic “too large” message is insufficient.
+
+Planning invoked inside an existing `deliver-issue` run does not recursively invoke another delivery. A direct result lets the enclosing run continue; a sizing result returns a precise blocker before dependent implementation.
+
+Planning a child assesses the child contribution. It does not automatically reconsider unrelated siblings or create grandchildren.
+
+## 6. Adaptive re-slicing requirements
+
+### R13. Detect a sizing problem from concrete delivery evidence
+
+`deliver-issue` and direct `implement-contract` may discover new evidence that the current leaf boundary is wrong before or during implementation.
+
+A valid sizing signal must identify at least one concrete burden and why a different boundary could reduce it. Examples include:
+
+- multiple substantial state machines with independently bounded outcomes;
+- distinct migration/recovery stages that cannot be reasoned about safely as one leaf;
+- substantially different verification environments or recovery mechanisms whose combination is the source of delivery risk;
+- implementation discovery that the alleged single outcome actually contains separable complete contributions with a stable interface between them.
+
+The report must cite the inspected code, agreement, candidate, failed assumption, or other observable basis for the signal.
+
+The following are **not sufficient on their own**:
+
+- the implementation is taking longer than expected;
+- a test failed;
+- review requested changes;
+- proof found a defect;
+- the automatic repair allowance was exhausted;
+- the diff is large;
+- many files or requirements are involved;
+- the model is uncertain or has consumed substantial context.
+
+Those cases follow the existing implementation, repair, or blocker path unless the evidence independently establishes a useful separable delivery boundary.
+
+### R14. Route an oversized leaf to `slice-contract` without silently changing it
+
+When a grounded sizing signal makes the current leaf materially unsuitable for continued direct delivery, stop dependent work safely and return a precise sizing handoff:
+
+```text
+Delivery sizing: reconsider this leaf.
+Reason: <concrete burden and evidence>.
+Preserved work: <candidate/report/worktree references>.
+Next: /slice-contract work/<slug>.md
 ```
 
-Reuse the existing outcome, contribution, dependency, and evidence descriptions instead of copying a second contract into this section. For `NO SPLIT` on an existing canonical work item, retain the short result in `slicing.md` as specified by R12. With only a small source and no work item, return the rationale without creating a work item merely to store it. A draft-only invocation continues to report `DRAFT` under existing status rules; it may state a proposed no-split conclusion, but that does not become approval or authority for any later effect.
+`deliver-issue` returns `BLOCKED` rather than pretending the leaf is delivered. `implement-contract` uses `PARTIAL` when safe useful implementation work exists, otherwise `BLOCKED` under its existing semantics.
 
-### R8. Preserve authority, identity, and downstream requirements
+Neither skill creates children, edits the decomposition, closes issues, or changes tracker relationships automatically.
 
-Apply the new sizing behavior to new decompositions and explicitly requested reconsideration. Do not invalidate or automatically regroup an approved plan because it lacks a sizing rationale. Do not create replacement issues, rewrite child contracts, or close existing children merely to reduce the count.
+### R15. Re-slice only the smallest affected subtree
 
-For authorized re-slicing, preserve completed work, human edits, identities, history, and traceable old-to-new contributions. Preview material allocation changes under existing approval rules. Changes to child promises return to `plan-acceptance`; regrouping unchanged promises does not by itself revise the parent's meaning. [S3]
+When `slice-contract` is invoked on an existing child, treat that child as the proposed parent of the new subdivision.
 
-Preserve local-first operation, draft-only behavior, publication authority, readiness rules, prerequisite checks, and full parent verification on one assembled candidate. Historical child proofs must not become a parent verdict. Existing result statuses remain unchanged. [S1] [S3]
+By default:
 
-The resulting flow is the conditional route in Section 2, not mandatory slicing for every parent. `deliver-issue` may invoke missing child planning under its existing rules; sizing does not supply approval or bypass it. Apply R12 to nested invocations, existing children, and parent completion. [S4]
+- keep its own parent link unchanged;
+- keep unaffected siblings unchanged;
+- preserve the original contribution mapping from the child to its parent;
+- create the new decomposition under `.p2p/work/<child>/slicing.md`;
+- map the new grandchildren to the child contract, not directly to the grandparent;
+- change ancestors or siblings only when the new evidence actually changes their prerequisite or contribution semantics.
 
-## 5. Example: the same promise can need different delivery shapes
+Do not flatten grandchildren into the top-level parent merely for convenience.
 
-Consider retry-safe uploads. A preliminary list separates database changes, API changes, authorization, browser changes, tests, and documentation.
+If the smallest safe correction requires changing an ancestor boundary, preview that wider affected subtree explicitly and require the same approval that such a material allocation change would normally require.
 
-**Clearly manageable.** The repository already supplies the storage and authorization mechanisms; the browser change is a thin call into the same existing flow, with a bounded public-interface evidence plan. `plan-acceptance` recommends direct delivery. There is no mandatory slicing invocation.
+### R16. A leaf may become a parent while preserving its meaning
 
-**Materially uncertain.** Acceptance planning identifies the required outcome but cannot yet tell whether browser recovery is a thin extension or a separate state machine. It names that specific question and recommends sizing inspection. If deeper inspection confirms a small existing mechanism, `slice-contract` returns `NO SPLIT`, records why, and directs approved work to delivery without another generic sizing pass.
+An approved/applied re-slice changes the work item's role, not its promised contribution.
 
-**Clearly broad.** Inspection establishes substantial server-side persistence/recovery work and a new browser offline queue with its own restart and cancellation behavior. Planning recommends slicing; the slicer may retain separate server and browser contributions because combining both mechanisms would overload implementation and verification. Each includes its necessary tests, failures, constraints, and evidence. The browser contribution has an explicit server prerequisite; combined interactions remain in parent verification.
+Before:
 
-These alternatives illustrate judgments, not fixed ticket counts. The controlling facts are implementation and verification burden, not document length, headings, or the mere ability to name multiple behaviors.
+```text
+Parent → C (leaf contribution)
+```
 
-## 6. Implementation scope
+After:
 
-| Location | Required change |
+```text
+Parent → C (same contribution, now a parent)
+          ├── C1
+          └── C2
+```
+
+While C's active decomposition has remaining children, C is not a direct implementation leaf. `deliver-issue work/C.md` must use the decomposition to identify the next appropriate child or parent-completion action rather than start a second competing implementation of C.
+
+C1/C2 receive their own child contracts through `plan-acceptance`. C's original contract remains the agreement that their assembled result must eventually satisfy.
+
+After descendant implementation is assembled, C requires full review and proof of C's complete contract on one exact candidate, including interactions across C1/C2. Their historical proofs do not compose into C acceptance. The top-level parent later retains its own full parent verification requirement.
+
+### R17. Preserve and explicitly allocate in-flight work
+
+Before proposing a re-slice, inspect existing implementation reports, candidates, worktree changes, evidence, open PR state when known, and human edits for the affected leaf.
+
+Retain an `## Existing work allocation` section in its `slicing.md` that classifies relevant existing work as one of:
+
+- attributable to a proposed child;
+- shared/integration work belonging at the re-sliced parent level;
+- still valid historical evidence but not implementation to carry forward;
+- unresolved ownership requiring a focused decision before dependent editing.
+
+Do not move, duplicate, discard, cherry-pick, retarget, close, or rewrite code/PRs merely by saving the decomposition.
+
+Existing implementation may reduce future work, but the planner must not claim that a new child is already implemented merely because some matching bytes exist. The receiving implementation workflow confirms scope, prerequisites, candidate identity, and ownership.
+
+If an open PR contains mixed future-child payload, record the contamination and the required extraction/strategy action. Re-slicing approval alone does not authorize that effect.
+
+### R18. Preserve verification meaning after re-slicing
+
+Existing implementation, review, and proof reports remain historical records tied to their exact old work-item agreement and candidate.
+
+Re-slicing does not automatically transform:
+
+- old parent proof into child proof;
+- partial implementation observations into completed child outcomes;
+- a review finding into acceptance evidence;
+- previously green checks into proof of a new child contract.
+
+Applicable observations and tests may be reused as inputs after their identity and scope are re-established under the existing protocol.
+
+If the final assembled candidate and agreement happen to satisfy ordinary report-reuse rules exactly, existing reuse rules apply; this specification creates no special shortcut.
+
+### R19. Permit consolidation of undersized siblings when it still reduces total cost
+
+Re-sizing may also merge children when later evidence shows that the original plan was unnecessarily fine-grained.
+
+Prefer consolidation only while the affected children are unstarted or still in planning, or when an explicit re-slice can preserve all started work without making the correction cost exceed the avoided delivery overhead.
+
+Do not rewrite completed/proven children merely to make the hierarchy prettier. Their historical identities and completion remain intact.
+
+A merge preview must explain:
+
+- which delivery cycles would be avoided;
+- why the combined leaf remains manageable;
+- what contracts/work files would be superseded or retained as historical mappings;
+- how human edits, candidates, reports, and tracker mirrors are preserved;
+- what approval is required.
+
+When consolidation is no longer economical or safe, keep the existing children.
+
+### R20. Bound recursive decomposition and keep the next action ergonomic
+
+Nested slicing is allowed, but recursive fragmentation must stop when another boundary no longer solves a concrete delivery problem.
+
+If a child remains hard because its single outcome is intrinsically difficult, `slice-contract` returns `NO SPLIT` or a focused blocker. It must not generate C1a/C1b/C1c simply to reduce apparent complexity.
+
+Every sizing-related handoff must include:
+
+- current work-item role: leaf or parent;
+- exact applicable contract/decomposition identity;
+- concise reason for the route;
+- preserved in-flight work references when applicable;
+- one immediate next action;
+- any approval or prerequisite that must occur first.
+
+When the user invokes a parent work item with active descendants, P2P should recover the tree and point to the next ready leaf, unresolved planning decision, or parent-completion step. The user should not need to remember the hierarchy manually.
+
+A stale or contradictory route is reconciled from durable records and current evidence; it is not resolved by blindly alternating `deliver-issue` and `slice-contract`.
+
+## 7. Ergonomic behavior by common situation
+
+| User situation | Expected P2P behavior |
 |---|---|
-| `skills/productivity/plan-acceptance/SKILL.md` | Add the lightweight assessment, conditional handoff, durable recommendation, and existing/nested-work handling. Update both final next steps and generic contract-template handoff. |
-| `skills/productivity/slice-contract/SKILL.md` | Implement R1–R8; consume the planner's sizing question without treating it as an order to split. Retain `NO SPLIT` results and give a consistent direct-delivery handoff under R12. |
-| `skills/productivity/slice-contract/references/sizing.md` — new | Bundle a compact decision guide and contrasting examples. Keep core behavior in `SKILL.md`. |
-| `skills/productivity/deliver-issue/SKILL.md` | Preserve the oversized-work guard; align nested-planning responses and consideration of current sizing results. Prevent recursive self-invocation and generic routing loops. |
-| `docs/acceptance-contract-protocol.md` | Describe delivery-shape advice, ownership, storage, identity, and handoffs. Keep acceptance semantics, approved branch-destination format, existing status values, and authority unchanged. Keep distributed copies consistent. |
-| `checks/plan-acceptance-scenarios.md`, `checks/slice-contract-scenarios.md`, and `checks/deliver-issue-scenarios.md` | Add the mapped cases below, reuse fixture conventions, and preserve existing coverage. |
-| `checks/right-sized-delivery-validation.md` — new | Retain actual routing/sizing comparisons, delivery observations, failures, and unexecuted checks. Replaces the earlier proposal's narrower validation-file deliverable; do not rewrite historical validation evidence. |
-| `docs/how-to.md`, `docs/faq.md`, and relevant README handoffs | Explain the conditional workflow, pending approvals, `NO SPLIT`, and the preference for fewer children. Show direct, sliced, and uncertain-then-unsplit examples. |
+| “I created a parent issue. What next?” | `plan-acceptance` creates the agreement and tells the user direct delivery or sizing inspection. |
+| “This contract looks big; I don't know whether to slice.” | User runs the normal planning flow; the routing judgment is P2P's responsibility. |
+| `slice-contract` inspects a questionable parent and finds it manageable. | Return durable `NO SPLIT` and route to direct delivery. |
+| One child later turns out to be a mini-epic. | Delivery preserves work and routes that child to `slice-contract`; unaffected siblings continue. |
+| One child is simply technically hard. | Keep the leaf; continue normal implementation/repair unless a separable boundary is evidenced. |
+| Two untouched children prove unnecessarily tiny. | Explicit re-slice may merge them if the avoided cycles exceed correction overhead. |
+| Child C becomes parent of C1/C2. | C keeps its parent contribution; P2P routes future work to C1/C2 and later C-level assembly verification. |
+| User invokes the old parent path after nested slicing. | Recover the active tree and state the single next ready action instead of asking the user to reconstruct it. |
 
-`create-parent-issue` keeps its existing behavior and next command. Documentation may explain what acceptance planning decides next; parent creation must not gain a sizing gate or approve a delivery shape.
+## 8. Durable records
 
-Use existing filesystem helpers for the small advisory report. Do not add a controller parser, machine-enforced sizing field, required model call, mandatory audit, scheduler, learning service, new issue type, new command, or user configuration. The behavior must work with each skill installed alone and its bundled references. No new runtime dependence on a sibling skill's source files is permitted.
+Reuse existing storage. Do not introduce a new database or scheduler.
 
-## 7. Required behavioral scenarios
+### 8.1 `delivery-shape.md`
 
-Use the existing installed-skill evaluation conventions: disposable repositories, expectations withheld from the actor, recorded inputs and identities, actual action/artifact inspection, and honest distinction between simulated and live effects. [S6]
+Owned by acceptance planning for lightweight direct-vs-sizing advice.
 
-The routing cases below use source-specific labels `DS1`–`DS10`; map them into the corresponding check files without colliding with existing case IDs. The sizing cases retain the proposed T22–T33 identities from version 1.0; renumber only if intervening repository changes require it, retaining traceability.
+Minimum fields:
 
-### Routing and handoff cases
+```markdown
+# Delivery shape
 
-| Case | Fixture and required observation | Requirements |
-|---|---|---|
-| DS1: Small direct path | A coherent, manageable contract with several rows produces direct delivery after required gates. No sizing invocation, child files, or wrapper issue. | R9–R11 |
-| DS2: Broad parent | Distinct substantial mechanisms and verification burdens produce a grounded `/slice-contract` recommendation. The planner creates no decomposition, and its template does not contradict that handoff. | R9–R11 |
-| DS3: Uncertain, then unsplit | Name a material sizing uncertainty. Deeper slicing inspection resolves it as manageable; retain `NO SPLIT`. A fresh planner and delivery session do not repeat the earlier generic uncertainty. No source facts change between these latter steps. | R9–R12, R7 |
-| DS4: Uncertain, then sliced | The same routing pattern reveals genuine breadth on inspection. The first complete decomposition has justified boundaries and no obvious feasible merge. Planning did not preselect a count. | R9, R1–R6 |
-| DS5: Route is not readiness | Variants: approval pending, unresolved product promise, missing credible oracle, known harness not yet built, unavailable host, and unmet prerequisite. Identify the actual next gate; neither manufacture splitting nor authorize implementation to bypass it. | R9–R12, R8 |
-| DS6: Existing hierarchy | Plan a manageable child and an already sliced parent without making grandchildren or bypassing the approved plan. Introduce concrete new child scope separately and require a scoped reconciliation handoff. Preserve final-parent verification. | R8, R12 |
-| DS7: Planning inside delivery | Exercise direct and sizing recommendations from nested planning. The direct case continues the enclosing workflow; the sizing case stops before implementation with retained artifacts. Neither recursively invokes delivery nor automatically slices. | R10–R12 |
-| DS8: Persistence and publication | Recover advice from the work path; preserve exact contract bytes and approval receipts. Exercise local-only, draft-only, authorized issue handoff, missing write access, and unchanged rerun variants. No unauthorized extra comment or new acceptance state. | R10, R11 |
-| DS9: Drift and disagreement | Reuse a current rationale; separately change a material promise/context fact and detect stale advice. If delivery disputes current `NO SPLIT`, require a specific reason and reconciliation, not a generic loop or blind admission. | R11, R12 |
-| DS10: Optional and standalone paths | Each changed skill works with its bundled references and truthful missing-skill handoffs. `create-parent-issue` still points to acceptance planning without a sizing decision. Legacy approved work without advisory reports is not newly blocked. | R8–R12 |
+Work item: work/foo.md
+Contract: v2 sha256:<...>
+Binding inputs: <identities>
+Assessment: direct | sizing-inspection
+Reason: <concise evidence-backed reason>
+Applicable slicing result: <path/hash or None>
+Material assumptions: <... or None>
+Immediate next action: <one action>
+Outstanding gates: <... or None>
+```
 
-### Sizing cases retained from version 1.0
+### 8.2 `slicing.md`
 
-| Case | Fixture and required observation | Requirements |
-|---|---|---|
-| T22: Manageable parent | One coherent outcome with several requirements. A normal invocation returns `NO SPLIT`, with no wrapper child; an explicit draft-only invocation retains `DRAFT` and proposes no split. | R2, R3, R6 |
-| T23: Artificial micro-tickets | One small behavior proposed as field/API/validation/test/documentation tickets. Combine the work before the first complete proposal; preserve every obligation. | R2, R4–R6 |
-| T24: Hidden mini-epic | A short proposal combines substantial mechanisms with distinct state and recovery obligations. Identify the concrete overload and form complete, manageable contributions rather than accepting the short description as small. | R1, R3, R5 |
-| T25: Good boundaries | A draft already has necessary, manageable contributions and evidenced reasons not to combine them. Retain useful boundaries rather than reducing count at any cost or fragmenting further. | R3–R5 |
-| T26: Size proxies mislead | Paired cases: a broad mechanical change across many files; a small diff with difficult concurrency behavior. Base decisions on mechanisms and verification, not counts. | R1, R3 |
-| T27: Merge beyond neighbors | Related fragments are separated in display order; a plausible group shares one outcome and evidence setup. Consolidate that group without relying on adjacency. | R4, R6 |
-| T28: Necessary small stage | A compatibility migration requires an evidenced small preparatory stage. Retain it when combining would violate the transition constraint. | R4, R5, R8 |
-| T29: Grouped and dependent delivery | Children need prerequisites or an approved integration destination. Neither force independent release nor use grouping to waive child completeness or parent proof. | R3, R8 |
-| T30: Missing knowledge | Contrast a missing test harness for a clear outcome with an unresolved product decision affecting scope. Assign ordinary evidence work in the first; expose the blocking decision in the second. | R1, R5, R6 |
-| T31: History used honestly | Supply relevant prior delivery evidence, then an absent-history variant and a prior unrelated failure. Use applicable observations without inventing history, causation, or a mandatory history dependency. | R1, R3 |
-| T32: Safe rerun | An approved legacy plan lacks sizing notes and contains started work. An unchanged rerun preserves it; explicit re-slicing previews changes and preserves history and human edits. Draft-only runs create no children. | R6–R8 |
-| T33: Wording does not set size | Reorder and paraphrase the same obligations, or group them under different headings. Produce materially equivalent boundaries unless real constraints change. | R2–R6 |
+Continue to own decomposition and delivery-plan state. Add or retain these sections as applicable:
 
-No scenario passes merely because it contains sizing vocabulary. Evaluate outcomes, scope coverage, evidence references, actual artifacts, and reasons for retained boundaries. Except where a fixture genuinely warrants `NO SPLIT`, do not bake an arbitrary target child count into the expectation.
+- `## Sizing rationale`
+- coverage map and dependency graph
+- `## Existing work allocation` for re-slicing with in-flight work
+- `## Proposed delivery plan`
+- exactly one active `## Approved delivery plan` under existing byte-identity rules
+- history/transition notes identifying the prior decomposition when re-slicing
 
-## 8. Validation and acceptance
+Do not alter the machine-consumed byte semantics of the approved delivery-plan section.
 
-### First-handoff and first-proposal comparison
+### 8.3 No new acceptance state
 
-Run the baseline and revised installed skills on equivalent disposable fixtures, with the same model configuration, tools, permissions, and starting artifacts. Capture the planner's first route and the slicer's first complete proposal before corrective feedback. Retain the exact fixture, skill, model/host identity when available, requests, actions, artifacts, and before/after identities.
+“direct”, “sizing-inspection”, “leaf”, and “parent” are routing/decomposition descriptions, not new acceptance verdicts.
 
-Execute every required new case and variant. Repeat the central over-slicing, under-slicing, and uncertain-routing cases in at least three fresh contexts per version. This is an evaluation procedure, not runtime overhead or a ticket-count policy. Hold back cases from the bundled examples to check generalization.
+Contract plan states, implementation statuses, review outcomes, proof verdicts, publication states, and merge-readiness semantics remain owned by their existing stages.
 
-Use mechanical checks for coverage, identities, links, unchanged protected content, and permitted writes where practical. Have an evaluator other than the producing invocation judge whether the routing and boundary reasons are supported, a credible lower-count alternative was missed, or a contribution remains oversized. Define these criteria before examining the candidate outputs. Do not demand identical prose or one unique partition.
+## 9. Approval and authority
 
-Compare unnecessary slicer referrals, inappropriate direct referrals, unnecessary boundaries, oversized contributions, lost obligations, contradictory next steps, repeated routing, and required human corrections. Count the entire plan, including enabling and integration work. Moving work off the child list or bundling unrelated scope is not improvement.
+Detection and recommendation are read-only/advisory except for already-authorized local report storage.
 
-### Delivery reality check
+The following remain consequential changes requiring existing authority:
 
-Exercise at least one representative parent through both baseline and revised workflows, and a second, more demanding parent through the revised workflow. Use equivalent fresh checkouts, establish required approvals, deliver all selected children through the real supported workflow, and verify the assembled parent. Deliver an unsliced result directly as the original work item.
+- creating or replacing child work files;
+- changing allocation mappings or dependencies;
+- activating a revised decomposition or delivery strategy;
+- publishing/updating tracker issues or native relationships;
+- retargeting or closing PRs;
+- changing branches or refs;
+- staging, committing, pushing, merging, or deploying.
 
-Across these observations and the routing scenarios, cover direct delivery, actual decomposition, and uncertain-then-`NO SPLIT` handoffs. At least one retained execution must exercise planning inside an actual `deliver-issue` workflow so a correct-looking standalone recommendation does not conceal recursive dispatch or continued implementation after a sizing blocker.
+A user approving a re-slice does not implicitly authorize tracker restructuring, PR changes, source-code movement, or branch effects unless the approval explicitly covers them.
 
-Record completion/blocker outcomes, repairs, re-slicing, human intervention, extra routing calls, and available elapsed-time and usage evidence, including planning overhead. Distinguish sizing-related failures from host, permission, and unrelated implementation defects. Mark unavailable costs unknown. Fewer planned tickets alone does not prove faster or cheaper delivery.
+Unchanged approved routing or decomposition authority may be reused only within its existing scope.
 
-Controlled fixtures can establish routing and authorized effects against their interface. They cannot establish real host isolation, successful independent delivery, or live GitHub compatibility. Label evidence classes separately; unavailable required execution remains a gap, not a pass.
+## 10. Implementation scope
 
-### Acceptance conditions
+### Required skill changes
 
-The change is ready when R1–R12 and their mapped scenarios are satisfied, affected existing checks pass, standalone installation includes all referenced guidance, and representative delivery observations support the resulting boundaries without a known unresolved sizing-related failure.
+| Location | Change |
+|---|---|
+| `skills/productivity/plan-acceptance/SKILL.md` | Add R9–R12 routing assessment, durable `delivery-shape.md`, and a single conditional next-step handoff. Remove unconditional implementation wording that bypasses the route. |
+| `skills/productivity/slice-contract/SKILL.md` | Implement R1–R8 and R15–R20. Accept any canonical work item, including an existing child, as a potential parent. Add local affected-subtree and in-flight-work rules. |
+| `skills/productivity/slice-contract/references/sizing.md` — new | Compact merge/split decision guide, initial-sizing examples, adaptive re-slicing examples, and anti-fragmentation counterexamples. Core requirements remain in `SKILL.md`. |
+| `skills/productivity/deliver-issue/SKILL.md` | Consume current routing/slicing records; recognize grounded post-planning sizing signals; return a precise re-slicing blocker; reject direct implementation of an active decomposed parent; recover the next ready leaf or parent-completion handoff. |
+| `skills/productivity/implement-contract/SKILL.md` | Preserve partial work and report a grounded sizing concern discovered during direct implementation. Do not create children. Keep ordinary hard implementation on the current work item. |
+| `docs/acceptance-contract-protocol.md` | Define leaf/parent role, nested decomposition, local re-slicing, report-history meaning, affected-subtree preservation, and parent verification after nested slicing. Keep copied protocol references consistent. |
 
-Small work must not acquire mandatory slicing overhead. Broad or materially uncertain work must receive an actionable sizing handoff. Over-fragmented work must lose avoidable boundaries, while genuinely broad work retains necessary splits. Applicable `NO SPLIT` decisions must lead forward without bypassing approval or safety checks.
+`review-implementation` and `prove` need no new ownership role. Their existing reports may supply evidence consumed by `deliver-issue` or a later explicit `slice-contract` invocation. Update their docs only if necessary to make that handoff unambiguous without changing verdict semantics.
 
-All source promises, inherited constraints, dependent contributions, authority boundaries, and parent-verification obligations must survive. Preserve existing coverage for relationship publication/recovery, exact identities, contract revisions, and partial effects; no change here grants additional remote authority.
+### Documentation changes
 
-Report where the baseline already performs as well, where the revision helps, where results vary, and where it fails. Claim measured savings only when comparable observations support them. Do not rewrite prior validation as evidence of this feature; the historical sampled validation has its own explicit limits. [S7]
+Update `README.md`, `docs/how-to.md`, and `docs/faq.md` to show:
 
-## 9. Non-goals and completion definition
+1. user does not choose direct-vs-slice before planning;
+2. `NO SPLIT` is a valid sizing result;
+3. an oversized child can later become a parent;
+4. unaffected siblings remain stable;
+5. hard work is not automatically split;
+6. P2P reports one immediate next action from the current tree.
 
-This proposal does not implement `audit-slicing`, weaken review/proof, change the repair budget, guarantee a delivery duration, produce numerical effort estimates, enforce a globally minimal partition, or automatically learn new policy. It does not change branch strategy, add child scheduling, create automatic publication, or merge/close existing issues to improve a metric.
+### No new required product surface
 
-Completion requires updated instructions, bundled examples, aligned handoffs and documentation, scenario fixtures where needed, and retained behavioral validation—not only a paragraph advising the model to make better tickets.
+Do not add:
 
-The intended experience is: create a source issue when wanted, plan acceptance, follow P2P's explicit recommendation, and receive the fewest manageable children only when slicing is warranted.
+- a new mandatory `audit-slicing` skill;
+- story points, time estimates, or numerical size scores;
+- a new tracker issue type or label;
+- a scheduler or autonomous recursive execution engine;
+- a new acceptance verdict;
+- automatic PR/branch restructuring during re-slicing;
+- a requirement that all epics be sliced or that all difficult work be recursively decomposed.
 
-> **Avoid an unnecessary slicing pass. Avoid an unnecessary child. Never buy either saving by weakening the promise or making delivery unmanageable.**
+## 11. Behavioral scenarios
 
-## 10. Version and requirement continuity
+Extend the existing human-runnable scenario suites. Keep expected outcomes out of actor input. Capture exact agreements, decompositions, candidates, action logs, affected files, reports, and before/after identities.
 
-Version 2.0 is a complete replacement for the version 1.0 proposal, not an additional independent feature specification. Replace `plans/right-sized-slicing-spec.md` under the normal source-edit process; retain the old version in history. This document does not itself authorize a repository update, issue creation, contract revision, implementation, or publication.
+### 11.1 Initial routing
 
-R1–R6 keep their original sizing intent. R7 adds durable `NO SPLIT` continuity for an existing work item; R8 now applies within the conditional workflow. R9–R12 add lightweight routing, gated next actions, an advisory record, and loop/lifecycle handling. T22–T33 remain sizing cases; DS1–DS10 extend validation across planning and delivery. The validation deliverable expands from slicing-only to the complete workflow.
+**T22 — Small coherent parent**  
+`plan-acceptance` recommends direct delivery with a grounded reason. No slicing record is required to make the work usable.
 
-If version 1.0 has already become an approved work contract, reconcile this source revision through `plan-acceptance` and its normal amendment/approval rules. Do not silently replace that contract or treat this source's R identifiers as automatically identical to its acceptance rows.
+**T23 — Clearly broad parent**  
+The contract spans materially distinct delivery mechanisms. Planning recommends `/slice-contract`, not direct delivery.
 
-## Sources inspected
+**T24 — Uncertain parent**  
+Planning identifies the exact sizing uncertainty. `slice-contract` performs deeper inspection and returns either `NO SPLIT` or a justified decomposition without relying on a preselected ticket count.
 
-References describe the inspected baseline, not implementation, approval, or successful validation of this proposal. The baseline advances the earlier inspected commit `18bab308a297b9af978d6dcf3e1107cd5eaedce5` by adding the version 1.0 proposal; the compared skill and protocol files are unchanged. [S10]
+**T25 — Pending approval**  
+The contract looks direct or sliced, but approval is pending. The immediate next action is approval; the later route is stated conditionally and is not presented as authorized.
 
-[S1]: https://github.com/grove/promise-to-proof/blob/bac5aa15345514416f3f7244f48c88c4edd7daa1/skills/productivity/slice-contract/SKILL.md "slice-contract instructions"
-[S2]: https://github.com/grove/promise-to-proof/blob/bac5aa15345514416f3f7244f48c88c4edd7daa1/skills/productivity/create-parent-issue/SKILL.md "create-parent-issue instructions"
-[S3]: https://github.com/grove/promise-to-proof/blob/bac5aa15345514416f3f7244f48c88c4edd7daa1/docs/acceptance-contract-protocol.md#parent-and-child-contracts "Parent/child contracts and epic delivery plans"
-[S4]: https://github.com/grove/promise-to-proof/blob/bac5aa15345514416f3f7244f48c88c4edd7daa1/skills/productivity/deliver-issue/SKILL.md "Delivery work-item and agreement handling"
-[S5]: https://github.com/grove/promise-to-proof/blob/bac5aa15345514416f3f7244f48c88c4edd7daa1/skills/productivity/deliver-issue/SKILL.md#review-prove-and-recover "Review, proof, recovery, and authority"
-[S6]: https://github.com/grove/promise-to-proof/blob/bac5aa15345514416f3f7244f48c88c4edd7daa1/checks/slice-contract-scenarios.md "Existing slicing scenarios"
-[S7]: https://github.com/grove/promise-to-proof/blob/bac5aa15345514416f3f7244f48c88c4edd7daa1/checks/slice-contract-validation.md "Historical sampled slicing validation"
-[S8]: https://github.com/grove/promise-to-proof/blob/bac5aa15345514416f3f7244f48c88c4edd7daa1/skills/productivity/plan-acceptance/SKILL.md "Acceptance planning and handoffs"
-[S9]: https://github.com/grove/promise-to-proof/blob/bac5aa15345514416f3f7244f48c88c4edd7daa1/docs/acceptance-contract-protocol.md#standalone-planning-on-an-issue "Standalone planning and exact approval handoffs"
-[S10]: https://github.com/grove/promise-to-proof/compare/18bab308a297b9af978d6dcf3e1107cd5eaedce5...bac5aa15345514416f3f7244f48c88c4edd7daa1 "Comparison with version 1.0 inspected baseline"
-[S11]: https://github.com/grove/promise-to-proof/blob/bac5aa15345514416f3f7244f48c88c4edd7daa1/plans/right-sized-slicing-spec.md "Version 1.0 source proposal"
+**T26 — Nested planner inside delivery**  
+`deliver-issue` invokes missing planning. Direct assessment continues within the same delivery invocation; sizing assessment stops before implementation with the exact slicing handoff and no recursive delivery call.
 
-Predecessor source: [Version 1.0 proposal][S11].
+### 11.2 First-pass right-sizing
+
+**T27 — Artificial micro-tickets**  
+A field/API/test/docs task list represents one coherent outcome. Slicing combines it before the first complete proposal.
+
+**T28 — Hidden mini-epic**  
+A short issue hides multiple material recovery/state mechanisms. Slicing identifies the actual burden and creates only the boundaries needed to make the work manageable.
+
+**T29 — Good existing boundaries**  
+A proposed decomposition already has justified manageable leaves. Preserve it rather than minimizing child count at any cost.
+
+**T30 — Misleading size proxies**  
+A many-file mechanical change stays together while a small concurrency/state change may split. Decisions rely on actual mechanisms and verification burden.
+
+**T31 — Non-adjacent merge opportunity**  
+Two fragments far apart in display order share one production path and proof setup. Merge them instead of checking only adjacent pairs.
+
+**T32 — Necessary small migration stage**  
+A small compatibility stage is retained because combining it would violate a real transition condition.
+
+**T33 — Stable `NO SPLIT`**  
+After deeper inspection returns `NO SPLIT`, an unchanged fresh delivery session uses that result and does not bounce back to slicing without new evidence.
+
+### 11.3 Adaptive re-slicing
+
+**T34 — Oversized child discovered before edits**  
+Delivery inspection finds two separable mechanisms omitted by initial sizing. It returns a concrete `/slice-contract work/C.md` handoff. A/B are untouched.
+
+**T35 — Hard but indivisible child**  
+Implementation encounters a difficult algorithm or failing test with no useful separable outcome. It remains one leaf; no sizing escape hatch is used.
+
+**T36 — Oversized child after partial implementation**  
+Implementation has safe useful changes when a real boundary becomes apparent. The implementation result preserves the partial candidate/worktree, returns the sizing handoff, and later `slice-contract` records exact existing-work allocation without editing the code.
+
+**T37 — Evidence appears during review/proof**  
+A review or proof observation exposes a structural boundary rather than merely a defect. The enclosing delivery workflow records the observation and recommends re-slicing only when the separability criterion is met. An ordinary defect still routes to implementation/repair.
+
+**T38 — Local nested split**  
+Top-level parent has A/B/C. Re-slicing C creates C1/C2, keeps A/B bytes, contracts, links, reports, and tracker state unchanged, keeps C's contribution to the top-level parent unchanged, and maps C1/C2 only through C.
+
+**T39 — Nested parent completion**  
+C1 and C2 each complete, but their interaction violates C. C remains unproven until one exact assembled C candidate passes full C review/proof. Top-level parent acceptance remains separate.
+
+**T40 — Existing mixed PR/worktree**  
+C has an open PR or local candidate containing future C1/C2 changes. Saving the decomposition causes no PR/ref/code mutation. The plan records what is attributable, shared, contaminated, or unresolved and the exact authorized follow-up required.
+
+**T41 — Merge undersized untouched siblings**  
+Two planned/unstarted children are shown by later evidence to be one economical leaf. Re-slicing previews consolidation, preserves identities/history, and demonstrates the avoided delivery-cycle overhead. Repeat after one child is completed: default behavior preserves the completed child instead of rewriting history for aesthetics.
+
+**T42 — Recursive fragmentation guard**  
+C was split into C1/C2. C1 is still difficult but has one indivisible outcome. Another slicing invocation returns `NO SPLIT` or a concrete blocker instead of producing arbitrary C1a/C1b.
+
+### 11.4 Ergonomic tree recovery
+
+**T43 — User invokes an ancestor path**  
+A fresh session receives only `work/Parent.md` after nested re-slicing. It recovers the active tree and names the next ready leaf, unresolved prerequisite, or parent-completion step without requiring the user to know the child path.
+
+**T44 — User invokes converted child-parent C**  
+With C1 remaining, `/deliver-issue work/C.md` does not reimplement C. It routes to the applicable ready descendant or blocker. After descendants are complete, it identifies C parent verification/assembly rather than another leaf implementation.
+
+**T45 — Routing disagreement without loop**  
+Current `NO SPLIT` says direct, but delivery discovers genuinely new sizing evidence. The handoff cites that evidence. If slicing still concludes `NO SPLIT`, it records the disagreement and concrete blocker/decision rather than creating an endless direct→slice→direct loop.
+
+### 11.5 Authority and preservation
+
+**T46 — Draft re-slice**  
+A re-slice requested as draft performs inspection and saves only permitted planning records. It does not create grandchildren, change parent/child files, mutate issues, PRs, refs, or code.
+
+**T47 — Approved local re-slice**  
+Under explicit local allocation authority, create grandchildren and update the child-parent hierarchy with readback. No external effects occur.
+
+**T48 — Tracker hierarchy unavailable**  
+Canonical nested local work succeeds. If configured publication requires unsupported native nesting, follow the existing fallback/block rules honestly rather than flattening the canonical hierarchy or claiming success.
+
+## 12. Validation strategy
+
+### 12.1 First-proposal quality
+
+Compare the baseline and revised installed skills on identical disposable fixtures. Capture the first complete routing/slicing proposal before corrective feedback.
+
+Measure:
+
+- unnecessary child boundaries;
+- oversized leaves that later need re-slicing;
+- lost or duplicated obligations;
+- extra delivery cycles implied by the proposal;
+- corrections required before delivery;
+- unsupported or generic reasons for boundaries.
+
+Do not bake arbitrary target child counts into fixtures. The evaluator should judge whether each boundary is materially justified and whether a credible lower-count decomposition was missed.
+
+### 12.2 Adaptive correction quality
+
+Seed intentionally imperfect initial decompositions, then expose controlled new evidence during implementation/review/proof.
+
+Check that the revised workflow:
+
+- distinguishes structural sizing evidence from ordinary defects;
+- localizes re-slicing to the smallest affected subtree;
+- preserves unaffected siblings and in-flight work;
+- avoids duplicate code/PR effects;
+- preserves exact historical report meaning;
+- gives one actionable handoff;
+- avoids recursive fragmentation and routing loops.
+
+### 12.3 Delivery reality check
+
+Exercise representative work through real supported delivery flows:
+
+1. one task that remains unsliced;
+2. one task that is correctly sliced initially;
+3. one task with an intentionally oversized child that is re-sliced after partial implementation;
+4. one intrinsically hard task that must remain one leaf.
+
+For each, retain actual stage outcomes, repairs, re-slicing, human intervention, available elapsed time/usage information, and final parent verification.
+
+Compare complete delivery episodes, not model-call count or initial ticket count alone. Fewer planned children is not an improvement if it produces repeated failure or expensive rework; more children is not an improvement merely because each ticket looks simpler.
+
+### 12.4 Regression and packaging
+
+Run the affected existing planning, slicing, delivery, implementation, review, proof, publication, readiness, and epic-delivery scenarios.
+
+Install changed skill packages independently through the supported installation path. Verify bundled references and copied protocol bytes. Standalone packages must not depend on sibling source-skill directories.
+
+Record unavailable live GitHub or host checks as unexecuted rather than simulated successes.
+
+## 13. Acceptance conditions for this proposal's implementation
+
+The implementation is ready for acceptance evaluation when:
+
+1. acceptance planning reliably produces a grounded direct-vs-sizing recommendation and one next action;
+2. the slicer demonstrates the fewest-defensible-child behavior on over-sliced, under-sliced, and already-good fixtures;
+3. an existing child can be re-sliced locally without disturbing unaffected siblings;
+4. in-flight work is retained and explicitly allocated rather than silently moved or lost;
+5. hard-but-indivisible work does not trigger arbitrary recursive slicing;
+6. active nested parents are not accidentally treated as implementation leaves;
+7. child-to-parent and parent-to-grandparent proof semantics remain intact;
+8. current approval, authority, exact-identity, publication, review, proof, and merge-readiness rules remain unchanged unless explicitly specified here;
+9. first-proposal and adaptive-correction validation is retained with honest limits;
+10. documentation makes the workflow understandable without requiring the user to memorize routing rules.
+
+## 14. Non-goals
+
+This proposal does not promise:
+
+- perfect effort prediction;
+- no future re-slicing;
+- a globally minimal mathematical partition;
+- automatic execution of every next action;
+- automatically parallelizing children;
+- automatic code extraction from a partially implemented parent;
+- automatic PR retargeting or closure;
+- automatic acceptance of a parent from child verdicts;
+- replacing product decisions with model judgment;
+- weakening review, proof, approval, CI, compatibility, safety, or external-effect authority.
+
+## 15. User experience target
+
+The developer should be able to think in terms of the work, not the workflow graph.
+
+Typical interaction:
+
+```text
+/create-parent-issue ...
+/plan-acceptance ...
+```
+
+P2P then says exactly one of:
+
+```text
+Next: /deliver-issue work/foo.md
+```
+
+or:
+
+```text
+Next: /slice-contract work/foo.md
+```
+
+If delivery later learns that `foo-child-c` is the outlier, it says:
+
+```text
+This leaf should be reconsidered because <concrete sizing evidence>.
+Existing work is preserved at <references>.
+Next: /slice-contract work/foo-child-c.md
+```
+
+After re-slicing, invoking an ancestor path should recover the current tree and continue guiding the user to the next relevant leaf or parent-completion step.
+
+The intended mental model is therefore:
+
+> **Give P2P the work. P2P chooses the current delivery shape, minimizes unnecessary children, and corrects local sizing mistakes when new evidence appears. You make the product decisions and approve consequential changes.**
+
+## 16. Change notes
+
+- **v1.0:** Proposed explicit right-sizing inside `slice-contract`, optimizing for the fewest manageable children.
+- **v2.0:** Added lightweight `plan-acceptance` routing so users do not need to know whether to slice before invoking delivery.
+- **v3.0:** Adds adaptive local re-slicing, stable leaf-to-parent conversion, in-flight-work preservation, merge-after-the-fact constraints, recursive-fragmentation guards, and consistent tree-aware next-step routing.
+
+## 17. Source references
+
+These are implementation context, not proof that this proposal has been implemented:
+
+- [S1] `skills/productivity/slice-contract/SKILL.md` — existing decomposition, `NO SPLIT`, coverage, dependency, publication, and parent-completion rules.
+- [S2] `skills/productivity/create-parent-issue/SKILL.md` — originating issue is deliberately not a decomposition step.
+- [S3] `docs/acceptance-contract-protocol.md` — contract ownership, parent/child semantics, exact identities, delivery plans, history, and parent verification.
+- [S4] `skills/productivity/deliver-issue/SKILL.md` — single-work-item delivery, planning orchestration, oversized/unresolved guard, independent review/proof, and repair limits.
+- [S5] `skills/productivity/implement-contract/SKILL.md` — one child contribution, partial work preservation, development evidence, and implementation handoff.
+- [S6] `skills/productivity/review-implementation/SKILL.md` and `skills/productivity/prove/SKILL.md` — review/proof ownership and exact-candidate semantics.
+- [S7] `checks/slice-contract-scenarios.md`, `checks/plan-acceptance-scenarios.md`, and `checks/deliver-issue-scenarios.md` — existing human-runnable behavioral evaluation conventions.
+- [S8] `plans/right-sized-slicing-spec.md` v2 at baseline `357bf61992d960d60014c6531152330021847139` — superseded proposal whose R1–R12 identities are retained here.
