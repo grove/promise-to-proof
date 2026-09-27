@@ -214,7 +214,7 @@ Pending actions: none.
         before = len(self.fake.calls)
         code, value = self.cli('resume')
         self.assertEqual(code, 1)
-        self.assertIn('approved delivery plan or destination tip changed', value['blocker'])
+        self.assertIn('approved delivery plan changed', value['blocker'])
         self.assertEqual(len(self.fake.calls), before)
 
     def test_public_cli_retains_plain_approval_on_transfer_and_fresh_recovery(self):
@@ -290,12 +290,19 @@ Pending actions: none.
         self.assertEqual((self.root / 'sibling.txt').read_text(), 'unfinished sibling payload\n')
         self.assertEqual(d.fs.full_commit(self.root / '.p2p/work/tiny/runtime/workspace', 'HEAD'), self.base)
 
-    def test_child_target_advance_and_wrong_explicit_base_block(self):
-        self.planned_child()
+    def advance_target(self, parent=None):
         tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
-        newer = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
-                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base], input=b'Advance target\n').decode().strip()
-        d.fs.git(self.root, 'update-ref', 'refs/heads/epic/tiny', newer)
+        args = ['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                '-c', 'user.email=fixture@localhost', 'commit-tree', tree]
+        if parent is not None:
+            args += ['-p', parent]
+        tip = subprocess.check_output(args, input=('Fixture destination ' + str(time.time_ns()) + '\n').encode()).decode().strip()
+        d.fs.git(self.root, 'update-ref', 'refs/heads/epic/tiny', tip)
+        return tip
+
+    def test_child_stale_admission_blocks_but_target_advance_preserves_completed_reports(self):
+        self.planned_child()
+        newer = self.advance_target(self.base)
         code, value = self.cli()
         self.assertEqual(code, 1)
         self.assertIn('comparison base conflicts with approved destination epic/tiny', value['blocker'])
@@ -303,10 +310,142 @@ Pending actions: none.
         self.assertEqual(self.fake.calls, [])
         d.fs.git(self.root, 'update-ref', 'refs/heads/epic/tiny', self.base)
         self.assertEqual(self.cli()[0], 0)
+        before = self.state()
+        admission = (self.root / '.p2p/work/tiny/admission.json').read_bytes()
+        reports = {name: (self.root / '.p2p/work/tiny' / record['path']).read_bytes()
+                   for name, record in before['reports'].items()}
+        self.assertEqual(before['destination_observation']['relationship'], 'unchanged')
         d.fs.git(self.root, 'update-ref', 'refs/heads/epic/tiny', newer)
         code, value = self.cli('resume')
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['status'], 'REVIEWED_AND_PROVEN')
+        self.assertEqual(value['comparison_base'], self.base)
+        self.assertEqual(value['destination_observation']['observed_tip'], newer)
+        self.assertEqual(value['destination_observation']['relationship'], 'fast-forward')
+        self.assertIn('Compatibility with the current destination has not been established', value['acceptance_boundary'])
+        after = self.state()
+        for key in ('candidate', 'routing', 'reports', 'attempts'):
+            self.assertEqual(after[key], before[key])
+        self.assertEqual((self.root / '.p2p/work/tiny/admission.json').read_bytes(), admission)
+        for name, record in before['reports'].items():
+            self.assertEqual((self.root / '.p2p/work/tiny' / record['path']).read_bytes(), reports[name])
+        self.assertEqual(self.fake.calls, ['preflight', 'preflight', 'implementation', 'review', 'proof'])
+        code, value = self.cli('run', '--comparison-base', newer)
         self.assertEqual(code, 1)
-        self.assertIn('destination tip changed', value['blocker'])
+        self.assertIn('cannot change persisted', value['blocker'])
+
+    def test_busy_destination_during_stages_and_completion_keeps_frozen_base(self):
+        self.planned_child()
+        tips = [self.base]
+        original = self.fake
+        def moving(*args):
+            result = original(*args)
+            if self.fake.calls[-1] in ('implementation', 'review', 'proof'):
+                tips.append(self.advance_target(tips[-1]))
+            return result
+        complete = d.Delivery.complete
+        def moved_after_reports(delivery):
+            self.assertEqual(set(delivery.state['reports']), {'implementation', 'review', 'proof'})
+            tips.append(self.advance_target(tips[-1]))
+            return complete(delivery)
+        with patch.object(d, 'launch', moving), patch.object(d.Delivery, 'complete', moved_after_reports):
+            code, value = self.cli()
+        self.assertEqual(code, 0, value)
+        self.assertEqual(len(tips), 5)
+        self.assertEqual(value['destination_observation']['observed_tip'], tips[-1])
+        self.assertEqual(value['comparison_base'], self.base)
+        self.assertEqual(self.fake.calls, ['preflight', 'preflight', 'implementation', 'review', 'proof'])
+        for report in self.state()['reports'].values():
+            self.assertEqual(report['inputs']['comparison_base'], self.base)
+            self.assertEqual(report['inputs']['routing']['target_tip'], self.base)
+            self.assertNotIn('destination_observation', report['inputs'])
+
+    def test_rewritten_and_missing_destination_are_observations_only(self):
+        self.planned_child()
+        self.assertEqual(self.cli()[0], 0)
+        candidate = self.state()['candidate']
+        unrelated = self.advance_target()
+        code, value = self.cli('resume')
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['destination_observation']['relationship'], 'non-fast-forward')
+        self.assertEqual(value['destination_observation']['observed_tip'], unrelated)
+        d.fs.git(self.root, 'update-ref', '-d', 'refs/heads/epic/tiny')
+        before = (self.root / '.p2p/work/tiny/delivery.json').read_bytes()
+        code, value = self.cli('status')
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['destination_observation']['relationship'], 'unavailable')
+        self.assertIsNone(value['destination_observation']['observed_tip'])
+        self.assertEqual((self.root / '.p2p/work/tiny/delivery.json').read_bytes(), before)
+        self.assertEqual(self.cli('resume')[0], 0)
+        self.assertEqual(self.state()['destination_observation']['relationship'], 'unavailable')
+        self.assertEqual(self.state()['candidate'], candidate)
+        self.assertEqual(len(self.fake.calls), 5)
+
+    def test_resume_missing_stages_after_destination_advance(self):
+        self.planned_child()
+        original = d.Delivery.stage
+        def pause(delivery, name):
+            if name == 'review':
+                raise OSError('fixture pause before review dispatch')
+            return original(delivery, name)
+        with patch.object(d.Delivery, 'stage', pause):
+            self.assertEqual(self.cli()[0], 1)
+        candidate = self.state()['candidate']
+        newer = self.advance_target(self.base)
+        code, value = self.cli('resume')
+        self.assertEqual(code, 0, value)
+        self.assertEqual(self.state()['candidate'], candidate)
+        self.assertEqual(value['destination_observation']['observed_tip'], newer)
+        self.assertEqual(self.fake.calls, ['preflight', 'preflight', 'implementation', 'review', 'proof'])
+
+    def test_moving_destination_does_not_hide_candidate_source_or_base_drift(self):
+        self.planned_child()
+        self.assertEqual(self.cli()[0], 0)
+        newer = self.advance_target(self.base)
+        directory = self.root / '.p2p/work/tiny'
+        for relative, replacement, message in [
+                ('runtime/workspace/greet.py', b"print('wrong')\n", 'product candidate changed'),
+                ('candidate.json', b'{}', 'malformed candidate metadata'),
+                ('delivery.json', d.encoded(dict(self.state(), comparison_base=newer)), 'persisted admission changed: comparison_base'),
+                ('base-manifest.json', b'[]', 'retained comparison-base content changed'),
+                ('runtime/repository.git/objects/' + self.base[:2] + '/' + self.base[2:], b'corrupt', None)]:
+            path = directory / relative
+            before = path.read_bytes()
+            path.write_bytes(replacement)
+            code, value = self.cli('resume')
+            self.assertEqual(code, 1, value)
+            if message is not None:
+                self.assertIn(message, value['blocker'])
+            path.write_bytes(before)
+        # Source HEAD and index remain independent protections even for identical trees.
+        head = d.fs.full_commit(self.root, 'HEAD')
+        newer = self.advance_target(self.base)
+        d.fs.git(self.root, 'update-ref', 'HEAD', newer)
+        code, value = self.cli('resume')
+        self.assertEqual(code, 1, value)
+        self.assertIn('source HEAD changed', value['blocker'])
+        d.fs.git(self.root, 'update-ref', 'HEAD', head)
+        d.fs.git(self.root, 'add', 'work/tiny.md')
+        code, value = self.cli('resume')
+        self.assertEqual(code, 1, value)
+        self.assertIn('source index changed', value['blocker'])
+
+    def test_legacy_target_movement_blocker_resumes_without_rewriting_admission(self):
+        self.planned_child()
+        self.assertEqual(self.cli()[0], 0)
+        directory = self.root / '.p2p/work/tiny'
+        state = self.state()
+        state.pop('destination_observation')
+        state.update(status='BLOCKED', blocker='approved delivery plan or destination tip changed; reconcile routing and refresh review')
+        (directory / 'delivery.json').write_bytes(d.encoded(state))
+        admission = (directory / 'admission.json').read_bytes()
+        newer = self.advance_target(self.base)
+        code, value = self.cli('resume')
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['destination_observation']['observed_tip'], newer)
+        self.assertEqual((directory / 'admission.json').read_bytes(), admission)
+        self.assertEqual(self.state()['reports'], state['reports'])
+        self.assertEqual(len(self.fake.calls), 5)
 
     def test_integration_missing_and_unrelated_ref_give_setup_handoff(self):
         self.planned_child()
@@ -759,6 +898,94 @@ Pending actions: none.
         self.assertEqual(other.returncode,1)
         self.assertIn('another controller holds',other.stdout)
         self.assertEqual(len(self.state()['attempts']),0)
+
+    def test_concurrent_worktree_deliveries_share_moving_destination(self):
+        """Real controller processes and Git worktrees; stage transport remains a fixture."""
+        plan = self.planned_child()
+        coordination = Path(self.temp.name) / 'coordination'
+        coordination.mkdir()
+        processes, roots = [], []
+        script = '''import sys, time
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+import test_p2p_delivery as t
+d = t.d
+d.platform.system = lambda: 'Darwin'
+root, base, gates = Path(sys.argv[2]), sys.argv[3], Path(sys.argv[4])
+transport = t.FakeTransport()
+def pause(stage):
+    (gates / (root.name + '-' + stage)).touch()
+    deadline = time.monotonic() + 60
+    while not (gates / ('release-' + stage)).exists():
+        if time.monotonic() > deadline:
+            raise TimeoutError('fixture coordination timed out: ' + stage)
+        time.sleep(0.02)
+def launch(*args):
+    result = transport(*args)
+    stage = transport.calls[-1]
+    if stage in ('implementation', 'review', 'proof'):
+        pause(stage)
+    return result
+d.launch = launch
+complete = d.Delivery.complete
+def completing(delivery):
+    pause('completion')
+    return complete(delivery)
+d.Delivery.complete = completing
+sys.exit(d.main(['--repo', str(root), 'run', 'work/tiny.md', '--comparison-base', base, '--authorize-local']))
+'''
+        tip = self.base
+        try:
+            for name in ('first', 'second'):
+                root = Path(self.temp.name) / name
+                d.fs.git(self.root, 'worktree', 'add', '--detach', str(root), self.base)
+                shutil.copytree(self.root / 'work', root / 'work')
+                d.fs.save(root, 'work/parent.md', 'slicing.md', plan.read_bytes())
+                roots.append(root)
+                processes.append(subprocess.Popen([sys.executable, '-c', script, str(Path(__file__).parent),
+                                                   str(root), self.base, str(coordination)],
+                                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True))
+            for stage in ('implementation', 'review', 'proof', 'completion'):
+                deadline = time.monotonic() + 60
+                while not all((coordination / (root.name + '-' + stage)).exists() for root in roots):
+                    for process in processes:
+                        if process.poll() is not None:
+                            stdout, stderr = process.communicate()
+                            self.fail('controller exited before ' + stage + ': ' + stdout + stderr)
+                    if time.monotonic() > deadline:
+                        self.fail('controllers did not both reach ' + stage)
+                    time.sleep(0.02)
+                self.assertTrue(all(process.poll() is None for process in processes))
+                tip = self.advance_target(tip)
+                for root in roots:
+                    self.assertEqual(d.fs.full_commit(root, 'refs/heads/epic/tiny'), tip)
+                    self.assertEqual(d.fs.full_commit(root, 'HEAD'), self.base)
+                (coordination / ('release-' + stage)).touch()
+            invocations = set()
+            for root, process in zip(roots, processes):
+                stdout, stderr = process.communicate(timeout=30)
+                self.assertEqual(process.returncode, 0, stdout + stderr)
+                value = json.loads(stdout)
+                self.assertEqual(value['status'], 'REVIEWED_AND_PROVEN')
+                self.assertEqual(value['destination_observation']['observed_tip'], tip)
+                self.assertEqual(value['destination_observation']['relationship'], 'fast-forward')
+                self.assertEqual(value['comparison_base'], self.base)
+                self.assertEqual([a['stage'] for a in value['attempts']],
+                                 ['preflight-1', 'preflight-2', 'implementation', 'review', 'proof'])
+                invocations.add(value['invocation_id'])
+                for name in ('review', 'proof'):
+                    self.assertEqual(value['reports'][name]['inputs']['comparison_base'], self.base)
+                # Read back through a separate process: moving refs do not cause redispatch.
+                resumed = subprocess.run([sys.executable, str(SCRIPTS / 'p2p_delivery.py'), '--repo', str(root),
+                                          'resume', 'work/tiny.md'], capture_output=True, text=True, timeout=30)
+                self.assertEqual(resumed.returncode, 0, resumed.stdout + resumed.stderr)
+                self.assertEqual(json.loads(resumed.stdout)['attempts'], value['attempts'])
+            self.assertEqual(len(invocations), 2)
+        finally:
+            for process in processes:
+                if process.poll() is None:
+                    process.kill()
+                process.communicate()
 
     def test_reconstruct_candidate_with_retained_base(self):
         self.assertEqual(self.cli()[0],0)

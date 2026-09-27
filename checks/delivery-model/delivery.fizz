@@ -15,10 +15,13 @@ action Init:
     contract = 0
     revision = "v1"
     candidate = 0
-    base = 0
+    admission_base = 0 # immutable comparison identity for this invocation
+    retained_base = 0 # recoverable content can be corrupted independently
+    destination_tip = 0 # mutable destination is observational after admission
+    destination_moved_while_running = False
     implemented = False
     stages = [0, 0] # not launched, running, returned
-    bindings = [[], []] # contract, candidate, base, invocation
+    bindings = [[], []] # contract, candidate, admission base, invocation
     reports = [0, 0]
     evidence = [0, 0]
     passed = [False, False]
@@ -38,7 +41,7 @@ atomic action Launch:
         require stages[stage] == 0
         stages[stage] = 1
         # Stage 0 = independent read-only review, stage 1 = proof.
-        bindings[stage] = [contract, candidate, base, 1 + stage + 2 * candidate]
+        bindings[stage] = [contract, candidate, admission_base, 1 + stage + 2 * candidate]
 
 atomic action Return:
     require outcome == "running"
@@ -76,14 +79,17 @@ atomic action ReadBack:
 
 atomic action Environment:
     require implemented and outcome == "running" and not fault
-    require SCENARIO in ["text", "candidate", "base", "report-lost", "report-access", "evidence-lost", "evidence-access"]
+    require SCENARIO in ["text", "candidate", "base", "destination-movement", "report-lost", "report-access", "evidence-lost", "evidence-access"]
     # Can race either running verifier, persistence, readback, or finalization.
     if SCENARIO == "text":
         contract = 1
     elif SCENARIO == "candidate":
         candidate = 1
     elif SCENARIO == "base":
-        base = 1
+        retained_base = 1
+    elif SCENARIO == "destination-movement":
+        destination_tip = 1
+        destination_moved_while_running = stages == [1, 1]
     else:
         oneof stage in range(2):
             if SCENARIO in ["report-lost", "report-access"]:
@@ -143,7 +149,7 @@ atomic action Complete:
         outcome = "text"
     elif MUTATION != "candidate" and bindings[0][1] != candidate:
         outcome = "candidate"
-    elif MUTATION != "base" and bindings[0][2] != base:
+    elif MUTATION != "base" and (retained_base != admission_base or any([b[2] != admission_base for b in bindings])):
         outcome = "base"
     else:
         outcome = "complete"
@@ -177,7 +183,7 @@ always assertion CurrentText:
 always assertion CurrentCandidate:
     return outcome != "complete" or all([b[1] == candidate for b in bindings])
 always assertion ComparisonBase:
-    return outcome != "complete" or bindings[0][2] == base
+    return outcome != "complete" or (retained_base == admission_base and all([b[2] == admission_base for b in bindings]))
 always assertion DurableReports:
     return outcome != "complete" or reports == [3, 3]
 always assertion DurableEvidence:
@@ -198,6 +204,8 @@ always assertion Witness:
         return not (outcome == "repair-exhausted" and restarted and repairs_actual == 1)
     if WITNESS == "text":
         return not (outcome == "text" and fault and revision == "v1")
+    if WITNESS == "destination-movement":
+        return not (outcome == "complete" and destination_moved_while_running and destination_tip != admission_base and not restarted)
     if WITNESS != "none":
         return outcome != WITNESS
     return True

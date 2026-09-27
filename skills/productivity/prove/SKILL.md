@@ -85,6 +85,9 @@ environment. Follow the protocol's identity rules and confirm both identities
 before checks begin. Validate the work-item hash, binding parent/spec hashes,
 and comparison-base SHA against `candidate.json`. Compare product content
 outside `.p2p/`; artifact-only commits retain the original candidate identity.
+Use the admitted comparison base. Later destination-ref movement alone does not
+invalidate proof or authorize replacing that base. Proof covers only the exact
+candidate; it establishes no compatibility with destination commits absent from it.
 If any identity cannot be established, return `NOT PROVEN`.
 If the candidate or contract drifts, or observations cannot be tied to them,
 return `NOT PROVEN`.
