@@ -1,0 +1,14 @@
+[
+  {
+    "content_base64": "Ly5wMnAvdG1wLwo=",
+    "mode": "100644",
+    "path": ".gitignore",
+    "type": "file"
+  },
+  {
+    "content_base64": "Z3JlZXQucHkgcHJpbnRzIGhlbGxvIGZvbGxvd2VkIGJ5IGEgbmV3bGluZSBhbmQgZXhpdHMgemVyby4KUGFyZW50IGNyZWF0aW9uLCBhdG9taWMgcmVwbGFjZW1lbnQgYW5kIGNyYXNoIGR1cmFiaWxpdHkgYXJlIGV4Y2x1ZGVkLgo=",
+    "mode": "100644",
+    "path": "spec.txt",
+    "type": "file"
+  }
+]

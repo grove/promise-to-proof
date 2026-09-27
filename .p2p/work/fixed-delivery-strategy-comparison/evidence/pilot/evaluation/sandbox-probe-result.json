@@ -1,0 +1,11 @@
+{
+  "command": "codex sandbox --permission-profile :workspace -c sandbox_workspace_write.network_access=false -c sandbox_workspace_write.exclude_slash_tmp=true -c sandbox_workspace_write.exclude_tmpdir_env_var=true -C evaluation/sandbox-scratch python3 -B evaluation/sandbox-probe.py evaluation/protected.txt",
+  "observed": {
+    "protected_write": "denied",
+    "scratch_write": "allowed",
+    "network": "denied"
+  },
+  "exit_code": 0,
+  "protected_bytes_unchanged": true,
+  "source": "https://learn.chatgpt.com/docs/config-file/config-reference"
+}

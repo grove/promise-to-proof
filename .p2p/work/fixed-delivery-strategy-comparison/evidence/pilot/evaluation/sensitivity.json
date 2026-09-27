@@ -1,0 +1,15 @@
+[
+  {
+    "name": "contract-R10-crossover",
+    "a_base": 2,
+    "a_repair": 8,
+    "b_base": 5,
+    "b_repair": 0,
+    "failure_rates": [
+      0.25,
+      0.375,
+      0.5
+    ],
+    "provenance": "SYNTHETIC contract R10 arithmetic illustration, not measured pilot rates or prices. Same full checks and useful-completion assumptions."
+  }
+]

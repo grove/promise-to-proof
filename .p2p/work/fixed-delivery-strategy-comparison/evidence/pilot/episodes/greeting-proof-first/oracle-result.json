@@ -1,0 +1,30 @@
+{
+  "candidate_key": "snapshot:sha256:b59546173e23076384bb6566554239a56869c0b628b190d7bccab664a1443ee5",
+  "candidate_stable": true,
+  "command": [
+    "/opt/homebrew/bin/codex",
+    "sandbox",
+    "--permission-profile",
+    ":workspace",
+    "-c",
+    "sandbox_workspace_write.network_access=false",
+    "-c",
+    "sandbox_workspace_write.exclude_slash_tmp=true",
+    "-c",
+    "sandbox_workspace_write.exclude_tmpdir_env_var=true",
+    "-C",
+    "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/oracle-scratch",
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-B",
+    "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/evaluation/oracle.py",
+    "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/runtime/workspace",
+    "greeting"
+  ],
+  "elapsed_seconds": 0.08875758340582252,
+  "oracle_sha256": "072b6cb01598aca6bacd2a5fd3512e74f83c16506527719f057354d1f4baeb6c",
+  "returncode": 0,
+  "sandbox_probe": "../../evaluation/sandbox-probe-result.json",
+  "stderr": "",
+  "stdout": "public behavior checks passed\n",
+  "timed_out": false
+}

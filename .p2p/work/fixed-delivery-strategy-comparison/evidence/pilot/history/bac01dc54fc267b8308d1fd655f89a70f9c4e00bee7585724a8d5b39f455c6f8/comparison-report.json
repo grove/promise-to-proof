@@ -1,0 +1,985 @@
+{
+  "calculation_version": 1,
+  "currency": "USD",
+  "decision": {
+    "active_human_break_even_episodes": null,
+    "break_even_episodes": null,
+    "break_even_limit": "Elapsed and monetary overhead or approved payback horizon unavailable. Active-human payback uses only active-human savings; no exchange between ledgers.",
+    "descriptive_threshold_met": null,
+    "matched_comparable_cohort": false,
+    "proof_first_elapsed_improvement_fraction": null,
+    "reason": "Feasibility pilot only; confirmatory matched repetitions and stopping rules are not agreed. No general winner.",
+    "status": "inconclusive",
+    "supported_winner": null,
+    "threshold_fraction": 0.2
+  },
+  "elapsed_including_overhead": {
+    "known_subtotal_seconds": 1279.385910987854,
+    "scope": "Sum of observed episode elapsed durations and preparation elapsed; other comparison overhead remains unknown.",
+    "status": "partial",
+    "total_seconds": null
+  },
+  "episodes": [
+    {
+      "adjudication": {
+        "missed_defects": null,
+        "outcome": "unresolved",
+        "provenance": "Independent sandboxed oracle has not been adjudicated."
+      },
+      "attempts": [],
+      "blocker": null,
+      "config": {
+        "controller": "cc7aa58ef786ac0bb6925fcefd19b181f21d48452a1c2df2906ca2953367e4af",
+        "model": "gpt-6-luna",
+        "permissions": "macos-codex-local-v1",
+        "reasoning": "xhigh",
+        "repair_limit": 1,
+        "required_checks": [
+          "review",
+          "proof"
+        ]
+      },
+      "cost": {
+        "components": [
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": "Episode setup and readback charges are unavailable."
+          }
+        ],
+        "estimated_subtotal": 0,
+        "kind": "unknown",
+        "measured_subtotal": 0,
+        "total": null,
+        "unknown_components": 1
+      },
+      "costs": [
+        {
+          "kind": "unknown",
+          "provenance": "Episode setup and readback charges are unavailable."
+        }
+      ],
+      "elapsed_seconds": null,
+      "eligible": false,
+      "end": null,
+      "evidence": "unexecuted",
+      "host": {
+        "executable": "/opt/homebrew/bin/codex",
+        "model": "gpt-6-luna",
+        "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "reasoning": "xhigh",
+        "skills": {
+          "implementation": {
+            "path": "/Users/grove/.agents/skills/implement-contract/SKILL.md",
+            "sha256": "5d0aa2670f471a6629e0818ef46b30c4dfd7ac77d0fe8f703137aba1d039a2a7"
+          },
+          "proof": {
+            "path": "/Users/grove/.agents/skills/prove/SKILL.md",
+            "sha256": "7741259978b9cf0cc6f323d2e9e3e61b25b986dad3519acaf746816b3eefa323"
+          },
+          "repair": {
+            "path": "/Users/grove/.agents/skills/repair-gaps/SKILL.md",
+            "sha256": "640150ed87764045ba390e1abfcec2a782d68a4b959bb0eabe07ca4f97284a94"
+          },
+          "review": {
+            "path": "/Users/grove/.agents/skills/review-implementation/SKILL.md",
+            "sha256": "e5b8ade59142779914780d5ec35acafc9a087fd3087904c43d8e356ffc3005b7"
+          }
+        },
+        "version": "codex-cli 0.157.1"
+      },
+      "human": {
+        "active_seconds": null,
+        "interruptions": null,
+        "waiting_seconds": null
+      },
+      "id": "greeting-proof-first",
+      "missed_defects": null,
+      "occupied_seconds": null,
+      "outcome": "unresolved",
+      "raw_records": "episodes/greeting-proof-first/source/.p2p/work/greeting",
+      "reported_complete": false,
+      "stage_seconds": null,
+      "start": null,
+      "strategy": "proof-first",
+      "task": "greeting",
+      "workflow_status": "unexecuted"
+    },
+    {
+      "adjudication": {
+        "limits": "Prewritten finite public-behavior checks; zero means no defect observed by these checks. Setup failures and timeouts require maintainer adjudication.",
+        "missed_defects": 0,
+        "outcome": "satisfactory",
+        "provenance": "episodes/greeting-review-first/oracle-result.json"
+      },
+      "attempts": [
+        {
+          "cost": {
+            "kind": "unknown"
+          },
+          "end": 1790447778.262304,
+          "id": "173e01fe-eb3e-4768-8586-7a59882eeea5",
+          "receipts": "episodes/greeting-review-first/source/.p2p/work/greeting/attempts/173e01fe-eb3e-4768-8586-7a59882eeea5",
+          "stage": "preflight-1",
+          "start": 1790447732.549138,
+          "status": "complete",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 11008,
+            "input_tokens": 25929,
+            "output_tokens": 2147,
+            "reasoning_output_tokens": 466
+          }
+        },
+        {
+          "cost": {
+            "kind": "unknown"
+          },
+          "end": 1790447824.931577,
+          "id": "204a226b-a5d8-4326-80f0-62c9105a44f9",
+          "receipts": "episodes/greeting-review-first/source/.p2p/work/greeting/attempts/204a226b-a5d8-4326-80f0-62c9105a44f9",
+          "stage": "preflight-2",
+          "start": 1790447778.55254,
+          "status": "complete",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 0,
+            "input_tokens": 25886,
+            "output_tokens": 2154,
+            "reasoning_output_tokens": 484
+          }
+        },
+        {
+          "cost": {
+            "kind": "unknown"
+          },
+          "end": 1790448281.923541,
+          "id": "dafc7810-ec6c-4e6d-ab85-6f1a94d9416b",
+          "receipts": "episodes/greeting-review-first/source/.p2p/work/greeting/attempts/dafc7810-ec6c-4e6d-ab85-6f1a94d9416b",
+          "stage": "implementation",
+          "start": 1790447825.404915,
+          "status": "complete",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 241152,
+            "input_tokens": 284600,
+            "output_tokens": 17632,
+            "reasoning_output_tokens": 13226
+          }
+        },
+        {
+          "cost": {
+            "kind": "unknown"
+          },
+          "end": 1790448634.506949,
+          "id": "ba023365-f439-486c-9e88-05a19c293cfa",
+          "receipts": "episodes/greeting-review-first/source/.p2p/work/greeting/attempts/ba023365-f439-486c-9e88-05a19c293cfa",
+          "stage": "review",
+          "start": 1790448283.170238,
+          "status": "complete",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 291072,
+            "input_tokens": 341506,
+            "output_tokens": 18597,
+            "reasoning_output_tokens": 12901
+          }
+        },
+        {
+          "cost": {
+            "kind": "unknown"
+          },
+          "end": 1790449009.007735,
+          "id": "fbe14bc7-531d-4c18-ac4c-a8d28eb795b3",
+          "receipts": "episodes/greeting-review-first/source/.p2p/work/greeting/attempts/fbe14bc7-531d-4c18-ac4c-a8d28eb795b3",
+          "stage": "proof",
+          "start": 1790448635.523731,
+          "status": "complete",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 346880,
+            "input_tokens": 400285,
+            "output_tokens": 17991,
+            "reasoning_output_tokens": 13305
+          }
+        }
+      ],
+      "blocker": "review contains unresolved requirement findings",
+      "config": {
+        "controller": "cc7aa58ef786ac0bb6925fcefd19b181f21d48452a1c2df2906ca2953367e4af",
+        "model": "gpt-6-luna",
+        "permissions": "macos-codex-local-v1",
+        "reasoning": "xhigh",
+        "repair_limit": 1,
+        "required_checks": [
+          "review",
+          "proof"
+        ]
+      },
+      "cost": {
+        "components": [
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": "Episode setup and readback charges are unavailable."
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": null
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": null
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": null
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": null
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": null
+          }
+        ],
+        "estimated_subtotal": 0,
+        "kind": "unknown",
+        "measured_subtotal": 0,
+        "total": null,
+        "unknown_components": 6
+      },
+      "costs": [
+        {
+          "kind": "unknown",
+          "provenance": "Episode setup and readback charges are unavailable."
+        }
+      ],
+      "elapsed_seconds": 1278.6576631069183,
+      "eligible": true,
+      "end": 1790449009.873454,
+      "evidence": "live",
+      "host": {
+        "executable": "/opt/homebrew/bin/codex",
+        "model": "gpt-6-luna",
+        "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "reasoning": "xhigh",
+        "skills": {
+          "implementation": {
+            "path": "/Users/grove/.agents/skills/implement-contract/SKILL.md",
+            "sha256": "5d0aa2670f471a6629e0818ef46b30c4dfd7ac77d0fe8f703137aba1d039a2a7"
+          },
+          "proof": {
+            "path": "/Users/grove/.agents/skills/prove/SKILL.md",
+            "sha256": "7741259978b9cf0cc6f323d2e9e3e61b25b986dad3519acaf746816b3eefa323"
+          },
+          "repair": {
+            "path": "/Users/grove/.agents/skills/repair-gaps/SKILL.md",
+            "sha256": "640150ed87764045ba390e1abfcec2a782d68a4b959bb0eabe07ca4f97284a94"
+          },
+          "review": {
+            "path": "/Users/grove/.agents/skills/review-implementation/SKILL.md",
+            "sha256": "e5b8ade59142779914780d5ec35acafc9a087fd3087904c43d8e356ffc3005b7"
+          }
+        },
+        "version": "codex-cli 0.157.1"
+      },
+      "human": {
+        "active_seconds": null,
+        "interruptions": null,
+        "waiting_seconds": null
+      },
+      "id": "greeting-review-first",
+      "missed_defects": 0,
+      "occupied_seconds": 1273.4315438270569,
+      "outcome": "satisfactory",
+      "raw_records": "episodes/greeting-review-first/source/.p2p/work/greeting",
+      "reported_complete": false,
+      "stage_seconds": 1273.4315438270569,
+      "start": 1790447731.215791,
+      "strategy": "review-first",
+      "task": "greeting",
+      "workflow_status": "BLOCKED"
+    },
+    {
+      "adjudication": {
+        "missed_defects": null,
+        "outcome": "unresolved",
+        "provenance": "Independent sandboxed oracle has not been adjudicated."
+      },
+      "attempts": [],
+      "blocker": null,
+      "config": {
+        "controller": "cc7aa58ef786ac0bb6925fcefd19b181f21d48452a1c2df2906ca2953367e4af",
+        "model": "gpt-6-luna",
+        "permissions": "macos-codex-local-v1",
+        "reasoning": "xhigh",
+        "repair_limit": 1,
+        "required_checks": [
+          "review",
+          "proof"
+        ]
+      },
+      "cost": {
+        "components": [
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": "Episode setup and readback charges are unavailable."
+          }
+        ],
+        "estimated_subtotal": 0,
+        "kind": "unknown",
+        "measured_subtotal": 0,
+        "total": null,
+        "unknown_components": 1
+      },
+      "costs": [
+        {
+          "kind": "unknown",
+          "provenance": "Episode setup and readback charges are unavailable."
+        }
+      ],
+      "elapsed_seconds": null,
+      "eligible": false,
+      "end": null,
+      "evidence": "unexecuted",
+      "host": {
+        "executable": "/opt/homebrew/bin/codex",
+        "model": "gpt-6-luna",
+        "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "reasoning": "xhigh",
+        "skills": {
+          "implementation": {
+            "path": "/Users/grove/.agents/skills/implement-contract/SKILL.md",
+            "sha256": "5d0aa2670f471a6629e0818ef46b30c4dfd7ac77d0fe8f703137aba1d039a2a7"
+          },
+          "proof": {
+            "path": "/Users/grove/.agents/skills/prove/SKILL.md",
+            "sha256": "7741259978b9cf0cc6f323d2e9e3e61b25b986dad3519acaf746816b3eefa323"
+          },
+          "repair": {
+            "path": "/Users/grove/.agents/skills/repair-gaps/SKILL.md",
+            "sha256": "640150ed87764045ba390e1abfcec2a782d68a4b959bb0eabe07ca4f97284a94"
+          },
+          "review": {
+            "path": "/Users/grove/.agents/skills/review-implementation/SKILL.md",
+            "sha256": "e5b8ade59142779914780d5ec35acafc9a087fd3087904c43d8e356ffc3005b7"
+          }
+        },
+        "version": "codex-cli 0.157.1"
+      },
+      "human": {
+        "active_seconds": null,
+        "interruptions": null,
+        "waiting_seconds": null
+      },
+      "id": "repair-report-proof-first",
+      "missed_defects": null,
+      "occupied_seconds": null,
+      "outcome": "unresolved",
+      "raw_records": "episodes/repair-report-proof-first/source/.p2p/work/repair-report",
+      "reported_complete": false,
+      "stage_seconds": null,
+      "start": null,
+      "strategy": "proof-first",
+      "task": "repair-report",
+      "workflow_status": "unexecuted"
+    },
+    {
+      "adjudication": {
+        "missed_defects": null,
+        "outcome": "unresolved",
+        "provenance": "Independent sandboxed oracle has not been adjudicated."
+      },
+      "attempts": [],
+      "blocker": null,
+      "config": {
+        "controller": "cc7aa58ef786ac0bb6925fcefd19b181f21d48452a1c2df2906ca2953367e4af",
+        "model": "gpt-6-luna",
+        "permissions": "macos-codex-local-v1",
+        "reasoning": "xhigh",
+        "repair_limit": 1,
+        "required_checks": [
+          "review",
+          "proof"
+        ]
+      },
+      "cost": {
+        "components": [
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": "Episode setup and readback charges are unavailable."
+          }
+        ],
+        "estimated_subtotal": 0,
+        "kind": "unknown",
+        "measured_subtotal": 0,
+        "total": null,
+        "unknown_components": 1
+      },
+      "costs": [
+        {
+          "kind": "unknown",
+          "provenance": "Episode setup and readback charges are unavailable."
+        }
+      ],
+      "elapsed_seconds": null,
+      "eligible": false,
+      "end": null,
+      "evidence": "unexecuted",
+      "host": {
+        "executable": "/opt/homebrew/bin/codex",
+        "model": "gpt-6-luna",
+        "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "reasoning": "xhigh",
+        "skills": {
+          "implementation": {
+            "path": "/Users/grove/.agents/skills/implement-contract/SKILL.md",
+            "sha256": "5d0aa2670f471a6629e0818ef46b30c4dfd7ac77d0fe8f703137aba1d039a2a7"
+          },
+          "proof": {
+            "path": "/Users/grove/.agents/skills/prove/SKILL.md",
+            "sha256": "7741259978b9cf0cc6f323d2e9e3e61b25b986dad3519acaf746816b3eefa323"
+          },
+          "repair": {
+            "path": "/Users/grove/.agents/skills/repair-gaps/SKILL.md",
+            "sha256": "640150ed87764045ba390e1abfcec2a782d68a4b959bb0eabe07ca4f97284a94"
+          },
+          "review": {
+            "path": "/Users/grove/.agents/skills/review-implementation/SKILL.md",
+            "sha256": "e5b8ade59142779914780d5ec35acafc9a087fd3087904c43d8e356ffc3005b7"
+          }
+        },
+        "version": "codex-cli 0.157.1"
+      },
+      "human": {
+        "active_seconds": null,
+        "interruptions": null,
+        "waiting_seconds": null
+      },
+      "id": "repair-report-review-first",
+      "missed_defects": null,
+      "occupied_seconds": null,
+      "outcome": "unresolved",
+      "raw_records": "episodes/repair-report-review-first/source/.p2p/work/repair-report",
+      "reported_complete": false,
+      "stage_seconds": null,
+      "start": null,
+      "strategy": "review-first",
+      "task": "repair-report",
+      "workflow_status": "unexecuted"
+    },
+    {
+      "adjudication": {
+        "missed_defects": null,
+        "outcome": "unresolved",
+        "provenance": "Independent sandboxed oracle has not been adjudicated."
+      },
+      "attempts": [],
+      "blocker": null,
+      "config": {
+        "controller": "cc7aa58ef786ac0bb6925fcefd19b181f21d48452a1c2df2906ca2953367e4af",
+        "model": "gpt-6-luna",
+        "permissions": "macos-codex-local-v1",
+        "reasoning": "xhigh",
+        "repair_limit": 1,
+        "required_checks": [
+          "review",
+          "proof"
+        ]
+      },
+      "cost": {
+        "components": [
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": "Episode setup and readback charges are unavailable."
+          }
+        ],
+        "estimated_subtotal": 0,
+        "kind": "unknown",
+        "measured_subtotal": 0,
+        "total": null,
+        "unknown_components": 1
+      },
+      "costs": [
+        {
+          "kind": "unknown",
+          "provenance": "Episode setup and readback charges are unavailable."
+        }
+      ],
+      "elapsed_seconds": null,
+      "eligible": false,
+      "end": null,
+      "evidence": "unexecuted",
+      "host": {
+        "executable": "/opt/homebrew/bin/codex",
+        "model": "gpt-6-luna",
+        "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "reasoning": "xhigh",
+        "skills": {
+          "implementation": {
+            "path": "/Users/grove/.agents/skills/implement-contract/SKILL.md",
+            "sha256": "5d0aa2670f471a6629e0818ef46b30c4dfd7ac77d0fe8f703137aba1d039a2a7"
+          },
+          "proof": {
+            "path": "/Users/grove/.agents/skills/prove/SKILL.md",
+            "sha256": "7741259978b9cf0cc6f323d2e9e3e61b25b986dad3519acaf746816b3eefa323"
+          },
+          "repair": {
+            "path": "/Users/grove/.agents/skills/repair-gaps/SKILL.md",
+            "sha256": "640150ed87764045ba390e1abfcec2a782d68a4b959bb0eabe07ca4f97284a94"
+          },
+          "review": {
+            "path": "/Users/grove/.agents/skills/review-implementation/SKILL.md",
+            "sha256": "e5b8ade59142779914780d5ec35acafc9a087fd3087904c43d8e356ffc3005b7"
+          }
+        },
+        "version": "codex-cli 0.157.1"
+      },
+      "human": {
+        "active_seconds": null,
+        "interruptions": null,
+        "waiting_seconds": null
+      },
+      "id": "save-report-proof-first",
+      "missed_defects": null,
+      "occupied_seconds": null,
+      "outcome": "unresolved",
+      "raw_records": "episodes/save-report-proof-first/source/.p2p/work/save-report",
+      "reported_complete": false,
+      "stage_seconds": null,
+      "start": null,
+      "strategy": "proof-first",
+      "task": "save-report",
+      "workflow_status": "unexecuted"
+    },
+    {
+      "adjudication": {
+        "missed_defects": null,
+        "outcome": "unresolved",
+        "provenance": "Independent sandboxed oracle has not been adjudicated."
+      },
+      "attempts": [],
+      "blocker": null,
+      "config": {
+        "controller": "cc7aa58ef786ac0bb6925fcefd19b181f21d48452a1c2df2906ca2953367e4af",
+        "model": "gpt-6-luna",
+        "permissions": "macos-codex-local-v1",
+        "reasoning": "xhigh",
+        "repair_limit": 1,
+        "required_checks": [
+          "review",
+          "proof"
+        ]
+      },
+      "cost": {
+        "components": [
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": "Episode setup and readback charges are unavailable."
+          }
+        ],
+        "estimated_subtotal": 0,
+        "kind": "unknown",
+        "measured_subtotal": 0,
+        "total": null,
+        "unknown_components": 1
+      },
+      "costs": [
+        {
+          "kind": "unknown",
+          "provenance": "Episode setup and readback charges are unavailable."
+        }
+      ],
+      "elapsed_seconds": null,
+      "eligible": false,
+      "end": null,
+      "evidence": "unexecuted",
+      "host": {
+        "executable": "/opt/homebrew/bin/codex",
+        "model": "gpt-6-luna",
+        "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "reasoning": "xhigh",
+        "skills": {
+          "implementation": {
+            "path": "/Users/grove/.agents/skills/implement-contract/SKILL.md",
+            "sha256": "5d0aa2670f471a6629e0818ef46b30c4dfd7ac77d0fe8f703137aba1d039a2a7"
+          },
+          "proof": {
+            "path": "/Users/grove/.agents/skills/prove/SKILL.md",
+            "sha256": "7741259978b9cf0cc6f323d2e9e3e61b25b986dad3519acaf746816b3eefa323"
+          },
+          "repair": {
+            "path": "/Users/grove/.agents/skills/repair-gaps/SKILL.md",
+            "sha256": "640150ed87764045ba390e1abfcec2a782d68a4b959bb0eabe07ca4f97284a94"
+          },
+          "review": {
+            "path": "/Users/grove/.agents/skills/review-implementation/SKILL.md",
+            "sha256": "e5b8ade59142779914780d5ec35acafc9a087fd3087904c43d8e356ffc3005b7"
+          }
+        },
+        "version": "codex-cli 0.157.1"
+      },
+      "human": {
+        "active_seconds": null,
+        "interruptions": null,
+        "waiting_seconds": null
+      },
+      "id": "save-report-review-first",
+      "missed_defects": null,
+      "occupied_seconds": null,
+      "outcome": "unresolved",
+      "raw_records": "episodes/save-report-review-first/source/.p2p/work/save-report",
+      "reported_complete": false,
+      "stage_seconds": null,
+      "start": null,
+      "strategy": "review-first",
+      "task": "save-report",
+      "workflow_status": "unexecuted"
+    }
+  ],
+  "human_including_overhead": {
+    "active_seconds": null,
+    "interruptions": null,
+    "waiting_seconds": null
+  },
+  "limits": [
+    "Host and configuration scope is exactly the retained episode provenance.",
+    "Concurrent verification is unavailable in the approved pilot; synthetic overlap is not live capability.",
+    "Strategy totals exclude shared comparison overhead; overall totals include it.",
+    "Unknown costs, human observations and adjudication remain unavailable."
+  ],
+  "overall": {
+    "assigned": 6,
+    "completion_rate": 0.0,
+    "cost": {
+      "components": [
+        {
+          "amount": null,
+          "kind": "unknown",
+          "provenance": "Episode setup and readback charges are unavailable."
+        },
+        {
+          "amount": null,
+          "kind": "unknown",
+          "provenance": "Episode setup and readback charges are unavailable."
+        },
+        {
+          "amount": null,
+          "kind": "unknown",
+          "provenance": null
+        },
+        {
+          "amount": null,
+          "kind": "unknown",
+          "provenance": null
+        },
+        {
+          "amount": null,
+          "kind": "unknown",
+          "provenance": null
+        },
+        {
+          "amount": null,
+          "kind": "unknown",
+          "provenance": null
+        },
+        {
+          "amount": null,
+          "kind": "unknown",
+          "provenance": null
+        },
+        {
+          "amount": null,
+          "kind": "unknown",
+          "provenance": "Episode setup and readback charges are unavailable."
+        },
+        {
+          "amount": null,
+          "kind": "unknown",
+          "provenance": "Episode setup and readback charges are unavailable."
+        },
+        {
+          "amount": null,
+          "kind": "unknown",
+          "provenance": "Episode setup and readback charges are unavailable."
+        },
+        {
+          "amount": null,
+          "kind": "unknown",
+          "provenance": "Episode setup and readback charges are unavailable."
+        },
+        {
+          "amount": null,
+          "kind": "unknown",
+          "provenance": null
+        }
+      ],
+      "estimated_subtotal": 0,
+      "kind": "unknown",
+      "measured_subtotal": 0,
+      "total": null,
+      "unknown_components": 12
+    },
+    "cost_per_assigned": null,
+    "cost_per_useful_completion": null,
+    "elapsed_seconds": {
+      "max": 1278.6576631069183,
+      "median": 1278.6576631069183,
+      "min": 1278.6576631069183,
+      "observed": 1,
+      "total": null,
+      "values": [
+        1278.6576631069183
+      ]
+    },
+    "human": {
+      "active_seconds": null,
+      "interruptions": null,
+      "waiting_seconds": null
+    },
+    "ineligible_episodes": [
+      "greeting-proof-first",
+      "repair-report-proof-first",
+      "repair-report-review-first",
+      "save-report-proof-first",
+      "save-report-review-first"
+    ],
+    "missed_defects": null,
+    "outcomes": {
+      "satisfactory": 1,
+      "unresolved": 5
+    },
+    "satisfactory_without_workflow_completion": 1,
+    "useful_completions": 0
+  },
+  "overhead": {
+    "active_seconds": null,
+    "cost": {
+      "components": [
+        {
+          "amount": null,
+          "kind": "unknown",
+          "provenance": null
+        }
+      ],
+      "estimated_subtotal": 0,
+      "kind": "unknown",
+      "measured_subtotal": 0,
+      "total": null,
+      "unknown_components": 1
+    },
+    "interruptions": null,
+    "prepare_elapsed_seconds": 0.728247880935669,
+    "waiting_seconds": null
+  },
+  "schema_version": 1,
+  "sensitivity": [
+    {
+      "assumptions": "Same full checks and useful-completion probability; one repair at most. Costs are supplied assumptions.",
+      "crossover_failure_probability": 0.375,
+      "kind": "estimated",
+      "name": "contract-R10-crossover",
+      "provenance": "SYNTHETIC contract R10 arithmetic illustration, not measured pilot rates or prices. Same full checks and useful-completion assumptions.",
+      "values": [
+        {
+          "a_expected_cost": 4.0,
+          "b_expected_cost": 5.0,
+          "failure_probability": 0.25,
+          "preference": "a"
+        },
+        {
+          "a_expected_cost": 5.0,
+          "b_expected_cost": 5.0,
+          "failure_probability": 0.375,
+          "preference": "tie"
+        },
+        {
+          "a_expected_cost": 6.0,
+          "b_expected_cost": 5.0,
+          "failure_probability": 0.5,
+          "preference": "b"
+        }
+      ]
+    }
+  ],
+  "strategies": {
+    "concurrent": {
+      "assigned": 0,
+      "completion_rate": null,
+      "cost": {
+        "components": [],
+        "estimated_subtotal": 0,
+        "kind": "measured",
+        "measured_subtotal": 0,
+        "total": 0,
+        "unknown_components": 0
+      },
+      "cost_per_assigned": null,
+      "cost_per_useful_completion": null,
+      "elapsed_seconds": {
+        "max": null,
+        "median": null,
+        "min": null,
+        "observed": 0,
+        "total": 0,
+        "values": []
+      },
+      "human": {
+        "active_seconds": 0,
+        "interruptions": 0,
+        "waiting_seconds": 0
+      },
+      "ineligible_episodes": [],
+      "missed_defects": 0,
+      "outcomes": {},
+      "satisfactory_without_workflow_completion": 0,
+      "useful_completions": 0
+    },
+    "proof-first": {
+      "assigned": 3,
+      "completion_rate": 0.0,
+      "cost": {
+        "components": [
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": "Episode setup and readback charges are unavailable."
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": "Episode setup and readback charges are unavailable."
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": "Episode setup and readback charges are unavailable."
+          }
+        ],
+        "estimated_subtotal": 0,
+        "kind": "unknown",
+        "measured_subtotal": 0,
+        "total": null,
+        "unknown_components": 3
+      },
+      "cost_per_assigned": null,
+      "cost_per_useful_completion": null,
+      "elapsed_seconds": {
+        "max": null,
+        "median": null,
+        "min": null,
+        "observed": 0,
+        "total": null,
+        "values": []
+      },
+      "human": {
+        "active_seconds": null,
+        "interruptions": null,
+        "waiting_seconds": null
+      },
+      "ineligible_episodes": [
+        "greeting-proof-first",
+        "repair-report-proof-first",
+        "save-report-proof-first"
+      ],
+      "missed_defects": null,
+      "outcomes": {
+        "unresolved": 3
+      },
+      "satisfactory_without_workflow_completion": 0,
+      "useful_completions": 0
+    },
+    "review-first": {
+      "assigned": 3,
+      "completion_rate": 0.0,
+      "cost": {
+        "components": [
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": "Episode setup and readback charges are unavailable."
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": null
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": null
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": null
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": null
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": null
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": "Episode setup and readback charges are unavailable."
+          },
+          {
+            "amount": null,
+            "kind": "unknown",
+            "provenance": "Episode setup and readback charges are unavailable."
+          }
+        ],
+        "estimated_subtotal": 0,
+        "kind": "unknown",
+        "measured_subtotal": 0,
+        "total": null,
+        "unknown_components": 8
+      },
+      "cost_per_assigned": null,
+      "cost_per_useful_completion": null,
+      "elapsed_seconds": {
+        "max": 1278.6576631069183,
+        "median": 1278.6576631069183,
+        "min": 1278.6576631069183,
+        "observed": 1,
+        "total": null,
+        "values": [
+          1278.6576631069183
+        ]
+      },
+      "human": {
+        "active_seconds": null,
+        "interruptions": null,
+        "waiting_seconds": null
+      },
+      "ineligible_episodes": [
+        "repair-report-review-first",
+        "save-report-review-first"
+      ],
+      "missed_defects": null,
+      "outcomes": {
+        "satisfactory": 1,
+        "unresolved": 2
+      },
+      "satisfactory_without_workflow_completion": 1,
+      "useful_completions": 0
+    }
+  }
+}

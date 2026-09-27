@@ -1,0 +1,6 @@
+{
+  "limits": "Prewritten finite public-behavior checks; zero means no defect observed by these checks. Setup failures and timeouts require maintainer adjudication.",
+  "missed_defects": null,
+  "outcome": "unresolved",
+  "provenance": "episodes/greeting-review-first/oracle-result.json"
+}

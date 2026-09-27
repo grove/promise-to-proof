@@ -1,0 +1,32 @@
+{
+  "binding_inputs": [
+    {
+      "path": "spec.txt",
+      "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+    }
+  ],
+  "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+  "key": "snapshot:sha256:385c0c31cdaf7e11482e297bb03c160f2749b6aef33e275f71f25357f70ded78",
+  "manifest": [
+    {
+      "content_base64": "Ly5wMnAvdG1wLwo=",
+      "mode": "100644",
+      "path": ".gitignore",
+      "type": "file"
+    },
+    {
+      "content_base64": "Z3JlZXQucHkgcHJpbnRzIGhlbGxvIGZvbGxvd2VkIGJ5IGEgbmV3bGluZSBhbmQgZXhpdHMgemVyby4KUGFyZW50IGNyZWF0aW9uLCBhdG9taWMgcmVwbGFjZW1lbnQgYW5kIGNyYXNoIGR1cmFiaWxpdHkgYXJlIGV4Y2x1ZGVkLgo=",
+      "mode": "100644",
+      "path": "spec.txt",
+      "type": "file"
+    },
+    {
+      "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBncmVldGluZwoKQ29udHJhY3QgcmV2aXNpb246IHYxClNvdXJjZTogW1NwZWNpZmljYXRpb25dKC4uL3NwZWMudHh0KQoKSW50ZW5kZWQgb3V0Y29tZTogSW1wbGVtZW50IHRoZSBzdXBwbGllZCBwdWJsaWMgYmVoYXZpb3IuCgojIyBBY2NlcHRhbmNlIG1hdHJpeAoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyAvIGNvdW50ZXJleGFtcGxlcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgc3BlYy50eHQgfCBncmVldC5weSBwcmludHMgaGVsbG8gZm9sbG93ZWQgYnkgYSBuZXdsaW5lIGFuZCBleGl0cyB6ZXJvLiB8IEluY29ycmVjdCBvdXRwdXQsIHJldHVybiwgb3IgZXJyb3IgaGFuZGxpbmcgZmFpbHMuIHwgcHl0aG9uMyBncmVldC5weSB8IGV4YWN0IHN0ZG91dCBhbmQgZXhpdCBzdGF0dXMgfCBFeGVjdXRlIHRoZSBwdWJsaWMgc2VhbSBhbmQgcmV0YWluIGFzc2VydGlvbnMgYW5kIG9ic2VydmF0aW9ucy4gfCBwbGFubmVkIHwKCiMjIFVucmVzb2x2ZWQgZ2FwcwoKTm9uZS4K",
+      "mode": "100644",
+      "path": "work/greeting.md",
+      "type": "file"
+    }
+  ],
+  "work_item": "work/greeting.md",
+  "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8"
+}

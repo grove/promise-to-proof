@@ -1,0 +1,11 @@
+--- review-first/p2p_delivery.py
++++ proof-first/p2p_delivery.py
+@@ -526,7 +526,7 @@
+             self.state['implementation_complete'] = True
+             self.save()
+         while True:
+-            for name in ('review', 'proof'):
++            for name in ('proof', 'review'):
+                 if name not in self.state.get('reports', {}):
+                     self.stage(name)
+             review, proof = self.read_report('review'), self.read_report('proof')

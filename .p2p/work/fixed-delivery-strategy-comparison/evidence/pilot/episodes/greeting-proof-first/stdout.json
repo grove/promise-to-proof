@@ -1,0 +1,298 @@
+{
+  "status": "BLOCKED",
+  "blocker": "missing unambiguous host session/completion receipt: /Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/attempts/26a95461-0034-45e4-b32b-79500c910c97/events.jsonl",
+  "invocation_id": "f7d16595-bc9c-4083-9463-7626bbabda47",
+  "work_item": "work/greeting.md",
+  "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+  "limits": {
+    "dispatches": 8,
+    "elapsed_seconds": 1800.0
+  },
+  "repair_used": true,
+  "host": {
+    "name": "Codex CLI on macOS",
+    "executable": "/opt/homebrew/bin/codex",
+    "version": "codex-cli 0.157.1",
+    "hard_monetary_cap": "unsupported",
+    "cost": "unknown",
+    "enforced": [
+      "scratch-only verification writes",
+      "network denied",
+      "approval escalation disabled",
+      "isolated configuration",
+      "dispatch admission",
+      "one repair reservation"
+    ],
+    "elapsed_limit": "admission and process termination; provider billing may continue",
+    "trust": "controller and OS trusted; no arbitrary same-user tamper resistance"
+  },
+  "candidate": {
+    "work_item": "work/greeting.md",
+    "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8",
+    "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+    "binding_inputs": [
+      {
+        "path": "spec.txt",
+        "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+      }
+    ],
+    "key": "snapshot:sha256:b59546173e23076384bb6566554239a56869c0b628b190d7bccab664a1443ee5"
+  },
+  "reports": {
+    "implementation": {
+      "path": "attempts/7be40f9c-b789-4180-9ab5-454dcc7d8d46/report.json",
+      "sha256": "b5506c123ee9b36ac2c2d0533f3570126ef84be06bbcdedf7d33d0d9c10e1e26",
+      "attempt_id": "7be40f9c-b789-4180-9ab5-454dcc7d8d46",
+      "inputs": {
+        "work_item": "work/greeting.md",
+        "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8",
+        "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+        "binding_inputs": [
+          {
+            "path": "spec.txt",
+            "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+          }
+        ],
+        "key": "snapshot:sha256:385c0c31cdaf7e11482e297bb03c160f2749b6aef33e275f71f25357f70ded78"
+      }
+    },
+    "repair": {
+      "path": "attempts/de457ea8-7707-4e55-9c65-a0b72255f224/report.json",
+      "sha256": "94a8a28e2ff3f3235d45bf5323917bb3eb4297114a7816b51f85e0a979c728b0",
+      "attempt_id": "de457ea8-7707-4e55-9c65-a0b72255f224",
+      "inputs": {
+        "work_item": "work/greeting.md",
+        "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8",
+        "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+        "binding_inputs": [
+          {
+            "path": "spec.txt",
+            "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+          }
+        ],
+        "key": "snapshot:sha256:b59546173e23076384bb6566554239a56869c0b628b190d7bccab664a1443ee5"
+      }
+    }
+  },
+  "attempts": [
+    {
+      "id": "c678426a-bac5-4e36-9835-88ba40b1a7eb",
+      "stage": "preflight-1",
+      "inputs": {
+        "contract_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8",
+        "probe_sha256": "337c4f065b86a8c109610112eee1b128a007315d44e721a0850121fc2c661cc6"
+      },
+      "status": "complete",
+      "started": "2026-09-26T19:14:06.947781+00:00",
+      "started_epoch": 1790450046.947808,
+      "finished": "2026-09-26T19:14:54.136219+00:00",
+      "elapsed_seconds": 47.13632933283225,
+      "usage": {
+        "input_tokens": 26158,
+        "cached_input_tokens": 11008,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2286,
+        "reasoning_output_tokens": 617
+      },
+      "cost": "unknown",
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/runtime/scratch/dd87c9ac-b3a2-4701-991f-08ae2019ce8c",
+      "session_id": "01a0df23-9915-79c2-8f2f-3f1fbb171537",
+      "exit_code": 0,
+      "outcome": "finished"
+    },
+    {
+      "id": "014d8297-27ca-4556-a451-985c26b41d42",
+      "stage": "preflight-2",
+      "inputs": {
+        "contract_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8",
+        "probe_sha256": "337c4f065b86a8c109610112eee1b128a007315d44e721a0850121fc2c661cc6"
+      },
+      "status": "complete",
+      "started": "2026-09-26T19:14:54.364096+00:00",
+      "started_epoch": 1790450094.364119,
+      "finished": "2026-09-26T19:15:42.700476+00:00",
+      "elapsed_seconds": 48.284888833761215,
+      "usage": {
+        "input_tokens": 26218,
+        "cached_input_tokens": 12800,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2408,
+        "reasoning_output_tokens": 706
+      },
+      "cost": "unknown",
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/runtime/scratch/b9e2a0f8-2e8d-4309-83c9-0e32f6ac8767",
+      "session_id": "01a0df24-518f-72c2-bfde-e00d76619bc7",
+      "exit_code": 0,
+      "outcome": "finished"
+    },
+    {
+      "id": "7be40f9c-b789-4180-9ab5-454dcc7d8d46",
+      "stage": "implementation",
+      "inputs": {
+        "work_item": "work/greeting.md",
+        "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8",
+        "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+        "binding_inputs": [
+          {
+            "path": "spec.txt",
+            "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+          }
+        ],
+        "key": "snapshot:sha256:385c0c31cdaf7e11482e297bb03c160f2749b6aef33e275f71f25357f70ded78"
+      },
+      "status": "complete",
+      "started": "2026-09-26T19:15:43.180586+00:00",
+      "started_epoch": 1790450143.180615,
+      "finished": "2026-09-26T19:21:31.784719+00:00",
+      "elapsed_seconds": 348.5334458751604,
+      "usage": {
+        "input_tokens": 443188,
+        "cached_input_tokens": 392448,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 17665,
+        "reasoning_output_tokens": 12024
+      },
+      "cost": "unknown",
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/runtime/workspace",
+      "session_id": "01a0df25-1055-7a01-bfca-495ef58b3927",
+      "exit_code": 0,
+      "outcome": "finished",
+      "report": "attempts/7be40f9c-b789-4180-9ab5-454dcc7d8d46/report.json",
+      "report_sha256": "b5506c123ee9b36ac2c2d0533f3570126ef84be06bbcdedf7d33d0d9c10e1e26"
+    },
+    {
+      "id": "36a631ee-af61-44ac-9d28-0e3b60035142",
+      "stage": "proof",
+      "inputs": {
+        "work_item": "work/greeting.md",
+        "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8",
+        "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+        "binding_inputs": [
+          {
+            "path": "spec.txt",
+            "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+          }
+        ],
+        "key": "snapshot:sha256:b59546173e23076384bb6566554239a56869c0b628b190d7bccab664a1443ee5"
+      },
+      "status": "complete",
+      "started": "2026-09-26T19:21:32.738215+00:00",
+      "started_epoch": 1790450492.73824,
+      "finished": "2026-09-26T19:27:40.878773+00:00",
+      "elapsed_seconds": 368.0755867497064,
+      "usage": {
+        "input_tokens": 297328,
+        "cached_input_tokens": 250368,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 16513,
+        "reasoning_output_tokens": 10930
+      },
+      "cost": "unknown",
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/runtime/scratch/abe64ade-a90c-41eb-b951-92934d04f12a",
+      "session_id": "01a0df2a-65a3-7193-8f98-d6ac629ec15c",
+      "exit_code": 0,
+      "outcome": "finished",
+      "report": "attempts/36a631ee-af61-44ac-9d28-0e3b60035142/report.json",
+      "report_sha256": "357790785f9d8086bf750f3d42393ae637ccd92081e4ecd11092415a5c836cc4"
+    },
+    {
+      "id": "e51db78a-1fb2-4653-8fe1-d681f5a4f9b7",
+      "stage": "review",
+      "inputs": {
+        "work_item": "work/greeting.md",
+        "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8",
+        "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+        "binding_inputs": [
+          {
+            "path": "spec.txt",
+            "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+          }
+        ],
+        "key": "snapshot:sha256:b59546173e23076384bb6566554239a56869c0b628b190d7bccab664a1443ee5"
+      },
+      "status": "complete",
+      "started": "2026-09-26T19:27:41.725251+00:00",
+      "started_epoch": 1790450861.725274,
+      "finished": "2026-09-26T19:34:03.060057+00:00",
+      "elapsed_seconds": 381.2578937909566,
+      "usage": {
+        "input_tokens": 449124,
+        "cached_input_tokens": 390912,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 19423,
+        "reasoning_output_tokens": 12650
+      },
+      "cost": "unknown",
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/runtime/scratch/3f4fd948-acc7-475f-924e-50d79b72f8aa",
+      "session_id": "01a0df30-073e-7100-8d6b-bb8357ba576b",
+      "exit_code": 0,
+      "outcome": "finished",
+      "report": "attempts/e51db78a-1fb2-4653-8fe1-d681f5a4f9b7/report.json",
+      "report_sha256": "5f5179512ee29a0df0c95ff682af70939801de98eaa20b1f5d11507164e38095"
+    },
+    {
+      "id": "de457ea8-7707-4e55-9c65-a0b72255f224",
+      "stage": "repair",
+      "inputs": {
+        "work_item": "work/greeting.md",
+        "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8",
+        "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+        "binding_inputs": [
+          {
+            "path": "spec.txt",
+            "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+          }
+        ],
+        "key": "snapshot:sha256:b59546173e23076384bb6566554239a56869c0b628b190d7bccab664a1443ee5"
+      },
+      "status": "complete",
+      "started": "2026-09-26T19:34:05.143827+00:00",
+      "started_epoch": 1790451245.1438909,
+      "finished": "2026-09-26T19:39:14.061800+00:00",
+      "elapsed_seconds": 308.7329950411804,
+      "usage": {
+        "input_tokens": 270764,
+        "cached_input_tokens": 226048,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 15482,
+        "reasoning_output_tokens": 11319
+      },
+      "cost": "unknown",
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/runtime/workspace",
+      "session_id": "01a0df35-e1ba-72e0-b570-2da2f4a9ac46",
+      "exit_code": 0,
+      "outcome": "finished",
+      "report": "attempts/de457ea8-7707-4e55-9c65-a0b72255f224/report.json",
+      "report_sha256": "94a8a28e2ff3f3235d45bf5323917bb3eb4297114a7816b51f85e0a979c728b0"
+    },
+    {
+      "id": "26a95461-0034-45e4-b32b-79500c910c97",
+      "stage": "proof",
+      "inputs": {
+        "work_item": "work/greeting.md",
+        "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8",
+        "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+        "binding_inputs": [
+          {
+            "path": "spec.txt",
+            "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+          }
+        ],
+        "key": "snapshot:sha256:b59546173e23076384bb6566554239a56869c0b628b190d7bccab664a1443ee5"
+      },
+      "status": "failed",
+      "started": "2026-09-26T19:39:14.946440+00:00",
+      "started_epoch": 1790451554.946461,
+      "finished": "2026-09-26T19:44:06.185156+00:00",
+      "elapsed_seconds": 291.22373187495396,
+      "usage": "unknown",
+      "cost": "unknown",
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/runtime/scratch/8b920a3a-4534-43af-8e19-9f10ea6b1459",
+      "session_id": null,
+      "exit_code": -15,
+      "outcome": "interrupted"
+    }
+  ],
+  "records": "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting",
+  "resume": "python3 /Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/controllers/proof-first/skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source resume work/greeting.md"
+}

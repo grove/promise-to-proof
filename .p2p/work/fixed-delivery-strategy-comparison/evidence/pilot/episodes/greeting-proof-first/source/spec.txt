@@ -1,0 +1,2 @@
+greet.py prints hello followed by a newline and exits zero.
+Parent creation, atomic replacement and crash durability are excluded.

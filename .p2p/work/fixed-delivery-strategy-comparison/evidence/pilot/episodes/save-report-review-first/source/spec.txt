@@ -1,0 +1,5 @@
+report.py exports save_report(path, text), saving supplied text as UTF-8.
+Overwrite an existing report at the supplied path.
+Return None after success.
+Propagate I/O errors to the caller.
+Parent creation, atomic replacement and crash durability are excluded.

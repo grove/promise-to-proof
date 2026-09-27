@@ -1,0 +1,316 @@
+{
+  "attempts": [
+    {
+      "cost": "unknown",
+      "elapsed_seconds": 47.13632933283225,
+      "exit_code": 0,
+      "finished": "2026-09-26T19:14:54.136219+00:00",
+      "id": "c678426a-bac5-4e36-9835-88ba40b1a7eb",
+      "inputs": {
+        "contract_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8",
+        "probe_sha256": "337c4f065b86a8c109610112eee1b128a007315d44e721a0850121fc2c661cc6"
+      },
+      "outcome": "finished",
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/runtime/scratch/dd87c9ac-b3a2-4701-991f-08ae2019ce8c",
+      "session_id": "01a0df23-9915-79c2-8f2f-3f1fbb171537",
+      "stage": "preflight-1",
+      "started": "2026-09-26T19:14:06.947781+00:00",
+      "started_epoch": 1790450046.947808,
+      "status": "complete",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 11008,
+        "input_tokens": 26158,
+        "output_tokens": 2286,
+        "reasoning_output_tokens": 617
+      }
+    },
+    {
+      "cost": "unknown",
+      "elapsed_seconds": 48.284888833761215,
+      "exit_code": 0,
+      "finished": "2026-09-26T19:15:42.700476+00:00",
+      "id": "014d8297-27ca-4556-a451-985c26b41d42",
+      "inputs": {
+        "contract_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8",
+        "probe_sha256": "337c4f065b86a8c109610112eee1b128a007315d44e721a0850121fc2c661cc6"
+      },
+      "outcome": "finished",
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/runtime/scratch/b9e2a0f8-2e8d-4309-83c9-0e32f6ac8767",
+      "session_id": "01a0df24-518f-72c2-bfde-e00d76619bc7",
+      "stage": "preflight-2",
+      "started": "2026-09-26T19:14:54.364096+00:00",
+      "started_epoch": 1790450094.364119,
+      "status": "complete",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 12800,
+        "input_tokens": 26218,
+        "output_tokens": 2408,
+        "reasoning_output_tokens": 706
+      }
+    },
+    {
+      "cost": "unknown",
+      "elapsed_seconds": 348.5334458751604,
+      "exit_code": 0,
+      "finished": "2026-09-26T19:21:31.784719+00:00",
+      "id": "7be40f9c-b789-4180-9ab5-454dcc7d8d46",
+      "inputs": {
+        "binding_inputs": [
+          {
+            "path": "spec.txt",
+            "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+          }
+        ],
+        "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+        "key": "snapshot:sha256:385c0c31cdaf7e11482e297bb03c160f2749b6aef33e275f71f25357f70ded78",
+        "work_item": "work/greeting.md",
+        "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8"
+      },
+      "outcome": "finished",
+      "report": "attempts/7be40f9c-b789-4180-9ab5-454dcc7d8d46/report.json",
+      "report_sha256": "b5506c123ee9b36ac2c2d0533f3570126ef84be06bbcdedf7d33d0d9c10e1e26",
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/runtime/workspace",
+      "session_id": "01a0df25-1055-7a01-bfca-495ef58b3927",
+      "stage": "implementation",
+      "started": "2026-09-26T19:15:43.180586+00:00",
+      "started_epoch": 1790450143.180615,
+      "status": "complete",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 392448,
+        "input_tokens": 443188,
+        "output_tokens": 17665,
+        "reasoning_output_tokens": 12024
+      }
+    },
+    {
+      "cost": "unknown",
+      "elapsed_seconds": 368.0755867497064,
+      "exit_code": 0,
+      "finished": "2026-09-26T19:27:40.878773+00:00",
+      "id": "36a631ee-af61-44ac-9d28-0e3b60035142",
+      "inputs": {
+        "binding_inputs": [
+          {
+            "path": "spec.txt",
+            "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+          }
+        ],
+        "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+        "key": "snapshot:sha256:b59546173e23076384bb6566554239a56869c0b628b190d7bccab664a1443ee5",
+        "work_item": "work/greeting.md",
+        "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8"
+      },
+      "outcome": "finished",
+      "report": "attempts/36a631ee-af61-44ac-9d28-0e3b60035142/report.json",
+      "report_sha256": "357790785f9d8086bf750f3d42393ae637ccd92081e4ecd11092415a5c836cc4",
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/runtime/scratch/abe64ade-a90c-41eb-b951-92934d04f12a",
+      "session_id": "01a0df2a-65a3-7193-8f98-d6ac629ec15c",
+      "stage": "proof",
+      "started": "2026-09-26T19:21:32.738215+00:00",
+      "started_epoch": 1790450492.73824,
+      "status": "complete",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 250368,
+        "input_tokens": 297328,
+        "output_tokens": 16513,
+        "reasoning_output_tokens": 10930
+      }
+    },
+    {
+      "cost": "unknown",
+      "elapsed_seconds": "unknown",
+      "finished": null,
+      "id": "e51db78a-1fb2-4653-8fe1-d681f5a4f9b7",
+      "inputs": {
+        "binding_inputs": [
+          {
+            "path": "spec.txt",
+            "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+          }
+        ],
+        "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+        "key": "snapshot:sha256:b59546173e23076384bb6566554239a56869c0b628b190d7bccab664a1443ee5",
+        "work_item": "work/greeting.md",
+        "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8"
+      },
+      "scratch": "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source/.p2p/work/greeting/runtime/scratch/3f4fd948-acc7-475f-924e-50d79b72f8aa",
+      "session_id": null,
+      "stage": "review",
+      "started": "2026-09-26T19:27:41.725251+00:00",
+      "started_epoch": 1790450861.725274,
+      "status": "reserved",
+      "usage": "unknown"
+    }
+  ],
+  "authority": {
+    "external_effects": false,
+    "local_stages": true
+  },
+  "binding_inputs": [
+    {
+      "path": "spec.txt",
+      "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+    }
+  ],
+  "blocker": null,
+  "candidate": {
+    "binding_inputs": [
+      {
+        "path": "spec.txt",
+        "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+      }
+    ],
+    "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+    "key": "snapshot:sha256:b59546173e23076384bb6566554239a56869c0b628b190d7bccab664a1443ee5",
+    "manifest": [
+      {
+        "content_base64": "Ly5wMnAvdG1wLwo=",
+        "mode": "100644",
+        "path": ".gitignore",
+        "type": "file"
+      },
+      {
+        "content_base64": "cHJpbnQoImhlbGxvIikK",
+        "mode": "100644",
+        "path": "greet.py",
+        "type": "file"
+      },
+      {
+        "content_base64": "Z3JlZXQucHkgcHJpbnRzIGhlbGxvIGZvbGxvd2VkIGJ5IGEgbmV3bGluZSBhbmQgZXhpdHMgemVyby4KUGFyZW50IGNyZWF0aW9uLCBhdG9taWMgcmVwbGFjZW1lbnQgYW5kIGNyYXNoIGR1cmFiaWxpdHkgYXJlIGV4Y2x1ZGVkLgo=",
+        "mode": "100644",
+        "path": "spec.txt",
+        "type": "file"
+      },
+      {
+        "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBncmVldGluZwoKQ29udHJhY3QgcmV2aXNpb246IHYxClNvdXJjZTogW1NwZWNpZmljYXRpb25dKC4uL3NwZWMudHh0KQoKSW50ZW5kZWQgb3V0Y29tZTogSW1wbGVtZW50IHRoZSBzdXBwbGllZCBwdWJsaWMgYmVoYXZpb3IuCgojIyBBY2NlcHRhbmNlIG1hdHJpeAoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyAvIGNvdW50ZXJleGFtcGxlcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgc3BlYy50eHQgfCBncmVldC5weSBwcmludHMgaGVsbG8gZm9sbG93ZWQgYnkgYSBuZXdsaW5lIGFuZCBleGl0cyB6ZXJvLiB8IEluY29ycmVjdCBvdXRwdXQsIHJldHVybiwgb3IgZXJyb3IgaGFuZGxpbmcgZmFpbHMuIHwgcHl0aG9uMyBncmVldC5weSB8IGV4YWN0IHN0ZG91dCBhbmQgZXhpdCBzdGF0dXMgfCBFeGVjdXRlIHRoZSBwdWJsaWMgc2VhbSBhbmQgcmV0YWluIGFzc2VydGlvbnMgYW5kIG9ic2VydmF0aW9ucy4gfCBwbGFubmVkIHwKCiMjIFVucmVzb2x2ZWQgZ2FwcwoKTm9uZS4K",
+        "mode": "100644",
+        "path": "work/greeting.md",
+        "type": "file"
+      }
+    ],
+    "work_item": "work/greeting.md",
+    "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8"
+  },
+  "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+  "contract": {
+    "content": "# Acceptance contract: greeting\n\nContract revision: v1\nSource: [Specification](../spec.txt)\n\nIntended outcome: Implement the supplied public behavior.\n\n## Acceptance matrix\n\n| ID | Source | Requirement | Boundaries / counterexamples | Seam | Oracle | Planned evidence | Plan state |\n|---|---|---|---|---|---|---|---|\n| R1 | spec.txt | greet.py prints hello followed by a newline and exits zero. | Incorrect output, return, or error handling fails. | python3 greet.py | exact stdout and exit status | Execute the public seam and retain assertions and observations. | planned |\n\n## Unresolved gaps\n\nNone.\n",
+    "revision": "v1",
+    "sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8",
+    "source": "greeting"
+  },
+  "created": "2026-09-26T19:14:06.221439+00:00",
+  "deadline": 1790451846.2214038,
+  "excluded_dirty": [],
+  "host": {
+    "cost": "unknown",
+    "elapsed_limit": "admission and process termination; provider billing may continue",
+    "enforced": [
+      "scratch-only verification writes",
+      "network denied",
+      "approval escalation disabled",
+      "isolated configuration",
+      "dispatch admission",
+      "one repair reservation"
+    ],
+    "executable": "/opt/homebrew/bin/codex",
+    "hard_monetary_cap": "unsupported",
+    "name": "Codex CLI on macOS",
+    "trust": "controller and OS trusted; no arbitrary same-user tamper resistance",
+    "version": "codex-cli 0.157.1"
+  },
+  "implementation_complete": true,
+  "invocation_id": "f7d16595-bc9c-4083-9463-7626bbabda47",
+  "limits": {
+    "dispatches": 8,
+    "elapsed_seconds": 1800.0
+  },
+  "policy": "macos-codex-local-v1",
+  "preflight_complete": true,
+  "repair_used": false,
+  "reports": {
+    "implementation": {
+      "attempt_id": "7be40f9c-b789-4180-9ab5-454dcc7d8d46",
+      "inputs": {
+        "binding_inputs": [
+          {
+            "path": "spec.txt",
+            "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+          }
+        ],
+        "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+        "key": "snapshot:sha256:385c0c31cdaf7e11482e297bb03c160f2749b6aef33e275f71f25357f70ded78",
+        "work_item": "work/greeting.md",
+        "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8"
+      },
+      "path": "attempts/7be40f9c-b789-4180-9ab5-454dcc7d8d46/report.json",
+      "sha256": "b5506c123ee9b36ac2c2d0533f3570126ef84be06bbcdedf7d33d0d9c10e1e26"
+    },
+    "proof": {
+      "attempt_id": "36a631ee-af61-44ac-9d28-0e3b60035142",
+      "inputs": {
+        "binding_inputs": [
+          {
+            "path": "spec.txt",
+            "sha256": "043c563287f6436e4b72b40f450ddddc3715fcdd9456c6a8ed0972857a64f08c"
+          }
+        ],
+        "comparison_base": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+        "key": "snapshot:sha256:b59546173e23076384bb6566554239a56869c0b628b190d7bccab664a1443ee5",
+        "work_item": "work/greeting.md",
+        "work_item_sha256": "852f618a0d65c579bfca8a42439bfa483802f23e9bbab0f4da667db98658d5d8"
+      },
+      "path": "attempts/36a631ee-af61-44ac-9d28-0e3b60035142/report.json",
+      "sha256": "357790785f9d8086bf750f3d42393ae637ccd92081e4ecd11092415a5c836cc4"
+    }
+  },
+  "requirements": [
+    "R1"
+  ],
+  "schema": "promise-to-proof/delivery/v1",
+  "skills": {
+    "implementation": {
+      "path": "/Users/grove/.agents/skills/implement-contract/SKILL.md",
+      "sha256": "5d0aa2670f471a6629e0818ef46b30c4dfd7ac77d0fe8f703137aba1d039a2a7"
+    },
+    "proof": {
+      "path": "/Users/grove/.agents/skills/prove/SKILL.md",
+      "sha256": "7741259978b9cf0cc6f323d2e9e3e61b25b986dad3519acaf746816b3eefa323"
+    },
+    "repair": {
+      "path": "/Users/grove/.agents/skills/repair-gaps/SKILL.md",
+      "sha256": "640150ed87764045ba390e1abfcec2a782d68a4b959bb0eabe07ca4f97284a94"
+    },
+    "review": {
+      "path": "/Users/grove/.agents/skills/review-implementation/SKILL.md",
+      "sha256": "e5b8ade59142779914780d5ec35acafc9a087fd3087904c43d8e356ffc3005b7"
+    }
+  },
+  "source_head": "b2ac94d626d3303e08c84265fac24089c8f41cff",
+  "source_index_sha256": "05b877eff0d067abca082a94b354196583864e65789ba5f2afc7f948795e88e9",
+  "source_manifest": [
+    {
+      "content_base64": "Ly5wMnAvdG1wLwo=",
+      "mode": "100644",
+      "path": ".gitignore",
+      "type": "file"
+    },
+    {
+      "content_base64": "Z3JlZXQucHkgcHJpbnRzIGhlbGxvIGZvbGxvd2VkIGJ5IGEgbmV3bGluZSBhbmQgZXhpdHMgemVyby4KUGFyZW50IGNyZWF0aW9uLCBhdG9taWMgcmVwbGFjZW1lbnQgYW5kIGNyYXNoIGR1cmFiaWxpdHkgYXJlIGV4Y2x1ZGVkLgo=",
+      "mode": "100644",
+      "path": "spec.txt",
+      "type": "file"
+    },
+    {
+      "content_base64": "IyBBY2NlcHRhbmNlIGNvbnRyYWN0OiBncmVldGluZwoKQ29udHJhY3QgcmV2aXNpb246IHYxClNvdXJjZTogW1NwZWNpZmljYXRpb25dKC4uL3NwZWMudHh0KQoKSW50ZW5kZWQgb3V0Y29tZTogSW1wbGVtZW50IHRoZSBzdXBwbGllZCBwdWJsaWMgYmVoYXZpb3IuCgojIyBBY2NlcHRhbmNlIG1hdHJpeAoKfCBJRCB8IFNvdXJjZSB8IFJlcXVpcmVtZW50IHwgQm91bmRhcmllcyAvIGNvdW50ZXJleGFtcGxlcyB8IFNlYW0gfCBPcmFjbGUgfCBQbGFubmVkIGV2aWRlbmNlIHwgUGxhbiBzdGF0ZSB8CnwtLS18LS0tfC0tLXwtLS18LS0tfC0tLXwtLS18LS0tfAp8IFIxIHwgc3BlYy50eHQgfCBncmVldC5weSBwcmludHMgaGVsbG8gZm9sbG93ZWQgYnkgYSBuZXdsaW5lIGFuZCBleGl0cyB6ZXJvLiB8IEluY29ycmVjdCBvdXRwdXQsIHJldHVybiwgb3IgZXJyb3IgaGFuZGxpbmcgZmFpbHMuIHwgcHl0aG9uMyBncmVldC5weSB8IGV4YWN0IHN0ZG91dCBhbmQgZXhpdCBzdGF0dXMgfCBFeGVjdXRlIHRoZSBwdWJsaWMgc2VhbSBhbmQgcmV0YWluIGFzc2VydGlvbnMgYW5kIG9ic2VydmF0aW9ucy4gfCBwbGFubmVkIHwKCiMjIFVucmVzb2x2ZWQgZ2FwcwoKTm9uZS4K",
+      "mode": "100644",
+      "path": "work/greeting.md",
+      "type": "file"
+    }
+  ],
+  "status": "RUNNING",
+  "work_item": "work/greeting.md"
+}

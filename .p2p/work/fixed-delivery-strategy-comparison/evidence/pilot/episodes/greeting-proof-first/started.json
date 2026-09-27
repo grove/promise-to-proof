@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-B",
+    "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/controllers/proof-first/skills/productivity/deliver-issue/scripts/p2p_delivery.py",
+    "--repo",
+    "/Users/grove/projects/promise-to-proof/.p2p/work/fixed-delivery-strategy-comparison/evidence/pilot/episodes/greeting-proof-first/source",
+    "run",
+    "work/greeting.md",
+    "--comparison-base",
+    "b2ac94d626d3303e08c84265fac24089c8f41cff",
+    "--authorize-local",
+    "--max-dispatches",
+    "8",
+    "--max-seconds",
+    "1800"
+  ],
+  "started": 1790450045.7787771
+}

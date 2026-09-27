@@ -1,0 +1,8 @@
+{
+  "checks/run_delivery_comparison.py": "dbfd237b9dbfd6a0063bc4ef9666e9d17aedccfcb2236b663de431e44e0f8ed0",
+  "checks/test_run_delivery_comparison.py": "cf203d6b65ef662d5ab31a7ef294163519957237dc6536413ed03521e696ccab",
+  "checks/compare_delivery_strategies.py": "2034adbac127b2b6b498b47498342c315aa36bde3bddd8526f03fcd6c770d7de",
+  "checks/test_compare_delivery_strategies.py": "6251e57fd233e860a5f513e7700d604a9f9f1efd4917f8bd951b353124d65bcc",
+  "docs/delivery-strategy-comparison.md": "39ad0c5e7f27055e89bcb71c1c2f3841316f73033cc8ba5eaf48cceac7d4356f",
+  "work/fixed-delivery-strategy-comparison.md": "71c99c721096b5a0e535b44a00a0a8c9264175b584c417322868d342e7a21de2"
+}
