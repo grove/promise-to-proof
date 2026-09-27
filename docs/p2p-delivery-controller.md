@@ -30,10 +30,26 @@ starting-point behavior.
 
 Use the ordinary delivery skill to normalize an explicitly approved older plan
 or arrange missing branch setup under covering authority. The controller creates
-no destination branch and infers no approval. On resume, an approved-plan change,
-target advance, or missing transferred plan evidence blocks further dispatch.
+no destination branch and infers no approval. On resume, an approved-plan change
+or missing transferred plan evidence blocks further dispatch.
 A pending proposal alone leaves the active decision applicable. Preserve the
 prior run and reconcile routing and verification before a new delivery.
+
+The admitted comparison base stays fixed. A later destination advance, rewrite,
+or deletion alone does not block stages, resume, or completion. Routed deliveries
+report `destination_observation` separately, with the admitted base, observed tip,
+observation time, and relationship: `unchanged`, `fast-forward`, `non-fast-forward`,
+or `unavailable`. It is not part of candidate or report identity. Unsliced work
+does not infer a destination. Accepted reports establish the exact candidate
+against the frozen base; compatibility with a newer destination remains unchecked.
+Publication and merge readiness retain their current-target checks.
+
+Use a separate source checkout for each concurrent delivery, with its HEAD,
+index, and product files held fixed. Detached Git worktrees can share a moving
+destination ref while retaining separate source state. The controller still
+rejects changes to the original source checkout, agreement, routing decision,
+candidate, retained base, or evidence. Moving a branch that is also the source
+checkout's HEAD changes that source identity and still blocks delivery.
 
 Dirty agreement inputs enter the candidate. Other dirty paths block admission.
 Use repeated `--exclude-dirty relative/path` options only for work you explicitly

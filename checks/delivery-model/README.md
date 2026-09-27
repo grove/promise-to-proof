@@ -1,8 +1,9 @@
 # Delivery completion model
 
 This bounded FizzBee model checks one local `work/` item's completion rules at
-repository revision `41bebc726a8cc71c1d2f22d822ade006f4e78121`. It models the
-protocol, not execution of Markdown instructions by an agent. A passing run
+repository revision `41bebc726a8cc71c1d2f22d822ade006f4e78121`, extended with the
+[frozen delivery base](../../plans/frozen-delivery-under-moving-targets.md#8-delivery-model-changes).
+It models the protocol, not execution of Markdown instructions by an agent. A passing run
 provides no evidence that a real host enforced isolation, ran a stage, or retained
 adequate proof.
 
@@ -31,7 +32,7 @@ writes nothing beside its source, so checks can run against an immutable
 candidate. Durable delivery evidence belongs in a new directory beneath
 `.p2p/work/delivery-completion-integrity/evidence/`.
 
-Expect 43 checks: 11 baseline explorations, 18 reachable witnesses, and 14
+Expect 45 checks: 12 baseline explorations, 19 reachable witnesses, and 14
 mutation counterexamples. Each baseline must finish successfully without reaching
 the 64-action cutoff. Each witness intentionally falsifies only the negated
 reachability assertion `Witness`. Each mutation must fail its named safety
@@ -63,9 +64,18 @@ exists. It does not establish that assumption.
 `Save` and `ReadBack` act separately on each report and evidence artifact.
 Artifact states are 0 absent, 1 volatile, 2 saved but not reread, 3 reread and
 retrievable, 4 content lost, and 5 inaccessible. `Environment` can change exact
-contract text, candidate or review base, or lose content/access after readback.
+contract text, candidate or retained base content, move the destination tip, or
+lose content/access after readback.
 The text identity changes while the revision stays `v1`. An `identity` scenario
 also permits an old mismatched proof report to arrive.
+
+`admission_base` stays fixed for the invocation. Both verifiers bind that base;
+`retained_base` models its recoverable content and must still match at completion.
+`destination_tip` can move independently without invalidating those bindings.
+The `destination-movement` witness moves it while both verifiers are running,
+then completes with both reports and evidence saved and reread, without relaunch.
+The `base` scenario still blocks corrupted retained content, and its mutation
+still fails `ComparisonBase` when that guard is removed.
 
 `Repair` changes the candidate, discards both earlier reports, and requires new
 review and proof. It increments durable `repair_used`; the independent
@@ -93,7 +103,7 @@ come from section 9 of the [optimization handoff](../../plans/promise_to_proof_o
 |---|---|---|
 | R1, R8 | Implementation/review/proof handoffs; stage separation, persistence, repair and resume | `baseline-*`; `witness-initial`, `witness-repair`, `witness-restart`, `witness-exhausted` |
 | R2 / I02 | Candidate identity and proof handoffs: reports agree and bind the current input; `SameReports`, `CurrentText`, `CurrentCandidate`, `IndependentFullStages` | `identity`, `missing-stage` witnesses; `mutation-identity` |
-| R3 / I03 | Implementation and review handoffs: exact comparison base; `ComparisonBase` | `base` baseline, witness, mutation |
+| R3 / I03 | Implementation and review handoffs: exact frozen comparison base; `ComparisonBase` | `base` baseline, witness, mutation; `destination-movement` baseline and successful witness |
 | R4 / I05 | Requirements/revisions and proof handoffs: exact text independent of revision; `CurrentText` | `text` baseline, witness, mutation with `v1` unchanged |
 | R5 / I04 | Proof/repair handoffs: both verifiers refresh after candidate changes; `CurrentCandidate` | `candidate` baseline, witness, mutation; successful fresh `repair` witness |
 | R6 / I08 | Durable generated records: saved, reread, retrievable report/evidence content; `DurableReports`, `DurableEvidence` | `report-save/read/lost/access`, `evidence-save/read/lost/access/absent` witnesses and mutations |
@@ -113,8 +123,9 @@ does not assess test adequacy, fabricated evidence, partial requirement coverage
 or actual agent judgment.
 
 Exploration is exhaustive **within each finite scenario**, not exhaustive over
-all possible faults. Eleven scenario families isolate source, candidate, base,
-report and evidence failures; they do not combine independent fault families.
+all possible faults. Twelve scenario families isolate source, candidate, retained
+base, report and evidence failures, and destination movement; they do not combine
+independent fault families.
 Normal persistence interruption and restart can interleave with each family.
 `Environment` occurs at most once and can race any enabled nonterminal action,
 subject to content/access loss requiring a prior successful readback. This covers
@@ -239,7 +250,7 @@ report acceptance. The storage fault interrupts the canonical proof report
 write after its attempt report exists. Restart must consume that exact saved
 return without another worker dispatch. `CurrentCandidate`, full independent
 stages, durable reports and evidence, and `RepairBound` are checked at these
-boundaries. This suite does not replace the original 43 model checks or claim
+boundaries. This suite does not replace the 45 model checks or claim
 that it observes every internal write interleaving.
 
 FizzBee MBT 0.2 proposes action names globally. The model and adapter explicitly

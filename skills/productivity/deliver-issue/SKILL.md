@@ -62,13 +62,17 @@ State the destination and any unavailable prerequisite outcomes. Confirm those
 outcomes in the actual candidate, not ticket status. Retain the approved plan
 section and hash separately from the product snapshot and transfer its history.
 
-Use the intended target tip as the full comparison-base SHA and starting tree.
+At admission, use the intended target tip as the full comparison-base SHA and starting tree.
 Do not import unrelated work from the current branch. If branch setup is needed,
 show the exact approved starting SHA and local or remote refs. Perform setup only
 under covering authority, preserve conflicts, and verify refs by readback. The
 local controller cannot create destination refs; resolve setup before admission.
-An advanced target needs a fresh comparison base and review. A plan change during
-execution invalidates affected routing and requires reconciliation before resume.
+Keep the admitted comparison base fixed on resume and in every stage handoff.
+Later destination movement alone does not restart review or proof. Record the
+current tip separately when available, without rebasing or replacing the base.
+A plan or approved destination decision change during execution invalidates
+affected routing and requires reconciliation before resume. Candidate, agreement,
+evidence, and retained-base checks still apply.
 
 ## Establish the work item and host
 
@@ -260,7 +264,11 @@ Otherwise return `BLOCKED` with the precise decision, capability,
 identity, storage, check, or evidence gap and the completed work so far. Include
 issue, contract location/revision/text identity, candidate and comparison base,
 report/evidence references, actual checks and results, and any partial or
-uncertain effects. A local delivery request authorizes scoped local work and
+uncertain effects. If the destination moved, report the admitted base and observed
+tip separately; this delivery has not established compatibility with the newer
+destination.
+
+A local delivery request authorizes scoped local work and
 safe checks, not tracker edits, triage-label changes, commits, pushes, PRs,
 merges, deployment, or destructive actions. Each external effect needs its own
 authority and verified readback. Leave publication and merge readiness to their

@@ -91,7 +91,7 @@ def skills():
     return result
 
 
-def routing(root, work):
+def routing(root, work, *, resolve_tip=True):
     """Read the approved Markdown decision; never infer approval or a child target."""
     item, own_directory = fs.paths(root, work)
     parents = []
@@ -163,6 +163,11 @@ def routing(root, work):
     # An explicit local ref is required for local delivery. Skills inspect remote
     # state and perform any authorized setup before admitting this controller.
     ref = 'refs/heads/' + target
+    decision = {'path': str(path.relative_to(root)), 'parent': parent, 'revision': revision,
+                'sha256': fs.digest(sections[0]), 'text': text, 'approval_source': approval,
+                'destination': target, 'target_ref': ref}
+    if not resolve_tip:
+        return decision
     try:
         tip = fs.full_commit(root, ref)
     except ValueError as error:
@@ -173,9 +178,7 @@ def routing(root, work):
         result = subprocess.run(['git', '-C', str(root), 'merge-base', '--is-ancestor', start, tip], capture_output=True)
         if result.returncode:
             raise ValueError('integration branch conflicts with approved starting commit: ' + ref)
-    return {'path': str(path.relative_to(root)), 'parent': parent, 'revision': revision,
-            'sha256': fs.digest(sections[0]), 'text': text, 'approval_source': approval,
-            'destination': target, 'target_ref': ref, 'target_tip': tip}
+    return dict(decision, target_tip=tip)
 
 
 def routing_records(root, decision):
@@ -466,14 +469,37 @@ class Delivery:
     def save(self):
         retained(self.root, self.work, 'delivery.json', encoded(self.state))
 
+    def observe_destination(self):
+        decision = self.state.get('routing')
+        if decision is None:
+            return
+        base = self.state['comparison_base']
+        tip, relationship = None, 'unavailable'
+        try:
+            tip = fs.full_commit(self.root, decision['target_ref'])
+            if tip == base:
+                relationship = 'unchanged'
+            else:
+                check = subprocess.run(['git', '-C', str(self.root), 'merge-base', '--is-ancestor', base, tip],
+                                       capture_output=True)
+                if check.returncode in (0, 1):
+                    relationship = 'fast-forward' if check.returncode == 0 else 'non-fast-forward'
+        except (ValueError, OSError, subprocess.SubprocessError):
+            pass  # Ref availability does not determine acceptance against the retained base.
+        self.state['destination_observation'] = {
+            'destination': decision['destination'], 'comparison_base': base,
+            'observed_tip': tip, 'relationship': relationship, 'observed_at': now()}
+
     def source_stable(self):
         admission = json.loads((self.directory / 'admission.json').read_text())
         for key, value in admission.items():
             if self.state.get(key) != value:
                 raise ValueError('persisted admission changed: ' + key)
-        if routing(self.root, self.work) != self.state.get('routing'):
-            raise ValueError('approved delivery plan or destination tip changed; reconcile routing and refresh review')
-        if routing(self.workspace, self.work) != self.state.get('routing'):
+        admitted = self.state.get('routing')
+        decision = {k: v for k, v in admitted.items() if k != 'target_tip'} if admitted else None
+        if routing(self.root, self.work, resolve_tip=False) != decision:
+            raise ValueError('approved delivery plan changed; reconcile routing and refresh review')
+        if routing(self.workspace, self.work, resolve_tip=False) != decision:
             raise ValueError('transferred approved delivery plan changed')
         for record in self.state.get('routing_records', []):
             if record['path'] == self.state['routing']['path']:
@@ -505,6 +531,7 @@ class Delivery:
             raise ValueError('persisted authority or policy changed')
         if skills() != self.state['skills']:
             raise ValueError('installed stage skills changed; prior invocation inputs are no longer available')
+        self.observe_destination()
 
     def capture(self):
         if fs.digest((self.workspace / self.work).read_bytes()) != self.state['contract']['sha256']:
@@ -721,7 +748,9 @@ assert results['scratch'] == 'ok'
                          'otherwise name the gap. ')
         prompt = (f'Invoke the installed {STAGES[skill_stage]} skill at {self.state["skills"][skill_stage]["path"]}. '
                   f'Read it and its references. Work item {self.work}, workspace {self.workspace}. '
-                  f'Comparison base {self.state["comparison_base"]}. Whole contract, full scope. '
+                  f'Frozen admitted comparison base {self.state["comparison_base"]}. Whole contract, full scope. '
+                  'This validated delivery handoff supplies the authoritative base. Later destination-ref '
+                  'movement alone does not change review scope or proof identity; do not adopt a newer base. '
                   f'Approved delivery routing (separate from product identity): {json.dumps(self.state.get("routing"))}. '
                   'Read transferred plan/history and verify prerequisite outcomes in the actual candidate. '
                   'The enclosing controller owns durable reports; return your full report in the required JSON '
@@ -1075,6 +1104,9 @@ def result(delivery):
     return {key: state[key] for key in ('status', 'blocker', 'invocation_id', 'work_item', 'comparison_base',
                                       'limits', 'repair_used', 'host')} | {
         'routing': state.get('routing'),
+        'destination_observation': state.get('destination_observation'),
+        'acceptance_boundary': ('Acceptance applies to the exact candidate against its frozen comparison base. '
+                                'Compatibility with the current destination has not been established by this delivery.'),
         'progress': progress,
         'starting_commit': state.get('starting_commit'),
         'candidate': identity(state['candidate']) if state.get('candidate') else None,

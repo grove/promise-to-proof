@@ -21,7 +21,7 @@ PIN = {
     "fizzbee": "f0746cd47d13f268835fc0d8c1e85ec28a8ad0034e080cff6ec49a26304c1bf3",
     "parser/parser_bin": "54eb014c1cc7cb874faccfe22e4f93e78dbb3d633a9f496d71e21f5997a8f3fd",
 }
-SCENARIOS = ["initial", "repair", "exhausted", "identity", "text", "candidate", "base",
+SCENARIOS = ["initial", "repair", "exhausted", "identity", "text", "candidate", "base", "destination-movement",
              "report-lost", "report-access", "evidence-lost", "evidence-access"]
 WITNESSES = {name: name for name in SCENARIOS}
 WITNESSES.update({"restart": "repair", "missing-stage": "initial",
@@ -62,7 +62,7 @@ def check_trace(trace, kind, name, property_name):
     """Check observed terminal facts, independently of the completion guard."""
     state = trace[-1]["Node"]["state"]
     if kind == "witness":
-        expected = {"initial": "complete", "repair": "complete", "restart": "complete", "exhausted": "repair-exhausted"}.get(name, name)
+        expected = {"initial": "complete", "repair": "complete", "restart": "complete", "destination-movement": "complete", "exhausted": "repair-exhausted"}.get(name, name)
         assert state["outcome"] == expected, (name, state)
         if name in ["repair", "restart", "exhausted"]:
             assert state["repairs_actual"] == 1
@@ -71,10 +71,16 @@ def check_trace(trace, kind, name, property_name):
             assert state["restarted"]
         if name == "text":
             assert state["revision"] == "v1" and state["contract"] == 1
+        if name == "destination-movement":
+            assert state["destination_tip"] != state["admission_base"] and not state["restarted"]
+            movement = next(i for i, step in enumerate(trace) if step["Name"] == "Environment")
+            assert trace[movement - 1]["Node"]["state"]["stages"] == [1, 1]
+            assert sum(step["Name"] == "Launch" for step in trace) == 2
         if expected == "complete":
             assert state["reports"] == state["evidence"] == [3, 3]
             assert all(b[:2] == [state["contract"], state["candidate"]] for b in state["bindings"])
-            assert state["bindings"][0][2] == state["base"]
+            assert state["retained_base"] == state["admission_base"]
+            assert all(b[2] == state["admission_base"] for b in state["bindings"])
     else:
         if property_name == "RepairBound":
             assert state["repairs_actual"] == 2 and state["restarted"]
@@ -88,7 +94,7 @@ def check_trace(trace, kind, name, property_name):
             elif property_name == "CurrentCandidate":
                 assert any(b[1] != state["candidate"] for b in state["bindings"])
             elif property_name == "ComparisonBase":
-                assert state["bindings"][0][2] != state["base"]
+                assert state["retained_base"] != state["admission_base"] or any(b[2] != state["admission_base"] for b in state["bindings"])
             else:
                 artifact = "reports" if property_name == "DurableReports" else "evidence"
                 missing = {"absent": 0, "save": 1, "read": 2, "lost": 4, "access": 5}[name.split("-")[1]]
