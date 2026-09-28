@@ -7,6 +7,21 @@ It keeps the agreement, implementation, review, and proof separate so the
 promised capability does not get lost between ticket and implementation: no less
 in substance, no more in scope.
 
+## Current focus
+
+> [!IMPORTANT]
+> Promise to Proof is being hardened around one primary goal: **implement exactly what was promised, prove it thoroughly, and deliver that exact high-quality result.**
+>
+> We are currently working toward:
+> - **Much smaller repository footprint** — temporary P2P artifacts stay local and Git keeps only what is truly necessary (#38).
+> - **Eventually zero P2P-generated files in Git by default** — completed deliveries leave product code/tests in Git and only compact delivery metadata elsewhere (#46).
+> - **Better acceptance contracts** — make promises precise, complete, and verifiable before implementation begins (#44).
+> - **Stronger delivery quality** — trace requirements to code and proof, verify important seams and edge cases based on risk, and enforce high implementation quality without unnecessary ceremony (#40–#43).
+> - **Less churn in busy repositories** — normal movement of `main` should not force unnecessary re-review or block draft publication (#39).
+>
+> **Principle:** be strict about correctness, scope, evidence, and candidate identity — but flexible about the process used to establish them.
+
+
 ## Why this exists
 
 For developers using an issue tracker and coding agents, "done" can be hard to
