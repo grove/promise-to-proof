@@ -1,0 +1,8 @@
+Use the current publish-pr skill at /Users/grove/projects/promise-to-proof/skills/productivity/publish-pr/SKILL.md and current protocol at /Users/grove/projects/promise-to-proof/docs/acceptance-contract-protocol.md to handle this request:
+
+/publish-pr work/delivery-review-report-contract.md; review .p2p/work/delivery-review-report-contract/review.md; proof .p2p/work/delivery-review-report-contract/proof.md; target main; draft only
+
+Repository fixture: /private/tmp/issue37-r19-publish-boundary/repo
+Controlled read-only target observation: in this local fixture, refs/heads/main and refs/remotes/origin/main point to f5ff636d7537a6381579b59c3d80fd8535ff944b; configured origin URL is https://github.com/grove/promise-to-proof.git. This is fixture data, not a live GitHub read.
+
+Use only local fixture files and refs. Do not call GitHub, the network, or any external service. Do not create or edit files in the repository, change refs, commit, push, create/edit a pull request, or perform any other external effect. Return your result and any required next step in your response only.

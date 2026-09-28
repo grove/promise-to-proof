@@ -1,0 +1,1 @@
+python3 /private/tmp/issue37-r19-publish-boundary/repo/skills/productivity/deliver-issue/scripts/p2p_filesystem.py --repo /private/tmp/issue37-r19-publish-boundary/repo validate work/delivery-review-report-contract.md --base 9384d662d425d222df3f5547bcbf84ba7cd10973

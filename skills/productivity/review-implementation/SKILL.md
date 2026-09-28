@@ -45,17 +45,16 @@ reconciliation through `plan-acceptance` and the decomposition workflow.
 Resolve the active approved plan under the protocol's Epic delivery plans rules
 before accepting a comparison base. Review a child against its resolved target;
 review the assembled parent against its final destination. Unsliced work needs
-no epic plan. Capture the inherited agreement, plan revision, exact approved text
-hash, and recoverable plan reference. For a new direct review, resolve and freeze
-the current full target-tip SHA when capturing scope. For an admitted delivery,
-validate and use the comparison base in its candidate handoff even if the target
-has since moved. Record a later target observation separately; it does not prevent
-`REVIEWED` against that fixed base. A changed approved destination or explicitly
-adopted base requires fresh review. A candidate or binding-agreement change also
-requires fresh proof. Publication review must cover its current target under the
-protocol's publication rules. Reject a
-convenient unrelated base. Inspect moved integrated work for unfinished sibling
-payload, not just a matching branch name.
+an explicit workflow destination or one unambiguous configured upstream. Capture
+the inherited agreement, plan revision, exact approved text hash, and recoverable
+plan reference.
+
+For an admitted delivery, use its validated frozen comparison base. A later
+destination move alone does not require fresh review. For a direct review without
+an admitted handoff, capture the intended target's full tip when you establish the
+review scope. Do not replace that tip during the review. A changed candidate,
+agreement, approved plan, or adopted base requires fresh review. Inspect moved
+integrated work for unfinished sibling payload, not just a matching branch name.
 
 Capture the candidate and comparison base before inspecting. Resolve mutable
 references to fixed identities. For branch or PR review, establish the actual

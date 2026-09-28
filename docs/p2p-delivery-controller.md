@@ -7,7 +7,8 @@ in `~/.agents/skills/` or `$CODEX_HOME/skills/`. It inherits the configured Open
 model and reasoning preference. Other model providers are unsupported.
 
 Run from this repository, replacing the work item, source repository, and full
-comparison-base SHA:
+comparison-base SHA. For unsliced work, add `--destination BRANCH` when the
+workflow has an explicit destination.
 
 ```sh
 python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source run work/example.md --comparison-base FULL_SHA --authorize-local
@@ -25,31 +26,18 @@ running the controller. Use the resolved destination's current local tip for
 the plan and history outside product identity, and binds the approved plan text
 to stage inputs. It rejects a missing decision, conflicting base, missing ref,
 or integration ref unrelated to the approved starting commit. An assembled
-parent uses its own plan's final destination. Unsliced work keeps its existing
-starting-point behavior.
+parent uses its own plan's final destination. For unsliced work, the controller
+uses the explicit `--destination` when supplied. Otherwise, it resolves one
+unambiguous upstream from the current branch. It blocks before dispatch if neither
+is available. `--comparison-base` remains required and must equal the resolved
+destination tip. The controller starts from that exact tree.
 
 Use the ordinary delivery skill to normalize an explicitly approved older plan
 or arrange missing branch setup under covering authority. The controller creates
 no destination branch and infers no approval. On resume, an approved-plan change
-or missing transferred plan evidence blocks further dispatch.
-A pending proposal alone leaves the active decision applicable. Preserve the
-prior run and reconcile routing and verification before a new delivery.
-
-The admitted comparison base stays fixed. A later destination advance, rewrite,
-or deletion alone does not block stages, resume, or completion. Routed deliveries
-report `destination_observation` separately, with the admitted base, observed tip,
-observation time, and relationship: `unchanged`, `fast-forward`, `non-fast-forward`,
-or `unavailable`. It is not part of candidate or report identity. Unsliced work
-does not infer a destination. Accepted reports establish the exact candidate
-against the frozen base; compatibility with a newer destination remains unchecked.
-Publication and merge readiness retain their current-target checks.
-
-Use a separate source checkout for each concurrent delivery, with its HEAD,
-index, and product files held fixed. Detached Git worktrees can share a moving
-destination ref while retaining separate source state. The controller still
-rejects changes to the original source checkout, agreement, routing decision,
-candidate, retained base, or evidence. Moving a branch that is also the source
-checkout's HEAD changes that source identity and still blocks delivery.
+or missing transferred plan evidence blocks further dispatch. A target advance
+alone does not. A pending proposal leaves the active decision applicable.
+Preserve the prior run and reconcile changed routing before a new delivery.
 
 Dirty agreement inputs enter the candidate. Other dirty paths block admission.
 Use repeated `--exclude-dirty relative/path` options only for work you explicitly
@@ -99,6 +87,34 @@ Log activity establishes neither useful progress nor successful completion.
 Use the retained events to distinguish new observations from repeated checks.
 A timeout names the interrupted stage and retains its candidate workspace, event
 log, and process receipt. Resume does not repeat that uncertain or failed stage.
+
+The admitted comparison base remains fixed on resume. A destination move alone
+does not invalidate reports or trigger another verifier run. `delivery.json` and
+the public result retain a separate observation with the destination tip, its
+relationship to the frozen base, and the observation time. A changed approved
+plan still blocks resume. Successful completion means the exact candidate was
+reviewed and proven against the frozen base. It does not establish compatibility
+with the current destination.
+
+## Check target movement
+
+`checks/test_p2p_delivery.py` keeps the required movement cases distinct:
+
+| Case | Assertion |
+|---|---|
+| T1 | `test_child_stale_admission_blocks_but_target_advance_after_admission_is_observational` rejects the old base before dispatch. |
+| T2 | The same test admits at A, moves the target to B, and completes against A. |
+| T3 | `test_movement_during_implementation_review_and_proof_keeps_all_bindings_fixed` moves the target while stages run. |
+| T4 | `test_target_advance_after_reports_return_does_not_refresh_verifiers` moves it after reports return. |
+| T5 | `test_fresh_process_resumes_missing_stages_after_target_advance` resumes in a new process against A. |
+| T6 and T7 | `test_non_fast_forward_and_missing_destination_do_not_invalidate_acceptance` records non-fast-forward and unavailable observations. |
+| T8 | `test_parent_uses_final_destination_and_plan_loss_blocks_resume` keeps approved-plan loss as a blocker. |
+| T9 and T10 | `test_agreement_and_candidate_drift` and `test_source_agreement_binding_base_and_report_loss` retain integrity blockers while the target moves. |
+| T11 | `test_repeated_run_cannot_replace_frozen_base_after_target_moves` blocks base replacement; `test_adopting_new_base_uses_new_candidate_and_fresh_report_bindings` checks a new delivery at B. |
+| T12 | `test_busy_destination_moves_repeatedly_without_refreshing_completed_stages` completes after repeated target moves. |
+
+Run the controller suite to exercise these assertions. The result records the
+frozen SHA separately from each observed destination tip.
 
 Records live under `.p2p/work/<slug>/`. `delivery.json` contains the invocation,
 reservations, usage, and precise blocker. `admission.json` retains its fixed

@@ -1,0 +1,37 @@
+{
+  "kind": "baseline",
+  "name": "initial",
+  "scenario": "initial",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-initial",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-initial.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 3.158,
+  "model_sha256": "2142bd65b914799cb32c7ff7c2a1e084753c9a3fcb093d0845603954aa0c0480",
+  "nodes": 1575,
+  "max_actions_observed": 15,
+  "outcomes": [
+    "complete",
+    "evidence-absent",
+    "evidence-read",
+    "evidence-save",
+    "missing-stage",
+    "report-read",
+    "report-save",
+    "running"
+  ],
+  "actions": [
+    "Complete",
+    "Implement",
+    "Launch",
+    "ReadBack",
+    "Restart",
+    "Return",
+    "Save"
+  ],
+  "result": "complete finite safety exploration"
+}

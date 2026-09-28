@@ -1,0 +1,18 @@
+{
+  "kind": "mutation",
+  "name": "evidence-access",
+  "scenario": "evidence-access",
+  "mutation": "evidence-access",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-access",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-access.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 1.371,
+  "model_sha256": "783f1b2f00a31b0f33156e64c0c962db75406aea047bd8150a965aa5d3b1ae86",
+  "property": "DurableEvidence",
+  "steps": 36,
+  "result": "expected counterexample"
+}

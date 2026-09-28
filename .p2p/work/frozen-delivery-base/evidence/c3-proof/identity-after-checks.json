@@ -1,0 +1,13 @@
+{
+  "candidate": "snapshot:sha256:d0a2b3cc0d60f6f0f36e019e47ddddad7ca5845ee570ac02269ac3956bc82404",
+  "comparison_base": "dbe54bc20a19b8ab8e700fb3aba9c9e8a59ce4d4",
+  "contract_sha256": "3925c513a6702b94fbc2fcfc30f7d2d057638a275ae103056031cb3ca38aa0a9",
+  "binding_source_sha256": "c570232a7371a53fd6dad954ec9d53f7940ecba171b3a2080fd995a6bd9a77d2",
+  "manifest_entries": 141,
+  "manifest_validation": "PASS",
+  "separate_full_review_sha256": "3f0c1cfb0599abc88c567086ec37a7a91c90ec3f3170872b8722c57284e408fc",
+  "separate_full_review_status": "REVIEWED",
+  "review_candidate": "snapshot:sha256:d0a2b3cc0d60f6f0f36e019e47ddddad7ca5845ee570ac02269ac3956bc82404",
+  "review_base": "dbe54bc20a19b8ab8e700fb3aba9c9e8a59ce4d4",
+  "contract_revision": "v2"
+}

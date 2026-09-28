@@ -1,0 +1,17 @@
+git status --short --branch
+## fixture/candidate
+ M .p2p/work/delivery-review-report-contract/candidate.json
+ M .p2p/work/delivery-review-report-contract/evidence/SHA256SUMS
+ M .p2p/work/delivery-review-report-contract/proof.md
+ M .p2p/work/delivery-review-report-contract/review.md
+?? .p2p/work/delivery-review-report-contract/evidence/host/proof-main-938-unittest.log
+?? .p2p/work/delivery-review-report-contract/history/7076d863a2e8aeae5bbf57c6fb54252ac7c39c5c2737b3032a0ad9a7f037e9ae/
+?? .p2p/work/delivery-review-report-contract/history/b6671ba447daba2bf7694b64315180703bd18861090fb84fc4281586a4831911/
+?? .p2p/work/delivery-review-report-contract/history/e0003a64ede7f562ce9ee70c350b4dafe7fef3985504c24c3db3d797ba2bd11b/
+?? .p2p/work/delivery-review-report-contract/merge-readiness.md
+
+git show-ref
+495bb1899b82f9d5c1b7c05d78fb15922b330a11 refs/heads/fixture/candidate
+f5ff636d7537a6381579b59c3d80fd8535ff944b refs/heads/main
+f5ff636d7537a6381579b59c3d80fd8535ff944b refs/remotes/origin/HEAD
+f5ff636d7537a6381579b59c3d80fd8535ff944b refs/remotes/origin/main

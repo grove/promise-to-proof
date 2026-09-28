@@ -1,0 +1,32 @@
+{
+  "kind": "baseline",
+  "name": "review-base",
+  "scenario": "review-base",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-review-base",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-review-base.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.966,
+  "model_sha256": "166c355c8d33fb9bb1d639a8ba5d20ce6d2947b95c973a6f105805a16dcda6e8",
+  "nodes": 1575,
+  "max_actions_observed": 15,
+  "outcomes": [
+    "base",
+    "missing-stage",
+    "running"
+  ],
+  "actions": [
+    "Complete",
+    "Implement",
+    "Launch",
+    "ReadBack",
+    "Restart",
+    "Return",
+    "Save"
+  ],
+  "result": "complete finite safety exploration"
+}

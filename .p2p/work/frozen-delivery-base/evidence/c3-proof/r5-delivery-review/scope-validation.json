@@ -1,0 +1,41 @@
+{
+  "observed_at": "2026-09-28T08:05:45.990414+00:00",
+  "candidate": "snapshot:sha256:d0a2b3cc0d60f6f0f36e019e47ddddad7ca5845ee570ac02269ac3956bc82404",
+  "manifest_entries": 141,
+  "manifest_product_match": true,
+  "contract_sha256": "3925c513a6702b94fbc2fcfc30f7d2d057638a275ae103056031cb3ca38aa0a9",
+  "binding_inputs": [
+    {
+      "path": "plans/frozen-delivery-under-moving-targets.md",
+      "sha256": "c570232a7371a53fd6dad954ec9d53f7940ecba171b3a2080fd995a6bd9a77d2"
+    }
+  ],
+  "comparison_base": "dbe54bc20a19b8ab8e700fb3aba9c9e8a59ce4d4",
+  "base_tree": "c8bfbe410b902c57d2b52d6f609f5c3cb659637c",
+  "base_product_blobs_verified": 140,
+  "main_tip": "7ebbc1438ef7cafc6de2935e6d15260ffff49c04",
+  "relationship": "fast-forward",
+  "merge_base_with_main": "dbe54bc20a19b8ab8e700fb3aba9c9e8a59ce4d4",
+  "changed_paths_against_frozen_base": [
+    "checks/check_p2p_delivery_host.py",
+    "checks/deliver-issue-scenarios.md",
+    "checks/delivery-model/README.md",
+    "checks/delivery-model/check.py",
+    "checks/delivery-model/delivery.fizz",
+    "checks/epic-delivery-scenarios.md",
+    "checks/merge-readiness-scenarios.md",
+    "checks/proof-repair-scenarios.md",
+    "checks/publish-pr-scenarios.md",
+    "checks/review-implementation-scenarios.md",
+    "checks/test_p2p_delivery.py",
+    "docs/acceptance-contract-protocol.md",
+    "docs/p2p-delivery-controller.md",
+    "skills/productivity/deliver-issue/SKILL.md",
+    "skills/productivity/deliver-issue/scripts/p2p_delivery.py",
+    "skills/productivity/merge-readiness/SKILL.md",
+    "skills/productivity/prove/SKILL.md",
+    "skills/productivity/review-implementation/SKILL.md",
+    "work/frozen-delivery-base.md"
+  ],
+  "helper_validation": "passed"
+}

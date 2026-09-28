@@ -1,0 +1,18 @@
+{
+  "kind": "witness",
+  "name": "repair",
+  "scenario": "repair",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-repair",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-repair.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 1.393,
+  "model_sha256": "2a23d6f5c8e71c63af3fd72fa271ea408b94c90087a186f3481ac4a584580b55",
+  "property": "Witness",
+  "steps": 43,
+  "result": "reachable witness"
+}

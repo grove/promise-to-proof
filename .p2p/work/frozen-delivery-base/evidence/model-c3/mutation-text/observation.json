@@ -1,0 +1,18 @@
+{
+  "kind": "mutation",
+  "name": "text",
+  "scenario": "text",
+  "mutation": "text",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-text",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-text.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 2.632,
+  "model_sha256": "feeb0a4edc71e382ba9b0905cee5286e106f9351c36d07ccb098380a5710bfb5",
+  "property": "CurrentText",
+  "steps": 35,
+  "result": "expected counterexample"
+}

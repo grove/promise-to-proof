@@ -1,0 +1,32 @@
+{
+  "kind": "baseline",
+  "name": "proof-base",
+  "scenario": "proof-base",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-proof-base",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-proof-base.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 1.034,
+  "model_sha256": "ac6b752880d637c71f7a7ecf503c00c6245ec9c69284d53ce5f51dba42b53a4a",
+  "nodes": 1699,
+  "max_actions_observed": 15,
+  "outcomes": [
+    "base",
+    "missing-stage",
+    "running"
+  ],
+  "actions": [
+    "Complete",
+    "Implement",
+    "Launch",
+    "ReadBack",
+    "Restart",
+    "Return",
+    "Save"
+  ],
+  "result": "complete finite safety exploration"
+}

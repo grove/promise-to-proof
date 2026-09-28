@@ -1,0 +1,18 @@
+{
+  "kind": "witness",
+  "name": "evidence-read",
+  "scenario": "initial",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-evidence-read",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-evidence-read.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.545,
+  "model_sha256": "02ecbeef05099de7c3fe8bdc24ae5e452f739ed76a8ff12f27b4c70cfd650b24",
+  "property": "Witness",
+  "steps": 13,
+  "result": "reachable witness"
+}

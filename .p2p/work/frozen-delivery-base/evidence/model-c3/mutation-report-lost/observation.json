@@ -1,0 +1,18 @@
+{
+  "kind": "mutation",
+  "name": "report-lost",
+  "scenario": "report-lost",
+  "mutation": "report-lost",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-report-lost",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-report-lost.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 1.29,
+  "model_sha256": "6b6713ccb5986eabac060a721dbfff62199fdf1d61336f117bf4d2ab458db805",
+  "property": "DurableReports",
+  "steps": 36,
+  "result": "expected counterexample"
+}

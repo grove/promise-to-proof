@@ -1,0 +1,1147 @@
+{
+  "fizzbee": "v0.5.3",
+  "binary_sha256": {
+    "fizz": "8e8f905864b1781a3960f44fb654fc4455ef633e45556adf3fae586b652480a6",
+    "fizzbee": "f0746cd47d13f268835fc0d8c1e85ec28a8ad0034e080cff6ec49a26304c1bf3",
+    "parser/parser_bin": "54eb014c1cc7cb874faccfe22e4f93e78dbb3d633a9f496d71e21f5997a8f3fd"
+  },
+  "repository_revision": "41bebc726a8cc71c1d2f22d822ade006f4e78121",
+  "environment": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.7",
+  "bounds": "single fault family; 64 actions; one restart; one repair",
+  "model_sha256": "2142bd65b914799cb32c7ff7c2a1e084753c9a3fcb093d0845603954aa0c0480",
+  "runs": [
+    {
+      "kind": "baseline",
+      "name": "initial",
+      "scenario": "initial",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-initial",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-initial.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 3.158,
+      "model_sha256": "2142bd65b914799cb32c7ff7c2a1e084753c9a3fcb093d0845603954aa0c0480",
+      "nodes": 1575,
+      "max_actions_observed": 15,
+      "outcomes": [
+        "complete",
+        "evidence-absent",
+        "evidence-read",
+        "evidence-save",
+        "missing-stage",
+        "report-read",
+        "report-save",
+        "running"
+      ],
+      "actions": [
+        "Complete",
+        "Implement",
+        "Launch",
+        "ReadBack",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "baseline",
+      "name": "repair",
+      "scenario": "repair",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-repair",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-repair.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.525,
+      "model_sha256": "8cf070e618b229ee1d7483028fe42bdd8ce2f4ca308475a965b191cbf02b1797",
+      "nodes": 3148,
+      "max_actions_observed": 20,
+      "outcomes": [
+        "complete",
+        "evidence-absent",
+        "evidence-read",
+        "evidence-save",
+        "failed-verification",
+        "missing-stage",
+        "report-read",
+        "report-save",
+        "running"
+      ],
+      "actions": [
+        "Complete",
+        "Implement",
+        "Launch",
+        "ReadBack",
+        "Repair",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "baseline",
+      "name": "exhausted",
+      "scenario": "exhausted",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-exhausted",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-exhausted.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.471,
+      "model_sha256": "df96f5488fed45647c16370b82aef012ea22cb47cff043e1907b62e2ad9739cd",
+      "nodes": 3148,
+      "max_actions_observed": 20,
+      "outcomes": [
+        "failed-verification",
+        "missing-stage",
+        "repair-exhausted",
+        "running"
+      ],
+      "actions": [
+        "Complete",
+        "Implement",
+        "Launch",
+        "ReadBack",
+        "Repair",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "baseline",
+      "name": "identity",
+      "scenario": "identity",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-identity",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-identity.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.973,
+      "model_sha256": "1e42a94eaf677d92f05c77e7b60874ef077f44028f3130d42b96df4f6c7eb629",
+      "nodes": 1575,
+      "max_actions_observed": 15,
+      "outcomes": [
+        "identity",
+        "missing-stage",
+        "running"
+      ],
+      "actions": [
+        "Complete",
+        "Implement",
+        "Launch",
+        "ReadBack",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "baseline",
+      "name": "text",
+      "scenario": "text",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-text",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-text.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 2.768,
+      "model_sha256": "c27dfaf0f6aa1708978e719fde7de94a642cea3a2ff5b4c5dc1f7b05c98db382",
+      "nodes": 7281,
+      "max_actions_observed": 16,
+      "outcomes": [
+        "complete",
+        "evidence-absent",
+        "evidence-read",
+        "evidence-save",
+        "identity",
+        "missing-stage",
+        "report-read",
+        "report-save",
+        "running",
+        "text"
+      ],
+      "actions": [
+        "Complete",
+        "Environment",
+        "Implement",
+        "Launch",
+        "ReadBack",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "baseline",
+      "name": "candidate",
+      "scenario": "candidate",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-candidate",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-candidate.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 2.767,
+      "model_sha256": "0e7b84a8c24b867051e50a9e2af4f69c5deba89413d6646bcd46aaccfaafb75d",
+      "nodes": 7281,
+      "max_actions_observed": 16,
+      "outcomes": [
+        "candidate",
+        "complete",
+        "evidence-absent",
+        "evidence-read",
+        "evidence-save",
+        "identity",
+        "missing-stage",
+        "report-read",
+        "report-save",
+        "running"
+      ],
+      "actions": [
+        "Complete",
+        "Environment",
+        "Implement",
+        "Launch",
+        "ReadBack",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "baseline",
+      "name": "base",
+      "scenario": "base",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-base",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-base.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 2.836,
+      "model_sha256": "0d05ceb5380a2dd8abf90ccb4cec0db31201f2bbf8c5df20a386486b43378548",
+      "nodes": 7281,
+      "max_actions_observed": 16,
+      "outcomes": [
+        "base",
+        "complete",
+        "evidence-absent",
+        "evidence-read",
+        "evidence-save",
+        "missing-stage",
+        "report-read",
+        "report-save",
+        "running"
+      ],
+      "actions": [
+        "Complete",
+        "Environment",
+        "Implement",
+        "Launch",
+        "ReadBack",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "baseline",
+      "name": "review-base",
+      "scenario": "review-base",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-review-base",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-review-base.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.966,
+      "model_sha256": "166c355c8d33fb9bb1d639a8ba5d20ce6d2947b95c973a6f105805a16dcda6e8",
+      "nodes": 1575,
+      "max_actions_observed": 15,
+      "outcomes": [
+        "base",
+        "missing-stage",
+        "running"
+      ],
+      "actions": [
+        "Complete",
+        "Implement",
+        "Launch",
+        "ReadBack",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "baseline",
+      "name": "proof-base",
+      "scenario": "proof-base",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-proof-base",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-proof-base.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.034,
+      "model_sha256": "ac6b752880d637c71f7a7ecf503c00c6245ec9c69284d53ce5f51dba42b53a4a",
+      "nodes": 1699,
+      "max_actions_observed": 15,
+      "outcomes": [
+        "base",
+        "missing-stage",
+        "running"
+      ],
+      "actions": [
+        "Complete",
+        "Implement",
+        "Launch",
+        "ReadBack",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "baseline",
+      "name": "moving-target",
+      "scenario": "moving-target",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-moving-target",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-moving-target.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 2.463,
+      "model_sha256": "df96dd606bd1022994d3e749467b1d241187d7b2e1102e37d2d2169ff9cf03be",
+      "nodes": 5979,
+      "max_actions_observed": 18,
+      "outcomes": [
+        "complete",
+        "evidence-absent",
+        "evidence-read",
+        "evidence-save",
+        "missing-stage",
+        "report-read",
+        "report-save",
+        "running"
+      ],
+      "actions": [
+        "Complete",
+        "Implement",
+        "Launch",
+        "MoveDestination",
+        "ReadBack",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "baseline",
+      "name": "report-lost",
+      "scenario": "report-lost",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-report-lost",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-report-lost.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.379,
+      "model_sha256": "04cec58bd02ca07f17de76c309595ddfb23d0da2d8d84b78f8ecc172c7c400fa",
+      "nodes": 2534,
+      "max_actions_observed": 16,
+      "outcomes": [
+        "complete",
+        "evidence-absent",
+        "evidence-read",
+        "evidence-save",
+        "missing-stage",
+        "report-lost",
+        "report-read",
+        "report-save",
+        "running"
+      ],
+      "actions": [
+        "Complete",
+        "Environment",
+        "Implement",
+        "Launch",
+        "ReadBack",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "baseline",
+      "name": "report-access",
+      "scenario": "report-access",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-report-access",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-report-access.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.375,
+      "model_sha256": "310bf87d4fb386fe36661b432aaff5e9fa90385e64d94340a979beece6c06018",
+      "nodes": 2534,
+      "max_actions_observed": 16,
+      "outcomes": [
+        "complete",
+        "evidence-absent",
+        "evidence-read",
+        "evidence-save",
+        "missing-stage",
+        "report-access",
+        "report-read",
+        "report-save",
+        "running"
+      ],
+      "actions": [
+        "Complete",
+        "Environment",
+        "Implement",
+        "Launch",
+        "ReadBack",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "baseline",
+      "name": "evidence-lost",
+      "scenario": "evidence-lost",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-evidence-lost",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-evidence-lost.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.613,
+      "model_sha256": "034c9da3dbf39135708035458bf5b9418176ee53559071119b5cce8123376dda",
+      "nodes": 3299,
+      "max_actions_observed": 20,
+      "outcomes": [
+        "complete",
+        "evidence-absent",
+        "evidence-lost",
+        "evidence-read",
+        "evidence-save",
+        "missing-stage",
+        "report-read",
+        "report-save",
+        "running"
+      ],
+      "actions": [
+        "Complete",
+        "Environment",
+        "Implement",
+        "Launch",
+        "ReadBack",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "baseline",
+      "name": "evidence-access",
+      "scenario": "evidence-access",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-evidence-access",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-evidence-access.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.608,
+      "model_sha256": "e3cb49f3db1db1301ef102d7ecaf4a67d773d2dfd65b5774f9783da36808a235",
+      "nodes": 3299,
+      "max_actions_observed": 20,
+      "outcomes": [
+        "complete",
+        "evidence-absent",
+        "evidence-access",
+        "evidence-read",
+        "evidence-save",
+        "missing-stage",
+        "report-read",
+        "report-save",
+        "running"
+      ],
+      "actions": [
+        "Complete",
+        "Environment",
+        "Implement",
+        "Launch",
+        "ReadBack",
+        "Restart",
+        "Return",
+        "Save"
+      ],
+      "result": "complete finite safety exploration"
+    },
+    {
+      "kind": "witness",
+      "name": "initial",
+      "scenario": "initial",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-initial",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-initial.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.943,
+      "model_sha256": "72eab05756361e84400098dab5950942f2a84f1038937591a16114fdaff9e804",
+      "property": "Witness",
+      "steps": 34,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "repair",
+      "scenario": "repair",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-repair",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-repair.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.393,
+      "model_sha256": "2a23d6f5c8e71c63af3fd72fa271ea408b94c90087a186f3481ac4a584580b55",
+      "property": "Witness",
+      "steps": 43,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "exhausted",
+      "scenario": "exhausted",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-exhausted",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-exhausted.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.978,
+      "model_sha256": "9e58ea4a0e5d12e3d72138bacc2821b731e5aec6c617199d301b33bb2589a4a1",
+      "property": "Witness",
+      "steps": 20,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "identity",
+      "scenario": "identity",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-identity",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-identity.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.503,
+      "model_sha256": "8dbbdf3f892ca4ed5dbad6b7e6d575cdcdbf6baa97e327fa13ef67896c1f1aa1",
+      "property": "Witness",
+      "steps": 10,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "text",
+      "scenario": "text",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-text",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-text.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.628,
+      "model_sha256": "3016e56d69c98c577d7921ab499f0897fec5a992525a1bfda3cedf3cb3cd5bb6",
+      "property": "Witness",
+      "steps": 11,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "candidate",
+      "scenario": "candidate",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-candidate",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-candidate.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.63,
+      "model_sha256": "5d6cb5947d14c1425fecb59a8372533fea3961accf6d789fe65a0ffc7080baa4",
+      "property": "Witness",
+      "steps": 11,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "base",
+      "scenario": "base",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-base",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-base.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.631,
+      "model_sha256": "862018f0b42d8beae3fb247175183cfbcade8eec60b552c0a949c51172a1e01b",
+      "property": "Witness",
+      "steps": 11,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "moving-target",
+      "scenario": "moving-target",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-moving-target",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-moving-target.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 2.349,
+      "model_sha256": "a4f7801cfb7f0f7042b9ea2b4219541b8f58bf1320fc24e19083083ec4839b3f",
+      "property": "Witness",
+      "steps": 37,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "report-lost",
+      "scenario": "report-lost",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-report-lost",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-report-lost.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.981,
+      "model_sha256": "69fd336ca90effdeb018ea817d7d16ae324f292b73712b1af9d5a60477b147cb",
+      "property": "Witness",
+      "steps": 24,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "report-access",
+      "scenario": "report-access",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-report-access",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-report-access.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.974,
+      "model_sha256": "6841ea4cc7a0127fb8205c8a421be5f09477e549ff48fb1672be8e3b8fefdb28",
+      "property": "Witness",
+      "steps": 24,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "evidence-lost",
+      "scenario": "evidence-lost",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-evidence-lost",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-evidence-lost.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.712,
+      "model_sha256": "fa49326676243704886f3e59631373de742aa85a3e6a9d92ffb45075e8653d85",
+      "property": "Witness",
+      "steps": 18,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "evidence-access",
+      "scenario": "evidence-access",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-evidence-access",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-evidence-access.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.721,
+      "model_sha256": "8558dac08f1031a0d0aed83c03e623fff6db600c5d4458a92ee109c770646c03",
+      "property": "Witness",
+      "steps": 18,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "restart",
+      "scenario": "repair",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-restart",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-restart.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.419,
+      "model_sha256": "581463118a1f67d0378a1ca42b2cacade347fdeddf2bb89d31a0020bf6546ff0",
+      "property": "Witness",
+      "steps": 44,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "missing-stage",
+      "scenario": "initial",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-missing-stage",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-missing-stage.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.458,
+      "model_sha256": "e5fcadc3edaad79c3a828ef1de0f9aaf311f31f8119d3abd175bca649df5c0dc",
+      "property": "Witness",
+      "steps": 2,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "report-save",
+      "scenario": "initial",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-report-save",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-report-save.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.605,
+      "model_sha256": "a0894022b5de149682177474e45f4c7455fd24cada79bdf501a48ba7e14284ba",
+      "property": "Witness",
+      "steps": 16,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "report-read",
+      "scenario": "initial",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-report-read",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-report-read.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.678,
+      "model_sha256": "56424669b011f2455b6d6c108e91c456388038b2215685c0815683dc9a12a2db",
+      "property": "Witness",
+      "steps": 19,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "evidence-absent",
+      "scenario": "initial",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-evidence-absent",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-evidence-absent.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.626,
+      "model_sha256": "153f68267c77148b0d185df665539e9965475febde7f3cf6e13ec5534565914d",
+      "property": "Witness",
+      "steps": 14,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "evidence-save",
+      "scenario": "initial",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-evidence-save",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-evidence-save.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.503,
+      "model_sha256": "dad0da94912fe9653b284fa28ef615780fb8a9ba93c7a3160e43c62fd463a75c",
+      "property": "Witness",
+      "steps": 10,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "witness",
+      "name": "evidence-read",
+      "scenario": "initial",
+      "mutation": "none",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-evidence-read",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-evidence-read.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.545,
+      "model_sha256": "02ecbeef05099de7c3fe8bdc24ae5e452f739ed76a8ff12f27b4c70cfd650b24",
+      "property": "Witness",
+      "steps": 13,
+      "result": "reachable witness"
+    },
+    {
+      "kind": "mutation",
+      "name": "identity",
+      "scenario": "identity",
+      "mutation": "identity",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-identity",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-identity.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.961,
+      "model_sha256": "6926e7f5e5477580a9d3eb5f5193257940d3ed9a964237751cea8003c9baac17",
+      "property": "SameReports",
+      "steps": 34,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "text",
+      "scenario": "text",
+      "mutation": "text",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-text",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-text.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 2.632,
+      "model_sha256": "feeb0a4edc71e382ba9b0905cee5286e106f9351c36d07ccb098380a5710bfb5",
+      "property": "CurrentText",
+      "steps": 35,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "candidate",
+      "scenario": "candidate",
+      "mutation": "candidate",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-candidate",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-candidate.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 2.659,
+      "model_sha256": "d535a71eeb955331037042f34c670e3907624426fb5b880019cec9db7b0e7978",
+      "property": "CurrentCandidate",
+      "steps": 35,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "review-base",
+      "scenario": "review-base",
+      "mutation": "review-base",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-review-base",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-review-base.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.975,
+      "model_sha256": "c59a9d221cc7d485a31a0dbf45357590b8855d66d3da9e1a58e852a45c25e11f",
+      "property": "ComparisonBase",
+      "steps": 34,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "proof-base",
+      "scenario": "proof-base",
+      "mutation": "proof-base",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-proof-base",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-proof-base.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.0,
+      "model_sha256": "add2c5945ecdea9c3c8fd44688f6b23e3e505c699c1860b07dd3b3597a48b8d3",
+      "property": "ComparisonBase",
+      "steps": 34,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "repair-reset",
+      "scenario": "exhausted",
+      "mutation": "repair-reset",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-repair-reset",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-repair-reset.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.013,
+      "model_sha256": "c027d99a9b61b74b55faae91d370724c9035f372891f970fefabbe5d7aaaa8fc",
+      "property": "RepairBound",
+      "steps": 20,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "report-save",
+      "scenario": "initial",
+      "mutation": "report-save",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-report-save",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-report-save.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.759,
+      "model_sha256": "b4c7202a5cf07c548ad90933237e83b5495c6b801c61cfc5dc133f5a2c88f15d",
+      "property": "DurableReports",
+      "steps": 22,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "report-read",
+      "scenario": "initial",
+      "mutation": "report-read",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-report-read",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-report-read.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.891,
+      "model_sha256": "de2c1afab65d61ca3e6441f1c4ce8f1bf8cfabc4dddd5202e308fe948252fd39",
+      "property": "DurableReports",
+      "steps": 28,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "report-lost",
+      "scenario": "report-lost",
+      "mutation": "report-lost",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-report-lost",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-report-lost.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.29,
+      "model_sha256": "6b6713ccb5986eabac060a721dbfff62199fdf1d61336f117bf4d2ab458db805",
+      "property": "DurableReports",
+      "steps": 36,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "report-access",
+      "scenario": "report-access",
+      "mutation": "report-access",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-report-access",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-report-access.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.289,
+      "model_sha256": "ec5655ac31e8b292e95235464273c533db62e20e3c4dfe76a36c77d98a4e4e70",
+      "property": "DurableReports",
+      "steps": 36,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "evidence-absent",
+      "scenario": "initial",
+      "mutation": "evidence-absent",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-absent",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-absent.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.85,
+      "model_sha256": "bf2cfa07e3aae8a196563482f34cef4e3560e6c77091a8bf68e1f6d1ad418300",
+      "property": "DurableEvidence",
+      "steps": 23,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "evidence-save",
+      "scenario": "initial",
+      "mutation": "evidence-save",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-save",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-save.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.76,
+      "model_sha256": "eeca5ed9384e1b5e82d0d8fc066bc68682c0d74a9d0fcda9a3c4c1dd4b445859",
+      "property": "DurableEvidence",
+      "steps": 22,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "evidence-read",
+      "scenario": "initial",
+      "mutation": "evidence-read",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-read",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-read.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 0.889,
+      "model_sha256": "cd87e502e1c9a3bd5053a510f84504e3381b22a3e09cd5b90095fbd86727d331",
+      "property": "DurableEvidence",
+      "steps": 28,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "evidence-lost",
+      "scenario": "evidence-lost",
+      "mutation": "evidence-lost",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-lost",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-lost.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.354,
+      "model_sha256": "9488240a4f3687aa3c490193f30f5f1f009de42103ec71b5021618766186e848",
+      "property": "DurableEvidence",
+      "steps": 36,
+      "result": "expected counterexample"
+    },
+    {
+      "kind": "mutation",
+      "name": "evidence-access",
+      "scenario": "evidence-access",
+      "mutation": "evidence-access",
+      "command": [
+        "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+        "--output-dir",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-access",
+        "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-access.fizz"
+      ],
+      "returncode": 0,
+      "seconds": 1.371,
+      "model_sha256": "783f1b2f00a31b0f33156e64c0c962db75406aea047bd8150a965aa5d3b1ae86",
+      "property": "DurableEvidence",
+      "steps": 36,
+      "result": "expected counterexample"
+    }
+  ],
+  "result": "PASS"
+}

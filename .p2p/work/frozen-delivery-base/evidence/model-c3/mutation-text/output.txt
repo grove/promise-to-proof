@@ -1,0 +1,160 @@
+Model checking /var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-text.json
+configFileName: /var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/fizz.yaml
+fizz.yaml not found. Using default options
+StateSpaceOptions: options:{max_actions:64 max_concurrent_actions:1} deadlock_detection:false
+Nodes: 13116, queued: 890, elapsed: 2.155770417s
+Time taken for model checking: 2.155784792s
+Skipping dotfile generation. Too many Nodes: 13116
+FAILED: Model checker failed. Invariant:  CurrentText
+------
+Init
+--
+state: {"admission_base":0,"bindings":[[],[]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[0,0],"fault":false,"implemented":false,"outcome":"running","passed":[false,false],"repair_used":0,"repairs_actual":0,"reports":[0,0],"restarted":false,"revision":"v1","stages":[0,0]}
+------
+Implement
+--
+state: {"admission_base":0,"bindings":[[],[]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[0,0],"fault":false,"implemented":true,"outcome":"running","passed":[false,false],"repair_used":0,"repairs_actual":0,"reports":[0,0],"restarted":false,"revision":"v1","stages":[0,0]}
+------
+Launch
+--
+state: {"admission_base":0,"bindings":[[],[]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[0,0],"fault":false,"implemented":true,"outcome":"running","passed":[false,false],"repair_used":0,"repairs_actual":0,"reports":[0,0],"restarted":false,"revision":"v1","stages":[0,0]}
+------
+Any:stage=0
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[0,0],"fault":false,"implemented":true,"outcome":"running","passed":[false,false],"repair_used":0,"repairs_actual":0,"reports":[0,0],"restarted":false,"revision":"v1","stages":[1,0]}
+------
+Launch
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[0,0],"fault":false,"implemented":true,"outcome":"running","passed":[false,false],"repair_used":0,"repairs_actual":0,"reports":[0,0],"restarted":false,"revision":"v1","stages":[1,0]}
+------
+Any:stage=1
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[0,0],"fault":false,"implemented":true,"outcome":"running","passed":[false,false],"repair_used":0,"repairs_actual":0,"reports":[0,0],"restarted":false,"revision":"v1","stages":[1,1]}
+------
+Return
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[0,0],"fault":false,"implemented":true,"outcome":"running","passed":[false,false],"repair_used":0,"repairs_actual":0,"reports":[0,0],"restarted":false,"revision":"v1","stages":[1,1]}
+------
+Any:stage=0
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[1,0],"fault":false,"implemented":true,"outcome":"running","passed":[true,false],"repair_used":0,"repairs_actual":0,"reports":[1,0],"restarted":false,"revision":"v1","stages":[2,1]}
+------
+Return
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[1,0],"fault":false,"implemented":true,"outcome":"running","passed":[true,false],"repair_used":0,"repairs_actual":0,"reports":[1,0],"restarted":false,"revision":"v1","stages":[2,1]}
+------
+Any:stage=1
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[1,1],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[1,1],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Save
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[1,1],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[1,1],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:stage=0
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[1,1],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[1,1],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:kind="report"
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[1,1],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[2,1],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Save
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[1,1],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[2,1],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:stage=0
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[1,1],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[2,1],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:kind="evidence"
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[2,1],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[2,1],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Save
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[2,1],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[2,1],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:stage=1
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[2,1],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[2,1],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:kind="report"
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[2,1],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[2,2],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Save
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[2,1],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[2,2],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:stage=1
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[2,1],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[2,2],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:kind="evidence"
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[2,2],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[2,2],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+ReadBack
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[2,2],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[2,2],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:stage=0
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[2,2],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[2,2],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:kind="report"
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[2,2],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[3,2],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+ReadBack
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[2,2],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[3,2],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:stage=0
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[2,2],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[3,2],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:kind="evidence"
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[3,2],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[3,2],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+ReadBack
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[3,2],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[3,2],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:stage=1
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[3,2],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[3,2],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:kind="report"
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[3,2],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[3,3],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+ReadBack
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[3,2],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[3,3],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:stage=1
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[3,2],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[3,3],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Any:kind="evidence"
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":0,"destination_tip":0,"evidence":[3,3],"fault":false,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[3,3],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Environment
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":1,"destination_tip":0,"evidence":[3,3],"fault":true,"implemented":true,"outcome":"running","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[3,3],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Complete
+--
+state: {"admission_base":0,"bindings":[[0,0,0,1],[0,0,0,2]],"candidate":0,"contract":1,"destination_tip":0,"evidence":[3,3],"fault":true,"implemented":true,"outcome":"complete","passed":[true,true],"repair_used":0,"repairs_actual":0,"reports":[3,3],"restarted":false,"revision":"v1","stages":[2,2]}
+------
+Writen graph json: /var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-text/error-graph.json
+Writen graph dotfile: /var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-text/error-graph.dot
+To generate an image file, run: 
+dot -Tsvg /var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-text/error-graph.dot -o error-graph.svg && open error-graph.svg
+Writen error states as html: /var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-text/error-states.html
+To open: 
+open /var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-text/error-states.html

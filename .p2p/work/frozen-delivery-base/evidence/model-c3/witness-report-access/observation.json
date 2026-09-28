@@ -1,0 +1,18 @@
+{
+  "kind": "witness",
+  "name": "report-access",
+  "scenario": "report-access",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-report-access",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-report-access.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.974,
+  "model_sha256": "6841ea4cc7a0127fb8205c8a421be5f09477e549ff48fb1672be8e3b8fefdb28",
+  "property": "Witness",
+  "steps": 24,
+  "result": "reachable witness"
+}

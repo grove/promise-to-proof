@@ -1,0 +1,39 @@
+{
+  "kind": "baseline",
+  "name": "repair",
+  "scenario": "repair",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-repair",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-repair.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 1.525,
+  "model_sha256": "8cf070e618b229ee1d7483028fe42bdd8ce2f4ca308475a965b191cbf02b1797",
+  "nodes": 3148,
+  "max_actions_observed": 20,
+  "outcomes": [
+    "complete",
+    "evidence-absent",
+    "evidence-read",
+    "evidence-save",
+    "failed-verification",
+    "missing-stage",
+    "report-read",
+    "report-save",
+    "running"
+  ],
+  "actions": [
+    "Complete",
+    "Implement",
+    "Launch",
+    "ReadBack",
+    "Repair",
+    "Restart",
+    "Return",
+    "Save"
+  ],
+  "result": "complete finite safety exploration"
+}

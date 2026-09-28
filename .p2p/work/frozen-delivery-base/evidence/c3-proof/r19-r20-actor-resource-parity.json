@@ -1,0 +1,30 @@
+{
+  "r19_publish_pr_skill": {
+    "sha256": "c1c0c65b5d588bba53f464a2b52ca2c4eb239d390d2c470e89b4f2a7ce8f0884",
+    "exact_match": true
+  },
+  "r19_protocol": {
+    "sha256": "625757c679f03acd88eaa3fa24acf348ea73de94b8c585a3fd293951663e846a",
+    "exact_match": true
+  },
+  "r19_agents": {
+    "sha256": "22af0f7d5f565dfdfbb091b4625c0b6f6b96376555eb73f4868fc4cf1d469a49",
+    "exact_match": true
+  },
+  "r19_issue_tracker": {
+    "sha256": "9dad3fd9b5dcedf194ae37613d5a66e20b06765723433a956a5de60bb0ed868e",
+    "exact_match": true
+  },
+  "r20_merge_readiness_skill": {
+    "sha256": "7d8fa77aa11d63670915afc7f70235e6a17156bb4835d31c7efa5bb24fb5b7e0",
+    "exact_match": true
+  },
+  "r20_protocol": {
+    "sha256": "625757c679f03acd88eaa3fa24acf348ea73de94b8c585a3fd293951663e846a",
+    "exact_match": true
+  },
+  "r20_scenarios": {
+    "sha256": "9269c97042272200bb9c30f03240ac69cd89b93b8e9f90f542dc4acc119a8d58",
+    "exact_match": true
+  }
+}

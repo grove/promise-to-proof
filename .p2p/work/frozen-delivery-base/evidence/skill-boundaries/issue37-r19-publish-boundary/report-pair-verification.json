@@ -1,0 +1,31 @@
+{
+  "fixture_subject": "C-prime acceptance fixture; not issue-37 candidate C",
+  "identity": {
+    "candidate": "git:495bb1899b82f9d5c1b7c05d78fb15922b330a11",
+    "base_A": "9384d662d425d222df3f5547bcbf84ba7cd10973",
+    "target_B": "f5ff636d7537a6381579b59c3d80fd8535ff944b",
+    "contract_sha256": "b490dc25a68ba6521282128bcf60bc3f77e8a11b907b0c9b385402fa230677cb"
+  },
+  "reports": {
+    "review_sha256": "07a3bde168303423053c4a85abf794f2de9de14aad0dd8dab2b2390054457e79",
+    "review_status": "REVIEWED",
+    "coverage": "R1-R3",
+    "proof_sha256": "dfb7af4d5fad505598e9da79d2d4d2bfc72b4cd6ba8bd87124b56b16f786983c",
+    "proof_status": "PROVEN",
+    "requirements": "3/3",
+    "candidate_json_sha256": "d247087c964a3c1f32cfca6a9cdf12cec9527e1949c310b7b8c6262961b3be3f"
+  },
+  "checks": {
+    "candidate_record_matches_identity": true,
+    "review_is_full_REVIEWED": true,
+    "proof_is_full_PROVEN": true,
+    "candidate_and_reports_match_contract_sha": true,
+    "candidate_commit_parent_is_A": true,
+    "target_B_distinct_from_A": true,
+    "target_B_parent_is_A": true,
+    "validate_command_succeeded": true,
+    "current_source_reports_byte_match_fixture": true
+  },
+  "validation_output_sha256": "5b04f0deecac850fc432b080fcbffa36b800f2b915a4698dbda21632103208d5",
+  "validation_command": "python3 /private/tmp/issue37-r19-publish-boundary/repo/skills/productivity/deliver-issue/scripts/p2p_filesystem.py --repo /private/tmp/issue37-r19-publish-boundary/repo validate work/delivery-review-report-contract.md --base 9384d662d425d222df3f5547bcbf84ba7cd10973"
+}

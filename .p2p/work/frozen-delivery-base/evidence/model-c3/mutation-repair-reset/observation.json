@@ -1,0 +1,18 @@
+{
+  "kind": "mutation",
+  "name": "repair-reset",
+  "scenario": "exhausted",
+  "mutation": "repair-reset",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-repair-reset",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-repair-reset.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 1.013,
+  "model_sha256": "c027d99a9b61b74b55faae91d370724c9035f372891f970fefabbe5d7aaaa8fc",
+  "property": "RepairBound",
+  "steps": 20,
+  "result": "expected counterexample"
+}

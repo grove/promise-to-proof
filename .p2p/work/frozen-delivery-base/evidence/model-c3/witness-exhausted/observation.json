@@ -1,0 +1,18 @@
+{
+  "kind": "witness",
+  "name": "exhausted",
+  "scenario": "exhausted",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-exhausted",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-exhausted.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.978,
+  "model_sha256": "9e58ea4a0e5d12e3d72138bacc2821b731e5aec6c617199d301b33bb2589a4a1",
+  "property": "Witness",
+  "steps": 20,
+  "result": "reachable witness"
+}

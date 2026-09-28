@@ -1,0 +1,18 @@
+{
+  "kind": "mutation",
+  "name": "review-base",
+  "scenario": "review-base",
+  "mutation": "review-base",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-review-base",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-review-base.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.975,
+  "model_sha256": "c59a9d221cc7d485a31a0dbf45357590b8855d66d3da9e1a58e852a45c25e11f",
+  "property": "ComparisonBase",
+  "steps": 34,
+  "result": "expected counterexample"
+}

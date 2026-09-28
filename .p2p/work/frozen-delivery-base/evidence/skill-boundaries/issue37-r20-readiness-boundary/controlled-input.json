@@ -1,0 +1,47 @@
+{
+  "fixture": "controlled local acceptance fixture; no GitHub or network calls",
+  "observed_at_utc": "2026-09-27 21:12:17 UTC",
+  "pull_request": {
+    "url": "https://github.invalid/grove/promise-to-proof/pull/17",
+    "number": 17,
+    "state": "OPEN",
+    "is_draft": false,
+    "head_ref": "reviewed-candidate",
+    "head_sha": "495bb1899b82f9d5c1b7c05d78fb15922b330a11",
+    "base_ref": "main",
+    "base_sha": "68c526be33642bca0f378bb90618632532cc1244",
+    "description_before": "Merge readiness: NOT ASSESSED.\n<!-- publication marker: fixture-only -->\nReports: local fixture references\nHuman note: preserve this line."
+  },
+  "repository_policy": {
+    "branch": "main",
+    "policy_status": "known in controlled fixture",
+    "required_checks": [
+      "controller-contract"
+    ],
+    "required_approvals": 1,
+    "merge_queue_required": false
+  },
+  "current_gates": {
+    "controller-contract": "PENDING for head 495bb1899b82f9d5c1b7c05d78fb15922b330a11",
+    "approved_reviews": 0,
+    "required_approvals": 1
+  },
+  "saved_handoff": {
+    "contract": "repo/work/delivery-review-report-contract.md",
+    "contract_revision": "v3",
+    "contract_sha256": "b490dc25a68ba6521282128bcf60bc3f77e8a11b907b0c9b385402fa230677cb",
+    "candidate_key": "git:495bb1899b82f9d5c1b7c05d78fb15922b330a11",
+    "candidate_record": "repo/.p2p/work/delivery-review-report-contract/candidate.json",
+    "review_report": "repo/.p2p/work/delivery-review-report-contract/review.md",
+    "proof_report": "repo/.p2p/work/delivery-review-report-contract/proof.md",
+    "reviewed_comparison_base": "9384d662d425d222df3f5547bcbf84ba7cd10973",
+    "proven_comparison_base": "9384d662d425d222df3f5547bcbf84ba7cd10973"
+  },
+  "local_git_observations": {
+    "head_commit_parent": "9384d662d425d222df3f5547bcbf84ba7cd10973",
+    "target_B_parent": "9384d662d425d222df3f5547bcbf84ba7cd10973",
+    "merge_base_head_and_target": "9384d662d425d222df3f5547bcbf84ba7cd10973",
+    "fixture_remotes": []
+  },
+  "request": "read-only assessment; local report only; leave description unchanged"
+}

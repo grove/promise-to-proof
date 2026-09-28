@@ -1,0 +1,18 @@
+{
+  "kind": "mutation",
+  "name": "evidence-save",
+  "scenario": "initial",
+  "mutation": "evidence-save",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-save",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-evidence-save.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.76,
+  "model_sha256": "eeca5ed9384e1b5e82d0d8fc066bc68682c0d74a9d0fcda9a3c4c1dd4b445859",
+  "property": "DurableEvidence",
+  "steps": 22,
+  "result": "expected counterexample"
+}

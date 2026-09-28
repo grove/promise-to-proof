@@ -1,0 +1,18 @@
+{
+  "kind": "witness",
+  "name": "restart",
+  "scenario": "repair",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-restart",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/witness-restart.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 1.419,
+  "model_sha256": "581463118a1f67d0378a1ca42b2cacade347fdeddf2bb89d31a0020bf6546ff0",
+  "property": "Witness",
+  "steps": 44,
+  "result": "reachable witness"
+}

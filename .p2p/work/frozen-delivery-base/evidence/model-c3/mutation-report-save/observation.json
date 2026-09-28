@@ -1,0 +1,18 @@
+{
+  "kind": "mutation",
+  "name": "report-save",
+  "scenario": "initial",
+  "mutation": "report-save",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-report-save",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/mutation-report-save.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.759,
+  "model_sha256": "b4c7202a5cf07c548ad90933237e83b5495c6b801c61cfc5dc133f5a2c88f15d",
+  "property": "DurableReports",
+  "steps": 22,
+  "result": "expected counterexample"
+}

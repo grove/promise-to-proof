@@ -1,0 +1,19 @@
+{
+  "base": "dbe54bc20a19b8ab8e700fb3aba9c9e8a59ce4d4",
+  "captured_commit_bytes_equal": true,
+  "tree": "c8bfbe410b902c57d2b52d6f609f5c3cb659637c",
+  "tree_equal": true,
+  "tree_entry_count": 2226,
+  "unique_tree_objects": 1254,
+  "all_object_bytes_sha256": "a897671dd00f362cfc8ec2b1698682023c4ed7eedb11404db84b94d5d116736c",
+  "all_tree_object_bytes_equal": true,
+  "bundle_sha256": "66801edaf265b33fbd28b7a2cedadae1a4b596dd52a430588459ce4436b42a56",
+  "bundle_bytes": 43569027,
+  "bundle_verify": "The bundle contains this ref:\ndbe54bc20a19b8ab8e700fb3aba9c9e8a59ce4d4 refs/heads/comparison-base\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha1",
+  "source_pruned_commit": "0df6ed85dba1d141898df02780953c6a44b05126",
+  "source_clone_no_longer_resolves_base": true,
+  "separate_bundle_clone_still_resolves_exact_base": true,
+  "pack_bytes": 43629424,
+  "python": "3.14.7 (main, Aug  5 2026, 10:29:49) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "existing_comparison_base_bundle_status": "contains only old 39cf main; not used for C3 B"
+}

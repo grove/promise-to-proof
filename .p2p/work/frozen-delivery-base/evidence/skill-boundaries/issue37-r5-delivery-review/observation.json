@@ -1,0 +1,98 @@
+{
+  "schema": "issue37-r5-delivery-review-observation/v1",
+  "review_status": "REVIEWED",
+  "scope": "Full contract review R1-R21; R5 exercised in a delivery-launched fixture.",
+  "stage_invocation": {
+    "agent_context": "/root/r5_delivery_review",
+    "skill": "/Users/grove/projects/promise-to-proof/skills/productivity/review-implementation/SKILL.md",
+    "skill_sha256": "34118e50a4b595ae27f1df7ac787d9650208d5b183c87c77d34dea54413a08d9",
+    "protocol": "/Users/grove/projects/promise-to-proof/skills/productivity/review-implementation/references/acceptance-contract-protocol.md",
+    "protocol_sha256": "625757c679f03acd88eaa3fa24acf348ea73de94b8c585a3fd293951663e846a",
+    "invoked_at_utc": "2026-09-27T21:08:21Z",
+    "external_effects": false
+  },
+  "contract": {
+    "path": "work/frozen-delivery-base.md",
+    "revision": "v2",
+    "sha256": "3925c513a6702b94fbc2fcfc30f7d2d057638a275ae103056031cb3ca38aa0a9",
+    "binding_source": "plans/frozen-delivery-under-moving-targets.md",
+    "binding_source_sha256": "c570232a7371a53fd6dad954ec9d53f7940ecba171b3a2080fd995a6bd9a77d2",
+    "approval_receipt": "/private/tmp/issue37-r5-delivery-314yvddr/delivery-review-fixture/.p2p/work/frozen-delivery-base/planning-handoff.md",
+    "approval_receipt_sha256": "2d9c7618c2f9b7a8dcac1469004a55f9346a14256b7a80a8b86f48b278c16571",
+    "approval_text": "I approve it"
+  },
+  "candidate": {
+    "key": "snapshot:sha256:62d091adb1dbca6759b728946c47f1c9203d7094350c0bdac22a7bccbb165331",
+    "comparison_base": "39cf3a96aaf89789fceed9b0454682f9e88bc0b8",
+    "manifest_path": "/private/tmp/issue37-r5-delivery-314yvddr/delivery-review-fixture/.p2p/work/frozen-delivery-base/candidate.json",
+    "candidate_record_sha256": "db0c2a75d6b06819d520d3de5cba4aef236cd551e763ff5ecfaeb1c4d4b32993",
+    "manifest_entries": 141,
+    "final_validation_passed": true
+  },
+  "product_diff_from_base": {
+    "changed_paths": 18,
+    "modified": [
+      "checks/check_p2p_delivery_host.py",
+      "checks/deliver-issue-scenarios.md",
+      "checks/delivery-model/README.md",
+      "checks/delivery-model/check.py",
+      "checks/delivery-model/delivery.fizz",
+      "checks/merge-readiness-scenarios.md",
+      "checks/proof-repair-scenarios.md",
+      "checks/publish-pr-scenarios.md",
+      "checks/review-implementation-scenarios.md",
+      "checks/test_p2p_delivery.py",
+      "docs/acceptance-contract-protocol.md",
+      "docs/p2p-delivery-controller.md",
+      "skills/productivity/deliver-issue/SKILL.md",
+      "skills/productivity/deliver-issue/scripts/p2p_delivery.py",
+      "skills/productivity/merge-readiness/SKILL.md",
+      "skills/productivity/prove/SKILL.md",
+      "skills/productivity/review-implementation/SKILL.md"
+    ],
+    "added": [
+      "work/frozen-delivery-base.md"
+    ],
+    "deleted": []
+  },
+  "destination_observation": {
+    "destination": "main",
+    "observed_tip": "f5193c384ba6aa4ad5a812463a50eb7238c1478c",
+    "observed_tip_parent": "39cf3a96aaf89789fceed9b0454682f9e88bc0b8",
+    "relation_to_base": "fast-forward",
+    "comparison_base": "39cf3a96aaf89789fceed9b0454682f9e88bc0b8",
+    "observed_at_utc": "2026-09-27T21:08:21Z",
+    "target_marker_in_candidate": false
+  },
+  "fixture": {
+    "path": "/private/tmp/issue37-r5-delivery-314yvddr/delivery-review-fixture",
+    "recreation_script": "/private/tmp/issue37-r5-recreate-fixture.py",
+    "recreation_script_sha256": "927e43176674010f1a24096b82703bfb6e6997eac56cee05ec93ee3e2c483bc8",
+    "builder_output": "/private/tmp/issue37-r5-fixture-builder.stdout",
+    "builder_output_sha256": "572440ac2f35ac1d0df57af8cb4818b12960b2fbe09bc46c629c362b251e4806",
+    "validation_command": "python3 skills/productivity/deliver-issue/scripts/p2p_filesystem.py --repo /private/tmp/issue37-r5-delivery-314yvddr/delivery-review-fixture validate --base 39cf3a96aaf89789fceed9b0454682f9e88bc0b8 work/frozen-delivery-base.md",
+    "validation_exit_code": 0,
+    "validation_raw_output": "/private/tmp/issue37-r5-validation-final.stdout",
+    "validation_output_sha256": "76a8a1132b3c6b9e4d8442958df64332ccc3b4e8e84673aadc3511b83beff2a2"
+  },
+  "review_report": {
+    "path": "/private/tmp/issue37-r5-delivery-review.md",
+    "sha256": "c8ade19ee264b39bb757b1fce4613ada2546b2e89f0e5d8828b8ccc71d0068c3",
+    "last_section": "Next steps"
+  },
+  "limitations": [
+    "Controller tests and FizzBee model were inspected but not executed during this review.",
+    "No PR metadata, publication, or merge-readiness assessment was requested or performed."
+  ],
+  "effects": [
+    "Fixture writes and controlled target commit stayed under /private/tmp.",
+    "No product, contract, GitHub, or remote changes were made."
+  ],
+  "prior_proof_identity_note": {
+    "path": ".p2p/work/frozen-delivery-base/proof.md",
+    "recorded_contract_sha256": "3925c513a6702b94fbc2fcfc30f7d2f057638a275ae103056031cb3ca38aa0a9",
+    "computed_contract_sha256": "3925c513a6702b94fbc2fcfc30f7d2d057638a275ae103056031cb3ca38aa0a9",
+    "candidate_and_handoff_agree_with_computed_hash": true,
+    "reuse": "Do not reuse the prior proof report as current identity evidence; rerun full proof against the exact candidate and computed contract hash."
+  }
+}

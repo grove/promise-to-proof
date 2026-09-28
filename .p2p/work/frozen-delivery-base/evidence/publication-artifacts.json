@@ -1,0 +1,2143 @@
+{
+  "artifacts": [
+    {
+      "bytes": 2113731,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/candidate.json",
+      "sha256": "141c122cebbd3d324ba7ac5369775bacee4474b6684ae0ab3468bd275a4d0ac4",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 753,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/c3-proof/identity-after-checks.json",
+      "sha256": "14b7ba9f13eab375033edf473af671da4496f3365d87cc34e3ba34fe7afde9eb",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 753,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/c3-proof/identity-before.json",
+      "sha256": "14b7ba9f13eab375033edf473af671da4496f3365d87cc34e3ba34fe7afde9eb",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 2113666,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/c3-proof/r12-direct-review/candidate-scope.json",
+      "sha256": "1993ad6f9d602e72093d1a12d5d1e145ecba91f319b82c3bc3a5c2483e75f5a0",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 2768,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/c3-proof/r12-direct-review/capture_scope_and_wait.py",
+      "sha256": "f90391e1c7df59769dd4cd7e1a9dbe5b20394cfe94a8ebb911dfe485b42ab487",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 243840,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/c3-proof/r12-direct-review/codex.log",
+      "sha256": "e513d47cbaf362a6900773ffee9b6aa83cfa9a7130a5bf4d2ce4df1f8c88c668",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 535,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/c3-proof/r12-direct-review/last-message.md",
+      "sha256": "006551786b7aaa3c9c9d8426ed73bd00eb3c5c634eea3f61cb130a1a495eec2d",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 6262,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/c3-proof/r12-direct-review/review.md",
+      "sha256": "ed4f687d8a9d39421450da0360d6f0d763eaa513f31488e440e34fcd71ec31c2",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 861,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/c3-proof/r12-direct-review/scope-captured.json",
+      "sha256": "1891109dc79cd722c98e30a06f5ca9991426bc4ec9ed9725e5d1b16a33c1ebed",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 945,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/c3-proof/r19-r20-actor-resource-parity.json",
+      "sha256": "6f62cdf44158d586b2cc8c715396f4472afa699a48204fa43ba9423224fd0fed",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 2113731,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/c3-proof/r5-delivery-review/candidate.json",
+      "sha256": "141c122cebbd3d324ba7ac5369775bacee4474b6684ae0ab3468bd275a4d0ac4",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 7046,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/c3-proof/r5-delivery-review/review.md",
+      "sha256": "2e968b957d170d67a051909d56a76861fcef282d196fc1fb5c3c21ad30070b2e",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 1726,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/c3-proof/r5-delivery-review/scope-validation.json",
+      "sha256": "4a1566cc39b28f87e4f0c2ea6d708d8dbb06065d1b5d592ee569c5b07fed8745",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 43569027,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/comparison-base-c3.bundle",
+      "sha256": "66801edaf265b33fbd28b7a2cedadae1a4b596dd52a430588459ce4436b42a56",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 1071,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/comparison-base-c3.json",
+      "sha256": "2e32b00b9d63cd9352ab656368177dbcb6086234082e6f0fe8cfb637217cab90",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 1730,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/controller-test-c3-focused.md",
+      "sha256": "037fa5068ff0ce399f9508be81f4038d0d43e6436e6490f8a9e116b06da48162",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 34596,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/controller-tests-c3.stdout",
+      "sha256": "25094101b20f0508035d38da717de8a06126451a8f403f8d804fb0ed4d7ef076",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8650,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-base/model.fizz",
+      "sha256": "0d05ceb5380a2dd8abf90ccb4cec0db31201f2bbf8c5df20a386486b43378548",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 959,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-base/observation.json",
+      "sha256": "3c9df2326414026dc7d7cc3650a0d08433a87b0dea3d7c702e7469a99d2f375b",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 778,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-base/output.txt",
+      "sha256": "84bfe1caab7daa0645692c69c442d10c72e04160b82e8beb6f404c4d9a2e74f8",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8655,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-candidate/model.fizz",
+      "sha256": "0e7b84a8c24b867051e50a9e2af4f69c5deba89413d6646bcd46aaccfaafb75d",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 1000,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-candidate/observation.json",
+      "sha256": "7510bd0fcbe1d8912c78e1ceb82f075e8b8df5ca5d151d0f9c1a518277db1e7e",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 788,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-candidate/output.txt",
+      "sha256": "a6e095862b47da7b88e004b1dfaafedbf1a1bdedc5bc08afa0627303624ab18a",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8661,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-evidence-access/model.fizz",
+      "sha256": "e3cb49f3db1db1301ef102d7ecaf4a67d773d2dfd65b5774f9783da36808a235",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 1014,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-evidence-access/observation.json",
+      "sha256": "7caf446ccbe72aa4e4e8375c72177323be4c471b5308ef1362b5f1fbaf13597d",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 798,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-evidence-access/output.txt",
+      "sha256": "9090dae66b4529560e6aa460a3b70fc914ff9e1efe4fa4a12b9cd17c21024f5e",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8659,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-evidence-lost/model.fizz",
+      "sha256": "034c9da3dbf39135708035458bf5b9418176ee53559071119b5cce8123376dda",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 1004,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-evidence-lost/observation.json",
+      "sha256": "6345acc33842299709f3659c91a83ff6cdbb8d28ad33291cc9ffcee50f58a219",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 791,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-evidence-lost/output.txt",
+      "sha256": "06f899b31274c85a6e5e5154fd37623bc48130a659b9099f42fe9103b4fb71fe",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8655,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-exhausted/model.fizz",
+      "sha256": "df96f5488fed45647c16370b82aef012ea22cb47cff043e1907b62e2ad9739cd",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 894,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-exhausted/observation.json",
+      "sha256": "98f8208dd4c9ecdd69ae1c239fed0a4da3bb57211d5bf2ac4c5d8a4677284b07",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 786,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-exhausted/output.txt",
+      "sha256": "29d9b99619e74e048e1c47aeb2cfdc01cb65a5176c491120a4d2bfc87f222d68",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8654,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-identity/model.fizz",
+      "sha256": "1e42a94eaf677d92f05c77e7b60874ef077f44028f3130d42b96df4f6c7eb629",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 841,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-identity/observation.json",
+      "sha256": "371fe8d185e403f1ce00d573ff12740013d3200f168ce0611d237cbf7ae3b508",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 782,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-identity/output.txt",
+      "sha256": "8a0224b1df20c344c9be173f062b1455b14a219e13227e877ee5e7ecef4fb24c",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8653,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-initial/model.fizz",
+      "sha256": "2142bd65b914799cb32c7ff7c2a1e084753c9a3fcb093d0845603954aa0c0480",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 940,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-initial/observation.json",
+      "sha256": "1e9e0c47f8516c521424790b417dc471939a8fbaa6ef269d912b851a11d90222",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 780,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-initial/output.txt",
+      "sha256": "3b23ac46a7292b7362d88224ab10d65f6776ba667c2cd8a53c114a24c95af241",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8659,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-moving-target/model.fizz",
+      "sha256": "df96dd606bd1022994d3e749467b1d241187d7b2e1102e37d2d2169ff9cf03be",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 987,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-moving-target/observation.json",
+      "sha256": "738808042fc2e495eea242ba971c09a6c7286ba733cb9d528bd0dbe69babf9ba",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 796,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-moving-target/output.txt",
+      "sha256": "6799764e5cd6d8b2853cdf119ae26fcd3158e344a11f6a04691a0f1aa9cc846d",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8656,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-proof-base/model.fizz",
+      "sha256": "ac6b752880d637c71f7a7ecf503c00c6245ec9c69284d53ce5f51dba42b53a4a",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 845,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-proof-base/observation.json",
+      "sha256": "0fc5f5ca75cda849fe4b232e2bde7e19b218b92b0c5895cb27391e1acf226383",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 783,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-proof-base/output.txt",
+      "sha256": "4550a66f82fc0ea5f1e2485ede0d0952a723ea4c803917118db719c1d7378214",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8652,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-repair/model.fizz",
+      "sha256": "8cf070e618b229ee1d7483028fe42bdd8ce2f4ca308475a965b191cbf02b1797",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 977,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-repair/observation.json",
+      "sha256": "26cda32b04960dfad944a471b6986e8e6ff8f5faf875fdc5f51d517f1661f268",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 780,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-repair/output.txt",
+      "sha256": "e9e40c569a768b107d6a57633fb5689fd633299f7a5c5cb23141a250befa7d77",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8659,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-report-access/model.fizz",
+      "sha256": "310bf87d4fb386fe36661b432aaff5e9fa90385e64d94340a979beece6c06018",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 1004,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-report-access/observation.json",
+      "sha256": "61fdab4c0927d4a5ff2012e80d991715cbfc08e25436c4951cc99ec36952dd5d",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 791,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-report-access/output.txt",
+      "sha256": "35d66968c2ea60dbc1326f7231c5ab748b3dbfd178fafaf74c57dd0f43ad29c0",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8657,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-report-lost/model.fizz",
+      "sha256": "04cec58bd02ca07f17de76c309595ddfb23d0da2d8d84b78f8ecc172c7c400fa",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 994,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-report-lost/observation.json",
+      "sha256": "4e1ba989a05f16e08ace9a6b3e01bf2c2b296cfea68fdb038b32510954c37444",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 789,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-report-lost/output.txt",
+      "sha256": "bede07a7a0a176ea0cdd1cbd527bb2769b018c31e71647ad849272512d0c6d34",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8657,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-review-base/model.fizz",
+      "sha256": "166c355c8d33fb9bb1d639a8ba5d20ce6d2947b95c973a6f105805a16dcda6e8",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 849,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-review-base/observation.json",
+      "sha256": "fd43eedc0095dd74f3633e41c879838b644baf4629310f175045ff4552bb92d2",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 788,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-review-base/output.txt",
+      "sha256": "5cbd69a830ccf678f1978143837366dae54f0902b4ad789f16657b909cb6e166",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8650,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-text/model.fizz",
+      "sha256": "c27dfaf0f6aa1708978e719fde7de94a642cea3a2ff5b4c5dc1f7b05c98db382",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 975,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-text/observation.json",
+      "sha256": "10ec75a1aee088a9a926a401d40f63ee804ae2968978b04b565001fa0d24264f",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 778,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/baseline-text/output.txt",
+      "sha256": "f41833c4d5845cdfe0dd6af8c3bcb8655762916e00ccb583a91bac0097d88be1",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8660,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-candidate/model.fizz",
+      "sha256": "d535a71eeb955331037042f34c670e3907624426fb5b880019cec9db7b0e7978",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 646,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-candidate/observation.json",
+      "sha256": "d85e0a42c7bb09aaaf37a6587e5cc0e27631ca2d8032b688d3ee7d804a7798be",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12830,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-candidate/output.txt",
+      "sha256": "cb531b66fc4ae0babfadc6c44262223a3a133d306a7cff31a412199ab2be0369",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 71394,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-candidate/trace.json",
+      "sha256": "bd18faa2286e80f15f8eb114f165d4e631e73bc8637e098fffe67b9a16841a08",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12376,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-candidate/trace.txt",
+      "sha256": "205edb7457eb8aa00a9bff2d77b8178f064e17006c2f9ecf672b0514d7fa30cd",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8664,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-absent/model.fizz",
+      "sha256": "bf2cfa07e3aae8a196563482f34cef4e3560e6c77091a8bf68e1f6d1ad418300",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 666,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-absent/observation.json",
+      "sha256": "027953a5a40cf92731588ba66a6f895a5d344629556c548b04fbafd355541e42",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8986,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-absent/output.txt",
+      "sha256": "c022f87b5c79df040f95e2d8ccc8787af65bfccb68e6b3ff14a036b1aed818a8",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 46005,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-absent/trace.json",
+      "sha256": "5312f2d742cac0ae61a9f47d554180b70d1b3971da7d6d173e02343c444447d1",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8202,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-absent/trace.txt",
+      "sha256": "725abd9200cd90c574fd10a90b53e2bc87a808485a225ebb584a64ff11556643",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8672,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-access/model.fizz",
+      "sha256": "783f1b2f00a31b0f33156e64c0c962db75406aea047bd8150a965aa5d3b1ae86",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 675,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-access/observation.json",
+      "sha256": "6ab52da5a43b1bc9d0fea22fecbdda921dbd9def134aca2b2670f8739e588f7b",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 13184,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-access/output.txt",
+      "sha256": "6922b54244a6e9eaf073f519616b3c00cffefcabbfde2b4622d3a87d8765c96c",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 73821,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-access/trace.json",
+      "sha256": "bed239f7225cd027a591c914d1f2999fa438e0bb1509d3236341dc0d5443ec5c",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12722,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-access/trace.txt",
+      "sha256": "ac98efc4c78e47494ee015fdce5a6a71cf772758fb84070dd73c055743613ab6",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8668,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-lost/model.fizz",
+      "sha256": "9488240a4f3687aa3c490193f30f5f1f009de42103ec71b5021618766186e848",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 665,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-lost/observation.json",
+      "sha256": "13776ce0b7dfcb0873d446ca2027a01ed27487fa27cec8f53265ca0c0015c25c",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 13172,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-lost/output.txt",
+      "sha256": "ae73c6789f9b1ccee2f8ad2854696346839bbe4ecb15d185da6392b762c53c54",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 73821,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-lost/trace.json",
+      "sha256": "7c5a9694e8fa0fcb53361efa110461cd5bbf20ad2590c24cb69535846daf742e",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12722,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-lost/trace.txt",
+      "sha256": "827cbb31ac015780f4bd91245668a8df5b0ea266c1b1d7021352bbd490d85be7",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8662,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-read/model.fizz",
+      "sha256": "cd87e502e1c9a3bd5053a510f84504e3381b22a3e09cd5b90095fbd86727d331",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 659,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-read/observation.json",
+      "sha256": "5040bd597b3dd6a37b0559cdd3cdb98ff2048a1984c20b6d07e50a2274371d66",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 10596,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-read/output.txt",
+      "sha256": "bc15baac0e3020048c9d01c836cbbf722d14a27c6e0f700aa771c3e2853458bd",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 56897,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-read/trace.json",
+      "sha256": "27173b8956fe101641f363c958f8f31039d6f3e0d7edfbb38aba2bba611c5ba3",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 9946,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-read/trace.txt",
+      "sha256": "945e8da6d3b931353dcc8a179f212b04b795d3124d41a9027cf4cbf296d0af6e",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8662,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-save/model.fizz",
+      "sha256": "eeca5ed9384e1b5e82d0d8fc066bc68682c0d74a9d0fcda9a3c4c1dd4b445859",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 658,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-save/observation.json",
+      "sha256": "357c894f03b68de925be6d62a3d984bcd410ecac7d4a82f41fbd81f619ed59cb",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8666,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-save/output.txt",
+      "sha256": "2af3cd3c28f24cf120c095b4c055a42a509b31db6272d49728c2b5fd113fef91",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 44247,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-save/trace.json",
+      "sha256": "629716cd21ab6f14f14b7f24955e4e6ee21869f1a6b610909abfb85ad3ca5bca",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 7868,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-evidence-save/trace.txt",
+      "sha256": "c6fc56b311535d9bdb141c3d73be8a2c02f90de7ec8694309343629ac64d5b19",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8658,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-identity/model.fizz",
+      "sha256": "6926e7f5e5477580a9d3eb5f5193257940d3ed9a964237751cea8003c9baac17",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 636,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-identity/observation.json",
+      "sha256": "18539e9b8ebbb94300ce283afdaf082ff797697486433e4e854d67e75d74c09a",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12498,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-identity/output.txt",
+      "sha256": "1bddcf2b256c90fca83a416170901af7afd531a748a0b09bc960b147af3e72a8",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 69742,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-identity/trace.json",
+      "sha256": "752a43f521114608a859b7f1662cddc8461201cec8b78fe437bd1cf49dc740bf",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12032,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-identity/trace.txt",
+      "sha256": "3ad58c07b01fbd44e7f793ba324c6f4ae6cd0d2e624f46e036979b247340b7c6",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8662,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-proof-base/model.fizz",
+      "sha256": "add2c5945ecdea9c3c8fd44688f6b23e3e505c699c1860b07dd3b3597a48b8d3",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 647,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-proof-base/observation.json",
+      "sha256": "2da45a2d300f4aac3231b8c0c2109dd52a7929b7cea0487e3ba0c49c8a7a150d",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12487,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-proof-base/output.txt",
+      "sha256": "b75b813939b541619bee800bee0807168542a00c22397ff1d3889753ecd40387",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 69705,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-proof-base/trace.json",
+      "sha256": "7123228f983514b91af6d843d3024a3065f311a1b5d8c320868446ca24f077cd",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12006,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-proof-base/trace.txt",
+      "sha256": "5879e6457ea8106987604a461cd868aeff3ddeb0ee708917524306ae6f34cf06",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8663,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-repair-reset/model.fizz",
+      "sha256": "c027d99a9b61b74b55faae91d370724c9035f372891f970fefabbe5d7aaaa8fc",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 653,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-repair-reset/observation.json",
+      "sha256": "3681b1d7deaabcf33cde9e7e0283262cf9e7e39b24fcf9725149c89fd4b00012",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 7921,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-repair-reset/output.txt",
+      "sha256": "0b0f697911d0df7a99a074e054f2873342ec5085694f9a72b156ef7feb840037",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 36411,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-repair-reset/trace.json",
+      "sha256": "7f08b86347b299ba7b87bbb338392c0f337472ad8b3c9d52a6bbb029db2c3c21",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 7050,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-repair-reset/trace.txt",
+      "sha256": "78b91e593df02998731bae81afe4e0105b10d5e611c6599c4dd7c37ac1c70b3d",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8668,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-access/model.fizz",
+      "sha256": "ec5655ac31e8b292e95235464273c533db62e20e3c4dfe76a36c77d98a4e4e70",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 664,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-access/observation.json",
+      "sha256": "49ed76b32071af3752f73391053631bc1536701629e764ab886f272e6a3dc002",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 13168,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-access/output.txt",
+      "sha256": "117234307bd776902fa48241ae026dfce0c12dd0aacfba97578d152aad6e0f0f",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 73821,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-access/trace.json",
+      "sha256": "568ea922867f2c26f853a99da8cb5e0083e522f2bda30c40eae622fe10359350",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12722,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-access/trace.txt",
+      "sha256": "5cb70c59367e28b72e8918e5f8af15ec16b5bed93f332d824a638416fb7b97eb",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8664,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-lost/model.fizz",
+      "sha256": "6b6713ccb5986eabac060a721dbfff62199fdf1d61336f117bf4d2ab458db805",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 653,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-lost/observation.json",
+      "sha256": "cb8f3019209e5814731f1a86c23ba530bd065a168d6e7dfe444a0f8ca62e3596",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 13159,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-lost/output.txt",
+      "sha256": "6a06440b31d52ad4bfa6af1b1f99c9143e930dcb76b22e58c1b71e4847b73729",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 73821,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-lost/trace.json",
+      "sha256": "c4a03e4ec665f84a061116eda042d08b7749a41f401f3c1a8afdab8a67e22996",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12722,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-lost/trace.txt",
+      "sha256": "5b8b76938bc883bb3c8f02d7b4d4908dd0b5c8ecfa2bd0d1efbe2d3f939d449a",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8660,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-read/model.fizz",
+      "sha256": "de2c1afab65d61ca3e6441f1c4ce8f1bf8cfabc4dddd5202e308fe948252fd39",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 650,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-read/observation.json",
+      "sha256": "cf362b88df73d9fd736c5ca74ab5a9e623208409f0acec700c6f4d86cfc457dd",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 10587,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-read/output.txt",
+      "sha256": "c33596e05c1f8df47ce3f9bc6a97f5b1cd2738d251b90ca7954ae3267c9cc886",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 56901,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-read/trace.json",
+      "sha256": "93874f1d1eaac9cd96c377e75df70db13a9a993ef339ee91d741c57ff2620282",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 9950,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-read/trace.txt",
+      "sha256": "01cc098067e02ab8f2cbf48adb36ed02c65b6dec12d3f5ffce8fda5c5a567695",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8660,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-save/model.fizz",
+      "sha256": "b4c7202a5cf07c548ad90933237e83b5495c6b801c61cfc5dc133f5a2c88f15d",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 650,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-save/observation.json",
+      "sha256": "c8cf937b1ee0b020cdb727a4084b97e10df84cff4c1c02a8dae3379ae2583b9a",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8664,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-save/output.txt",
+      "sha256": "f2a00b71e3d5d5c8c3bf4310abc387991056575c7ad097c451f3f8af266dcfe6",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 44255,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-save/trace.json",
+      "sha256": "11a2692aae773577b1e216993fe77531d575ecdfe9f416038fada98b2c9ac840",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 7876,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-report-save/trace.txt",
+      "sha256": "cfebd9697083ff4a6e979524333afa064f73c327638240d62aa9301877beb6ac",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8664,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-review-base/model.fizz",
+      "sha256": "c59a9d221cc7d485a31a0dbf45357590b8855d66d3da9e1a58e852a45c25e11f",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 654,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-review-base/observation.json",
+      "sha256": "be48f43731bc2129bb2fb96399722500c33565117c133abe1fa1fb7fcd43af2c",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12518,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-review-base/output.txt",
+      "sha256": "b3daed30b16a0c065adb9d3f027664a4fa535244a4105814990d3763c255f97a",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 69729,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-review-base/trace.json",
+      "sha256": "f24adbe3bbdc20e7cc003cf77a4074e47ae4aa06021abf53112139e9e0adbf1a",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12032,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-review-base/trace.txt",
+      "sha256": "9250ff5e05d0683353c83df11b8e5db37361f0182e8901f18e76f40d1a749e73",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8650,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-text/model.fizz",
+      "sha256": "feeb0a4edc71e382ba9b0905cee5286e106f9351c36d07ccb098380a5710bfb5",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 616,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-text/observation.json",
+      "sha256": "56f29d43a615eabf762f41bc7d2b8a3b1ecb4ab2d9a06786da6f3a6d2929ff8a",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12795,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-text/output.txt",
+      "sha256": "1c9793ba80e99ce89fcd8f2c82d1fb477e77cf8e968a7d2abd46d74a416e09ea",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 71394,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-text/trace.json",
+      "sha256": "1c736deb6279da800f3ddb4741b88e93b8dc427c887a5262fce88edbfcaee6e6",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12376,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/mutation-text/trace.txt",
+      "sha256": "cc8e052378934745ac81492b32fe5bb03dc586ca24b07b0bced4abab6c4a6ea8",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 40191,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/summary.json",
+      "sha256": "f57e04b74e242e23b44f5229a8ce5082b8ae5203dd6ab182fd533a55505ba866",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8650,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-base/model.fizz",
+      "sha256": "862018f0b42d8beae3fb247175183cfbcade8eec60b552c0a949c51172a1e01b",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 603,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-base/observation.json",
+      "sha256": "933468dcd025d9da1e27adc2cb90c0464a49de5082db9698d37ff36518a9f00b",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 5057,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-base/output.txt",
+      "sha256": "db1deeec659e874238057a0b3d1b661432b08447d25c01b017dd3c98380ea715",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 20344,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-base/trace.json",
+      "sha256": "c125ebe79b73b14e1df85f27db65983870cacc808fc8c7b3b24ee7734399d6da",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 4052,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-base/trace.txt",
+      "sha256": "9040d8b5449199cc89e673d22840766cc08dd7bb07f115b36f7fa747579f8f8c",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8660,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-candidate/model.fizz",
+      "sha256": "5d6cb5947d14c1425fecb59a8372533fea3961accf6d789fe65a0ffc7080baa4",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 622,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-candidate/observation.json",
+      "sha256": "a4e9a2df0283fe237f99ca311e377ca6f3a72805d07b607fb9866cd211e57fd2",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 5092,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-candidate/output.txt",
+      "sha256": "3be3d29489632ae28ebb9d15e0ef10f1f7c67093b6ba8d984b017331136ddde1",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 20349,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-candidate/trace.json",
+      "sha256": "01dabc6d804cf5dfa6f2e9f422809078b72f9d32877bd283ea6bda0a9bf991c2",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 4057,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-candidate/trace.txt",
+      "sha256": "297910439fd3c0bc52d45819c2d0888db383088045af7baeccb1bba4546ac177",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8664,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-absent/model.fizz",
+      "sha256": "153f68267c77148b0d185df665539e9965475febde7f3cf6e13ec5534565914d",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 639,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-absent/observation.json",
+      "sha256": "76a6f93a341ce122076beb5fa915f255b5ddea58e4ed7a3784b2be7ddd281389",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 6048,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-absent/output.txt",
+      "sha256": "c4f9360769011b4e2b60e3c9d90a2f83b88b0d080ac633592846d71fd2c5e5ce",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 26508,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-absent/trace.json",
+      "sha256": "656ff0a51cd51c0ba3f3418aa6b07166ac0d04123c275509fe15c6f3e82ec228",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 5034,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-absent/trace.txt",
+      "sha256": "c2994620a8f484294e2e55847dd3a90863dc1dcdb2ae57723fecbb71f32251e3",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8672,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-access/model.fizz",
+      "sha256": "8558dac08f1031a0d0aed83c03e623fff6db600c5d4458a92ee109c770646c03",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 647,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-access/observation.json",
+      "sha256": "a96c838c6ba38fc97fc58fed810ec7903f023cc75f9e9df6bfa6c072652f5447",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 7388,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-access/output.txt",
+      "sha256": "4f7fd3498f41404740e20272eac20b83b93813e2b39ea5936795cbe5f637740a",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 35611,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-access/trace.json",
+      "sha256": "78e4e61fb0e28db03ea0a4d29c073371c913248e4eac9400cac2d0a8fdd5dd81",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 6491,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-access/trace.txt",
+      "sha256": "7c5b665590930aa6c677636523b0b7838989d5b115b27c68836227b513d8c646",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8668,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-lost/model.fizz",
+      "sha256": "fa49326676243704886f3e59631373de742aa85a3e6a9d92ffb45075e8653d85",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 639,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-lost/observation.json",
+      "sha256": "6f40f283c32184dd154884ff069815b7c6cf1216797f86e59fb5c48e367f73f3",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 7376,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-lost/output.txt",
+      "sha256": "e1762bd53ae60adc754a7736d62e99020ec26cc63d6d5b292e9a01a33660f814",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 35609,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-lost/trace.json",
+      "sha256": "f172ed155f73bc79a1fc525ff8d41e31c11e9ded55a8242f9bd3b84ecdd6838c",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 6489,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-lost/trace.txt",
+      "sha256": "5868842f556600a7a9e891266001bcb386af3ff87eb106e8ee86fd8d2fd332ff",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8662,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-read/model.fizz",
+      "sha256": "02ecbeef05099de7c3fe8bdc24ae5e452f739ed76a8ff12f27b4c70cfd650b24",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 633,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-read/observation.json",
+      "sha256": "2ae4f3a733025ca62acb447956e461a00128ffa641a3f052f7a4cec4827d10e4",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 5763,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-read/output.txt",
+      "sha256": "feb2ea106b53cfa87f9a27eddb4751bea4a99c609a66a8eff9936c4a27989f8e",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 25086,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-read/trace.json",
+      "sha256": "3e3d78ac885cedfbbdd4155dde70dee61babd20fd347846fd4cf1daec0918fec",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 4756,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-read/trace.txt",
+      "sha256": "4259dd61203859b650c04335f1fc8b490716598b7a70ce435842b354c99f1901",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8662,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-save/model.fizz",
+      "sha256": "dad0da94912fe9653b284fa28ef615780fb8a9ba93c7a3160e43c62fd463a75c",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 633,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-save/observation.json",
+      "sha256": "a26d580a4c3bb831de79f5d01fbf57fad39047e446937704dc7d59375e5dcbaa",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 5061,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-save/output.txt",
+      "sha256": "c7c1bd51efada4773ae1264732d346d28d75cb81e3ff76799d906b5736a4063e",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 18745,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-save/trace.json",
+      "sha256": "601338de3beb87537d9753e3888b5c8b0b0e89342f0efe270b29823a353e914f",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 3717,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-evidence-save/trace.txt",
+      "sha256": "07ceca745170d7bbfc78334e12c4dc653ee2091d055539eacb68bb4fd21392e3",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8660,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-exhausted/model.fizz",
+      "sha256": "9e58ea4a0e5d12e3d72138bacc2821b731e5aec6c617199d301b33bb2589a4a1",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 623,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-exhausted/observation.json",
+      "sha256": "a227ce7f66d4653c2f6ea1b9d8c5b2e3a48da2c47ee612683cf79253f1cad9ca",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 7917,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-exhausted/output.txt",
+      "sha256": "0c0651cfe2a469af4aa81901583e97775924b7b423cfab85d133a5b1645c3f73",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 36586,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-exhausted/trace.json",
+      "sha256": "82fe72a9ca1557a0663e18bba26ac6f3c25c92548927704f1ad563cd1438de97",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 7080,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-exhausted/trace.txt",
+      "sha256": "9768a82488450ed9b3dd81d987ee74cdb24c60baf1a1177fe97f6b958a5f22a0",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8658,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-identity/model.fizz",
+      "sha256": "8dbbdf3f892ca4ed5dbad6b7e6d575cdcdbf6baa97e327fa13ef67896c1f1aa1",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 619,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-identity/observation.json",
+      "sha256": "9775d55164e9b5db59209ec940ad9290e59ec325778cd336c130cf483c1c1710",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 5017,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-identity/output.txt",
+      "sha256": "e2f7091fd619303c883ea779e45cd982d376581ac555e903c36a05015fd50c8f",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 18740,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-identity/trace.json",
+      "sha256": "75a157428442174afb9259275bb07de9411e80c4367e10769d7fb67143c6aa76",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 3712,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-identity/trace.txt",
+      "sha256": "fe66ff9b2b4f1b7921012d967f7d981a63da9eb9e7b4d6132a40f37f6367fa50",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8656,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-initial/model.fizz",
+      "sha256": "72eab05756361e84400098dab5950942f2a84f1038937591a16114fdaff9e804",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 615,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-initial/observation.json",
+      "sha256": "46bf30ed6cc920e56e366cc820079898ab515969974f3b32d941b33b22af4c48",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12482,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-initial/output.txt",
+      "sha256": "acead1ade16923d813c24b2ee6f97aa9da235d6bc77130ab32bccedb92102e37",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 69729,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-initial/trace.json",
+      "sha256": "b2ca834ded67551842077505479dd5e0a5c8685e388b65e25cf982f67e20ce35",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 12032,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-initial/trace.txt",
+      "sha256": "c3a2a6d05af18e3efdd52caac6cef784d7df3861e78ac84bc88376ae97181469",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8662,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-missing-stage/model.fizz",
+      "sha256": "e5fcadc3edaad79c3a828ef1de0f9aaf311f31f8119d3abd175bca649df5c0dc",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 632,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-missing-stage/observation.json",
+      "sha256": "c42e8f8c780373626d66f70241b218488ee1979c8344aadd3a343ae4af5e4e15",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 2514,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-missing-stage/output.txt",
+      "sha256": "678a40a8f89bccb660d273f981ad21ad7215d03f7e10e40e155ec40c2aba5d8e",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 4135,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-missing-stage/trace.json",
+      "sha256": "2c3ccec1e57b0e08a1c3e452224511c9535817f9ab9741fbb2d76bfc6b35c2d0",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 979,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-missing-stage/trace.txt",
+      "sha256": "945746bb5d45c325ac9e83d2ef9e5411cb7885a49298e21b554443c0a4a48292",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8668,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-moving-target/model.fizz",
+      "sha256": "a4f7801cfb7f0f7042b9ea2b4219541b8f58bf1320fc24e19083083ec4839b3f",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 639,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-moving-target/observation.json",
+      "sha256": "4db0cbbe204540eebbef6e4a0908cbaab7e73811dbf15e56315b397aa8dca6b1",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 13501,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-moving-target/output.txt",
+      "sha256": "3e01a705f1219672aff4dbf4c40cc6536dcfb7eb6ff487117c9692e85d191d8a",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 75391,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-moving-target/trace.json",
+      "sha256": "e80b0d0514f7a3b829cdcda6e63676ba8ff698720df9db205d012037845c1401",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 13088,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-moving-target/trace.txt",
+      "sha256": "b5cc82247c997c362db4a2ff5d3e292ee3359c11d5f7379fef188b7f6cd34214",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8654,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-repair/model.fizz",
+      "sha256": "2a23d6f5c8e71c63af3fd72fa271ea408b94c90087a186f3481ac4a584580b55",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 611,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-repair/observation.json",
+      "sha256": "ee5ca066e2bceb6720686afb968fe88df8680613f6e2dfc52a690df92493e1c3",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 15313,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-repair/output.txt",
+      "sha256": "a9f1bba7f0236a3052d408d7d4e0bee078138207fe116357ba02286dd5964741",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 86477,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-repair/trace.json",
+      "sha256": "b44ff5ee59b35944527853c14597cd2f7747dc371d3c7ccc73b07bf75467c227",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 15076,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-repair/trace.txt",
+      "sha256": "17be80131afd45afb8c81411952eff8d1c0e001598c407b4234cdc7c9fa16ed3",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8668,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-access/model.fizz",
+      "sha256": "6841ea4cc7a0127fb8205c8a421be5f09477e549ff48fb1672be8e3b8fefdb28",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 639,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-access/observation.json",
+      "sha256": "076421438eb66ce897307fa5965b545b8538e804934d102caaee2c1bd79c3c05",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 9303,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-access/output.txt",
+      "sha256": "36110d25eaa7627c09b87746b66633e4c12b4d9bd5f1174eccdc4f99cb2211d7",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 48343,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-access/trace.json",
+      "sha256": "af91854d925950d1ddd1597b232fd58739f61ff8a96ee6af80ac801378739e09",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8567,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-access/trace.txt",
+      "sha256": "7f0242bb9abb308efa40e23453d98328f5baa9498e2546313209c2f69e1a4696",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8664,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-lost/model.fizz",
+      "sha256": "69fd336ca90effdeb018ea817d7d16ae324f292b73712b1af9d5a60477b147cb",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 631,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-lost/observation.json",
+      "sha256": "34ce9b63d7e10750aac0c0c54aa1a89e3866566a54d55aa56a44901f074ad109",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 9290,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-lost/output.txt",
+      "sha256": "b0054dbf44987d4be1bef827bd2d03d4df031ed58dc8efa284eef161d68f397e",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 48341,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-lost/trace.json",
+      "sha256": "a8ce355b274dfd5962c6f60f045759e5e32782eddd9e31c2353bf8b514ca1cda",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8565,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-lost/trace.txt",
+      "sha256": "c01bf3c1af7f2149f15ee186d8954af08e6b9fe3fd2e7aa9beb55a833dfd7a26",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8660,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-read/model.fizz",
+      "sha256": "56424669b011f2455b6d6c108e91c456388038b2215685c0815683dc9a12a2db",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 627,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-read/observation.json",
+      "sha256": "60b4917d0c56a18b8fbbf9f318492dcfa2296749a826a6049f46ce0cb4e2f501",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 7683,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-read/output.txt",
+      "sha256": "6cbe492d4239ee4468efd9aec09bc681cfc5e59430a1344f8e06f74d2af1a95f",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 37842,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-read/trace.json",
+      "sha256": "c07847c5101b5a7ea3d696e32772c1b1d1671fc09ffc1200b4a2d6d049db3f49",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 6834,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-read/trace.txt",
+      "sha256": "d4f7b700761e9be605e9999f1d093e5bfc379f980b03c18cdd8c560f16b7b58c",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8660,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-save/model.fizz",
+      "sha256": "a0894022b5de149682177474e45f4c7455fd24cada79bdf501a48ba7e14284ba",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 627,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-save/observation.json",
+      "sha256": "978dacf277528b64a81493896656d050f2fa0dcf0bb285fdf8d608f701215a9c",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 6719,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-save/output.txt",
+      "sha256": "bc82b1bbba95efc84c3506d071be32d47c100c51fc61debfc8c57ec3ab9698f6",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 31522,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-save/trace.json",
+      "sha256": "04c60c705750d00fa31ca39d7ce31e1ed08c5638ca4761067ea8bb887358bce4",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 5797,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-report-save/trace.txt",
+      "sha256": "bb7d032ba862e2221171c73f4eee694d4eb139350ed9c8017f4a9bdeb617ee0e",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8655,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-restart/model.fizz",
+      "sha256": "581463118a1f67d0378a1ca42b2cacade347fdeddf2bb89d31a0020bf6546ff0",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 614,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-restart/observation.json",
+      "sha256": "acc49005eaaa6500f0dd4c48c6e8e32457d4ca4d39b73cbe18adc095a44cf76a",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 15618,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-restart/output.txt",
+      "sha256": "52401a7c2a3ffafd1908f633bf9c06b25cad93d9fc6f5065d223befbf7b96518",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 88394,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-restart/trace.json",
+      "sha256": "af3029013f6c58fd10092fbdf8946bcfa81dd43e3d5088d0ae24c6ae42d8ea23",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 15404,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-restart/trace.txt",
+      "sha256": "274c21a9a9589b42e3dff3dd5b4dcb0c55a16f12c8f84e55514a10b890c66268",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 8650,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-text/model.fizz",
+      "sha256": "3016e56d69c98c577d7921ab499f0897fec5a992525a1bfda3cedf3cb3cd5bb6",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 603,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-text/observation.json",
+      "sha256": "34596ff88978443683f118f82437fa9384d3e6366fb7034acaa4a9410bdb8bad",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 5058,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-text/output.txt",
+      "sha256": "67f2e60ba2af4ff27b9de66ccd5c66a05cce4bf15354cc0d1ea8bcf8c982bd73",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 20344,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-text/trace.json",
+      "sha256": "caf55493cb20111172af714524cd476b12ffbb4f7686ebd96c9255607368feac",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 4052,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/model-c3/witness-text/trace.txt",
+      "sha256": "98efc1e1d35837d34bd4e0e95b9671c28410c0ad859c32916b6d7854017f8ad1",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 1202,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/SHA256SUMS",
+      "sha256": "8c3da6576e43567ae487c3643e966c42cef703ca0acb53435fbf1ef095fd648e",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 1088,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/actor-request.txt",
+      "sha256": "5eb81156327d21355a3e0d1f262c6feac2fa262a89cb00cf698f74a4bfc8de00",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 1092,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/actual-output.md",
+      "sha256": "5eecc3ccc59a6663d357e765a36a0a23883a30ddd698e9a4431997863b794565",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 2386,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/controlled-inputs.json",
+      "sha256": "dee223b4d3e52550b616d89b0c7bd1206d3b2aa3e750fc7d165656d8b01e2f58",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 266,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/handoff-validation-command.txt",
+      "sha256": "72f9318b47dd84e858dcaad21317eaa012cab7dcbba878274ab32d61c24bf963",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 9379,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/handoff-validation.json",
+      "sha256": "5b04f0deecac850fc432b080fcbffa36b800f2b915a4698dbda21632103208d5",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 1426,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/input-hashes.json",
+      "sha256": "764e824dc018192cd9f5e778fb49e4874830447083205a1223a70299263b1114",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 576,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/instructions/AGENTS.md",
+      "sha256": "22af0f7d5f565dfdfbb091b4625c0b6f6b96376555eb73f4868fc4cf1d469a49",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 40760,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/instructions/acceptance-contract-protocol.md",
+      "sha256": "625757c679f03acd88eaa3fa24acf348ea73de94b8c585a3fd293951663e846a",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 2261,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/instructions/issue-tracker.md",
+      "sha256": "9dad3fd9b5dcedf194ae37613d5a66e20b06765723433a956a5de60bb0ed868e",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 22640,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/instructions/publish-pr-SKILL.md",
+      "sha256": "c1c0c65b5d588bba53f464a2b52ca2c4eb239d390d2c470e89b4f2a7ce8f0884",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 3642,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/observations.json",
+      "sha256": "a3cd40d09a4cf0a847cda8e157c50b4c09e4c5e7b2b8c7d4d4e4fd2081b11d53",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 1064,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/pre-state.txt",
+      "sha256": "e0a0f766478d183265568c5b903702b58919ab7f4b9c1e06dba8e07f78f9c148",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 1572,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r19-publish-boundary/report-pair-verification.json",
+      "sha256": "dc247e8e2d888b3b9cfa943d4845a85571ee709d9298203ad72470c902e3b6f0",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 1647,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r20-readiness-boundary/SHA256SUMS",
+      "sha256": "fbf10fc505e4f9ca8070573eb8e79848aa2cb13a7779765964db89c7b32ed3c0",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 888,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r20-readiness-boundary/actor-request.md",
+      "sha256": "25a976005473825011417521960dc1e728473dcef255ed5d00ca3c2605a40b87",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 3175,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r20-readiness-boundary/actor-response.md",
+      "sha256": "e598e110809d5e6d120e628dcf7bbf0e6b16530aaf0fc1d1e12da2dcf9f371bf",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 2074,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r20-readiness-boundary/controlled-input.json",
+      "sha256": "cc2b773c30db376d9fc6ba386643faa8b6329e77dfc79fe749400743872d884f",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 1245,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r20-readiness-boundary/expected-oracle.md",
+      "sha256": "71562baa475767961c200f0484ca4dbe9ff8bad7a3147bb1dd108bc667cc646d",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 40760,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r20-readiness-boundary/instructions/acceptance-contract-protocol.md",
+      "sha256": "625757c679f03acd88eaa3fa24acf348ea73de94b8c585a3fd293951663e846a",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 8993,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r20-readiness-boundary/instructions/merge-readiness-SKILL.md",
+      "sha256": "7d8fa77aa11d63670915afc7f70235e6a17156bb4835d31c7efa5bb24fb5b7e0",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 5806,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r20-readiness-boundary/instructions/merge-readiness-scenarios.md",
+      "sha256": "9269c97042272200bb9c30f03240ac69cd89b93b8e9f90f542dc4acc119a8d58",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 3374,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r20-readiness-boundary/observations.md",
+      "sha256": "0610c6f9297a23e7bf8a57dfa0f7904ea4a5bd491dd0f4bde23a7d6c7d9f93e5",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 1174,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r5-delivery-review/fixture-builder.stdout",
+      "sha256": "572440ac2f35ac1d0df57af8cb4818b12960b2fbe09bc46c629c362b251e4806",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 5193,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r5-delivery-review/observation.json",
+      "sha256": "0c3adf01eed9a3a52df2d094c237f946958f9a767ff5a8cb2e9efd1fc8b94b94",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 3648,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r5-delivery-review/recreate-fixture.py",
+      "sha256": "927e43176674010f1a24096b82703bfb6e6997eac56cee05ec93ee3e2c483bc8",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 4210,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/evidence/skill-boundaries/issue37-r5-delivery-review/transcript.md",
+      "sha256": "a0c2cf336d3a1e797380b66beab2f804c49f8748224f14618f2b486c42ed8d1d",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 7026,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/history/02e10f504200a0d957a290d613ca116c8efd2737b1eceb7c8f431bd08b2c575a/review.md",
+      "sha256": "02e10f504200a0d957a290d613ca116c8efd2737b1eceb7c8f431bd08b2c575a",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 23565,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/history/18656d2203d78d76d0740ab4dc1a69e50b3b5dbd365048ca3ba49185d1ca99fe/frozen-delivery-base.md",
+      "sha256": "18656d2203d78d76d0740ab4dc1a69e50b3b5dbd365048ca3ba49185d1ca99fe",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 2088487,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/history/4eaf3592755634360119bd0aeade2cbac35e38b7667e1d3d3bafcb72f0e4ad4e/candidate.json",
+      "sha256": "4eaf3592755634360119bd0aeade2cbac35e38b7667e1d3d3bafcb72f0e4ad4e",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 2088487,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/history/db0c2a75d6b06819d520d3de5cba4aef236cd551e763ff5ecfaeb1c4d4b32993/candidate.json",
+      "sha256": "db0c2a75d6b06819d520d3de5cba4aef236cd551e763ff5ecfaeb1c4d4b32993",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 5852,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/history/e07488d7c0827da68bb4d68187c83af92586832e9107b2eb792e74aba4dbf54e/review.md",
+      "sha256": "e07488d7c0827da68bb4d68187c83af92586832e9107b2eb792e74aba4dbf54e",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 2111963,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/history/fdc3b1037701105a4e31a378929de8c8e759fdd6796d57086bc28e3475164c45/candidate.json",
+      "sha256": "fdc3b1037701105a4e31a378929de8c8e759fdd6796d57086bc28e3475164c45",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 2491,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/implementation.md",
+      "sha256": "a2b3b3bbd21efd37c49ee38d83a08af9a9621a52ed137c8c893555a85ceed056",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 5229,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/planning-handoff.md",
+      "sha256": "2d9c7618c2f9b7a8dcac1469004a55f9346a14256b7a80a8b86f48b278c16571",
+      "source_mode": "0644",
+      "type": "file"
+    },
+    {
+      "bytes": 11508,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/proof.md",
+      "sha256": "00c97e81d139b05da6b6c2ca2a44cdb6cc1a958a65cc773f8da0fdcd6104515a",
+      "source_mode": "0600",
+      "type": "file"
+    },
+    {
+      "bytes": 5903,
+      "git_mode": "100644",
+      "path": ".p2p/work/frozen-delivery-base/review.md",
+      "sha256": "3f0c1cfb0599abc88c567086ec37a7a91c90ec3f3170872b8722c57284e408fc",
+      "source_mode": "0600",
+      "type": "file"
+    }
+  ],
+  "candidate": "snapshot:sha256:d0a2b3cc0d60f6f0f36e019e47ddddad7ca5845ee570ac02269ac3956bc82404",
+  "comparison_base": "dbe54bc20a19b8ab8e700fb3aba9c9e8a59ce4d4",
+  "self_digest": "recorded in publication.md; omitted here to avoid self-reference"
+}

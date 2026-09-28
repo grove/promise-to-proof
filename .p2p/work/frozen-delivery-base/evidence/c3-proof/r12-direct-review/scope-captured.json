@@ -1,0 +1,16 @@
+{
+  "candidate": "snapshot:sha256:d0a2b3cc0d60f6f0f36e019e47ddddad7ca5845ee570ac02269ac3956bc82404",
+  "contract_sha256": "3925c513a6702b94fbc2fcfc30f7d2d057638a275ae103056031cb3ca38aa0a9",
+  "source_sha256": "c570232a7371a53fd6dad954ec9d53f7940ecba171b3a2080fd995a6bd9a77d2",
+  "head_at_scope_capture": "dbe54bc20a19b8ab8e700fb3aba9c9e8a59ce4d4",
+  "intended_target": "main",
+  "comparison_scope_captured": "b6a749ff2582741242fff9c1737b10ed0287077a",
+  "target_B_expected": "b6a749ff2582741242fff9c1737b10ed0287077a",
+  "target_D_expected": "dbed9a960792e857e7af02d6580ba4676211607a",
+  "planning_handoff_sha256": "2d9c7618c2f9b7a8dcac1469004a55f9346a14256b7a80a8b86f48b278c16571",
+  "candidate_json_absent": true,
+  "delivery_record_absent": true,
+  "implementation_handoff_absent": true,
+  "product_tree_entries": 141,
+  "all_manifest_entries_match": true
+}

@@ -1,0 +1,24 @@
+{
+  "fixture": "/private/tmp/issue37-r5-delivery-314yvddr/delivery-review-fixture",
+  "candidate": "snapshot:sha256:62d091adb1dbca6759b728946c47f1c9203d7094350c0bdac22a7bccbb165331",
+  "comparison_base": "39cf3a96aaf89789fceed9b0454682f9e88bc0b8",
+  "target_main": "f5193c384ba6aa4ad5a812463a50eb7238c1478c",
+  "target_parent": "39cf3a96aaf89789fceed9b0454682f9e88bc0b8",
+  "target_relation": "fast-forward",
+  "candidate_entries": 141,
+  "candidate_record_base": "39cf3a96aaf89789fceed9b0454682f9e88bc0b8",
+  "approval_receipt_present": true,
+  "b_only_marker_in_candidate": false,
+  "prior_review_absent": true,
+  "commands": [
+    "git clone --shared --quiet --no-checkout /Users/grove/projects/promise-to-proof /private/tmp/issue37-r5-delivery-314yvddr/delivery-review-fixture",
+    "git checkout --quiet --detach 39cf3a96aaf89789fceed9b0454682f9e88bc0b8",
+    "git branch --force main 39cf3a96aaf89789fceed9b0454682f9e88bc0b8",
+    "git checkout --quiet main",
+    "git add .r5-target-only",
+    "git commit --quiet -m controlled target B --date=2026-09-27T00:00:00+00:00",
+    "git rev-parse refs/heads/main",
+    "git rev-parse HEAD",
+    "git rev-parse main^"
+  ]
+}

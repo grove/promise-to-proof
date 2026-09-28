@@ -1,0 +1,32 @@
+{
+  "kind": "baseline",
+  "name": "identity",
+  "scenario": "identity",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-identity",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-identity.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 0.973,
+  "model_sha256": "1e42a94eaf677d92f05c77e7b60874ef077f44028f3130d42b96df4f6c7eb629",
+  "nodes": 1575,
+  "max_actions_observed": 15,
+  "outcomes": [
+    "identity",
+    "missing-stage",
+    "running"
+  ],
+  "actions": [
+    "Complete",
+    "Implement",
+    "Launch",
+    "ReadBack",
+    "Restart",
+    "Return",
+    "Save"
+  ],
+  "result": "complete finite safety exploration"
+}

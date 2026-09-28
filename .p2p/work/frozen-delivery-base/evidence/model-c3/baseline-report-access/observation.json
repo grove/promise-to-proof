@@ -1,0 +1,39 @@
+{
+  "kind": "baseline",
+  "name": "report-access",
+  "scenario": "report-access",
+  "mutation": "none",
+  "command": [
+    "/private/tmp/issue37-fizzbee-v0.5.3/fizzbee-v0.5.3-macos_arm/fizz",
+    "--output-dir",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-report-access",
+    "/var/folders/vq/593qxcm57l90w1dlpywl_7nw0000gn/T/p2p-delivery-model-run-0gli0pye/baseline-report-access.fizz"
+  ],
+  "returncode": 0,
+  "seconds": 1.375,
+  "model_sha256": "310bf87d4fb386fe36661b432aaff5e9fa90385e64d94340a979beece6c06018",
+  "nodes": 2534,
+  "max_actions_observed": 16,
+  "outcomes": [
+    "complete",
+    "evidence-absent",
+    "evidence-read",
+    "evidence-save",
+    "missing-stage",
+    "report-access",
+    "report-read",
+    "report-save",
+    "running"
+  ],
+  "actions": [
+    "Complete",
+    "Environment",
+    "Implement",
+    "Launch",
+    "ReadBack",
+    "Restart",
+    "Return",
+    "Save"
+  ],
+  "result": "complete finite safety exploration"
+}
