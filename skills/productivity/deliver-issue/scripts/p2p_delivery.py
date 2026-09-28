@@ -14,6 +14,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import uuid
 
@@ -91,7 +92,45 @@ def skills():
     return result
 
 
-def routing(root, work, *, resolve_tip=True):
+def upstream_destination(root):
+    """Resolve one configured upstream without guessing from the requested SHA."""
+    try:
+        branch = fs.git(root, 'symbolic-ref', '--quiet', '--short', 'HEAD').decode().strip()
+        remotes = fs.git(root, 'config', '--get-all', f'branch.{branch}.remote').decode().splitlines()
+        merges = fs.git(root, 'config', '--get-all', f'branch.{branch}.merge').decode().splitlines()
+    except ValueError as error:
+        raise ValueError('unsliced delivery needs --destination or one configured upstream') from error
+    if len(remotes) != 1 or len(merges) != 1 or not merges[0].startswith('refs/heads/'):
+        raise ValueError('unsliced delivery needs --destination or one unambiguous configured upstream')
+    remote, branch_ref = remotes[0], merges[0]
+    branch_name = branch_ref.removeprefix('refs/heads/')
+    if remote == '.':
+        destination, ref = branch_name, branch_ref
+    else:
+        destination, ref = f'{remote}/{branch_name}', f'refs/remotes/{remote}/{branch_name}'
+    fs.git(root, 'check-ref-format', ref)
+    return destination, ref
+
+
+def explicit_destination(root, value):
+    for prefix in ('refs/heads/', 'refs/remotes/'):
+        if value.startswith(prefix):
+            try:
+                fs.git(root, 'check-ref-format', value)
+            except ValueError:
+                raise ValueError('invalid workflow destination: ' + value)
+            return value.removeprefix(prefix), value
+    if value.startswith('refs/'):
+        raise ValueError('destination must be a local branch or remote-tracking ref')
+    ref = 'refs/heads/' + value
+    try:
+        fs.git(root, 'check-ref-format', ref)
+    except ValueError:
+        raise ValueError('invalid workflow destination: ' + value)
+    return value, ref
+
+
+def routing(root, work, destination=None, require_tip=True):
     """Read the approved Markdown decision; never infer approval or a child target."""
     item, own_directory = fs.paths(root, work)
     parents = []
@@ -104,86 +143,151 @@ def routing(root, work, *, resolve_tip=True):
     if len(parents) > 1:
         raise ValueError('conflicting parent routing; hand off to slice-contract')
     if not parents and not (own_directory / 'slicing.md').exists():
-        return None
-    parent = parents[0] if parents else work
-    _, directory = fs.paths(root, parent)
-    path = fs.safe(root, str((directory / 'slicing.md').relative_to(root)))
-    if not path.is_file():
-        raise ValueError('missing approved routing; hand off to slice-contract ' + parent)
-    data = path.read_bytes()
-    sections = re.findall(rb'^## Approved delivery plan\r?\n.*?(?=^## |\Z)', data, re.M | re.S)
-    if len(sections) != 1 or list(fs.document_lines(data.decode())).count('## Approved delivery plan') != 1:
-        raise ValueError('missing/conflicting approved routing; normalize explicit legacy approval or hand off to slice-contract ' + parent)
-    text = sections[0].decode()
-    metadata = '\n'.join(fs.document_lines(text))
-    def field(name):
-        values = re.findall(r'^' + re.escape(name) + r': (.+)$', metadata, re.M)
-        if len(values) != 1 or not values[0].strip():
-            raise ValueError('missing/conflicting delivery plan field: ' + name)
-        return values[0].strip()
-    revision, approval = field('Plan revision'), field('Approval source')
-    if not re.fullmatch(r'v[1-9][0-9]*', revision) or approval.lower() in ('none', 'pending', 'unknown'):
-        raise ValueError('routing has no explicit approved revision/source; hand off to slice-contract ' + parent)
-    if field('Parent') != parent:
-        raise ValueError('delivery plan names a different parent')
-    final, integration, start = field('Final destination'), field('Integration branch'), field('Integration start')
-    default = field('Default choice')
-    if default not in ('independent', 'grouped'):
-        raise ValueError('invalid default delivery choice')
-    for branch in (final, integration):
-        if branch != 'none':
-            fs.git(root, 'check-ref-format', 'refs/heads/' + branch)
-    if final == 'none' or final == integration or (integration == 'none') != (start == 'none'):
-        raise ValueError('conflicting final/integration destinations')
-    if integration != 'none' and not re.fullmatch(r'[0-9a-f]{40}|[0-9a-f]{64}', start):
-        raise ValueError('integration setup requires a full starting commit SHA')
-    rows = {}
-    for line in metadata.splitlines():
-        if not line.startswith('|'):
-            continue
-        cells = [x.strip() for x in line.strip('|').split('|')]
-        if not cells or cells[0] == 'Child' or re.fullmatch(r'[-: ]+', cells[0]):
-            continue
-        if len(cells) != 5:
-            raise ValueError('invalid delivery child row')
-        child, choice, destination, reason, state = cells
-        fs.paths(root, child)
-        if child in rows or state not in ('remaining', 'landed') or not reason:
-            raise ValueError('duplicate or incomplete delivery child row: ' + child)
-        choice = default if choice == 'default' else choice
-        expected = {'independent': final, 'grouped': integration}.get(choice)
-        if expected is None or destination == 'none' or destination != expected:
-            raise ValueError('conflicting child destination: ' + child)
-        if state == 'landed' and destination != final:
-            raise ValueError('landed child must retain its final destination')
-        rows[child] = destination
-    if parents and work not in rows:
-        raise ValueError('child missing from approved routing; hand off to slice-contract ' + parent)
-    target = rows[work] if parents else final
+        if destination:
+            target, ref = explicit_destination(root, destination)
+        else:
+            target, ref = upstream_destination(root)
+        route = {'path': None, 'parent': None, 'revision': None, 'sha256': None, 'text': None,
+                 'approval_source': None, 'destination': target, 'target_ref': ref,
+                 'selection': 'explicit' if destination else 'upstream'}
+    else:
+        parent = parents[0] if parents else work
+        _, directory = fs.paths(root, parent)
+        path = fs.safe(root, str((directory / 'slicing.md').relative_to(root)))
+        if not path.is_file():
+            raise ValueError('missing approved routing; hand off to slice-contract ' + parent)
+        data = path.read_bytes()
+        sections = re.findall(rb'^## Approved delivery plan\r?\n.*?(?=^## |\Z)', data, re.M | re.S)
+        if len(sections) != 1 or list(fs.document_lines(data.decode())).count('## Approved delivery plan') != 1:
+            raise ValueError('missing/conflicting approved routing; normalize explicit legacy approval or hand off to slice-contract ' + parent)
+        text = sections[0].decode()
+        metadata = '\n'.join(fs.document_lines(text))
+        def field(name):
+            values = re.findall(r'^' + re.escape(name) + r': (.+)$', metadata, re.M)
+            if len(values) != 1 or not values[0].strip():
+                raise ValueError('missing/conflicting delivery plan field: ' + name)
+            return values[0].strip()
+        revision, approval = field('Plan revision'), field('Approval source')
+        if not re.fullmatch(r'v[1-9][0-9]*', revision) or approval.lower() in ('none', 'pending', 'unknown'):
+            raise ValueError('routing has no explicit approved revision/source; hand off to slice-contract ' + parent)
+        if field('Parent') != parent:
+            raise ValueError('delivery plan names a different parent')
+        final, integration, start = field('Final destination'), field('Integration branch'), field('Integration start')
+        default = field('Default choice')
+        if default not in ('independent', 'grouped'):
+            raise ValueError('invalid default delivery choice')
+        for branch in (final, integration):
+            if branch != 'none':
+                fs.git(root, 'check-ref-format', 'refs/heads/' + branch)
+        if final == 'none' or final == integration or (integration == 'none') != (start == 'none'):
+            raise ValueError('conflicting final/integration destinations')
+        if integration != 'none' and not re.fullmatch(r'[0-9a-f]{40}|[0-9a-f]{64}', start):
+            raise ValueError('integration setup requires a full starting commit SHA')
+        rows = {}
+        for line in metadata.splitlines():
+            if not line.startswith('|'):
+                continue
+            cells = [x.strip() for x in line.strip('|').split('|')]
+            if not cells or cells[0] == 'Child' or re.fullmatch(r'[-: ]+', cells[0]):
+                continue
+            if len(cells) != 5:
+                raise ValueError('invalid delivery child row')
+            child, choice, row_destination, reason, state = cells
+            fs.paths(root, child)
+            if child in rows or state not in ('remaining', 'landed') or not reason:
+                raise ValueError('duplicate or incomplete delivery child row: ' + child)
+            choice = default if choice == 'default' else choice
+            expected = {'independent': final, 'grouped': integration}.get(choice)
+            if expected is None or row_destination == 'none' or row_destination != expected:
+                raise ValueError('conflicting child destination: ' + child)
+            if state == 'landed' and row_destination != final:
+                raise ValueError('landed child must retain its final destination')
+            rows[child] = row_destination
+        if parents and work not in rows:
+            raise ValueError('child missing from approved routing; hand off to slice-contract ' + parent)
+        target = rows[work] if parents else final
+        ref = 'refs/heads/' + target
+        route = {'path': str(path.relative_to(root)), 'parent': parent, 'revision': revision,
+                 'sha256': fs.digest(sections[0]), 'text': text, 'approval_source': approval,
+                 'destination': target, 'target_ref': ref, 'selection': 'approved-plan'}
+        if destination:
+            requested, _ = explicit_destination(root, destination)
+            if requested != target:
+                raise ValueError('workflow destination conflicts with approved delivery plan: ' + target)
     # An explicit local ref is required for local delivery. Skills inspect remote
     # state and perform any authorized setup before admitting this controller.
-    ref = 'refs/heads/' + target
-    decision = {'path': str(path.relative_to(root)), 'parent': parent, 'revision': revision,
-                'sha256': fs.digest(sections[0]), 'text': text, 'approval_source': approval,
-                'destination': target, 'target_ref': ref}
-    if not resolve_tip:
-        return decision
     try:
         tip = fs.full_commit(root, ref)
     except ValueError as error:
-        setup = f'; setup {ref} at {start} under covering authority and read back the ref' if target == integration else ''
-        raise ValueError('delivery destination missing: ' + ref + setup) from error
-    if target == integration:
+        if not require_tip:
+            tip = None
+        else:
+            setup = f'; setup {ref} at {start} under covering authority and read back the ref' if route.get('path') and target == integration else ''
+            raise ValueError('delivery destination missing: ' + ref + setup) from error
+    if route.get('path') and target == integration and tip and require_tip:
         fs.full_commit(root, start)
         result = subprocess.run(['git', '-C', str(root), 'merge-base', '--is-ancestor', start, tip], capture_output=True)
         if result.returncode:
             raise ValueError('integration branch conflicts with approved starting commit: ' + ref)
-    return dict(decision, target_tip=tip)
+    return route | {'target_tip': tip}
+
+
+def route_identity(route):
+    identity = {key: value for key, value in route.items() if key != 'target_tip'}
+    # Older retained routes predate `selection`. Their destination and plan
+    # fields still identify the same choice, so normalize the added field.
+    selection = identity.get('selection')
+    if selection is None:
+        selection = 'approved-plan' if identity.get('path') else 'explicit'
+    if selection == 'approved-plan':
+        identity.pop('selection', None)
+    else:
+        identity['selection'] = selection
+    return identity
+
+
+def route_record(route):
+    return {key: value for key, value in route.items()
+            if not (key == 'selection' and value == 'approved-plan')}
+
+
+def validate_base_bundle(root, path, base, expected_digest=None):
+    if not path.is_file() or (expected_digest and fs.digest(path.read_bytes()) != expected_digest):
+        raise ValueError('retained comparison-base bundle changed or lost')
+    fs.git(root, 'bundle', 'verify', str(path))
+    with tempfile.TemporaryDirectory(prefix='p2p-base-bundle-') as temporary:
+        repository = Path(temporary) / 'repository.git'
+        object_format = '--object-format=sha256' if len(base) == 64 else '--object-format=sha1'
+        subprocess.run(['git', 'init', '--bare', object_format, str(repository)],
+                       check=True, capture_output=True)
+        fetched = subprocess.run(['git', '-C', str(repository), 'fetch', '--no-tags',
+                                  str(path), 'HEAD'], capture_output=True)
+        present = fetched.returncode == 0 and subprocess.run(
+            ['git', '-C', str(repository), 'cat-file', '-e', base + '^{commit}'],
+            capture_output=True).returncode == 0
+    if not present:
+        raise ValueError('retained comparison-base bundle does not contain the admitted commit')
+
+
+def destination_observation(root, route, base):
+    observed = now()
+    try:
+        tip = fs.full_commit(root, route['target_ref'])
+    except ValueError:
+        tip = None
+    relation = 'unavailable'
+    if tip == base:
+        relation = 'unchanged'
+    elif tip is not None:
+        result = subprocess.run(['git', '-C', str(root), 'merge-base', '--is-ancestor', base, tip], capture_output=True)
+        relation = 'fast-forward' if result.returncode == 0 else 'non-fast-forward' if result.returncode == 1 else 'unavailable'
+    return {'destination': route['destination'], 'comparison_base': base,
+            'observed_tip': tip, 'relation': relation, 'observed_at': observed}
 
 
 def routing_records(root, decision):
     """Transfer plan/history outside candidate identity, using existing file records."""
-    if decision is None:
+    if decision is None or decision.get('path') is None:
         return []
     path = fs.safe(root, decision['path'])
     selected = {path}
@@ -276,11 +380,13 @@ def launch(args, prompt, event_path, error_path, deadline):
         process = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=events, stderr=errors,
                                    start_new_session=True)
         outcome = 'finished'
+        interrupted = False
         payload = prompt.encode()
         while True:
             remaining = None if stop is None else max(0, stop - time.monotonic())
             try:
-                process.communicate(payload, timeout=HEARTBEAT_SECONDS if remaining is None else min(HEARTBEAT_SECONDS, remaining))
+                timeout = HEARTBEAT_SECONDS if remaining is None else min(HEARTBEAT_SECONDS, remaining)
+                process.communicate(payload, timeout=timeout)
                 break
             except subprocess.TimeoutExpired:
                 payload = None  # communicate resumes the original input after a timeout.
@@ -290,8 +396,9 @@ def launch(args, prompt, event_path, error_path, deadline):
                           f'last log activity {max(0, time.time() - activity):.0f}s ago '
                           '(activity is not verified progress)', file=sys.stderr, flush=True)
                     continue
+                interrupted = True
                 break
-        if process.poll() is None:
+        if interrupted:
             outcome = 'interrupted'
             import signal
             try:
@@ -389,7 +496,7 @@ def report_markdown(report):
 REVIEW_AXES = ('Contract fidelity', 'Scope and simplicity', 'Engineering quality')
 
 
-def review_markdown(report, work, contract, candidate, base_manifest):
+def review_markdown(report, work, contract, candidate, base_manifest, destination_observation=None):
     key = candidate_key(candidate)
     base = {entry['path']: entry for entry in base_manifest}
     current = {entry['path']: entry for entry in candidate.get('manifest', [])}
@@ -402,6 +509,9 @@ def review_markdown(report, work, contract, candidate, base_manifest):
              f"Comparison: base `{candidate['comparison_base']}`; included working-tree scope: {included}",
              'Stability: candidate and contract unchanged at report receipt.',
              f"Coverage: {report['coverage']}"]
+    if destination_observation:
+        tip = destination_observation['observed_tip'] or 'unavailable'
+        lines.insert(5, f"Destination observation: `{destination_observation['destination']}` {destination_observation['relation']} at `{tip}` ({destination_observation['observed_at']}).")
     for axis in REVIEW_AXES:
         lines.extend(['', '## ' + axis, ''])
         if axis == 'Contract fidelity':
@@ -469,40 +579,23 @@ class Delivery:
     def save(self):
         retained(self.root, self.work, 'delivery.json', encoded(self.state))
 
-    def observe_destination(self):
-        decision = self.state.get('routing')
-        if decision is None:
-            return
-        base = self.state['comparison_base']
-        tip, relationship = None, 'unavailable'
-        try:
-            tip = fs.full_commit(self.root, decision['target_ref'])
-            if tip == base:
-                relationship = 'unchanged'
-            else:
-                check = subprocess.run(['git', '-C', str(self.root), 'merge-base', '--is-ancestor', base, tip],
-                                       capture_output=True)
-                if check.returncode in (0, 1):
-                    relationship = 'fast-forward' if check.returncode == 0 else 'non-fast-forward'
-        except (ValueError, OSError, subprocess.SubprocessError):
-            pass  # Ref availability does not determine acceptance against the retained base.
-        self.state['destination_observation'] = {
-            'destination': decision['destination'], 'comparison_base': base,
-            'observed_tip': tip, 'relationship': relationship, 'observed_at': now()}
-
     def source_stable(self):
         admission = json.loads((self.directory / 'admission.json').read_text())
         for key, value in admission.items():
             if self.state.get(key) != value:
                 raise ValueError('persisted admission changed: ' + key)
-        admitted = self.state.get('routing')
-        decision = {k: v for k, v in admitted.items() if k != 'target_tip'} if admitted else None
-        if routing(self.root, self.work, resolve_tip=False) != decision:
-            raise ValueError('approved delivery plan changed; reconcile routing and refresh review')
-        if routing(self.workspace, self.work, resolve_tip=False) != decision:
+        admitted_route = self.state['routing']
+        selection = admitted_route.get('selection')
+        explicit = (admitted_route['target_ref']
+                    if selection == 'explicit' or (selection is None and not admitted_route.get('path'))
+                    else None)
+        active_route = routing(self.root, self.work, explicit, require_tip=False)
+        if route_identity(active_route) != route_identity(admitted_route):
+            raise ValueError('approved delivery plan or destination changed; reconcile routing before resume')
+        if admitted_route.get('path') and route_record(routing(self.workspace, self.work)) != route_record(admitted_route):
             raise ValueError('transferred approved delivery plan changed')
         for record in self.state.get('routing_records', []):
-            if record['path'] == self.state['routing']['path']:
+            if self.state['routing'].get('path') and record['path'] == self.state['routing']['path']:
                 continue  # Pending proposals may change outside the approved section.
             for root in (self.root, self.workspace):
                 if fs.digest(fs.safe(root, record['path']).read_bytes()) != record['sha256']:
@@ -521,8 +614,10 @@ class Delivery:
             raise ValueError('source index changed since admission')
         if json.loads((self.directory / 'base-manifest.json').read_text()) != fs.snapshot(self.workspace, self.state['comparison_base']):
             raise ValueError('retained comparison-base content changed')
-        if fs.full_commit(self.root, self.state['comparison_base']) != self.state['comparison_base']:
+        if fs.full_commit(self.workspace, self.state['comparison_base']) != self.state['comparison_base']:
             raise ValueError('comparison base unavailable')
+        validate_base_bundle(self.root, self.runtime / 'base.bundle', self.state['comparison_base'],
+                             admission.get('base_bundle_sha256'))
         if fs.bindings(self.root, self.work) != self.state['binding_inputs']:
             raise ValueError('binding inputs changed')
         if fs.digest(self.item.read_bytes()) != self.state['contract']['sha256']:
@@ -531,7 +626,10 @@ class Delivery:
             raise ValueError('persisted authority or policy changed')
         if skills() != self.state['skills']:
             raise ValueError('installed stage skills changed; prior invocation inputs are no longer available')
-        self.observe_destination()
+        self.state['destination_observation'] = destination_observation(
+            self.root, active_route, self.state['comparison_base'])
+        if not self.read_only:
+            self.save()
 
     def capture(self):
         if fs.digest((self.workspace / self.work).read_bytes()) != self.state['contract']['sha256']:
@@ -748,10 +846,11 @@ assert results['scratch'] == 'ok'
                          'otherwise name the gap. ')
         prompt = (f'Invoke the installed {STAGES[skill_stage]} skill at {self.state["skills"][skill_stage]["path"]}. '
                   f'Read it and its references. Work item {self.work}, workspace {self.workspace}. '
-                  f'Frozen admitted comparison base {self.state["comparison_base"]}. Whole contract, full scope. '
-                  'This validated delivery handoff supplies the authoritative base. Later destination-ref '
-                  'movement alone does not change review scope or proof identity; do not adopt a newer base. '
+                  f'Comparison base {self.state["comparison_base"]} is the immutable admission base for this invocation. '
+                  'Use it as the review comparison and proof binding; later destination movement is observational and '
+                  'must not replace this base or trigger a verifier restart. Whole contract, full scope. '
                   f'Approved delivery routing (separate from product identity): {json.dumps(self.state.get("routing"))}. '
+                  f'Latest destination observation (informational only): {json.dumps(self.state.get("destination_observation"))}. '
                   'Read transferred plan/history and verify prerequisite outcomes in the actual candidate. '
                   'The enclosing controller owns durable reports; return your full report in the required JSON '
                   'schema and it will save and reread it. Never mutate the source checkout, controller records, '
@@ -840,8 +939,10 @@ assert results['scratch'] == 'ok'
         if stored.exists() and stored.read_bytes() != encoded(report):
             raise ValueError('conflicting duplicate stage result: ' + attempt['id'])
         retained(self.root, self.work, path, encoded(report))
+        attempt['destination_observation'] = self.state.get('destination_observation')
         summary = (review_markdown(report, self.work, self.state['contract'], self.state['candidate'],
-                                   fs.snapshot(self.root, self.state['comparison_base']))
+                                   fs.snapshot(self.workspace, self.state['comparison_base']),
+                                   attempt['destination_observation'])
                    if name == 'review' else report['details']).encode()
         retained(self.root, self.work, f'attempts/{attempt["id"]}/report.md', summary)
         retained(self.root, self.work, name + '.md', summary)
@@ -863,7 +964,8 @@ assert results['scratch'] == 'ok'
         report = json.loads(data)
         if name == 'review' and 'coverage' in report:
             summary = review_markdown(report, self.work, self.state['contract'], self.state['candidate'],
-                                      fs.snapshot(self.root, self.state['comparison_base']))
+                                      fs.snapshot(self.workspace, self.state['comparison_base']),
+                                      attempt.get('destination_observation'))
         elif name == 'review' and 'details' in report:
             summary = report['details']
             if not isinstance(summary, str):
@@ -981,9 +1083,10 @@ def create(root, args):
     if not re.fullmatch(r'[0-9a-f]{40}|[0-9a-f]{64}', args.comparison_base):
         raise ValueError('comparison base must be an explicit full commit SHA')
     base = fs.full_commit(root, args.comparison_base)
-    decision = routing(root, args.work)
-    if decision is not None and base != decision['target_tip']:
-        raise ValueError('comparison base conflicts with approved destination ' + decision['destination'] + ': expected ' + decision['target_tip'] + ', actual ' + base)
+    decision = routing(root, args.work, args.destination)
+    if base != decision['target_tip']:
+        raise ValueError('destination ' + decision['destination'] + ' is currently at ' + decision['target_tip'] +
+                         '; requested comparison base ' + base + ' is stale; start a new delivery with --comparison-base ' + decision['target_tip'])
     records = routing_records(root, decision)
     installed = skills()
     fs.check_index(root)
@@ -1004,7 +1107,7 @@ def create(root, args):
         raise ValueError('contested dirty paths require explicit --exclude-dirty: ' + ', '.join(sorted(contested)))
     if excluded - dirty:
         raise ValueError('--exclude-dirty names paths that are not dirty: ' + ', '.join(sorted(excluded - dirty)))
-    starting = base if decision is not None else head
+    starting = base
     manifest = {e['path']: e for e in fs.snapshot(root, starting)}
     comparison = {e['path']: e for e in fs.snapshot(root, base)}
     for path in excluded:
@@ -1026,6 +1129,7 @@ def create(root, args):
     if result.returncode:
         raise ValueError('isolated Git metadata copy failed: ' + result.stderr.decode())
     fs.git(root, 'bundle', 'create', str(runtime / 'base.bundle'), 'HEAD', base)
+    base_bundle_sha256 = fs.digest((runtime / 'base.bundle').read_bytes())
     retained(root, args.work, 'base-manifest.json', encoded(fs.snapshot(root, base)))
     workspace = runtime / 'workspace'
     materialize(workspace, sorted(manifest.values(), key=lambda e:e['path']))
@@ -1042,6 +1146,8 @@ def create(root, args):
              'source_index_sha256': fs.digest(fs.git(root, 'ls-files', '--stage', '-z')),
              'excluded_dirty': sorted(excluded), 'skills': installed,
              'routing': decision, 'routing_records': records, 'starting_commit': starting,
+             'base_bundle_sha256': base_bundle_sha256,
+             'destination_observation': destination_observation(root, decision, base),
              'authority': {'local_stages': True, 'external_effects': False},
              'limits': {'dispatches': args.max_dispatches, 'elapsed_seconds': args.max_seconds,
                         'stage_seconds': args.max_stage_seconds},
@@ -1055,7 +1161,7 @@ def create(root, args):
                       'elapsed_limit': 'admission and process termination; provider billing may continue',
                       'trust': 'controller and OS trusted; no arbitrary same-user tamper resistance'}}
     delivery = Delivery(root, args.work, state)
-    retained(root, args.work, 'admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_manifest', 'source_head', 'source_index_sha256', 'excluded_dirty', 'skills', 'routing', 'routing_records', 'starting_commit', 'authority', 'limits', 'deadline', 'host')}))
+    retained(root, args.work, 'admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_manifest', 'source_head', 'source_index_sha256', 'excluded_dirty', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_bundle_sha256', 'authority', 'limits', 'deadline', 'host')}))
     delivery.save()
     delivery.capture()
     delivery.save()
@@ -1105,6 +1211,8 @@ def result(delivery):
                                       'limits', 'repair_used', 'host')} | {
         'routing': state.get('routing'),
         'destination_observation': state.get('destination_observation'),
+        'completion_scope': ('Acceptance is for the exact candidate against the frozen comparison base; compatibility with the current destination is not established.'
+                             if state['status'] == 'REVIEWED_AND_PROVEN' else None),
         'acceptance_boundary': ('Acceptance applies to the exact candidate against its frozen comparison base. '
                                 'Compatibility with the current destination has not been established by this delivery.'),
         'progress': progress,
@@ -1124,6 +1232,7 @@ def main(argv=None):
         child.add_argument('work')
         if name == 'run':
             child.add_argument('--comparison-base', required=True)
+            child.add_argument('--destination', help='explicit workflow destination for unsliced work')
             child.add_argument('--authorize-local', action='store_true')
             child.add_argument('--exclude-dirty', action='append', default=[])
             child.add_argument('--max-dispatches', type=int, default=8, help='dispatch limit (default: 8)')
@@ -1169,9 +1278,11 @@ def main(argv=None):
             if args.action == 'run':
                 requested = {'dispatches': args.max_dispatches, 'elapsed_seconds': args.max_seconds,
                              'stage_seconds': args.max_stage_seconds}
+                requested_destination = explicit_destination(root, args.destination)[0] if args.destination else None
                 if (not args.authorize_local or args.hard_cost_cap is not None or
                     requested != delivery.state['limits'] or args.comparison_base != delivery.state['comparison_base'] or
-                    sorted(args.exclude_dirty) != delivery.state['excluded_dirty']):
+                    sorted(args.exclude_dirty) != delivery.state['excluded_dirty'] or
+                    (requested_destination and requested_destination != delivery.state['routing']['destination'])):
                     raise ValueError('run cannot change persisted authority, scope, base or limits; use resume')
         elif args.action == 'resume':
             raise ValueError('missing delivery invocation; no effects can be reconciled')

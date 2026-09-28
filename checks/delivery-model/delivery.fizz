@@ -15,13 +15,11 @@ action Init:
     contract = 0
     revision = "v1"
     candidate = 0
-    admission_base = 0 # immutable comparison identity for this invocation
-    retained_base = 0 # recoverable content can be corrupted independently
-    destination_tip = 0 # mutable destination is observational after admission
-    destination_moved_while_running = False
+    admission_base = 0
+    destination_tip = 0
     implemented = False
     stages = [0, 0] # not launched, running, returned
-    bindings = [[], []] # contract, candidate, admission base, invocation
+    bindings = [[], []] # contract, candidate, base, invocation
     reports = [0, 0]
     evidence = [0, 0]
     passed = [False, False]
@@ -53,6 +51,10 @@ atomic action Return:
         passed[stage] = not (stage == 1 and (SCENARIO == "exhausted" or (SCENARIO == "repair" and repairs_actual == 0)))
         if SCENARIO == "identity" and stage == 1:
             bindings[stage][0] = 2 # an old, mismatched report arrives
+        if SCENARIO == "review-base" and stage == 0:
+            bindings[stage][2] = 1
+        if SCENARIO == "proof-base" and stage == 1:
+            bindings[stage][2] = 1
             fault = True
 
 atomic action Save:
@@ -79,17 +81,14 @@ atomic action ReadBack:
 
 atomic action Environment:
     require implemented and outcome == "running" and not fault
-    require SCENARIO in ["text", "candidate", "base", "destination-movement", "report-lost", "report-access", "evidence-lost", "evidence-access"]
+    require SCENARIO in ["text", "candidate", "base", "report-lost", "report-access", "evidence-lost", "evidence-access"]
     # Can race either running verifier, persistence, readback, or finalization.
     if SCENARIO == "text":
         contract = 1
     elif SCENARIO == "candidate":
         candidate = 1
     elif SCENARIO == "base":
-        retained_base = 1
-    elif SCENARIO == "destination-movement":
-        destination_tip = 1
-        destination_moved_while_running = stages == [1, 1]
+        admission_base = 1
     else:
         oneof stage in range(2):
             if SCENARIO in ["report-lost", "report-access"]:
@@ -99,6 +98,12 @@ atomic action Environment:
                 require evidence[stage] == 3
                 evidence[stage] = 4 if SCENARIO == "evidence-lost" else 5
     fault = True
+
+atomic action MoveDestination:
+    require SCENARIO == "moving-target" and implemented and outcome == "running"
+    require stages == [1, 1]
+    require destination_tip < 3
+    destination_tip += 1
 
 atomic action Repair:
     require outcome == "running" and stages == [2, 2] and not all(passed)
@@ -149,7 +154,9 @@ atomic action Complete:
         outcome = "text"
     elif MUTATION != "candidate" and bindings[0][1] != candidate:
         outcome = "candidate"
-    elif MUTATION != "base" and (retained_base != admission_base or any([b[2] != admission_base for b in bindings])):
+    elif MUTATION != "review-base" and bindings[0][2] != admission_base:
+        outcome = "base"
+    elif MUTATION != "proof-base" and bindings[1][2] != admission_base:
         outcome = "base"
     else:
         outcome = "complete"
@@ -183,7 +190,7 @@ always assertion CurrentText:
 always assertion CurrentCandidate:
     return outcome != "complete" or all([b[1] == candidate for b in bindings])
 always assertion ComparisonBase:
-    return outcome != "complete" or (retained_base == admission_base and all([b[2] == admission_base for b in bindings]))
+    return outcome != "complete" or all([b[2] == admission_base for b in bindings])
 always assertion DurableReports:
     return outcome != "complete" or reports == [3, 3]
 always assertion DurableEvidence:
@@ -204,8 +211,10 @@ always assertion Witness:
         return not (outcome == "repair-exhausted" and restarted and repairs_actual == 1)
     if WITNESS == "text":
         return not (outcome == "text" and fault and revision == "v1")
-    if WITNESS == "destination-movement":
-        return not (outcome == "complete" and destination_moved_while_running and destination_tip != admission_base and not restarted)
+    if WITNESS == "moving-target":
+        return not (outcome == "complete" and destination_tip == 3 and
+                    bindings[0][2] == admission_base and bindings[1][2] == admission_base and
+                    reports == [3, 3] and evidence == [3, 3])
     if WITNESS != "none":
         return outcome != WITNESS
     return True

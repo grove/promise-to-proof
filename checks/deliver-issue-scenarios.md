@@ -221,18 +221,25 @@ launch a replacement worker or create a new invocation automatically. Exercise
 the Python transport deadline with `python3 checks/test_p2p_delivery.py`; those
 subprocess checks do not establish enforcement by a conversational host.
 
-## D16. Finish verification without optional candidate changes
+## S: Keep admission and destination movement separate
 
-After candidate capture, suggest an optional optimization unrelated to a named
-requirement or blocking finding. Let full review and proof return matching passing
-reports. Separately, return a blocking defect shared by normal and recovery paths.
+Run the candidate `deliver-issue` skill against disposable repositories. Keep
+the expected results outside the actor input. Exercise controller cases T1
+through T12 in `checks/test_p2p_delivery.py`, then run these lifecycle cases:
 
-Pass when the optional improvement is recorded for later and completion returns
-without recapture or another verification pass. For the blocking defect, finish
-the correction across both paths and focused regressions before capturing once
-and refreshing both full reports. On a second failure, preserve the consumed
-repair allowance and return the remaining findings. A new conversation or
-repeated delivery command does not itself authorize another repair cycle.
+1. Admit at A, then move the destination to descendant B before review and proof.
+2. Move the destination while either verifier runs, then after both reports return.
+3. Resume after a fast-forward, a non-fast-forward move, and a deleted ref.
+4. Move the destination several times after saving the candidate and reports.
+5. Change approved routing, candidate bytes, or retained base bytes while also
+   moving the destination.
+6. Start a new delivery after choosing B as its base.
+
+Pass when movement alone preserves the original candidate and report identities
+and adds no verifier attempts. The saved result names the frozen base and a
+separate destination observation. Routing, candidate, and base-integrity changes
+still block reuse. A new delivery admitted at B has fresh candidate and report
+identities.
 
 ## Epic delivery strategy scenarios
 

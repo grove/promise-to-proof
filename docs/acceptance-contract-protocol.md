@@ -223,10 +223,9 @@ A product candidate A can be followed by commit B recording `.p2p/` artifacts.
 Review and proof remain bound to A. To reuse them for B, compare the complete
 tracked tree outside `.p2p/`, check relevant uncommitted content, and recheck the
 exact work item, every binding input, and the requested comparison base. A
-product or agreement difference invalidates reuse. Explicitly adopting a different
-comparison base requires fresh review and prevents claiming a matching pair under
-the old base. Movement of the destination ref does not change an admitted base.
-Do not replace a report's candidate identity with `HEAD` merely because artifacts were committed.
+product or agreement difference invalidates reuse. A base change requires fresh
+review and prevents claiming a matching pair under the old base. Do not replace
+a report's candidate identity with `HEAD` merely because artifacts were committed.
 If Git metadata affects the build, also establish execution-input equivalence
 under the publication rules below.
 
@@ -422,24 +421,23 @@ destination from the default branch. An unresolved proposal does not override
 an applicable approved decision.
 
 Resolve routing before selecting an implementation starting point or comparison
-base. State the destination and unavailable prerequisite outcomes. Confirm those
-outcomes in the actual candidate. Closed tickets do not establish them. Inspect
-the intended target ref at admission and record its full tip SHA as the fixed
-comparison base. A new delivery rejects an explicitly supplied base that differs
-from that tip. After admission, keep that base through implementation, review,
-proof, and resume. Later ref movement, including a rewrite or disappearance,
-does not invalidate local acceptance when the admitted base remains recoverable.
-An approved-plan or destination decision change still requires reconciliation.
+base. For unsliced work, use an explicit workflow destination or one unambiguous
+configured upstream. If neither resolves, block before dispatch without adding a
+required destination argument. State the destination and unavailable prerequisite
+outcomes. Confirm those outcomes in the actual candidate. Closed tickets do not
+establish them. For a new delivery, resolve the intended target ref and record
+its full tip SHA at admission. Require the requested base to match that tip.
 
-Report any later destination observation separately from candidate and report
-identity. It describes whether the tip is unchanged, advanced, rewritten, or
-unavailable; it never replaces the comparison base. Keep the candidate fixed and
-do not automatically rebase or restart verification solely because the ref moved.
-Local acceptance establishes the exact candidate against its admitted agreement
-and base, not compatibility with a newer destination. Publication and merge
-readiness still inspect the current target and require the applicable fresh
-verification under their existing rules. Publication must inspect the remote
-target when the destination is remote.
+Keep the admitted base fixed for the delivery. A later target move alone does not
+invalidate the candidate, review, proof, or saved reports. Retain a separate
+point-in-time destination observation with its tip, relationship to the frozen
+base, and observation time. Classify it as `unchanged`, `fast-forward`,
+`non-fast-forward`, or `unavailable`. For a direct review without an admitted
+delivery, capture the target tip when review scope is established and keep that
+scope fixed.
+Changed candidate, agreement, approved routing, or adopted base still requires
+fresh verification. Publication must inspect the current remote target when the
+destination is remote.
 
 If an integration branch is missing, name its approved starting SHA and the
 specific local or remote creation needed. Planning changes no refs. A consuming

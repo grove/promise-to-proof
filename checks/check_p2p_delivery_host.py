@@ -22,7 +22,8 @@ def main():
     # Retain all runtime and source artifacts; no temporary path is required to resume.
     script = Path(__file__).resolve().parents[1] / 'skills/productivity/deliver-issue/scripts/p2p_delivery.py'
     command = [sys.executable, str(script), '--repo', str(root), 'run', 'work/tiny.md',
-               '--comparison-base', base, '--authorize-local', '--max-dispatches', '7']
+               '--comparison-base', base, '--destination', 'delivery-target',
+               '--authorize-local', '--max-dispatches', '7']
     project = Path(__file__).resolve().parents[1]
     product = d.fs.snapshot(project)
     product_key = 'snapshot:sha256:' + d.fs.digest(d.fs.canonical(product))
