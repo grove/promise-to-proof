@@ -47,13 +47,16 @@ def repo(path):
                     'commit', '-qm', 'Fixture base'], check=True)
     (path / 'work').mkdir()
     (path / 'work/tiny.md').write_text(CONTRACT)
-    return subprocess.check_output(['git', '-C', str(path), 'rev-parse', 'HEAD'], text=True).strip()
+    base = subprocess.check_output(['git', '-C', str(path), 'rev-parse', 'HEAD'], text=True).strip()
+    subprocess.run(['git', '-C', str(path), 'branch', 'delivery-target', base], check=True)
+    return base
 
 
 class FakeTransport:
     """Clearly labeled fixture that supplies host-shaped records, never host proof."""
     def __init__(self, mode='success'):
         self.mode, self.calls, self.prompts = mode, [], []
+        self.on_stage = None
 
     def __call__(self, args, prompt, event_path, error_path, deadline):
         attempt = json.loads((event_path.parent / 'launch.json').read_text())
@@ -62,6 +65,8 @@ class FakeTransport:
         self.calls.append(stage)
         self.prompts.append((stage, prompt))
         workspace = Path(args[args.index('-C') + 1])
+        if self.on_stage:
+            self.on_stage(stage)
         if self.mode == 'uncertain' and stage == 'implementation':
             raise OSError('fixture crash after durable reservation')
         events = [{'type': 'thread.started', 'thread_id': 'fixture-' + __import__('uuid').uuid4().hex}]
@@ -149,13 +154,249 @@ class DeliveryTests(unittest.TestCase):
 
     def cli(self, action='run', *extra):
         args = ['--repo', str(self.root), action, 'work/tiny.md']
-        if action == 'run': args += ['--comparison-base', self.base, '--authorize-local']
+        if action == 'run':
+            args += ['--comparison-base', self.base, '--authorize-local']
+            if not (self.root / '.p2p/work/parent/slicing.md').exists():
+                args += ['--destination', 'delivery-target']
         output = io.StringIO()
         with contextlib.redirect_stdout(output): code = d.main(args + list(extra))
         return code, json.loads(output.getvalue())
 
     def state(self):
         return json.loads((self.root / '.p2p/work/tiny/delivery.json').read_text())
+
+    def run_without_destination(self):
+        output = io.StringIO()
+        args = ['--repo', str(self.root), 'run', 'work/tiny.md',
+                '--comparison-base', self.base, '--authorize-local']
+        with contextlib.redirect_stdout(output):
+            code = d.main(args)
+        return code, json.loads(output.getvalue())
+
+    def test_unsliced_admission_requires_explicit_or_unambiguous_upstream(self):
+        code, value = self.run_without_destination()
+        self.assertEqual(code, 1)
+        self.assertIn('needs --destination or one configured upstream', value['blocker'])
+        self.assertEqual(self.fake.calls, [])
+
+        branch = d.fs.git(self.root, 'symbolic-ref', '--quiet', '--short', 'HEAD').decode().strip()
+        d.fs.git(self.root, 'config', '--add', f'branch.{branch}.remote', 'origin')
+        d.fs.git(self.root, 'config', '--add', f'branch.{branch}.remote', 'other')
+        d.fs.git(self.root, 'config', '--add', f'branch.{branch}.merge', 'refs/heads/main')
+        code, value = self.run_without_destination()
+        self.assertEqual(code, 1)
+        self.assertIn('unambiguous configured upstream', value['blocker'])
+        self.assertEqual(self.fake.calls, [])
+
+        d.fs.git(self.root, 'config', '--unset-all', f'branch.{branch}.remote')
+        d.fs.git(self.root, 'config', '--add', f'branch.{branch}.remote', 'origin')
+        d.fs.git(self.root, 'update-ref', 'refs/remotes/origin/main', self.base)
+        code, value = self.run_without_destination()
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['routing']['destination'], 'origin/main')
+        self.assertEqual(value['routing']['selection'], 'upstream')
+        self.assertEqual(value['destination_observation']['relation'], 'unchanged')
+
+    def test_unsliced_stale_explicit_base_names_current_destination(self):
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        newer = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base],
+                    input=b'Advance target\n').decode().strip()
+        d.fs.git(self.root, 'update-ref', 'refs/heads/delivery-target', newer)
+        output = io.StringIO()
+        args = ['--repo', str(self.root), 'run', 'work/tiny.md', '--comparison-base', self.base,
+                '--destination', 'delivery-target', '--authorize-local']
+        with contextlib.redirect_stdout(output):
+            code = d.main(args)
+        value = json.loads(output.getvalue())
+        self.assertEqual(code, 1)
+        self.assertIn('destination delivery-target is currently at ' + newer, value['blocker'])
+        self.assertIn('--comparison-base ' + newer, value['blocker'])
+        self.assertEqual(self.fake.calls, [])
+
+    def test_fully_qualified_destination_rejects_revision_expressions(self):
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        newer = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base],
+                    input=b'Advance target\n').decode().strip()
+        d.fs.git(self.root, 'update-ref', 'refs/heads/delivery-target', newer)
+        d.fs.git(self.root, 'update-ref', 'refs/remotes/origin/delivery-target', newer)
+
+        for destination in ('refs/heads/delivery-target~1', 'refs/remotes/origin/delivery-target~1'):
+            output = io.StringIO()
+            args = ['--repo', str(self.root), 'run', 'work/tiny.md', '--comparison-base', self.base,
+                    '--destination', destination, '--authorize-local']
+            with contextlib.redirect_stdout(output):
+                code = d.main(args)
+            value = json.loads(output.getvalue())
+            self.assertEqual(code, 1)
+            self.assertIn('invalid workflow destination', value['blocker'])
+            self.assertEqual(self.fake.calls, [])
+
+    def test_explicit_remote_tracking_destination_resumes_from_stored_ref(self):
+        d.fs.git(self.root, 'update-ref', 'refs/remotes/origin/main', self.base)
+        output = io.StringIO()
+        args = ['--repo', str(self.root), 'run', 'work/tiny.md', '--comparison-base', self.base,
+                '--destination', 'refs/remotes/origin/main', '--authorize-local']
+        with contextlib.redirect_stdout(output):
+            code = d.main(args)
+        value = json.loads(output.getvalue())
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['routing']['destination'], 'origin/main')
+        self.assertEqual(value['routing']['target_ref'], 'refs/remotes/origin/main')
+        calls = self.fake.calls[:]
+
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        newer = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base],
+                    input=b'Advance remote-tracking destination\n').decode().strip()
+        d.fs.git(self.root, 'update-ref', 'refs/remotes/origin/main', newer)
+        code, resumed = self.cli('resume')
+        self.assertEqual(code, 0, resumed)
+        self.assertEqual(resumed['comparison_base'], self.base)
+        self.assertEqual(resumed['destination_observation']['observed_tip'], newer)
+        self.assertEqual(resumed['destination_observation']['relation'], 'fast-forward')
+        self.assertEqual(self.fake.calls, calls)
+
+    def test_non_fast_forward_and_missing_destination_do_not_invalidate_acceptance(self):
+        self.assertEqual(self.cli()[0], 0)
+        original = self.state()
+        calls = self.fake.calls[:]
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        unrelated = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree],
+                    input=b'Non-fast-forward target\n').decode().strip()
+        d.fs.git(self.root, 'update-ref', 'refs/heads/delivery-target', unrelated)
+        code, value = self.cli('resume')
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['destination_observation']['relation'], 'non-fast-forward')
+        self.assertEqual(value['destination_observation']['observed_tip'], unrelated)
+        self.assertEqual(value['comparison_base'], self.base)
+        self.assertEqual(value['candidate'], d.identity(original['candidate']))
+        d.fs.git(self.root, 'update-ref', '-d', 'refs/heads/delivery-target')
+        code, value = self.cli('resume')
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['destination_observation']['relation'], 'unavailable')
+        self.assertIsNone(value['destination_observation']['observed_tip'])
+        self.assertEqual(value['candidate'], d.identity(original['candidate']))
+        self.assertEqual(self.fake.calls, calls)
+
+    def test_busy_destination_moves_repeatedly_without_refreshing_completed_stages(self):
+        self.assertEqual(self.cli()[0], 0)
+        original = self.state()
+        calls = self.fake.calls[:]
+        tip = self.base
+        for message in ('B', 'C', 'D'):
+            tree = d.fs.git(self.root, 'rev-parse', tip + '^{tree}').decode().strip()
+            tip = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                        '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', tip],
+                        input=(message + '\n').encode()).decode().strip()
+            d.fs.git(self.root, 'update-ref', 'refs/heads/delivery-target', tip)
+            code, value = self.cli('resume')
+            self.assertEqual(code, 0, value)
+            self.assertEqual(value['comparison_base'], self.base)
+            self.assertEqual(value['candidate'], d.identity(original['candidate']))
+        self.assertEqual(value['destination_observation']['observed_tip'], tip)
+        self.assertEqual(value['destination_observation']['relation'], 'fast-forward')
+        self.assertEqual(self.state()['routing']['target_tip'], self.base)
+        self.assertEqual(self.fake.calls, calls)
+
+    def test_movement_during_implementation_review_and_proof_keeps_all_bindings_fixed(self):
+        tip = [self.base]
+        def advance(stage):
+            if stage not in ('implementation', 'review', 'proof'):
+                return
+            tree = d.fs.git(self.root, 'rev-parse', tip[0] + '^{tree}').decode().strip()
+            tip[0] = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                        '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', tip[0]],
+                        input=(stage + '\n').encode()).decode().strip()
+            d.fs.git(self.root, 'update-ref', 'refs/heads/delivery-target', tip[0])
+        self.fake.on_stage = advance
+        code, value = self.cli()
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['status'], 'REVIEWED_AND_PROVEN')
+        self.assertEqual(value['comparison_base'], self.base)
+        self.assertEqual(value['destination_observation']['observed_tip'], tip[0])
+        self.assertEqual([stage for stage, _ in self.fake.prompts].count('review'), 1)
+        self.assertEqual([stage for stage, _ in self.fake.prompts].count('proof'), 1)
+        for stage in ('review', 'proof'):
+            prompt = next(prompt for actual, prompt in self.fake.prompts if actual == stage)
+            self.assertIn('Comparison base ' + self.base + ' is the immutable admission base', prompt)
+        self.assertEqual(self.state()['reports']['review']['inputs']['comparison_base'], self.base)
+        self.assertEqual(self.state()['reports']['proof']['inputs']['comparison_base'], self.base)
+        review = (self.root / '.p2p/work/tiny/review.md').read_text()
+        self.assertIn('Comparison: base `' + self.base + '`', review)
+        self.assertIn('Destination observation:', review)
+
+    def test_target_advance_after_reports_return_does_not_refresh_verifiers(self):
+        original_complete = d.Delivery.complete
+        moved = []
+        def move_before_completion(delivery):
+            if not moved:
+                tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+                newer = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                            '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base],
+                            input=b'After reports returned\n').decode().strip()
+                d.fs.git(self.root, 'update-ref', 'refs/heads/delivery-target', newer)
+                moved.append(newer)
+            return original_complete(delivery)
+        with patch.object(d.Delivery, 'complete', move_before_completion):
+            code, value = self.cli()
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['destination_observation']['observed_tip'], moved[0])
+        self.assertIn('compatibility with the current destination is not established', value['completion_scope'])
+        self.assertEqual([stage for stage, _ in self.fake.prompts].count('review'), 1)
+        self.assertEqual([stage for stage, _ in self.fake.prompts].count('proof'), 1)
+
+    def test_fresh_process_resumes_missing_stages_after_target_advance(self):
+        setup = "original=d.Delivery.stage\ndef stop(self,name):\n if name=='review': __import__('os')._exit(77)\n return original(self,name)\nd.Delivery.stage=stop"
+        first = self.subprocess_cli('exec(' + repr(setup) + ')')
+        self.assertEqual(first.returncode, 77, first.stderr + first.stdout)
+        before = self.state()
+        self.assertTrue(before['implementation_complete'])
+        self.assertNotIn('review', before['reports'])
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        newer = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base],
+                    input=b'Advance during interruption\n').decode().strip()
+        d.fs.git(self.root, 'update-ref', 'refs/heads/delivery-target', newer)
+        resumed = self.subprocess_cli('pass', 'resume')
+        self.assertEqual(resumed.returncode, 0, resumed.stderr + resumed.stdout)
+        after = self.state()
+        self.assertEqual(after['comparison_base'], self.base)
+        self.assertEqual(after['candidate'], before['candidate'])
+        self.assertEqual([a['stage'] for a in after['attempts']].count('implementation'), 1)
+        self.assertEqual([a['stage'] for a in after['attempts']].count('review'), 1)
+        self.assertEqual([a['stage'] for a in after['attempts']].count('proof'), 1)
+        self.assertEqual(after['destination_observation']['observed_tip'], newer)
+
+    def test_legacy_approved_route_resumes_after_target_move_when_base_is_recoverable(self):
+        self.planned_child()
+        original_run = d.Delivery.run
+        def run_with_legacy_records(delivery):
+            delivery.state['routing'].pop('selection')
+            delivery.state.pop('base_bundle_sha256')
+            delivery.save()
+            admission_path = delivery.directory / 'admission.json'
+            admission = json.loads(admission_path.read_text())
+            admission['routing'].pop('selection')
+            admission.pop('base_bundle_sha256')
+            admission_path.write_bytes(d.encoded(admission))
+            return original_run(delivery)
+        with patch.object(d.Delivery, 'run', run_with_legacy_records):
+            self.assertEqual(self.cli()[0], 0)
+        state_path = self.root / '.p2p/work/tiny/delivery.json'
+        state = json.loads(state_path.read_text())
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        newer = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base],
+                    input=b'Legacy target movement\n').decode().strip()
+        d.fs.git(self.root, 'update-ref', state['routing']['target_ref'], newer)
+        result = self.subprocess_cli('pass', 'resume')
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        resumed = self.state()
+        self.assertEqual(resumed['comparison_base'], self.base)
+        self.assertEqual(resumed['destination_observation']['observed_tip'], newer)
 
     def planned_child(self, choice='grouped'):
         d.fs.git(self.root, 'branch', 'trunk', self.base)
@@ -209,12 +450,17 @@ Pending actions: none.
         # A saved proposal changes neither the active decision nor candidate bytes.
         d.fs.save(self.root, 'work/parent.md', 'slicing.md', old + b'## Proposed delivery plan\nAnother proposal.\n')
         self.assertEqual(self.cli('resume')[0], 0)
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        advanced = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base],
+                    input=b'Plan drift target movement\n').decode().strip()
+        d.fs.git(self.root, 'update-ref', 'refs/heads/epic/tiny', advanced)
         changed = old.replace(b'Plan revision: v1', b'Plan revision: v2')
         d.fs.save(self.root, 'work/parent.md', 'slicing.md', changed)
         before = len(self.fake.calls)
         code, value = self.cli('resume')
         self.assertEqual(code, 1)
-        self.assertIn('approved delivery plan changed', value['blocker'])
+        self.assertIn('approved delivery plan or destination changed', value['blocker'])
         self.assertEqual(len(self.fake.calls), before)
 
     def test_public_cli_retains_plain_approval_on_transfer_and_fresh_recovery(self):
@@ -228,6 +474,8 @@ Pending actions: none.
             command = [sys.executable, str(SCRIPTS / 'p2p_delivery.py'), '--repo', str(root), action, 'work/tiny.md']
             if action == 'run':
                 command += ['--comparison-base', self.base, '--authorize-local', '--max-dispatches', '0']
+                if not (root / '.p2p/work/parent/slicing.md').exists():
+                    command += ['--destination', 'delivery-target']
             result = subprocess.run(command, capture_output=True, text=True)
             self.assertEqual(result.returncode, 1, result.stderr)
             return json.loads(result.stdout)
@@ -290,162 +538,32 @@ Pending actions: none.
         self.assertEqual((self.root / 'sibling.txt').read_text(), 'unfinished sibling payload\n')
         self.assertEqual(d.fs.full_commit(self.root / '.p2p/work/tiny/runtime/workspace', 'HEAD'), self.base)
 
-    def advance_target(self, parent=None):
-        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
-        args = ['git', '-C', str(self.root), '-c', 'user.name=Fixture',
-                '-c', 'user.email=fixture@localhost', 'commit-tree', tree]
-        if parent is not None:
-            args += ['-p', parent]
-        tip = subprocess.check_output(args, input=('Fixture destination ' + str(time.time_ns()) + '\n').encode()).decode().strip()
-        d.fs.git(self.root, 'update-ref', 'refs/heads/epic/tiny', tip)
-        return tip
-
-    def test_child_stale_admission_blocks_but_target_advance_preserves_completed_reports(self):
+    def test_child_stale_admission_blocks_but_target_advance_after_admission_is_observational(self):
         self.planned_child()
-        newer = self.advance_target(self.base)
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        newer = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base], input=b'Advance target\n').decode().strip()
+        d.fs.git(self.root, 'update-ref', 'refs/heads/epic/tiny', newer)
         code, value = self.cli()
         self.assertEqual(code, 1)
-        self.assertIn('comparison base conflicts with approved destination epic/tiny', value['blocker'])
+        self.assertIn('destination epic/tiny is currently at ' + newer, value['blocker'])
+        self.assertIn('start a new delivery with --comparison-base ' + newer, value['blocker'])
         self.assertIn(newer, value['blocker'])
         self.assertEqual(self.fake.calls, [])
         d.fs.git(self.root, 'update-ref', 'refs/heads/epic/tiny', self.base)
         self.assertEqual(self.cli()[0], 0)
-        before = self.state()
-        admission = (self.root / '.p2p/work/tiny/admission.json').read_bytes()
-        reports = {name: (self.root / '.p2p/work/tiny' / record['path']).read_bytes()
-                   for name, record in before['reports'].items()}
-        self.assertEqual(before['destination_observation']['relationship'], 'unchanged')
+        initial = self.state()
+        calls = self.fake.calls[:]
         d.fs.git(self.root, 'update-ref', 'refs/heads/epic/tiny', newer)
         code, value = self.cli('resume')
         self.assertEqual(code, 0, value)
         self.assertEqual(value['status'], 'REVIEWED_AND_PROVEN')
         self.assertEqual(value['comparison_base'], self.base)
+        self.assertEqual(value['candidate'], d.identity(initial['candidate']))
         self.assertEqual(value['destination_observation']['observed_tip'], newer)
-        self.assertEqual(value['destination_observation']['relationship'], 'fast-forward')
-        self.assertIn('Compatibility with the current destination has not been established', value['acceptance_boundary'])
-        after = self.state()
-        for key in ('candidate', 'routing', 'reports', 'attempts'):
-            self.assertEqual(after[key], before[key])
-        self.assertEqual((self.root / '.p2p/work/tiny/admission.json').read_bytes(), admission)
-        for name, record in before['reports'].items():
-            self.assertEqual((self.root / '.p2p/work/tiny' / record['path']).read_bytes(), reports[name])
-        self.assertEqual(self.fake.calls, ['preflight', 'preflight', 'implementation', 'review', 'proof'])
-        code, value = self.cli('run', '--comparison-base', newer)
-        self.assertEqual(code, 1)
-        self.assertIn('cannot change persisted', value['blocker'])
-
-    def test_busy_destination_during_stages_and_completion_keeps_frozen_base(self):
-        self.planned_child()
-        tips = [self.base]
-        original = self.fake
-        def moving(*args):
-            result = original(*args)
-            if self.fake.calls[-1] in ('implementation', 'review', 'proof'):
-                tips.append(self.advance_target(tips[-1]))
-            return result
-        complete = d.Delivery.complete
-        def moved_after_reports(delivery):
-            self.assertEqual(set(delivery.state['reports']), {'implementation', 'review', 'proof'})
-            tips.append(self.advance_target(tips[-1]))
-            return complete(delivery)
-        with patch.object(d, 'launch', moving), patch.object(d.Delivery, 'complete', moved_after_reports):
-            code, value = self.cli()
-        self.assertEqual(code, 0, value)
-        self.assertEqual(len(tips), 5)
-        self.assertEqual(value['destination_observation']['observed_tip'], tips[-1])
-        self.assertEqual(value['comparison_base'], self.base)
-        self.assertEqual(self.fake.calls, ['preflight', 'preflight', 'implementation', 'review', 'proof'])
-        for report in self.state()['reports'].values():
-            self.assertEqual(report['inputs']['comparison_base'], self.base)
-            self.assertEqual(report['inputs']['routing']['target_tip'], self.base)
-            self.assertNotIn('destination_observation', report['inputs'])
-
-    def test_rewritten_and_missing_destination_are_observations_only(self):
-        self.planned_child()
-        self.assertEqual(self.cli()[0], 0)
-        candidate = self.state()['candidate']
-        unrelated = self.advance_target()
-        code, value = self.cli('resume')
-        self.assertEqual(code, 0, value)
-        self.assertEqual(value['destination_observation']['relationship'], 'non-fast-forward')
-        self.assertEqual(value['destination_observation']['observed_tip'], unrelated)
-        d.fs.git(self.root, 'update-ref', '-d', 'refs/heads/epic/tiny')
-        before = (self.root / '.p2p/work/tiny/delivery.json').read_bytes()
-        code, value = self.cli('status')
-        self.assertEqual(code, 0, value)
-        self.assertEqual(value['destination_observation']['relationship'], 'unavailable')
-        self.assertIsNone(value['destination_observation']['observed_tip'])
-        self.assertEqual((self.root / '.p2p/work/tiny/delivery.json').read_bytes(), before)
-        self.assertEqual(self.cli('resume')[0], 0)
-        self.assertEqual(self.state()['destination_observation']['relationship'], 'unavailable')
-        self.assertEqual(self.state()['candidate'], candidate)
-        self.assertEqual(len(self.fake.calls), 5)
-
-    def test_resume_missing_stages_after_destination_advance(self):
-        self.planned_child()
-        original = d.Delivery.stage
-        def pause(delivery, name):
-            if name == 'review':
-                raise OSError('fixture pause before review dispatch')
-            return original(delivery, name)
-        with patch.object(d.Delivery, 'stage', pause):
-            self.assertEqual(self.cli()[0], 1)
-        candidate = self.state()['candidate']
-        newer = self.advance_target(self.base)
-        code, value = self.cli('resume')
-        self.assertEqual(code, 0, value)
-        self.assertEqual(self.state()['candidate'], candidate)
-        self.assertEqual(value['destination_observation']['observed_tip'], newer)
-        self.assertEqual(self.fake.calls, ['preflight', 'preflight', 'implementation', 'review', 'proof'])
-
-    def test_moving_destination_does_not_hide_candidate_source_or_base_drift(self):
-        self.planned_child()
-        self.assertEqual(self.cli()[0], 0)
-        newer = self.advance_target(self.base)
-        directory = self.root / '.p2p/work/tiny'
-        for relative, replacement, message in [
-                ('runtime/workspace/greet.py', b"print('wrong')\n", 'product candidate changed'),
-                ('candidate.json', b'{}', 'malformed candidate metadata'),
-                ('delivery.json', d.encoded(dict(self.state(), comparison_base=newer)), 'persisted admission changed: comparison_base'),
-                ('base-manifest.json', b'[]', 'retained comparison-base content changed'),
-                ('runtime/repository.git/objects/' + self.base[:2] + '/' + self.base[2:], b'corrupt', None)]:
-            path = directory / relative
-            before = path.read_bytes()
-            path.write_bytes(replacement)
-            code, value = self.cli('resume')
-            self.assertEqual(code, 1, value)
-            if message is not None:
-                self.assertIn(message, value['blocker'])
-            path.write_bytes(before)
-        # Source HEAD and index remain independent protections even for identical trees.
-        head = d.fs.full_commit(self.root, 'HEAD')
-        newer = self.advance_target(self.base)
-        d.fs.git(self.root, 'update-ref', 'HEAD', newer)
-        code, value = self.cli('resume')
-        self.assertEqual(code, 1, value)
-        self.assertIn('source HEAD changed', value['blocker'])
-        d.fs.git(self.root, 'update-ref', 'HEAD', head)
-        d.fs.git(self.root, 'add', 'work/tiny.md')
-        code, value = self.cli('resume')
-        self.assertEqual(code, 1, value)
-        self.assertIn('source index changed', value['blocker'])
-
-    def test_legacy_target_movement_blocker_resumes_without_rewriting_admission(self):
-        self.planned_child()
-        self.assertEqual(self.cli()[0], 0)
-        directory = self.root / '.p2p/work/tiny'
-        state = self.state()
-        state.pop('destination_observation')
-        state.update(status='BLOCKED', blocker='approved delivery plan or destination tip changed; reconcile routing and refresh review')
-        (directory / 'delivery.json').write_bytes(d.encoded(state))
-        admission = (directory / 'admission.json').read_bytes()
-        newer = self.advance_target(self.base)
-        code, value = self.cli('resume')
-        self.assertEqual(code, 0, value)
-        self.assertEqual(value['destination_observation']['observed_tip'], newer)
-        self.assertEqual((directory / 'admission.json').read_bytes(), admission)
-        self.assertEqual(self.state()['reports'], state['reports'])
-        self.assertEqual(len(self.fake.calls), 5)
+        self.assertEqual(value['destination_observation']['relation'], 'fast-forward')
+        self.assertEqual(self.state()['routing']['target_tip'], self.base)
+        self.assertEqual(self.fake.calls, calls)
 
     def test_integration_missing_and_unrelated_ref_give_setup_handoff(self):
         self.planned_child()
@@ -562,6 +680,49 @@ Pending actions: none.
         code, value = self.cli('run','--max-dispatches','2')
         self.assertIn('cannot change persisted',value['blocker'])
         self.assertEqual(self.fake.calls,[])
+
+    def test_repeated_run_cannot_replace_frozen_base_after_target_moves(self):
+        code, value = self.cli('run', '--max-dispatches', '0')
+        self.assertEqual(code, 1)
+        admitted = self.state()
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        newer = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base],
+                    input=b'Advance target\n').decode().strip()
+        d.fs.git(self.root, 'update-ref', 'refs/heads/delivery-target', newer)
+        code, value = self.cli('run', '--max-dispatches', '0', '--comparison-base', newer)
+        self.assertEqual(code, 1)
+        self.assertIn('cannot change persisted', value['blocker'])
+        self.assertEqual(self.state()['comparison_base'], admitted['comparison_base'])
+        self.assertEqual(self.state()['candidate'], admitted['candidate'])
+        self.assertEqual(self.fake.calls, [])
+
+    def test_adopting_new_base_uses_new_candidate_and_fresh_report_bindings(self):
+        self.assertEqual(self.cli()[0], 0)
+        old = self.state()
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        newer = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base],
+                    input=b'Adopted integration base\n').decode().strip()
+        d.fs.git(self.root, 'update-ref', 'refs/heads/delivery-target', newer)
+        integrated = Path(self.temp.name) / 'integrated-source'
+        subprocess.run(['git', 'clone', '-q', str(self.root), str(integrated)], check=True)
+        d.fs.git(integrated, 'checkout', '-q', '-B', 'delivery-target', newer)
+        (integrated / 'work').mkdir(exist_ok=True)
+        (integrated / 'work/tiny.md').write_bytes((self.root / 'work/tiny.md').read_bytes())
+        output = io.StringIO()
+        args = ['--repo', str(integrated), 'run', 'work/tiny.md', '--comparison-base', newer,
+                '--destination', 'delivery-target', '--authorize-local']
+        with contextlib.redirect_stdout(output):
+            code = d.main(args)
+        self.assertEqual(code, 0, output.getvalue())
+        new = json.loads((integrated / '.p2p/work/tiny/delivery.json').read_text())
+        self.assertEqual(new['comparison_base'], newer)
+        self.assertNotEqual(new['candidate'], old['candidate'])
+        self.assertEqual(new['candidate']['key'], old['candidate']['key'])
+        self.assertNotEqual(new['reports']['review']['inputs'], old['reports']['review']['inputs'])
+        self.assertNotEqual(new['reports']['proof']['inputs'], old['reports']['proof']['inputs'])
+        self.assertEqual(json.loads((self.root / '.p2p/work/tiny/delivery.json').read_text())['comparison_base'], self.base)
 
     def test_missing_authority_dispatches_nothing(self):
         output=io.StringIO()
@@ -832,17 +993,17 @@ Pending actions: none.
         marker=folder/'child-survived'
         child='import pathlib,signal,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); print("child-ready",flush=True); time.sleep(0.8); pathlib.Path('+repr(str(marker))+').touch()'
         command='import subprocess,sys,time; subprocess.Popen([sys.executable,"-c",'+repr(child)+']); print("activity",flush=True); time.sleep(10)'
-        with patch.object(d,'HEARTBEAT_SECONDS',0.03), contextlib.redirect_stderr(progress):
+        with patch.object(d,'HEARTBEAT_SECONDS',0.03,create=True), contextlib.redirect_stderr(progress):
             result=d.launch([sys.executable,'-c',command],
                             '',events,errors,time.time()+0.3)
         self.assertEqual(result['outcome'],'interrupted')
         self.assertLess(time.monotonic()-started,3)
         self.assertNotEqual(result['exit_code'],0)
-        self.assertIn('log activity',progress.getvalue())
+        time.sleep(0.9)
+        self.assertEqual(('log activity' in progress.getvalue(), marker.exists()),
+                         (True,False),'heartbeat and worker process-group termination must both hold')
         self.assertIn('activity\n',events.read_text())
         self.assertIn('child-ready\n',events.read_text())
-        time.sleep(0.9)
-        self.assertFalse(marker.exists(),'worker child survived process-group termination')
 
     def test_successful_repair_rereviews_and_reproves(self):
         self.fake.mode='repair'
@@ -863,7 +1024,10 @@ Pending actions: none.
         # Fixture injection lives only in this test launcher, never in production CLI.
         code = "import sys;sys.path.insert(0," + repr(str(Path(__file__).parent)) + ");import test_p2p_delivery as t;d=t.d;d.launch=t.FakeTransport();" + setup + ";sys.exit(d.main(sys.argv[1:]))"
         args=[sys.executable,'-c',code,'--repo',str(self.root),action,'work/tiny.md']
-        if action=='run':args+=['--comparison-base',self.base,'--authorize-local']
+        if action=='run':
+            args+=['--comparison-base',self.base,'--authorize-local']
+            if not (self.root / '.p2p/work/parent/slicing.md').exists():
+                args+=['--destination','delivery-target']
         return subprocess.run(args+list(extra),capture_output=True,text=True)
 
     def test_fresh_process_recovers_known_completion_once(self):
@@ -899,97 +1063,13 @@ Pending actions: none.
         self.assertIn('another controller holds',other.stdout)
         self.assertEqual(len(self.state()['attempts']),0)
 
-    def test_concurrent_worktree_deliveries_share_moving_destination(self):
-        """Real controller processes and Git worktrees; stage transport remains a fixture."""
-        plan = self.planned_child()
-        coordination = Path(self.temp.name) / 'coordination'
-        coordination.mkdir()
-        processes, roots = [], []
-        script = '''import sys, time
-from pathlib import Path
-sys.path.insert(0, sys.argv[1])
-import test_p2p_delivery as t
-d = t.d
-d.platform.system = lambda: 'Darwin'
-root, base, gates = Path(sys.argv[2]), sys.argv[3], Path(sys.argv[4])
-transport = t.FakeTransport()
-def pause(stage):
-    (gates / (root.name + '-' + stage)).touch()
-    deadline = time.monotonic() + 60
-    while not (gates / ('release-' + stage)).exists():
-        if time.monotonic() > deadline:
-            raise TimeoutError('fixture coordination timed out: ' + stage)
-        time.sleep(0.02)
-def launch(*args):
-    result = transport(*args)
-    stage = transport.calls[-1]
-    if stage in ('implementation', 'review', 'proof'):
-        pause(stage)
-    return result
-d.launch = launch
-complete = d.Delivery.complete
-def completing(delivery):
-    pause('completion')
-    return complete(delivery)
-d.Delivery.complete = completing
-sys.exit(d.main(['--repo', str(root), 'run', 'work/tiny.md', '--comparison-base', base, '--authorize-local']))
-'''
-        tip = self.base
-        try:
-            for name in ('first', 'second'):
-                root = Path(self.temp.name) / name
-                d.fs.git(self.root, 'worktree', 'add', '--detach', str(root), self.base)
-                shutil.copytree(self.root / 'work', root / 'work')
-                d.fs.save(root, 'work/parent.md', 'slicing.md', plan.read_bytes())
-                roots.append(root)
-                processes.append(subprocess.Popen([sys.executable, '-c', script, str(Path(__file__).parent),
-                                                   str(root), self.base, str(coordination)],
-                                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True))
-            for stage in ('implementation', 'review', 'proof', 'completion'):
-                deadline = time.monotonic() + 60
-                while not all((coordination / (root.name + '-' + stage)).exists() for root in roots):
-                    for process in processes:
-                        if process.poll() is not None:
-                            stdout, stderr = process.communicate()
-                            self.fail('controller exited before ' + stage + ': ' + stdout + stderr)
-                    if time.monotonic() > deadline:
-                        self.fail('controllers did not both reach ' + stage)
-                    time.sleep(0.02)
-                self.assertTrue(all(process.poll() is None for process in processes))
-                tip = self.advance_target(tip)
-                for root in roots:
-                    self.assertEqual(d.fs.full_commit(root, 'refs/heads/epic/tiny'), tip)
-                    self.assertEqual(d.fs.full_commit(root, 'HEAD'), self.base)
-                (coordination / ('release-' + stage)).touch()
-            invocations = set()
-            for root, process in zip(roots, processes):
-                stdout, stderr = process.communicate(timeout=30)
-                self.assertEqual(process.returncode, 0, stdout + stderr)
-                value = json.loads(stdout)
-                self.assertEqual(value['status'], 'REVIEWED_AND_PROVEN')
-                self.assertEqual(value['destination_observation']['observed_tip'], tip)
-                self.assertEqual(value['destination_observation']['relationship'], 'fast-forward')
-                self.assertEqual(value['comparison_base'], self.base)
-                self.assertEqual([a['stage'] for a in value['attempts']],
-                                 ['preflight-1', 'preflight-2', 'implementation', 'review', 'proof'])
-                invocations.add(value['invocation_id'])
-                for name in ('review', 'proof'):
-                    self.assertEqual(value['reports'][name]['inputs']['comparison_base'], self.base)
-                # Read back through a separate process: moving refs do not cause redispatch.
-                resumed = subprocess.run([sys.executable, str(SCRIPTS / 'p2p_delivery.py'), '--repo', str(root),
-                                          'resume', 'work/tiny.md'], capture_output=True, text=True, timeout=30)
-                self.assertEqual(resumed.returncode, 0, resumed.stdout + resumed.stderr)
-                self.assertEqual(json.loads(resumed.stdout)['attempts'], value['attempts'])
-            self.assertEqual(len(invocations), 2)
-        finally:
-            for process in processes:
-                if process.poll() is None:
-                    process.kill()
-                process.communicate()
-
     def test_reconstruct_candidate_with_retained_base(self):
         self.assertEqual(self.cli()[0],0)
         state=self.state()
+        d.fs.git(self.root, 'update-ref', '-d', 'refs/heads/delivery-target')
+        code, value = self.cli('resume')
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['destination_observation']['relation'], 'unavailable')
         restored=Path(self.temp.name)/'fresh'
         metadata=Path(self.temp.name)/'fresh.git'
         archive=self.root/'.p2p/work/tiny/runtime/base.bundle'
@@ -998,14 +1078,43 @@ sys.exit(d.main(['--repo', str(root), 'run', 'work/tiny.md', '--comparison-base'
         (restored/'.git').write_text('gitdir: '+str(metadata)+'\n')
         d.fs.git(restored,'config','core.bare','false')
         d.fs.git(restored,'read-tree',state['source_head'])
+        self.assertEqual(d.fs.full_commit(restored, self.base), self.base)
+        self.assertEqual(d.fs.snapshot(restored, self.base), json.loads((self.root/'.p2p/work/tiny/base-manifest.json').read_text()))
         d.fs.save(restored,'work/tiny.md','candidate.json',d.encoded(state['candidate']))
         self.assertEqual(d.fs.validate(restored,'work/tiny.md',self.base),state['candidate'])
 
+    def test_resume_rereads_reports_after_source_prunes_base_commit(self):
+        tree=d.fs.git(self.root,'rev-parse',self.base+'^{tree}').decode().strip()
+        unrelated_head=subprocess.check_output(['git','-C',str(self.root),'-c','user.name=Fixture',
+                    '-c','user.email=fixture@localhost','commit-tree',tree],input=b'Unrelated source HEAD\n').decode().strip()
+        branch=d.fs.git(self.root,'symbolic-ref','--short','HEAD').decode().strip()
+        d.fs.git(self.root,'update-ref','refs/heads/'+branch,unrelated_head)
+        self.assertEqual(self.cli()[0],0)
+        calls=list(self.fake.calls)
+
+        d.fs.git(self.root,'update-ref','-d','refs/heads/delivery-target')
+        d.fs.git(self.root,'reflog','expire','--expire=now','--all')
+        d.fs.git(self.root,'gc','--prune=now')
+        with self.assertRaises(ValueError):
+            d.fs.full_commit(self.root,self.base)
+
+        code,value=self.cli('resume')
+        self.assertEqual(code,0,value)
+        self.assertEqual(value['status'],'REVIEWED_AND_PROVEN')
+        self.assertEqual(value['destination_observation']['relation'],'unavailable')
+        self.assertEqual(self.fake.calls,calls)
+
     def test_source_agreement_binding_base_and_report_loss(self):
         self.assertEqual(self.cli()[0],0)
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        newer = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base],
+                    input=b'Drift with a moving destination\n').decode().strip()
+        d.fs.git(self.root, 'update-ref', 'refs/heads/delivery-target', newer)
         for relative,replacement in [('work/tiny.md',CONTRACT+'same revision changed bytes\n'),
                                       ('spec.txt','changed binding\n'),
                                       ('.p2p/work/tiny/base-manifest.json','[]'),
+                                      ('.p2p/work/tiny/runtime/base.bundle','damaged bundle'),
                                       ('.p2p/work/tiny/proof.md','truncated')]:
             file=self.root/relative
             previous=file.read_bytes()
@@ -1044,6 +1153,11 @@ sys.exit(d.main(['--repo', str(root), 'run', 'work/tiny.md', '--comparison-base'
     def test_agreement_and_candidate_drift(self):
         self.assertEqual(self.cli()[0],0)
         state=self.state()
+        tree = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        newer = subprocess.check_output(['git', '-C', str(self.root), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@localhost', 'commit-tree', tree, '-p', self.base],
+                    input=b'Candidate drift with moving destination\n').decode().strip()
+        d.fs.git(self.root, 'update-ref', 'refs/heads/delivery-target', newer)
         candidate=self.root/'.p2p/work/tiny/runtime/workspace/greet.py'
         candidate.write_text("print('wrong')\n")
         code,value=self.cli('resume')

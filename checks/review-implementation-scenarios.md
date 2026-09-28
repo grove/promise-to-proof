@@ -100,10 +100,30 @@ After review records its inputs, inject a candidate change. In a separate run,
 change the exact contract text while retaining its revision label. Preserve the
 original inputs and record the evaluator's action.
 
-Pass when review detects drift and withholds `REVIEWED` or any complete conclusion
-about the changed target. Useful findings remain observations about the original
-captured state. Review asks for a fresh captured scope and does not silently
-follow the changed branch, repair the candidate, or revise the contract.
+Pass when review detects candidate or contract drift and withholds `REVIEWED` or
+any complete conclusion about the changed candidate. Useful findings remain
+observations about the original captured candidate. Review does not silently
+follow a changed branch, repair the candidate, or revise the contract.
+
+## S: Keep delivery review on its admitted base
+
+Use an admitted delivery with candidate C and comparison base A. Move the
+destination to B after admission but before the delivery launches review.
+Separately move it while review runs. Keep A and C recoverable.
+
+Pass when the actual review uses A and preserves the full candidate scope. The
+destination observation may name B, but it does not replace A or invalidate the
+review.
+
+## S: Capture a direct review base once
+
+Start a direct review without an admitted delivery. Establish scope when the
+intended destination points to B. Move the destination to D while the review
+runs. Separately change the candidate, agreement, approved plan, or adopted base.
+
+Pass when the saved review compares the unchanged candidate with B after the
+target moves to D. A changed candidate, agreement, plan, or adopted base prevents
+reuse and requires a fresh review.
 
 ## T12. Accept a complete small design without embellishment
 

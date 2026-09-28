@@ -57,6 +57,10 @@ approved legacy routing without inventing approval or repeating its decision.
 Recheck the active plan before reporting or synchronizing; changed routing makes
 the prior decision stale even when code is unchanged.
 
+A delivery accepted against a frozen base does not waive these current-target
+checks. Readiness still requires the PR's actual target, head, review scope, proof,
+CI, approvals, and merge rules to match the current decision.
+
 ## Check the final candidate
 
 Confirm that the PR head represents the exact candidate covered by a current

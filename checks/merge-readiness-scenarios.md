@@ -79,6 +79,16 @@ without a remote write, and reports synchronization as skipped. The merged case
 remains historical, receives no body edit or merge handoff, and does not become
 `READY` merely because it was merged.
 
+## S: Preserve current-target readiness checks
+
+Use candidate C with matching review and proof against frozen base A. Move the
+PR target to B, then run merge readiness with current PR metadata and gate
+observations. Separately leave a required CI check or repository approval absent.
+
+Pass when readiness checks the actual PR target and current head, review scope,
+proof, CI, approvals, and merge rules. Acceptance against A does not establish
+compatibility with B or produce `READY` when a current gate is missing.
+
 ## Filesystem handoff
 
 Use a subject linked to `work/example.md`, with source/parent links and durable

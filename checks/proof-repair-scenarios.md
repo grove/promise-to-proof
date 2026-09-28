@@ -303,6 +303,17 @@ evidence; a passing focused check or refreshed child proof alone is insufficient
 A pending parent amendment instead returns to `plan-acceptance` before any
 repair that depends on the changed promise.
 
+## S: Keep proof on the admitted candidate and base
+
+Use an admitted delivery with candidate C, exact contract H, and comparison base
+A. Move the destination to B before proof and again while proof runs. Keep C, H,
+and A unchanged. Separately alter the candidate, contract, retained base bundle,
+or proof evidence while the destination also moves.
+
+Pass when proof uses C and A after movement and makes no claim about compatibility
+with B. A candidate, contract, retained-base, or evidence change still blocks or
+disproves the affected proof.
+
 ## Sampled validation, 2026-09-22
 
 > Historical note: the `acceptance-contract` skill used in these runs was renamed

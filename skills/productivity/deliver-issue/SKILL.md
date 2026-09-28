@@ -55,24 +55,29 @@ and retained history. The Python controller cannot widen an existing admission.
 Before selecting a starting point or comparison base, follow the protocol's Epic
 delivery plans rules. From a child path recover its parent's active approved plan
 and history; for an assembled parent use its own plan's final destination.
-Unsliced work needs none. Normalize explicit approved legacy routing locally,
-preserving its approval evidence. Missing or conflicting decisions return to
-`/slice-contract <parent>`; a pending proposal leaves the active plan applicable.
-State the destination and any unavailable prerequisite outcomes. Confirm those
-outcomes in the actual candidate, not ticket status. Retain the approved plan
-section and hash separately from the product snapshot and transfer its history.
+Unsliced work still needs a destination. Use an explicit workflow destination or
+one unambiguous configured upstream. If neither resolves, block before dispatch
+with setup instructions. Do not add a required destination argument.
+Normalize explicit approved legacy routing locally, preserving its approval
+evidence. Missing or conflicting decisions return to `/slice-contract <parent>`;
+a pending proposal leaves the active plan applicable. State the destination and
+any unavailable prerequisite outcomes. Confirm those outcomes in the actual
+candidate, not ticket status. Retain the approved plan section and hash separately
+from the product snapshot and transfer its history.
 
-At admission, use the intended target tip as the full comparison-base SHA and starting tree.
-Do not import unrelated work from the current branch. If branch setup is needed,
-show the exact approved starting SHA and local or remote refs. Perform setup only
-under covering authority, preserve conflicts, and verify refs by readback. The
-local controller cannot create destination refs; resolve setup before admission.
-Keep the admitted comparison base fixed on resume and in every stage handoff.
-Later destination movement alone does not restart review or proof. Record the
-current tip separately when available, without rebasing or replacing the base.
-A plan or approved destination decision change during execution invalidates
-affected routing and requires reconciliation before resume. Candidate, agreement,
-evidence, and retained-base checks still apply.
+At admission, resolve the destination's current full commit SHA. Require the
+requested `--comparison-base` to match it. Use that SHA as the starting tree and
+keep it fixed for the invocation. Do not import unrelated work from the current
+branch. If branch setup is needed, show the exact approved starting SHA and local
+or remote refs. Perform setup only under covering authority, preserve conflicts,
+and verify refs by readback. The local controller cannot create destination refs;
+resolve setup before admission.
+
+After admission, a destination move alone does not invalidate the candidate or
+matching review and proof reports. Record the observed tip and classify it as
+unchanged, fast-forward, non-fast-forward, or unavailable. Report acceptance
+against the frozen base separately from compatibility with the current
+destination. A plan change still invalidates routing and requires reconciliation.
 
 ## Establish the work item and host
 
@@ -127,10 +132,6 @@ evidence, and retained-base checks still apply.
    sandbox must keep candidate inputs read-only. Let the enclosing workflow
    save returned reports in `.p2p/work/<slug>/`; diagnostics may write only
    to disposable scratch space.
-   Check required test executables, versions, and scratch permissions before
-   expensive verification. Retain the working commands for subsequent stages.
-   Missing tools or denied permissions need a specific environment handoff;
-   repeating the same unavailable check does not repair the candidate.
 3. Record the work-item path, repository, branch, starting commit, and existing tracked
    and untracked work. Preserve unrelated work. When ownership of overlapping
    edits is unclear, stop before changing them. Do not stash, reset, clean, or
@@ -202,15 +203,6 @@ checksum; report unavailable evidence when no safe durable copy exists.
 
 ## Review, prove, and recover
 
-Once captured, hold the candidate fixed through review and proof. Further
-product edits must address a named blocking review finding, proof gap, or
-reproduced failure of a required check within the allowed repair cycle.
-Record optional cleanup, optimization, and adjacent
-improvements as follow-up work. Each verifier performs its required independent
-checks; the enclosing workflow validates and retains its returned evidence
-without adding another full verification pass. Repeat a completed check only
-when changed inputs, a failure, or a specific unresolved concern requires it.
-
 8. Reread the saved agreement and candidate identity before dispatch. Invoke
    `review-implementation` and `prove` in separate independent read-only
    contexts, in either order, with the same exact captured contract and fixed
@@ -236,10 +228,7 @@ when changed inputs, a failure, or a specific unresolved concern requires it.
 9. Route supported in-scope review findings to `implement-contract` and named
    gaps in a matching `NOT PROVEN` report to `repair-gaps`. A changed promise or
    consequential seam goes back to `plan-acceptance` with its required decision
-   and approval. Finish each named correction across its callers and recovery
-   paths, and run focused regression checks before capturing the repaired
-   candidate or launching expensive full verification. After a correction,
-   recapture the candidate and rerun **both**
+   and approval. After a correction, recapture the candidate and rerun **both**
    full review and proof on it. Allow at most one automatic repair and recheck
    cycle per invocation; retain all reports and return a specific blocker if
    findings or gaps remain. Never weaken the agreement or checks to get green.
@@ -258,17 +247,11 @@ when changed inputs, a failure, or a specific unresolved concern requires it.
 
 Return `REVIEWED` and `PROVEN` only when the full saved reports match the current
 exact agreement and one unchanged recoverable candidate and their evidence is
-retrievable. Return immediately once those conditions hold. Optional improvements
-and publication are follow-up work, not additional local completion gates.
-Otherwise return `BLOCKED` with the precise decision, capability,
+retrievable. Otherwise return `BLOCKED` with the precise decision, capability,
 identity, storage, check, or evidence gap and the completed work so far. Include
 issue, contract location/revision/text identity, candidate and comparison base,
 report/evidence references, actual checks and results, and any partial or
-uncertain effects. If the destination moved, report the admitted base and observed
-tip separately; this delivery has not established compatibility with the newer
-destination.
-
-A local delivery request authorizes scoped local work and
+uncertain effects. A local delivery request authorizes scoped local work and
 safe checks, not tracker edits, triage-label changes, commits, pushes, PRs,
 merges, deployment, or destructive actions. Each external effect needs its own
 authority and verified readback. Leave publication and merge readiness to their
