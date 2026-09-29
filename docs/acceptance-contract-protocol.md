@@ -169,10 +169,14 @@ evidence, retain a description, safe durable reference, SHA-256 checksum, and
 access limitations. Without a safe durable copy, mark evidence unavailable.
 A checksum or inaccessible old temporary path alone is insufficient.
 
-The `deliver-issue` controller keeps invocation state, candidate payload, stage
-reports, and attempt evidence under ignored `.p2p/tmp/deliver-issue/` while
-active or unresolved. After `REVIEWED_AND_PROVEN`, explicit cleanup waits for
-the source checkout to match the candidate, writes and reads back only
+The outer `deliver-issue` workflow keeps its invocation record, fixed review
+snapshot, reports, and scratch under the user-level work root's
+`orchestration/` directory while active or unresolved.
+The `p2p_delivery.py` controller keeps its execution records, attempts,
+prompts, events, receipts, reports, and scratch under
+`~/.p2p/work/<repo-id>/<work-item>/runtime`, with its local Git workspace under
+`~/.p2p/work/<repo-id>/<work-item>/`. After `REVIEWED_AND_PROVEN`, explicit
+cleanup waits for the source checkout to match the candidate, writes and reads back only
 `candidate.json`, `delivery.json`, `review.md`, and `proof.md`, then deletes the
 local payload. These current records replace prior records without an extra
 `.p2p/work/` history copy. The controller keeps any uncommitted prior record
@@ -234,9 +238,14 @@ all relevant tracked, staged, unstaged, deleted, and untracked product content,
 including executable modes and symlink targets. A compact record keeps the full
 candidate key plus only changed path/mode/type/content digests relative to the
 comparison base; it does not retain product payloads or unchanged paths. The
-controller keeps a full local workspace under ignored `.p2p/tmp/deliver-issue/`
-while a run is active or unresolved. After `REVIEWED_AND_PROVEN`, apply the
-candidate to the source checkout and run explicit cleanup; cleanup verifies the
+controller keeps its full local execution workspace under
+`~/.p2p/work/<repo-id>/<work-item>/` while a run is active or unresolved. The
+outer workflow keeps its invocation record, fixed review snapshot, reports,
+and scratch under the user-level work root's `orchestration/` directory; the
+Python controller keeps its stage records, attempts, prompts, events, receipts,
+reports, and scratch under
+`~/.p2p/work/<repo-id>/<work-item>/runtime`. After `REVIEWED_AND_PROVEN`, apply
+the candidate to the source checkout and run explicit cleanup; cleanup verifies the
 complete source tree and reads back the durable records before deleting the
 local payload. After that cleanup, the records do not reconstruct the candidate
 in a fresh checkout. Resolve mixed staged and unstaged versions explicitly; the

@@ -15,7 +15,7 @@ import test_p2p_delivery as fixture
 d = fixture.d
 ROOT = Path(os.environ['P2P_TRACE_DIR'])
 SOURCE = ROOT / 'source'
-LOCAL = SOURCE / '.p2p/tmp/deliver-issue/tiny'
+LOCAL = None
 CASE = os.environ['P2P_MBT_CASE']
 
 
@@ -153,6 +153,10 @@ def projection(code, saved):
     expected_identity = {k: v for k, v in (candidate or {}).items() if k not in ('manifest', 'changes')}
     if saved.get('routing') is not None:
         expected_identity['routing'] = saved['routing']
+    if saved.get('local_git_generations'):
+        latest = saved['local_git_generations'][-1]
+        expected_identity['local_git_generation'] = {key: latest[key] for key in
+                                                     ('sequence', 'candidate_key', 'tree', 'commit', 'record_sha256')}
     for name, passing in [('review', 'REVIEWED'), ('proof', 'PROVEN')]:
         record = saved.get('reports', {}).get(name)
         if not record:
@@ -171,15 +175,18 @@ def projection(code, saved):
 
 
 def main(action):
+    global LOCAL
     if action == 'Init':
         # MBT initializes once per trace. Refuse accidental fixture reuse.
         ROOT.mkdir(parents=True, exist_ok=True)
         base = fixture.repo(SOURCE)
+        LOCAL = d.local_directory(SOURCE, 'work/tiny.md')
         (ROOT / 'base').write_text(base)
         if CASE == 'contested-dirty-file':
             (SOURCE / 'dirty').write_text('untouched\n')
         print('initialized')
         return
+    LOCAL = d.local_directory(SOURCE, 'work/tiny.md')
     before = state()
     detail = {}
     if action == 'Start':

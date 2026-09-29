@@ -15,11 +15,17 @@ python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/t
 ```
 
 `--authorize-local` grants scoped local agent stages and safe checks. The
-controller copies the candidate into an isolated workspace under ignored
-`.p2p/tmp/deliver-issue/<slug>/` and leaves the source checkout untouched. A
-successful result identifies that workspace and matching full `REVIEWED` and
-`PROVEN` reports. Apply the candidate to the source checkout yourself, then run
-the explicit cleanup command:
+Python controller keeps its isolated Git workspace under
+`~/.p2p/work/<repo-id>/<work-item>/` and its execution records, attempts,
+launch prompts, events, receipts, reports, and runtime scratch under that work
+item's `runtime/` directory, keyed by source repository and work item, outside
+the source checkout. The outer `deliver-issue` workflow keeps its invocation
+record, fixed review snapshot, reports, and scratch under the work root's
+`orchestration/` directory. A successful
+controller result identifies the workspace and matching full `REVIEWED` and
+`PROVEN` reports. The controller leaves the source checkout untouched. Apply
+the candidate to the source checkout yourself, then run the explicit cleanup
+command:
 
 ```sh
 python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source cleanup work/example.md
@@ -129,11 +135,15 @@ with the current destination.
 Run the controller suite to exercise these assertions. The result records the
 frozen SHA separately from each observed destination tip.
 
-Active invocation state, workspace, Git metadata, comparison-base identity,
-acceptance bundle, stage commands, prompts, events, receipts, reports, and scratch
-live under ignored `.p2p/tmp/deliver-issue/<slug>/`. They remain there while a run
-is active, blocked, interrupted, or uncertain. The controller reuses local Git
-objects when Git can safely hard-link them.
+The Python controller's active workspace, Git metadata, comparison-base
+identity, and candidate generations live under
+`~/.p2p/work/<repo-id>/<work-item>/`. Its delivery records, attempts,
+acceptance bundle, stage commands, prompts, events, receipts, reports, and
+runtime scratch live under that work item's `runtime/` directory. The outer
+`deliver-issue` workflow keeps its fixed review snapshot, invocation record,
+reports, and scratch under the work root's `orchestration/` directory. Retain
+the work root while a run is active, blocked, interrupted, or uncertain. The controller reuses
+local Git objects when Git can safely hard-link them.
 
 After completion and explicit cleanup, `.p2p/work/<slug>/` retains only
 `candidate.json`, `delivery.json`, `review.md`, and `proof.md` as generated

@@ -163,11 +163,16 @@ def check_final_footprint(root, work, values):
 
 
 def local_directory(root, work):
-    relative = f'.p2p/tmp/deliver-issue/{Path(work).stem}'
-    ignored = subprocess.run(['git', '-C', str(root), 'check-ignore', '--quiet', '--no-index', '--', relative])
-    if ignored.returncode:
-        raise ValueError('controller runtime path is not ignored: ' + relative)
-    return fs.safe(root, relative)
+    common = fs.git(root, 'rev-parse', '--path-format=absolute', '--git-common-dir').decode().strip()
+    repo_id = Path(root).name + '-' + fs.digest(str(Path(common).resolve()).encode())[:16]
+    home = Path.home().resolve()
+    local_root = home / '.p2p' / 'work'
+    # Keep the configured user-level root from redirecting delivery state elsewhere.
+    local = local_root / repo_id / Path(work).stem
+    for path in (home / '.p2p', local_root, local_root / repo_id, local):
+        if path.is_symlink():
+            raise ValueError('user-local P2P state path contains a symlink: ' + str(path))
+    return local
 
 
 def local_save(root, work, name, data):
@@ -177,6 +182,88 @@ def local_save(root, work, name, data):
     if local.read_bytes() != data:
         raise ValueError('local storage readback failed: ' + name)
     return local
+
+
+def git_generation_tree(workspace, manifest):
+    """Write the exact non-.p2p snapshot to a temporary index and return its tree."""
+    git_dir = Path(fs.git(workspace, 'rev-parse', '--absolute-git-dir').decode().strip())
+    index_dir = git_dir / 'p2p-indexes'
+    index_dir.mkdir(exist_ok=True)
+    index = index_dir / (uuid.uuid4().hex + '.index')
+    env = os.environ | {'GIT_INDEX_FILE': str(index)}
+
+    def run(*args, input=None):
+        result = subprocess.run(['git', '-C', str(workspace), *args], input=input,
+                                env=env, capture_output=True)
+        if result.returncode:
+            raise ValueError(result.stderr.decode().strip() or 'local generation Git command failed')
+        return result.stdout
+
+    try:
+        run('read-tree', '--empty')
+        entries = []
+        for item in manifest:
+            content = (base64.b64decode(item['content_base64'], validate=True)
+                       if item['type'] == 'file' else item['target'].encode())
+            oid = run('hash-object', '-w', '--stdin', input=content).decode().strip()
+            entries.append(item['mode'].encode() + b' ' + oid.encode() + b'\t' +
+                           item['path'].encode('utf-8') + b'\0')
+        if entries:
+            run('update-index', '--add', '-z', '--index-info', input=b''.join(entries))
+        return run('write-tree').decode().strip()
+    finally:
+        index.unlink(missing_ok=True)
+        Path(str(index) + '.lock').unlink(missing_ok=True)
+
+
+def record_generation(delivery, candidate, stage):
+    state = delivery.state
+    generations = state.setdefault('local_git_generations', [])
+    sequence = len(generations) + 1
+    local, workspace = delivery.local, delivery.workspace
+    repository = delivery.runtime / 'repository.git'
+    generation_ref = f'refs/p2p/{Path(delivery.work).stem}/generation-{sequence:06d}'
+    if subprocess.run(['git', '-C', str(repository), 'show-ref', '--verify', '--quiet', generation_ref]).returncode == 0:
+        raise ValueError('local generation ref exists outside recovery state: ' + generation_ref)
+    path = f'runtime/generations/{sequence:06d}.json'
+    target = fs.safe(local, path)
+    if target.exists():
+        raise ValueError('local generation record exists outside recovery state: ' + path)
+    manifest = fs.snapshot(workspace)
+    tree = git_generation_tree(workspace, manifest)
+    parent = generations[-1]['commit'] if generations else state['local_git_base']['local_commit']
+    commit = subprocess.run(['git', '-C', str(workspace), '-c', 'user.name=Promise-to-Proof',
+                             '-c', 'user.email=p2p@localhost', 'commit-tree', tree, '-p', parent,
+                             '-m', f'P2P {delivery.work} generation {sequence}'],
+                            capture_output=True, text=True)
+    if commit.returncode:
+        raise ValueError('local Git generation commit failed: ' + commit.stderr.strip())
+    commit = commit.stdout.strip()
+    fs.git(repository, 'update-ref', generation_ref, commit)
+    previous_key = generations[-1]['candidate_key'] if generations else None
+    source_attempt = next(({'attempt_id': attempt['id'], 'report_sha256': attempt.get('report_sha256'),
+                            'inputs': attempt['inputs']}
+                           for attempt in reversed(state['attempts'])
+                           if attempt['stage'] == stage and attempt['status'] == 'complete'), None)
+    if stage != 'admission' and source_attempt is None:
+        raise ValueError('candidate generation has no completed stage attempt: ' + stage)
+    record = {'schema': 'promise-to-proof/local-generation/v1', 'sequence': sequence,
+              'stage': stage, 'work_item': delivery.work, 'repository_id': local.parent.name,
+              'invocation_id': state['invocation_id'], 'comparison_base': state['comparison_base'],
+              'base_tree': state['local_git_base']['tree'],
+              'contract_sha256': state['contract']['sha256'], 'parent_commit': parent,
+              'previous_candidate_key': previous_key, 'source_attempt': source_attempt,
+              'candidate_key': candidate['key'],
+              'changes': candidate['changes'], 'tree': tree, 'commit': commit,
+              'ref': generation_ref}
+    data = encoded(record)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    fs.atomic_write(target, data)
+    if target.read_bytes() != data:
+        raise ValueError('local generation record readback failed: ' + path)
+    summary = record | {'record_path': path, 'record_sha256': fs.digest(data)}
+    generations.append(summary)
+    return summary
 
 
 def materialize(root, manifest):
@@ -723,6 +810,7 @@ class Delivery:
         self.local = local_directory(root, work)
         self.runtime = self.local / 'runtime'
         self.workspace = self.runtime / 'workspace'
+        self._generation_chain_verified = False
 
     def save(self):
         local_save(self.root, self.work, 'delivery.json', encoded(self.state))
@@ -813,7 +901,7 @@ class Delivery:
         if not self.read_only:
             self.save()
 
-    def capture(self):
+    def capture(self, stage='implementation'):
         if fs.digest((self.workspace / self.work).read_bytes()) != self.state['contract']['sha256']:
             raise ValueError('implementation changed the approved agreement')
         if fs.bindings(self.workspace, self.work) != self.state['binding_inputs']:
@@ -826,13 +914,102 @@ class Delivery:
             raise ValueError('implementation changed excluded scope paths: ' + ', '.join(changed))
         candidate = fs.capture(self.workspace, self.work, self.state['comparison_base'])
         self.state['candidate'] = candidate
+        record_generation(self, candidate, stage)
+        self._generation_chain_verified = False
         return candidate
+
+    def verify_generation_chain(self):
+        if self._generation_chain_verified:
+            return
+        base = self.state.get('local_git_base')
+        if not isinstance(base, dict) or base.get('source_commit') != self.state['comparison_base']:
+            raise ValueError('missing or conflicting local Git comparison-base mapping')
+        repository = self.runtime / 'repository.git'
+        try:
+            if (fs.full_commit(repository, base['source_commit']) != base['source_commit'] or
+                    fs.git(repository, 'rev-parse', base['source_commit'] + '^{tree}').decode().strip() != base['source_tree']):
+                raise ValueError('source comparison-base commit mapping changed')
+            if fs.full_commit(repository, base['local_commit']) != base['local_commit']:
+                raise ValueError('local Git comparison-base commit is missing')
+            if fs.git(repository, 'rev-parse', base['local_commit'] + '^{tree}').decode().strip() != base['tree']:
+                raise ValueError('local Git comparison-base tree mapping changed')
+            if fs.git(repository, 'rev-parse', base['ref']).decode().strip() != base['local_commit']:
+                raise ValueError('local Git comparison-base ref changed or is missing')
+            source_base_snapshot = fs.snapshot(repository, base['source_commit'])
+            if fs.snapshot_key(source_base_snapshot) != self.state['base_tree_key']:
+                raise ValueError('source comparison-base content no longer matches its product identity')
+            base_snapshot = fs.snapshot(repository, base['local_commit'])
+        except (ValueError, OSError) as error:
+            raise ValueError('missing or corrupt local Git comparison base: ' + str(error)) from error
+        if (fs.snapshot_key(base_snapshot) != self.state['base_tree_key'] or
+                base.get('tree_key') != self.state['base_tree_key']):
+            raise ValueError('local Git comparison base does not match the frozen source base')
+        generations = self.state.get('local_git_generations')
+        if not isinstance(generations, list) or not generations:
+            raise ValueError('missing local Git candidate generation history')
+        parent = base['local_commit']
+        previous_key = None
+        for sequence, summary in enumerate(generations, 1):
+            path = summary.get('record_path', '')
+            try:
+                data = fs.safe(self.local, path).read_bytes()
+                record = json.loads(data)
+            except (OSError, ValueError, json.JSONDecodeError) as error:
+                raise ValueError('missing or corrupt local Git generation record: ' + (path or str(sequence))) from error
+            if (fs.digest(data) != summary.get('record_sha256') or record != {k: v for k, v in summary.items()
+                                                                              if k not in ('record_path', 'record_sha256')} or
+                    record.get('sequence') != sequence or record.get('work_item') != self.work or
+                    record.get('repository_id') != base.get('repository_id') or
+                    record.get('invocation_id') != self.state['invocation_id'] or
+                    record.get('comparison_base') != self.state['comparison_base'] or
+                    record.get('base_tree') != base['tree'] or
+                    record.get('contract_sha256') != self.state['contract']['sha256'] or
+                    record.get('parent_commit') != parent or
+                    record.get('previous_candidate_key') != previous_key or
+                    record.get('stage') not in ('admission', 'implementation', 'repair') or
+                    (sequence == 1) != (record.get('stage') == 'admission')):
+                raise ValueError('local Git generation mapping changed: ' + path)
+            source_attempt = record.get('source_attempt')
+            if sequence == 1:
+                if source_attempt is not None:
+                    raise ValueError('admission generation unexpectedly names a stage attempt')
+            else:
+                attempt = next((item for item in self.state['attempts']
+                                if item['id'] == (source_attempt or {}).get('attempt_id')), None)
+                prior = generations[sequence - 2]
+                expected_input = (attempt or {}).get('inputs', {}).get('local_git_generation', {})
+                if (attempt is None or attempt.get('stage') != record['stage'] or
+                        attempt.get('status') != 'complete' or
+                        attempt.get('report_sha256') != source_attempt.get('report_sha256') or
+                        source_attempt.get('inputs') != attempt.get('inputs') or
+                        expected_input.get('commit') != prior.get('commit') or
+                        record.get('previous_candidate_key') != prior.get('candidate_key')):
+                    raise ValueError('local Git generation does not map to its completed stage attempt')
+            try:
+                commit = fs.full_commit(repository, record['commit'])
+                tree = fs.git(repository, 'rev-parse', commit + '^{tree}').decode().strip()
+                if commit != record['commit'] or tree != record['tree']:
+                    raise ValueError('generation commit/tree identity mismatch')
+                manifest = fs.snapshot(repository, commit)
+            except (ValueError, OSError, KeyError) as error:
+                raise ValueError('missing or corrupt local Git generation object: ' + str(record.get('commit'))) from error
+            if (fs.snapshot_key(manifest) != record['candidate_key'] or
+                    fs.tree_changes(base_snapshot, manifest) != record['changes']):
+                raise ValueError('local Git generation content does not match its exact candidate identity')
+            if fs.git(repository, 'rev-parse', record['ref']).decode().strip() != commit:
+                raise ValueError('local Git generation ref changed or is missing: ' + record['ref'])
+            parent = commit
+            previous_key = record['candidate_key']
+        if generations[-1]['candidate_key'] != self.state.get('candidate', {}).get('key'):
+            raise ValueError('local Git history does not map to the retained candidate')
+        self._generation_chain_verified = True
 
     def current(self, check_source=True):
         if check_source:
             self.source_stable()
         expected = self.state.get('candidate')
         if expected:
+            self.verify_generation_chain()
             actual = fs.validate(self.workspace, self.work, self.state['comparison_base'])
             saved = json.loads((self.workspace / '.p2p/work' / Path(self.work).stem / 'candidate.json').read_text())
             if actual != expected or saved != expected:
@@ -1003,6 +1180,10 @@ assert results['scratch'] == 'ok'
 
     def stage_inputs(self, candidate):
         result = report_identity(candidate)
+        if self.state.get('local_git_generations'):
+            generation = self.state['local_git_generations'][-1]
+            result['local_git_generation'] = {key: generation[key] for key in
+                                               ('sequence', 'candidate_key', 'tree', 'commit', 'record_sha256')}
         if self.state.get('routing') is not None:
             result['routing'] = self.state['routing']
         return result
@@ -1344,7 +1525,7 @@ assert results['scratch'] == 'ok'
         self.preflight()
         if not self.state.get('implementation_complete'):
             result = self.stage('implementation')
-            self.capture()
+            self.capture('implementation')
             if result['status'] != 'IMPLEMENTED':
                 raise ValueError('implementation incomplete: ' + '; '.join(result['gaps']))
             self.state['implementation_complete'] = True
@@ -1375,7 +1556,7 @@ assert results['scratch'] == 'ok'
             self.state['repair_skill'] = 'repair' if proof['status'] != 'PROVEN' else 'implementation'
             self.save()
             result = self.stage('repair')
-            self.capture()
+            self.capture('repair')
             self.state['reports'] = {k:v for k,v in self.state['reports'].items() if k not in ('review', 'proof')}
             self.save()
             if result['status'] not in ('REPAIRED', 'IMPLEMENTED'):
@@ -1442,7 +1623,27 @@ def create(root, args):
     result = subprocess.run(['git', 'clone', '--bare', '--', str(root), str(repository)], capture_output=True)
     if result.returncode:
         raise ValueError('isolated Git metadata copy failed: ' + result.stderr.decode())
-    base_tree_key = fs.snapshot_key(fs.snapshot(root, base))
+    base_manifest = fs.snapshot(repository, base)
+    base_tree_key = fs.snapshot_key(base_manifest)
+    base_tree = git_generation_tree(repository, base_manifest)
+    local_base_ref = f'refs/p2p/{Path(args.work).stem}/comparison-base'
+    ref = subprocess.run(['git', '-C', str(repository), 'show-ref', '--verify', '--quiet', local_base_ref])
+    if ref.returncode == 0:
+        raise ValueError('local Git comparison-base ref already exists: ' + local_base_ref)
+    if ref.returncode != 1:
+        raise ValueError('cannot inspect local Git comparison-base ref: ' + local_base_ref)
+    local_base = subprocess.run(['git', '-C', str(repository), '-c', 'user.name=Promise-to-Proof',
+                                 '-c', 'user.email=p2p@localhost', 'commit-tree', base_tree,
+                                 '-m', f'P2P product-only base for {args.work}'],
+                                capture_output=True, text=True)
+    if local_base.returncode:
+        raise ValueError('local Git product-only base commit failed: ' + local_base.stderr.strip())
+    local_base_commit = local_base.stdout.strip()
+    fs.git(repository, 'update-ref', local_base_ref, local_base_commit)
+    local_git_base = {'repository_id': local.parent.name, 'source_commit': base,
+                      'source_tree': fs.git(repository, 'rev-parse', base + '^{tree}').decode().strip(),
+                      'local_commit': local_base_commit, 'tree': base_tree,
+                      'tree_key': base_tree_key, 'ref': local_base_ref}
     local_save(root, args.work, 'runtime/base-tree-key', (base_tree_key + '\n').encode())
     previous_records = {}
     for name in ('candidate.json', 'delivery.json', 'review.md', 'proof.md'):
@@ -1467,6 +1668,7 @@ def create(root, args):
              'excluded_dirty': sorted(excluded), 'skills': installed,
              'routing': decision, 'routing_records': records, 'starting_commit': starting,
              'base_tree_key': base_tree_key,
+             'local_git_base': local_git_base, 'local_git_generations': [],
              'previous_records': previous_records,
              'destination_observation': destination_observation(root, decision, base),
              'authority': {'local_stages': True, 'external_effects': False},
@@ -1482,9 +1684,9 @@ def create(root, args):
                       'elapsed_limit': 'admission and process termination; provider billing may continue',
                       'trust': 'controller and OS trusted; no arbitrary same-user tamper resistance'}}
     delivery = Delivery(root, args.work, state)
-    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'excluded_dirty', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'previous_records', 'authority', 'limits', 'deadline', 'host')}))
+    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'excluded_dirty', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'limits', 'deadline', 'host')}))
     delivery.save()
-    delivery.capture()
+    delivery.capture('admission')
     delivery.save()
     return delivery
 

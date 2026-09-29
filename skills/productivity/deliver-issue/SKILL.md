@@ -128,11 +128,12 @@ destination. A plan change still invalidates routing and requires reconciliation
    candidate, base, and agreement. Use `--sandbox read-only` when checks need
    no writes; otherwise use a separate writable scratch workspace with those
    inputs outside its write scope. Verify that boundary before running checks.
-   Retain invocation output alongside the reports. Never resume or fork
-   the implementation session as an independent verifier. The workspace
-   sandbox must keep candidate inputs read-only. Keep returned stage reports
-   and diagnostics in ignored local storage until successful cleanup;
-   diagnostics may write only to disposable scratch space.
+   Retain outer invocation output with its invocation record. Never resume or
+   fork the implementation session as an independent verifier. The workspace
+   sandbox must keep candidate inputs read-only. Keep controller stage reports
+   and diagnostics under `~/.p2p/work/<repo-id>/<work-item>/runtime` until
+   successful cleanup; diagnostics may write only to controller runtime
+   scratch.
 3. Record the work-item path, repository, branch, starting commit, and existing tracked
    and untracked work. Preserve unrelated work. When ownership of overlapping
    edits is unclear, stop before changing them. Do not stash, reset, clean, or
@@ -162,9 +163,14 @@ destination. A plan change still invalidates routing and requires reconciliation
    before handing off. Missing, conflicting, or unsaved agreements block
    dependent implementation. Do not create a second checklist or contract store.
 
-Keep active workspaces, candidate payloads, stage reports, invocation records,
-and scratch under ignored `.p2p/tmp/deliver-issue/<slug>/`. Preserve them while
-the run is active, blocked, interrupted, or uncertain. After review and proof
+Keep active execution/recovery state, candidate payloads, stage reports,
+invocation records, and scratch under `~/.p2p/work/<repo-id>/<work-item>/`.
+Store outer workflow artifacts under its `orchestration/` directory and direct
+controller artifacts under `runtime/`. The `p2p_delivery.py` controller
+stores its delivery records, attempts (including prompts, events, receipts,
+and reports), and runtime scratch under
+`~/.p2p/work/<repo-id>/<work-item>/runtime`. Preserve the work root while the
+run is active, blocked, interrupted, or uncertain. After review and proof
 succeed, keep the candidate locally available until it is applied to the source
 checkout. The explicit cleanup command verifies the source identity, writes
 and reads back `candidate.json`, `delivery.json`, `review.md`, and `proof.md`

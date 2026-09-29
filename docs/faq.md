@@ -129,8 +129,10 @@ resume work.
 
 ### Why commit generated reports if they are outside the candidate?
 
-The candidate excludes `.p2p/`. Active controller state, candidate payloads,
-transcripts, and attempt evidence stay under ignored `.p2p/tmp/`. After the
+The candidate excludes `.p2p/`. Active controller state and attempt evidence
+stay under the user-level work root's `runtime/`; outer workflow candidate
+payloads, transcripts, reports, and invocation state stay under its
+`orchestration/` directory. After the
 candidate is applied and explicit cleanup verifies its identity, the compact
 candidate, delivery, review, and proof records live in `.p2p/work/<slug>/` and
 travel with authorized commits. If review and

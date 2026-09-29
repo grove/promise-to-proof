@@ -340,9 +340,13 @@ Save `implementation.md` and a compact `candidate.json` under
 `.p2p/work/<slug>/`. The candidate record contains the full-tree key, comparison
 base, agreement/binding hashes, and base-relative changed path, mode, type, and
 content digests; it does not contain product payloads or unchanged-path rows.
-Keep payload needed to resume an active or unresolved delivery under ignored
-`.p2p/tmp/deliver-issue/<slug>/`. Exclude all of `.p2p/` from the candidate and
-use the fixed review base.
+Keep the active execution/recovery workspace and candidate payload under
+`~/.p2p/work/<repo-id>/<work-item>/`. The Python controller keeps its delivery
+records, attempts, prompts, events, receipts, reports, and runtime scratch
+under that work item's `runtime/` directory. The outer workflow keeps its
+fixed review snapshot, invocation record, reports, and scratch under that
+work item's `orchestration/` directory. Exclude all of `.p2p/` from the product
+candidate and use the fixed review base.
 
 Record exact work-item and binding parent/specification hashes. A compact
 candidate identity is sufficient after successful cleanup and does not rebuild
