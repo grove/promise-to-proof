@@ -129,8 +129,11 @@ resume work.
 
 ### Why commit generated reports if they are outside the candidate?
 
-The candidate excludes `.p2p/`. Reports, retained evidence, and snapshot records
-live in `.p2p/work/<slug>/` and travel with authorized commits. If review and
+The candidate excludes `.p2p/`. Active controller state, candidate payloads,
+transcripts, and attempt evidence stay under ignored `.p2p/tmp/`. After the
+candidate is applied and explicit cleanup verifies its identity, the compact
+candidate, delivery, review, and proof records live in `.p2p/work/<slug>/` and
+travel with authorized commits. If review and
 proof examined commit A, a later commit B recording those artifacts does not
 change their subject to B. Reuse requires identical content outside `.p2p/`,
 unchanged agreements, and the same comparison base. Git-dependent builds also
@@ -139,9 +142,13 @@ need execution-input equivalence.
 ### What happens to old reports and temporary evidence?
 
 Before replacement, retain old records in Git or the work item's `history/`
-directory. Scratch files in `.p2p/tmp/` and OS temporary directories may be
-deleted at any time. Required observations must already be retained in a report
-or evidence file. Sensitive or large evidence needs a safe durable reference,
+directory, except the `deliver-issue` controller's explicit compact finalizer:
+it keeps prior uncommitted final bytes in ignored local recovery until the new
+four-record set is read back. Keep recovery data while the controller run is
+active, blocked, interrupted, or uncertain; successful cleanup removes it after
+the source identity matches. Disposable scratch can be removed earlier.
+Required observations must already be retained in a report or evidence file.
+Sensitive or large evidence needs a safe durable reference,
 checksum, and access limitations. Unavailable evidence stays unavailable.
 
 Keep exploratory runs and generated fixtures in scratch. For inactive work,

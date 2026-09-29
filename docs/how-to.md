@@ -423,9 +423,11 @@ review requirements still apply after proof succeeds.
 ## Carry work to another session or checkout
 
 Commit durable work files and `.p2p/work/` records when authorized, then transfer
-or clone the repository. Include candidate Git objects and the comparison base,
-or retain the recoverable snapshot manifest. Keep secrets out of both snapshots
-and evidence. Delete scratch files only after durable artifacts are saved.
+or clone the repository. An active delivery needs its ignored local recovery
+directory and comparison-base Git objects transferred separately. After
+successful explicit cleanup, the compact durable identity does not reconstruct
+the candidate. Keep secrets out of snapshots and evidence, and delete scratch
+files only after durable records are read back.
 
 In the new checkout, resume with the work-item path:
 

@@ -21,13 +21,14 @@ identity checks. Run `--help` for arguments. `resolve` locates the work item,
 previous bytes before replacing a report. Resolve the repository root first;
 pass `--repo <root>` rather than relying on the caller's working directory.
 For unrelated dirty work, capture in the isolated authorized-scope checkout
-specified below, then retain its recoverable records under the work item.
+specified below and retain its payload only in ignored local storage while the
+delivery is active or unresolved.
 
 ## Bound the delivery
 
 Before the first stage dispatch, record the invocation, start time, deadline,
-stage allowance, dispatch count, and repair usage in the durable work-item
-records. For a new invocation, default to 30 minutes overall, 10 minutes per
+stage allowance, dispatch count, and repair usage in ignored local invocation
+state. For a new invocation, default to 30 minutes overall, 10 minutes per
 stage, and eight dispatches, including preflight and failed stages. State these
 limits before starting; use explicit user limits when supplied. Pass each stage
 its remaining allowance and reserve time to return its observations. The Python
@@ -129,9 +130,9 @@ destination. A plan change still invalidates routing and requires reconciliation
    inputs outside its write scope. Verify that boundary before running checks.
    Retain invocation output alongside the reports. Never resume or fork
    the implementation session as an independent verifier. The workspace
-   sandbox must keep candidate inputs read-only. Let the enclosing workflow
-   save returned reports in `.p2p/work/<slug>/`; diagnostics may write only
-   to disposable scratch space.
+   sandbox must keep candidate inputs read-only. Keep returned stage reports
+   and diagnostics in ignored local storage until successful cleanup;
+   diagnostics may write only to disposable scratch space.
 3. Record the work-item path, repository, branch, starting commit, and existing tracked
    and untracked work. Preserve unrelated work. When ownership of overlapping
    edits is unclear, stop before changing them. Do not stash, reset, clean, or
@@ -161,13 +162,19 @@ destination. A plan change still invalidates routing and requires reconciliation
    before handing off. Missing, conflicting, or unsaved agreements block
    dependent implementation. Do not create a second checklist or contract store.
 
-Save durable output automatically in `.p2p/work/<slug>/`: `implementation.md`,
-`candidate.json`, `review.md`, `proof.md`, and `evidence/`. Retain recoverable
-snapshots and host invocation records there too. Follow the protocol's history
-rule before replacement, including uncommitted runs. `.p2p/` is excluded from
-the product candidate. Use `.p2p/tmp/` only for disposable material. Before
-claiming a durable handoff, retain safe evidence or its durable reference and
-checksum; report unavailable evidence when no safe durable copy exists.
+Keep active workspaces, candidate payloads, stage reports, invocation records,
+and scratch under ignored `.p2p/tmp/deliver-issue/<slug>/`. Preserve them while
+the run is active, blocked, interrupted, or uncertain. After review and proof
+succeed, keep the candidate locally available until it is applied to the source
+checkout. The explicit cleanup command verifies the source identity, writes
+and reads back `candidate.json`, `delivery.json`, `review.md`, and `proof.md`
+under `.p2p/work/<slug>/`, then removes superseded implementation, repair, and
+generated history reports. It retains `planning-handoff.md` and `archive.md`
+with hashed reasons when present, enforces six generated files and 65,536
+logical bytes, and blocks on unclassified or staged extras. It deletes local
+runtime data only after final-record readback. `.p2p/` is excluded from the
+product candidate. A completed compact record does not reconstruct the
+candidate in another checkout.
 
 ## Build and capture
 
@@ -176,27 +183,22 @@ checksum; report unavailable evidence when no safe durable copy exists.
    report missing checks instead of treating a green suite as acceptance. Save
    and reread its report outside the candidate. Do not silently include existing
    unrelated work in the issue's result.
-7. Capture a recoverable fixed candidate: full commit SHA or a reproducible
-   snapshot with all relevant staged, unstaged, deleted, and untracked content.
-   Save `candidate.json` with the work-item path and exact byte hash, binding
-   parent/spec input hashes, candidate identity, and full comparison-base SHA.
-   Record the exact contract text and revision, comparison base, and included
-   working-tree scope. If unrelated dirty files exist, build the snapshot from
-   the comparison-base tree plus **only** the issue-owned changes (including
-   relevant untracked files); do not archive the current checkout wholesale or
-   reuse an implementation-stage archive made from it. For Git candidates,
-   export the full base tree to a disposable directory, apply only authorized
-   additions, modifications, and deletions (including modes and symlink targets),
-   and leave unrelated paths at their base bytes. Exclude all `.p2p/` content.
-   Compare the saved snapshot file
-   inventory, bytes, and modes to that declared scope,
-   including base versions of excluded paths, before any handoff. Include the
-   full base commit SHA and enough bytes to reconstruct its tree in another
-   checkout; a changed-files-only archive without a transferable base is not
-   recoverable. Test reconstruction in an isolated copy before handing it to
-   independent contexts. Keep reports and evidence outside that candidate.
-   Verify the captured content can be retrieved in the contexts that will
-   inspect it; a hash or mutable branch name alone is insufficient. Exclude
+7. Capture a fixed candidate with a full commit SHA or `snapshot:sha256:`
+   full-tree key, the full comparison-base SHA, work-item hash, binding input
+   hashes, and base-relative changed path/state/type/mode/content-digest rows.
+   Keep the complete candidate payload and comparison-base Git objects only in
+   the ignored local workspace while the delivery is active or unresolved. If
+   unrelated dirty files exist, build that workspace from the comparison-base
+   tree plus **only** the issue-owned changes (including relevant untracked
+   files); do not archive the current checkout wholesale or reuse an
+   implementation-stage archive made from it. Preserve modes and symlink
+   targets and exclude all `.p2p/` content. Compare the local candidate with
+   the declared scope before handoff. Independent contexts must be able to read
+   the same fixed local workspace; a hash or mutable branch name alone is not
+   sufficient. After reports succeed, retain the candidate until it is applied.
+   Explicit cleanup verifies the source checkout against the full-tree key and
+   changed-file digests before deletion. Fresh-checkout reconstruction is not
+   required after cleanup. Exclude
    platform metadata such as macOS `._*`
    tar entries (set `COPYFILE_DISABLE=1` when packaging with `tar`). Do not
    commit just to capture the candidate.
@@ -233,7 +235,7 @@ checksum; report unavailable evidence when no safe durable copy exists.
    cycle per invocation; retain all reports and return a specific blocker if
    findings or gaps remain. Never weaken the agreement or checks to get green.
 10. Resume from the same `work/<slug>.md` path by reading its linked inputs and
-    `.p2p/work/<slug>/candidate.json`, reports, snapshots, and evidence. Recheck
+    ignored local invocation state, candidate, reports, and evidence. Recheck
     binding parent/spec hashes and comparison base, and compare the entire
     product tree outside `.p2p/`. An artifact-only commit retains the original
     reviewed candidate identity; it does not make the new HEAD proven.
@@ -241,7 +243,9 @@ checksum; report unavailable evidence when no safe durable copy exists.
     saved candidate and reports; validate identities and scope before reusing
     any result. If an artifact is missing, storage is pending, or a candidate
     changed, return to the earliest affected step. Preserve earlier artifacts
-    as history. Do not infer a completed stage from a chat summary.
+    as history while delivery remains unresolved; successful cleanup may remove
+    only superseded generated reports after final-record readback. Do not infer
+    a completed stage from a chat summary.
 
 ## Result and authority
 

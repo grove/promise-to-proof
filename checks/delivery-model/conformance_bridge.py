@@ -15,7 +15,7 @@ import test_p2p_delivery as fixture
 d = fixture.d
 ROOT = Path(os.environ['P2P_TRACE_DIR'])
 SOURCE = ROOT / 'source'
-DIRECTORY = SOURCE / '.p2p/work/tiny'
+LOCAL = SOURCE / '.p2p/tmp/deliver-issue/tiny'
 CASE = os.environ['P2P_MBT_CASE']
 
 
@@ -28,7 +28,7 @@ def write(path, data):
 
 
 def state():
-    path = DIRECTORY / 'delivery.json'
+    path = LOCAL / 'delivery.json'
     return read(path) if path.exists() else None
 
 
@@ -54,12 +54,12 @@ def child():
         return original_receipt(self, attempt)
     d.Delivery.receipt = receipt
     if settings.get('storage_failure'):
-        original_retained = d.retained
-        def retained(root, work, name, data):
-            if name == 'proof.md':
+        original_local_save = d.local_save
+        def local_save(root, work, name, data):
+            if name.endswith('/report.json'):
                 raise OSError('fixture interrupted report storage')
-            return original_retained(root, work, name, data)
-        d.retained = retained
+            return original_local_save(root, work, name, data)
+        d.local_save = local_save
     if settings.get('hold_lock'):
         original_run = d.Delivery.run
         def run(self):
@@ -79,9 +79,11 @@ def command(action='resume', **settings):
     write(ROOT / 'command.json', settings)
     args = [sys.executable, str(Path(__file__).resolve()), 'child', '--repo', str(SOURCE), action, 'work/tiny.md']
     if action == 'run':
-        args += ['--comparison-base', (ROOT / 'base').read_text()]
+        args += ['--comparison-base', (ROOT / 'base').read_text(), '--destination', 'delivery-target']
         if CASE != 'unauthorized-before-dispatch':
             args += ['--authorize-local']
+        if CASE == 'repair-restart-exhaustion':
+            args += ['--max-dispatches', '9']
     return args
 
 
@@ -99,12 +101,12 @@ def invoke(action='resume', **settings):
 def corrupt():
     saved = state()
     attempt = saved['attempts'][-1]
-    folder = DIRECTORY / 'attempts' / attempt['id']
+    folder = LOCAL / 'attempts' / attempt['id']
     if CASE == 'candidate-mutated-during-verification':
-        (DIRECTORY / 'runtime/workspace/greet.py').write_text("print('mutated after launch')\n")
+        (LOCAL / 'runtime/workspace/greet.py').write_text("print('mutated after launch')\n")
     elif CASE == 'incomplete-archive':
-        # This is the actual retained comparison base, not the redundant bundle.
-        write(DIRECTORY / 'base-manifest.json', [])
+        # Remove the saved comparison-base identity used by current recovery checks.
+        (LOCAL / 'runtime/base-tree-key').unlink()
     elif CASE == 'late-stage-result':
         value = read(folder / 'exit.json')
         value['attempt_id'] = 'late-result-from-another-launch'
@@ -134,25 +136,34 @@ def projection(code, saved):
     if saved is None:
         return f'{code}|ABSENT|0|0||0|0|0|0|1'
     attempts = saved['attempts']
-    manifest = saved.get('candidate', {}).get('manifest', [])
+    candidate = saved.get('candidate')
+    workspace = LOCAL / 'runtime/workspace'
+    manifest = d.fs.snapshot(workspace) if workspace.exists() else []
+    current = 1
+    if candidate:
+        current = int(candidate.get('key') == d.fs.snapshot_key(manifest) and
+                      candidate.get('changes') == d.fs.tree_changes(
+                          d.fs.snapshot(workspace, candidate['comparison_base']), manifest))
     entries = {x['path']: x for x in manifest}
     generation = 0
     if 'greet.py' in entries:
-        import base64
-        content = base64.b64decode(entries['greet.py']['content_base64'])
+        content = (workspace / 'greet.py').read_bytes()
         generation = 2 if b'repaired fixture' in content else 1
     verifiers = []
-    expected_identity = {k: v for k, v in saved['candidate'].items() if k != 'manifest'}
+    expected_identity = {k: v for k, v in (candidate or {}).items() if k not in ('manifest', 'changes')}
+    if saved.get('routing') is not None:
+        expected_identity['routing'] = saved['routing']
     for name, passing in [('review', 'REVIEWED'), ('proof', 'PROVEN')]:
         record = saved.get('reports', {}).get(name)
         if not record:
             verifiers.append(0)
             continue
-        report = read(DIRECTORY / record['path'])
+        report = read(LOCAL / record['path'])
         exact = json.loads(report['input_identity_json']) == expected_identity
         full = [row['id'] for row in report['requirements']] == ['R1']
         verifiers.append(generation if exact and full and report['status'] == passing and not report['gaps'] else -1)
-    current = int(d.fs.snapshot(DIRECTORY / 'runtime/workspace') == manifest)
+    if not candidate:
+        current = 1
     return '|'.join(map(str, [code, saved['status'], len(attempts),
                              sum(a['status'] == 'complete' for a in attempts),
                              ','.join(sorted(saved.get('reports', {}))),

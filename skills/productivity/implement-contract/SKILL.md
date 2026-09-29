@@ -158,18 +158,20 @@ acceptance test/check or contract-approved non-test evidence path, observed
 result, and remaining gaps. Record test/assertion relationships in the report;
 requirement IDs need not appear in every test name or code comment.
 
-Recheck the agreement and capture the final candidate as a full commit SHA or
-reproducible snapshot covering relevant uncommitted and untracked content.
-Save `candidate.json` in `.p2p/work/<slug>/` with the candidate identity, full
-comparison-base SHA, work-item hash, and binding parent/spec hashes. Retain
-recoverable snapshots there, excluding all `.p2p/` content from the candidate.
-Save and reread `implementation.md` and retained evidence in the same artifact
-directory, preserving prior runs under the protocol's history rule. Follow the
-protocol's implementation and review handoff rules for comparison context.
-A missing commit is not a blocker when a transferable snapshot exists. If the
-review base is unresolved, return `PARTIAL` and name the missing comparison
-decision. Save the implementation observations, but do not create or replace
-`candidate.json` or claim a complete candidate handoff until the base is fixed.
+Recheck the agreement and capture the final candidate as a full commit SHA or a
+snapshot key covering relevant uncommitted and untracked content. Save
+`candidate.json` in `.p2p/work/<slug>/` with the candidate identity, comparison
+base, work-item hash, binding parent/spec hashes, and base-relative changed
+paths, modes, types, and content digests. Keep any payload needed to resume an
+active or unresolved run in ignored local storage; do not copy product contents
+into the durable identity record. After application, the explicit controller
+cleanup verifies the source tree against that identity before removing its
+local candidate. Save and reread `implementation.md` and retained evidence in
+the artifact directory, preserving prior runs under the protocol's history
+rule. If the review base is unresolved, return `PARTIAL` and name the missing
+comparison decision. Save implementation observations, but do not create or
+replace `candidate.json` or claim a complete candidate handoff until the base
+is fixed.
 
 Return development observations. Hand off separately to `/review-implementation` and
 `/prove` without invoking either implicitly. Only `/prove` produces acceptance

@@ -4,6 +4,7 @@ import importlib.util
 import contextlib
 import io
 import json
+import hashlib
 import os
 from pathlib import Path
 import shutil
@@ -23,6 +24,44 @@ def rejects(fn, message):
         assert message in str(error), str(error)
     else:
         raise AssertionError("expected rejection: " + message)
+
+
+def compact_identity_case():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory) / "repo"
+        root.mkdir()
+        p2p.git(root, "init", "-q")
+        p2p.git(root, "config", "user.name", "Filesystem Check")
+        p2p.git(root, "config", "user.email", "check@example.invalid")
+        p2p.setup(root)
+        (root / "unchanged.txt").write_text("same\n")
+        (root / "original.txt").write_text("old\n")
+        (root / "old-link").symlink_to("original.txt")
+        (root / "work/compact.md").write_text("# Compact identity\n")
+        p2p.git(root, "add", ".")
+        p2p.git(root, "commit", "-qm", "compact base")
+        base = p2p.full_commit(root, "HEAD")
+
+        (root / "original.txt").write_text("new\n")
+        (root / "original.txt").chmod(0o755)
+        (root / "old-link").unlink()
+        (root / "added.txt").write_text("added\n")
+        (root / "new-link").symlink_to("added.txt")
+        candidate = p2p.capture(root, "work/compact.md", base)
+        sha = lambda data: hashlib.sha256(data).hexdigest()
+        expected = [
+            {"path": "added.txt", "state": "added", "type": "file", "mode": "100644", "sha256": sha(b"added\n")},
+            {"path": "new-link", "state": "added", "type": "symlink", "mode": "120000", "sha256": sha(b"added.txt")},
+            {"path": "old-link", "state": "deleted", "type": "symlink", "mode": "120000", "sha256": sha(b"original.txt")},
+            {"path": "original.txt", "state": "modified", "type": "file", "mode": "100755", "sha256": sha(b"new\n")},
+        ]
+        manifest = p2p.snapshot(root)
+        encoded_manifest = json.dumps(manifest, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
+        assert candidate["changes"] == expected
+        assert candidate["key"] == "snapshot:sha256:" + hashlib.sha256(encoded_manifest).hexdigest()
+        serialized = json.dumps(candidate)
+        assert "manifest" not in candidate and "content_base64" not in serialized and "unchanged.txt" not in serialized
+        assert p2p.validate(root, "work/compact.md", base) == candidate
 
 
 def run():
@@ -60,10 +99,11 @@ def run():
         candidate_file = root / ".p2p/work/feature-api/candidate.json"
         candidate_file.write_text(json.dumps({**candidate, "commit": "HEAD"}))
         rejects(lambda: p2p.validate(root, work, base), "full commit SHA")
-        for malformed in ({**candidate, "key": "snapshot:sha256:bad", "manifest": []},
-                          {**candidate, "commit": 1}, {**candidate, "binding_inputs": None}):
+        for malformed, message in (({**candidate, "key": "snapshot:sha256:bad"}, "snapshot digest"),
+                                   ({**candidate, "commit": 1}, "candidate"),
+                                   ({**candidate, "binding_inputs": None}, "binding_inputs")):
             candidate_file.write_text(json.dumps(malformed))
-            rejects(lambda: p2p.validate(root, work, base), "candidate" if "key" in malformed or malformed.get("commit") == 1 else "binding_inputs")
+            rejects(lambda: p2p.validate(root, work, base), message)
         candidate_file.write_text(json.dumps(candidate))
         assert p2p.git(root, "diff", "--cached") == before
         p2p.save(root, work, "review.md", b"REVIEWED for " + base.encode())
@@ -116,7 +156,7 @@ def run():
         (root / "app.txt").write_text("two\n")
         dirty = p2p.capture(root, work, base)
         assert dirty["key"].startswith("snapshot:sha256:")
-        assert all(not entry["path"].startswith(".p2p/") for entry in dirty["manifest"])
+        assert "manifest" not in dirty and dirty["changes"]
         assert p2p.validate(root, work, base) == dirty
         p2p.git(root, "add", ".")
         p2p.git(root, "commit", "-qm", "retained snapshot")
@@ -178,6 +218,9 @@ def run():
 class FilesystemTests(unittest.TestCase):
     def test_disposable_repository(self):
         run()
+
+    def test_compact_dirty_candidate_identity(self):
+        compact_identity_case()
 
     def test_standalone_skill_packages(self):
         skills = Path(__file__).resolve().parents[1] / "skills/productivity"

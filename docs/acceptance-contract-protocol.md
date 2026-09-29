@@ -143,6 +143,12 @@ claiming a durable handoff. These files are committed project records, although
 writing them does not authorize staging, committing, pushing, tracker writes,
 publishing a PR, merging, or deploying.
 
+After a successful local delivery, cleanup reads back the four final records
+before removing superseded implementation, repair, and generated history
+reports. The final `delivery.json` records hashes and reasons for a retained
+`planning-handoff.md` or `archive.md`. Unclassified artifacts and staged extras
+block cleanup; cleanup never changes the Git index.
+
 Ignore only `/.p2p/tmp/` under the P2P convention. Setup detects conflicting
 repository, local, and global ignores affecting `specs/`, `work/`, or
 `.p2p/work/`; report the actual conflict rather than overriding unrelated rules.
@@ -163,7 +169,18 @@ evidence, retain a description, safe durable reference, SHA-256 checksum, and
 access limitations. Without a safe durable copy, mark evidence unavailable.
 A checksum or inaccessible old temporary path alone is insufficient.
 
-Before replacing a report, candidate, evidence, or uncommitted agreement, retain
+The `deliver-issue` controller keeps invocation state, candidate payload, stage
+reports, and attempt evidence under ignored `.p2p/tmp/deliver-issue/` while
+active or unresolved. After `REVIEWED_AND_PROVEN`, explicit cleanup waits for
+the source checkout to match the candidate, writes and reads back only
+`candidate.json`, `delivery.json`, `review.md`, and `proof.md`, then deletes the
+local payload. These current records replace prior records without an extra
+`.p2p/work/` history copy. The controller keeps any uncommitted prior record
+bytes in ignored local recovery until replacement has been read back; committed
+versions remain available in Git history. Successful compact records do not
+reconstruct the candidate in a different checkout.
+
+For other stage saves, before replacing a report, candidate, evidence, or uncommitted agreement, retain
 its previous bytes in Git history or `.p2p/work/<slug>/history/<sha256>/<name>`.
 When the exact old bytes already exist at the same path in `HEAD`, Git supplies
 that history; do not also copy them into `history/`. Staged bytes alone do not
@@ -195,8 +212,11 @@ data](./how-to.md#reduce-retained-work-data).
 
 `candidate.json` identifies one fixed candidate and the exact agreement:
 
-- `commit`: full candidate commit SHA, or `key`: the existing
-  `snapshot:sha256:<digest>` key with its recoverable `manifest`.
+- `key`: the full candidate tree's `snapshot:sha256:<digest>` identity. A
+  committed candidate may also retain `commit`, its full commit SHA.
+- `changes`: compact base-relative rows with the changed path, state, type,
+  mode, and content SHA-256. Deleted rows retain the removed entry's type,
+  mode, and digest. Older records may retain a full `manifest` instead.
 - `comparison_base`: full commit SHA, captured from the intended review base.
 - `work_item` and `work_item_sha256`: canonical path and hash of exact file bytes.
 - `binding_inputs`: repository paths and SHA-256 hashes of the binding local
@@ -211,13 +231,19 @@ The work item, binding inputs, and reports must all agree on these identities.
 
 Exclude the entire `.p2p/` directory from candidate trees and snapshots. Capture
 all relevant tracked, staged, unstaged, deleted, and untracked product content,
-including executable modes and symlink targets. Reuse the recoverable manifest
-format in the [acceptance bundle specification](./acceptance-bundle-v1.md).
-Resolve mixed staged and unstaged versions explicitly; checks must examine the
-same bytes that the snapshot retains. The helper rejects partially staged
-content or mode differences and unsupported submodules instead of dropping
-inputs. Resolve those inputs before capture. Isolate unrelated changes before capture
-without resetting, stashing, or discarding the user's work.
+including executable modes and symlink targets. A compact record keeps the full
+candidate key plus only changed path/mode/type/content digests relative to the
+comparison base; it does not retain product payloads or unchanged paths. The
+controller keeps a full local workspace under ignored `.p2p/tmp/deliver-issue/`
+while a run is active or unresolved. After `REVIEWED_AND_PROVEN`, apply the
+candidate to the source checkout and run explicit cleanup; cleanup verifies the
+complete source tree and reads back the durable records before deleting the
+local payload. After that cleanup, the records do not reconstruct the candidate
+in a fresh checkout. Resolve mixed staged and unstaged versions explicitly; the
+helper rejects partially staged content or mode differences and unsupported
+submodules instead of dropping inputs. Resolve those inputs before capture.
+Isolate unrelated changes before capture without resetting, stashing, or
+discarding the user's work.
 
 A product candidate A can be followed by commit B recording `.p2p/` artifacts.
 Review and proof remain bound to A. To reuse them for B, compare the complete

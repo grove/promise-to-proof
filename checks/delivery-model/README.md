@@ -234,7 +234,7 @@ and port availability window for each suite invocation.
 | `Start` | `run`, with the requested admission fault, then process exit immediately before review reservation | Public result or exit 77, saved status, three initial attempts, completed implementation, candidate generation |
 | `Review` | `resume`, process exit before proof reservation | One new full review against the current candidate, no proof yet |
 | `Proof` | `resume`, process exit after the controller saves the proof host completion but before it consumes the receipt | One reserved proof, no accepted proof report yet |
-| `Corrupt` | Change the saved pending report, receipt, candidate bytes, or retained base manifest | Immediate saved-state projection, followed by the real rejection on `Restart` |
+| `Corrupt` | Change the saved pending report, receipt, candidate bytes, or retained base identity | Immediate saved-state projection, followed by the real rejection on `Restart` |
 | `Restart` | Fresh-process `resume` against the same invocation | Receipt reconciliation, report storage, completion or blocker, persistent repair consumption, and both verifier reports after repair |
 | `Inspect` | Read-only `status` between stages | Returned result and unchanged saved state |
 | `Resume` | Two more fresh-process `resume` calls at the terminal boundary | Same attempts and repair count, no duplicate dispatch, same completion or rejection |
@@ -285,8 +285,9 @@ a stale earlier candidate identity after implementation drift, malformed
 identity JSON, candidate mutation after verifier launch, incomplete retained
 comparison-base content, interrupted report storage, a receipt from another
 attempt, a conflicting duplicate report, and overlapping resume processes.
-The incomplete-archive case removes the authoritative base manifest content.
-The redundant `base.bundle` alone is not treated as the recoverability oracle.
+The incomplete-archive case removes `runtime/base-tree-key`, the saved identity
+that resume requires to verify comparison-base recovery. Resume must block with
+the missing input named; the isolated bare repository supplies the Git objects.
 Candidate mutation blocks both acceptance and reuse. Successful repair separately
 checks that a changed candidate receives fresh full review and proof reports.
 

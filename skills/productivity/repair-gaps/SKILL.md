@@ -47,10 +47,12 @@ complete in depth.
    gaps remain. The candidate may change only in the scoped repair; the acceptance
    requirements stay intact.
 6. Save and reread `.p2p/work/<slug>/repair.md`, retained evidence, and the
-   updated `candidate.json` with recoverable content. Preserve previous reports
-   and candidate records under the protocol's history rule before replacement.
-   Exclude `.p2p/` from the candidate. Changed product or binding inputs make
-   old review/proof historical; neither accepts the repaired candidate.
+   updated compact `candidate.json` identity. Keep payload required to resume an
+   active run in ignored local storage, not in the durable candidate record.
+   Preserve previous reports and candidate records under the protocol's history
+   rule before replacement. Exclude `.p2p/` from the candidate. Changed product
+   or binding inputs make old review/proof historical; neither accepts the
+   repaired candidate.
    Hand off the changed candidate for separate `/review-implementation` and fresh proof.
    End with: **Fresh `/prove` required before acceptance.**
 

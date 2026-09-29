@@ -23,6 +23,10 @@ def canonical(value):
     return json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
 
 
+def snapshot_key(entries):
+    return "snapshot:sha256:" + digest(canonical(entries))
+
+
 def git(root, *args):
     result = subprocess.run(["git", "-C", str(root), *args], capture_output=True)
     if result.returncode:
@@ -123,6 +127,30 @@ def snapshot(root, commit=None):
             entry.update(type="file", content_base64=base64.b64encode(data).decode())
         entries.append(entry)
     return sorted(entries, key=lambda entry: entry["path"])
+
+
+def tree_identity(entries):
+    result = []
+    for entry in entries:
+        content = (base64.b64decode(entry["content_base64"], validate=True)
+                   if entry["type"] == "file" else entry["target"].encode("utf-8"))
+        result.append({"path": entry["path"], "type": entry["type"], "mode": entry["mode"],
+                       "sha256": digest(content)})
+    return result
+
+
+def tree_changes(base, candidate):
+    before = {entry["path"]: entry for entry in tree_identity(base)}
+    after = {entry["path"]: entry for entry in tree_identity(candidate)}
+    changes = []
+    for path in sorted(before.keys() | after.keys()):
+        old, new = before.get(path), after.get(path)
+        if old == new:
+            continue
+        item = new or old
+        changes.append({"path": path, "state": "deleted" if new is None else "added" if old is None else "modified",
+                        "type": item["type"], "mode": item["mode"], "sha256": item["sha256"]})
+    return changes
 
 
 def document_lines(text):
@@ -253,12 +281,13 @@ def capture(root, work, base, commit=None):
     committed = snapshot(root, chosen)
     if commit and manifest != committed:
         raise ValueError("working tree differs from requested committed candidate")
+    comparison_base = full_commit(root, base)
+    base_manifest = snapshot(root, comparison_base)
     record = {"work_item": work, "work_item_sha256": digest(item.read_bytes()),
-              "comparison_base": full_commit(root, base), "binding_inputs": bindings(root, work)}
+              "comparison_base": comparison_base, "binding_inputs": bindings(root, work),
+              "key": snapshot_key(manifest), "changes": tree_changes(base_manifest, manifest)}
     if manifest == committed:
         record["commit"] = chosen
-    else:
-        record.update(key="snapshot:sha256:" + digest(canonical(manifest)), manifest=manifest)
     save(root, work, "candidate.json", json.dumps(record, indent=2, ensure_ascii=False).encode() + b"\n")
     return record
 
@@ -268,7 +297,10 @@ def validate(root, work, base):
     item, artifact = paths(root, work)
     record = json.loads((artifact / "candidate.json").read_text())
     shared = {"work_item", "work_item_sha256", "comparison_base", "binding_inputs"}
-    if set(record) not in (shared | {"commit"}, shared | {"key", "manifest"}):
+    valid = (shared | {"commit"}, shared | {"key", "manifest"},
+             shared | {"commit", "changes"}, shared | {"key", "changes"},
+             shared | {"key", "changes", "commit"})
+    if set(record) not in valid:
         raise ValueError("candidate must contain exactly one committed or snapshot identity")
     for name in ("work_item", "work_item_sha256", "comparison_base", "commit" if "commit" in record else "key"):
         if not isinstance(record[name], str):
@@ -277,6 +309,19 @@ def validate(root, work, base):
         raise ValueError("binding_inputs must be an array")
     if "manifest" in record and not isinstance(record["manifest"], list):
         raise ValueError("snapshot manifest must be an array")
+    if "changes" in record:
+        changes = record["changes"]
+        if not isinstance(changes, list) or any(
+            not isinstance(entry, dict) or set(entry) != {"path", "state", "type", "mode", "sha256"} or
+            not isinstance(entry["path"], str) or not entry["path"] or "\\" in entry["path"] or "\0" in entry["path"] or
+            entry["path"].startswith("/") or any(part in ("", ".", "..") or part.lower() == ".git"
+                                                 for part in entry["path"].split("/")) or
+            entry["state"] not in ("added", "modified", "deleted") or entry["type"] not in ("file", "symlink") or
+            entry["mode"] not in (("100644", "100755") if entry["type"] == "file" else ("120000",)) or
+            not isinstance(entry["sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", entry["sha256"])
+            for entry in changes
+        ) or len({entry["path"] for entry in changes}) != len(changes) or changes != sorted(changes, key=lambda entry: entry["path"]):
+            raise ValueError("candidate compact identity is malformed")
     if not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", record["comparison_base"]):
         raise ValueError("comparison base must be a full commit SHA")
     if record["comparison_base"] != full_commit(root, base):
@@ -290,10 +335,18 @@ def validate(root, work, base):
             raise ValueError("candidate commit must be a full commit SHA")
         expected = snapshot(root, full_commit(root, record["commit"]))
     else:
-        expected = record["manifest"]
-        if record["key"] != "snapshot:sha256:" + digest(canonical(expected)):
+        expected = record.get("manifest")
+        if expected is not None and record["key"] != snapshot_key(expected):
             raise ValueError("snapshot digest mismatch")
-    if snapshot(root) != expected:
+    base_manifest = snapshot(root, full_commit(root, record["comparison_base"]))
+    current = snapshot(root)
+    if expected is not None and current != expected:
+        raise ValueError("product candidate changed")
+    if "changes" in record and tree_changes(base_manifest, current) != record["changes"]:
+        raise ValueError("product candidate changed")
+    if "key" in record and record["key"] != snapshot_key(current):
+        raise ValueError("snapshot digest mismatch")
+    if "changes" not in record and current != expected:
         raise ValueError("product candidate changed")
     return record
 

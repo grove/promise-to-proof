@@ -15,10 +15,23 @@ python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/t
 ```
 
 `--authorize-local` grants scoped local agent stages and safe checks. The
-controller copies the candidate into a persistent isolated workspace and leaves
-the source checkout untouched. A successful result identifies that workspace's
-recoverable candidate and matching full `REVIEWED` and `PROVEN` reports. Applying
-the result to the source checkout or publishing it is a separate operation.
+controller copies the candidate into an isolated workspace under ignored
+`.p2p/tmp/deliver-issue/<slug>/` and leaves the source checkout untouched. A
+successful result identifies that workspace and matching full `REVIEWED` and
+`PROVEN` reports. Apply the candidate to the source checkout yourself, then run
+the explicit cleanup command:
+
+```sh
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source cleanup work/example.md
+```
+
+Cleanup compares the complete source tree with the accepted candidate, reads
+back the compact candidate identity and final review, proof, and delivery
+records, then removes superseded implementation, repair, and generated history
+reports. It records hashes and reasons for retained planning and archive
+receipts, blocks on unclassified or staged extras, and removes the ignored
+workspace only after another final-record readback. A mismatch keeps the
+workspace. Cleanup does not apply, commit, publish, or merge code.
 
 For sliced work, resolve the approved plan through the child's Parent link before
 running the controller. Use the resolved destination's current local tip for
@@ -116,16 +129,22 @@ with the current destination.
 Run the controller suite to exercise these assertions. The result records the
 frozen SHA separately from each observed destination tip.
 
-Records live under `.p2p/work/<slug>/`. `delivery.json` contains the invocation,
-reservations, usage, and precise blocker. `admission.json` retains its fixed
-inputs and authority. `attempts/` retains each actual CLI command, safe prompt,
-host JSON events, process completion receipt, and exact returned report.
-`candidate.json` contains the recoverable candidate; `base-manifest.json` and
-`runtime/base.bundle` retain comparison-base content and Git objects. The runtime
-workspace and its separate Git metadata remain available for recovery.
-`review.md`, `proof.md`, and `acceptance-bundle.json` expose the current completed
-reports. Replaced records use Git history when the exact old bytes are already
-committed at `HEAD`; otherwise they retain those bytes under `history/`.
+Active invocation state, workspace, Git metadata, comparison-base identity,
+acceptance bundle, stage commands, prompts, events, receipts, reports, and scratch
+live under ignored `.p2p/tmp/deliver-issue/<slug>/`. They remain there while a run
+is active, blocked, interrupted, or uncertain. The controller reuses local Git
+objects when Git can safely hard-link them.
+
+After completion and explicit cleanup, `.p2p/work/<slug>/` retains only
+`candidate.json`, `delivery.json`, `review.md`, and `proof.md` as generated
+delivery records. `candidate.json` stores the exact candidate key and only
+base-relative changed paths, modes, types, and content digests. The product
+payload stays in the ignored workspace until the source checkout matches it.
+Cleanup enforces six generated files and 65,536 logical bytes across the entire
+work-item directory before writing the final set. Any previous uncommitted
+completion records stay in ignored local recovery until readback succeeds. The
+acceptance bundle is checked while the workspace is present and is deleted with
+other run-only data.
 
 A reserved attempt with an unambiguous saved process completion is reconciled
 without rerunning it. Missing launch/completion evidence returns `BLOCKED` and

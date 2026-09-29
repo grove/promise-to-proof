@@ -336,19 +336,29 @@ R4 visible. No implementation outcome declares acceptance.
 
 ## Capture and transfer the candidate
 
-Save `implementation.md` and `candidate.json` under `.p2p/work/<slug>/`.
-Review, proof, repair, and resume find them from the work-item path. Capture
-the full candidate commit SHA or a recoverable snapshot with exact paths, bytes,
-modes, symlink targets, and deletions. Include relevant uncommitted and untracked
-files. Exclude all of `.p2p/` from the candidate and use the fixed review base.
+Save `implementation.md` and a compact `candidate.json` under
+`.p2p/work/<slug>/`. The candidate record contains the full-tree key, comparison
+base, agreement/binding hashes, and base-relative changed path, mode, type, and
+content digests; it does not contain product payloads or unchanged-path rows.
+Keep payload needed to resume an active or unresolved delivery under ignored
+`.p2p/tmp/deliver-issue/<slug>/`. Exclude all of `.p2p/` from the candidate and
+use the fixed review base.
 
-Record exact work-item and binding parent/specification hashes. Use local
+Record exact work-item and binding parent/specification hashes. A compact
+candidate identity is sufficient after successful cleanup and does not rebuild
+the candidate in a fresh checkout. The delivery controller retains its local
+candidate through review and proof; after it is applied, explicit cleanup checks
+that the source checkout matches before deleting the payload. Use local
 Markdown links on `Source:`, `Parent:`, or `Parent contract:` lines to identify
 binding documents. Preserve source attribution when importing external text.
-A mutable issue, branch name, or bare digest is not a recoverable candidate.
+A mutable issue or branch name cannot identify the fixed candidate during an
+active delivery; use the local candidate workspace and its exact identity.
 
 Before replacing records, retain prior bytes and related evidence in Git or the
-work item's `history/` directory. Never save secrets, including inside snapshots.
+work item's `history/` directory. The controller's successful finalizer is a
+specific exception: it keeps any uncommitted prior four-record set in ignored
+local recovery until the new compact set is read back. Never save secrets,
+including inside snapshots.
 For unsuitable evidence, retain a safe durable reference, checksum, and access
 limitations; otherwise report it unavailable. Required observations must survive
 deletion of `.p2p/tmp/` and OS temporary files.

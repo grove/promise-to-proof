@@ -230,7 +230,8 @@ publication effect, even when no remote write began.
 
 After commit creation, compare the complete tracked tree outside `.p2p/`,
 including every path, byte, mode, symlink, deletion, and fixture, with the
-candidate manifest. Separately verify the approved durable `.p2p/work/` files.
+candidate's full-tree key and base-relative changed-file identities (or its
+legacy manifest). Separately verify the approved durable `.p2p/work/` files.
 Also confirm the commit parent and approved metadata inputs. A mismatch is `BLOCKED`: retain the
 diagnostic, do not push, and do not recapture the changed tree as the candidate.
 When complete content equivalence is established, record the snapshot-to-commit

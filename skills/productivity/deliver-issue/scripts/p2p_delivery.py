@@ -28,6 +28,10 @@ STAGES = {'implementation': 'implement-contract', 'review': 'review-implementati
           'proof': 'prove', 'repair': 'repair-gaps'}
 POLICY = 'macos-codex-local-v1'
 HEARTBEAT_SECONDS = 30
+RETAINED_ARTIFACTS = {'archive.md': 'Historical recovery map.',
+                      'planning-handoff.md': 'Approval and contract provenance.'}
+FINAL_RECORDS = {'candidate.json', 'delivery.json', 'review.md', 'proof.md'}
+SUPERSEDED_RECORDS = {'candidate.json', 'implementation.md', 'review.md', 'proof.md', 'repair.md'}
 
 
 def now():
@@ -43,6 +47,136 @@ def retained(root, work, name, data):
     if fs.safe(root, path).read_bytes() != data:
         raise ValueError('storage readback failed: ' + name)
     return path
+
+
+def save_final(root, work, name, data):
+    _, artifact = fs.paths(root, work)
+    target = fs.safe(artifact, name)
+    relative = str(target.relative_to(root))
+    fs.trackable(root, [relative])
+    target.parent.mkdir(parents=True, exist_ok=True)
+    # The current record replaces its predecessor; committed versions already live in Git history.
+    fs.atomic_write(target, data)
+    if target.read_bytes() != data:
+        raise ValueError('storage readback failed: ' + name)
+    return relative
+
+
+def check_final_footprint(root, work, values):
+    _, artifact = fs.paths(root, work)
+    replacing = {artifact / name for name in values}
+    existing = [path for path in artifact.rglob('*') if path.is_file() or path.is_symlink()]
+    compact = {}
+    retained = []
+    unknown = []
+    expected_index = {name: (data, '100644') for name, data in values.items()}
+    def superseded_record(relative):
+        return (relative in ('implementation.md', 'repair.md') or
+                (relative.startswith('history/') and Path(relative).name in SUPERSEDED_RECORDS))
+
+    for path in existing:
+        relative = path.relative_to(artifact).as_posix()
+        if path in replacing:
+            if path.is_symlink():
+                raise ValueError('final durable artifact is a symlink: ' + relative)
+            if path.is_file():
+                old = path.read_bytes()
+                if old != values[relative]:
+                    try:
+                        committed = fs.git(root, 'show', 'HEAD:' + str(path.relative_to(root)))
+                    except ValueError:
+                        committed = None
+                    if committed != old:
+                        compact[relative] = fs.digest(old)
+            continue
+        if not path.is_symlink() and path.is_file() and superseded_record(relative):
+            data = path.read_bytes()
+            compact[relative] = fs.digest(data)
+            expected_index[relative] = (data, '100755' if path.stat().st_mode & 0o111 else '100644')
+        else:
+            retained.append(path)
+            if (relative not in RETAINED_ARTIFACTS or path.is_symlink() or not path.is_file()):
+                unknown.append(relative)
+            elif relative in RETAINED_ARTIFACTS:
+                mode = '100755' if path.stat().st_mode & 0o111 else '100644'
+                expected_index[relative] = (path.read_bytes(), mode)
+    worktree = {path.relative_to(artifact).as_posix():
+                len(os.readlink(path).encode()) if path.is_symlink() else path.stat().st_size
+                for path in retained}
+    worktree.update({name: len(data) for name, data in values.items()})
+    count, size = len(worktree), sum(worktree.values())
+    if count > 6 or size > 65536:
+        raise ValueError(f'durable P2P footprint would exceed limits: {count} files, {size} logical bytes; limit is 6 files and 65536 bytes')
+    if unknown:
+        raise ValueError('unclassified durable P2P artifacts block cleanup: ' + ', '.join(sorted(unknown)))
+    prefix = str(artifact.relative_to(root))
+    staged = fs.git(root, 'ls-files', '--stage', '-z', '--', prefix).split(b'\0')
+    indexed = {}
+    for record in filter(None, staged):
+        metadata, raw_path = record.split(b'\t', 1)
+        mode, oid, stage = metadata.decode().split()
+        if stage != '0':
+            raise ValueError('unresolved P2P artifact index conflict: ' + prefix)
+        full_path = raw_path.decode()
+        if full_path != prefix and not full_path.startswith(prefix + '/'):
+            continue
+        if mode not in ('100644', '100755', '120000'):
+            raise ValueError('unclassified indexed P2P artifact blocks cleanup: ' + full_path)
+        path = full_path[len(prefix) + 1:] if full_path.startswith(prefix + '/') else ''
+        indexed[path] = (mode, oid, int(fs.git(root, 'cat-file', '-s', oid).decode()))
+    staged_changes = fs.git(root, 'diff', '--cached', '--no-renames', '--name-only', '-z',
+                            'HEAD', '--', prefix).split(b'\0')
+    staged_paths = {path.decode()[len(prefix) + 1:] for path in filter(None, staged_changes)
+                    if path.decode().startswith(prefix + '/')}
+    for path, (mode, oid, _) in indexed.items():
+        expected = expected_index.get(path)
+        if expected is None:
+            if path not in RETAINED_ARTIFACTS and not superseded_record(path):
+                if path in staged_paths:
+                    continue
+                raise ValueError('unclassified indexed P2P artifact blocks cleanup: ' + prefix + '/' + path)
+            if mode not in ('100644', '100755'):
+                raise ValueError('unclassified indexed P2P artifact blocks cleanup: ' + prefix + '/' + path)
+    # Clean index entries are prior committed records; only staged deltas must match new finals.
+    for raw_path in filter(None, staged_changes):
+        path = raw_path.decode()
+        relative = path[len(prefix) + 1:] if path.startswith(prefix + '/') else ''
+        expected = expected_index.get(relative)
+        entry = indexed.get(relative)
+        if expected is None:
+            if relative in RETAINED_ARTIFACTS or superseded_record(relative):
+                continue
+            raise ValueError('unclassified staged P2P artifact blocks cleanup: ' + path)
+        if (entry is None or entry[0] != expected[1] or
+                fs.git(root, 'cat-file', 'blob', entry[1]) != expected[0]):
+            raise ValueError('staged P2P artifact differs from final cleanup record: ' + path)
+    index_count, index_size = len(indexed), sum(entry[2] for entry in indexed.values())
+    if index_count > 6 or index_size > 65536:
+        raise ValueError(f'durable P2P footprint in staged index would exceed limits: {index_count} files, {index_size} logical bytes; limit is 6 files and 65536 bytes')
+    projected = dict(worktree)
+    for path, (_, _, blob_size) in indexed.items():
+        projected[path] = max(projected.get(path, 0), blob_size)
+    count, size = len(projected), sum(projected.values())
+    if count > 6 or size > 65536:
+        raise ValueError(f'combined durable P2P footprint would exceed limits: {count} files, {size} logical bytes; limit is 6 files and 65536 bytes')
+    return compact
+
+
+def local_directory(root, work):
+    relative = f'.p2p/tmp/deliver-issue/{Path(work).stem}'
+    ignored = subprocess.run(['git', '-C', str(root), 'check-ignore', '--quiet', '--no-index', '--', relative])
+    if ignored.returncode:
+        raise ValueError('controller runtime path is not ignored: ' + relative)
+    return fs.safe(root, relative)
+
+
+def local_save(root, work, name, data):
+    local = fs.safe(local_directory(root, work), name)
+    local.parent.mkdir(parents=True, exist_ok=True)
+    fs.atomic_write(local, data)
+    if local.read_bytes() != data:
+        raise ValueError('local storage readback failed: ' + name)
+    return local
 
 
 def materialize(root, manifest):
@@ -74,6 +208,10 @@ def contract(root, work):
 
 def identity(candidate):
     return {key: value for key, value in candidate.items() if key != 'manifest'}
+
+
+def report_identity(candidate):
+    return {key: value for key, value in identity(candidate).items() if key != 'changes'}
 
 
 def candidate_key(candidate):
@@ -249,24 +387,6 @@ def route_identity(route):
 def route_record(route):
     return {key: value for key, value in route.items()
             if not (key == 'selection' and value == 'approved-plan')}
-
-
-def validate_base_bundle(root, path, base, expected_digest=None):
-    if not path.is_file() or (expected_digest and fs.digest(path.read_bytes()) != expected_digest):
-        raise ValueError('retained comparison-base bundle changed or lost')
-    fs.git(root, 'bundle', 'verify', str(path))
-    with tempfile.TemporaryDirectory(prefix='p2p-base-bundle-') as temporary:
-        repository = Path(temporary) / 'repository.git'
-        object_format = '--object-format=sha256' if len(base) == 64 else '--object-format=sha1'
-        subprocess.run(['git', 'init', '--bare', object_format, str(repository)],
-                       check=True, capture_output=True)
-        fetched = subprocess.run(['git', '-C', str(repository), 'fetch', '--no-tags',
-                                  str(path), 'HEAD'], capture_output=True)
-        present = fetched.returncode == 0 and subprocess.run(
-            ['git', '-C', str(repository), 'cat-file', '-e', base + '^{commit}'],
-            capture_output=True).returncode == 0
-    if not present:
-        raise ValueError('retained comparison-base bundle does not contain the admitted commit')
 
 
 def destination_observation(root, route, base):
@@ -496,18 +616,23 @@ def report_markdown(report):
 REVIEW_AXES = ('Contract fidelity', 'Scope and simplicity', 'Engineering quality')
 
 
-def review_markdown(report, work, contract, candidate, base_manifest, destination_observation=None):
+def review_markdown(report, work, contract, candidate, base_manifest, destination_observation=None,
+                    environment=None, session_id=None):
     key = candidate_key(candidate)
-    base = {entry['path']: entry for entry in base_manifest}
-    current = {entry['path']: entry for entry in candidate.get('manifest', [])}
-    scope = sorted(path for path in base.keys() | current.keys()
-                   if base.get(path) != current.get(path))
+    if 'changes' in candidate:
+        scope = [entry['path'] for entry in candidate['changes']]
+    else:
+        base = {entry['path']: entry for entry in base_manifest}
+        current = {entry['path']: entry for entry in candidate.get('manifest', [])}
+        scope = sorted(path for path in base.keys() | current.keys()
+                       if base.get(path) != current.get(path))
     included = ', '.join(f'`{path}`' for path in scope) or '(no working-tree changes)'
     lines = [f"# {report['status']}: {work}", '',
              f"Contract: {work}, {contract['revision']}; SHA-256 `{contract['sha256']}`",
-             f"Candidate: `{key}`; recoverable snapshot `{work.replace('work/', '.p2p/work/', 1)}/candidate.json`",
+             f"Candidate: `{key}`; compact changed-file identity `{work.replace('work/', '.p2p/work/', 1)}/candidate.json`",
              f"Comparison: base `{candidate['comparison_base']}`; included working-tree scope: {included}",
              'Stability: candidate and contract unchanged at report receipt.',
+             f"Environment: {environment or 'not recorded'}; session `{session_id or 'unknown'}`.",
              f"Coverage: {report['coverage']}"]
     if destination_observation:
         tip = destination_observation['observed_tip'] or 'unavailable'
@@ -568,19 +693,59 @@ def review_markdown(report, work, contract, candidate, base_manifest, destinatio
     return '\n'.join(lines).rstrip() + '\n'
 
 
+def proof_markdown(report, work, contract, candidate, environment, session_id):
+    lines = [f"# {report['status']}: {work}", '',
+             f"Contract: {contract['revision']}; SHA-256 `{contract['sha256']}`",
+             f"Candidate: `{candidate_key(candidate)}`",
+             f"Comparison base: `{candidate['comparison_base']}`",
+             f"Environment: {environment}; session `{session_id or 'unknown'}`", '',
+             '## Requirement verdicts', '']
+    for row in report['requirements']:
+        lines.extend([f"### {row['id']}: {row['verdict']}", '', row['observation'], ''])
+        for evidence in row['evidence']:
+            lines.extend(['- Assertion: ' + evidence['assertion'],
+                          '  Observation: ' + evidence['observation'],
+                          '  Artifact: ' + evidence['artifact']])
+        lines.append('')
+    lines.extend(['## Gaps', ''])
+    lines.extend('- ' + item for item in report['gaps'])
+    if not report['gaps']:
+        lines.append('None.')
+    lines.extend(['', '## Proof details', '', report['details']])
+    return '\n'.join(lines).rstrip() + '\n'
+
+
 class Delivery:
     def __init__(self, root, work, state):
         self.root, self.work, self.state = root, work, state
         self.read_only = False
         self.item, self.directory = fs.paths(root, work)
-        self.runtime = self.directory / 'runtime'
+        self.local = local_directory(root, work)
+        self.runtime = self.local / 'runtime'
         self.workspace = self.runtime / 'workspace'
 
     def save(self):
-        retained(self.root, self.work, 'delivery.json', encoded(self.state))
+        local_save(self.root, self.work, 'delivery.json', encoded(self.state))
+
+    def verify_superseded_recovery(self):
+        for name, expected in self.state.get('superseded_artifacts', {}).items():
+            path = self.runtime / 'superseded-records' / name
+            try:
+                actual = fs.digest(path.read_bytes())
+            except OSError as error:
+                raise ValueError('missing local recovery input: runtime/superseded-records/' + name) from error
+            if actual != expected:
+                raise ValueError('retained superseded artifact changed or lost: ' + name)
+
+    def verification_environment(self):
+        host = self.state['host']
+        return f"{host['name']} {host['version']}; policy {self.state['policy']}; enforced: {', '.join(host['enforced'])}"
 
     def source_stable(self):
-        admission = json.loads((self.directory / 'admission.json').read_text())
+        try:
+            admission = json.loads((self.runtime / 'admission.json').read_text())
+        except OSError as error:
+            raise ValueError('missing local recovery input: runtime/admission.json') from error
         for key, value in admission.items():
             if self.state.get(key) != value:
                 raise ValueError('persisted admission changed: ' + key)
@@ -601,23 +766,40 @@ class Delivery:
                 if fs.digest(fs.safe(root, record['path']).read_bytes()) != record['sha256']:
                     raise ValueError('retained routing history/evidence changed: ' + record['path'])
         current = fs.snapshot(self.root)
-        if current != self.state['source_manifest']:
-            old = {x['path']: x for x in self.state['source_manifest']}
-            new = {x['path']: x for x in current}
-            changed = sorted(p for p in old.keys() | new.keys() if old.get(p) != new.get(p))
-            raise ValueError('source checkout changed since admission: ' + ', '.join(changed))
+        current_key = fs.snapshot_key(current)
+        applied_key = self.state.get('candidate', {}).get('key')
+        candidate_applied = self.state.get('status') == 'REVIEWED_AND_PROVEN' and current_key == applied_key
+        if current_key != self.state['source_tree_key'] and not candidate_applied:
+            raise ValueError('source checkout changed since admission')
         if (self.workspace / '.git').read_text() != 'gitdir: ' + str(self.runtime / 'repository.git') + '\n':
             raise ValueError('isolated Git metadata pointer changed')
-        if fs.full_commit(self.root, 'HEAD') != self.state['source_head']:
-            raise ValueError('source HEAD changed since admission')
-        if fs.digest(fs.git(self.root, 'ls-files', '--stage', '-z')) != self.state['source_index_sha256']:
-            raise ValueError('source index changed since admission')
-        if json.loads((self.directory / 'base-manifest.json').read_text()) != fs.snapshot(self.workspace, self.state['comparison_base']):
-            raise ValueError('retained comparison-base content changed')
+        head = fs.full_commit(self.root, 'HEAD')
+        index = fs.digest(fs.git(self.root, 'ls-files', '--stage', '-z'))
+        if head != self.state['source_head'] or index != self.state['source_index_sha256']:
+            committed_candidate = (candidate_applied and
+                                   fs.snapshot_key(fs.snapshot(self.root, head)) == applied_key)
+            staged_product = subprocess.run(['git', '-C', str(self.root), 'diff', '--cached', '--quiet',
+                                             '--', ':(exclude).p2p']).returncode
+            if not committed_candidate or staged_product:
+                raise ValueError('source HEAD or index changed since admission')
         if fs.full_commit(self.workspace, self.state['comparison_base']) != self.state['comparison_base']:
             raise ValueError('comparison base unavailable')
-        validate_base_bundle(self.root, self.runtime / 'base.bundle', self.state['comparison_base'],
-                             admission.get('base_bundle_sha256'))
+        base_key = fs.snapshot_key(fs.snapshot(self.workspace, self.state['comparison_base']))
+        try:
+            retained_base_key = (self.runtime / 'base-tree-key').read_text()
+        except OSError as error:
+            raise ValueError('missing local recovery input: runtime/base-tree-key') from error
+        if retained_base_key != base_key + '\n' or base_key != self.state['base_tree_key']:
+            raise ValueError('retained comparison-base identity changed or lost')
+        for name, expected in self.state.get('previous_records', {}).items():
+            path = self.runtime / 'previous-records' / name
+            try:
+                actual = fs.digest(path.read_bytes())
+            except OSError as error:
+                raise ValueError('missing local recovery input: runtime/previous-records/' + name) from error
+            if actual != expected:
+                raise ValueError('retained prior delivery record changed or lost: ' + name)
+        self.verify_superseded_recovery()
         if fs.bindings(self.root, self.work) != self.state['binding_inputs']:
             raise ValueError('binding inputs changed')
         if fs.digest(self.item.read_bytes()) != self.state['contract']['sha256']:
@@ -643,16 +825,16 @@ class Delivery:
         if changed:
             raise ValueError('implementation changed excluded scope paths: ' + ', '.join(changed))
         candidate = fs.capture(self.workspace, self.work, self.state['comparison_base'])
-        retained(self.root, self.work, 'candidate.json', encoded(candidate))
         self.state['candidate'] = candidate
         return candidate
 
-    def current(self):
-        self.source_stable()
+    def current(self, check_source=True):
+        if check_source:
+            self.source_stable()
         expected = self.state.get('candidate')
         if expected:
             actual = fs.validate(self.workspace, self.work, self.state['comparison_base'])
-            saved = json.loads((self.directory / 'candidate.json').read_text())
+            saved = json.loads((self.workspace / '.p2p/work' / Path(self.work).stem / 'candidate.json').read_text())
             if actual != expected or saved != expected:
                 raise ValueError('retained candidate identity changed')
         return expected
@@ -683,7 +865,7 @@ class Delivery:
         return attempt
 
     def receipt(self, attempt):
-        folder = self.directory / 'attempts' / attempt['id']
+        folder = self.local / 'attempts' / attempt['id']
         path = folder / 'exit.json'
         if not path.exists():
             raise ValueError('uncertain dispatch ' + attempt['id'] + ': missing controller host completion ' + str(path))
@@ -727,17 +909,17 @@ class Delivery:
         scratch.mkdir(parents=True, exist_ok=True)
         (scratch / '.p2p/tmp').mkdir(parents=True, exist_ok=True)
         attempt = self.reserve(stage, inputs, scratch)
-        folder = self.directory / 'attempts' / attempt['id']
+        folder = self.local / 'attempts' / attempt['id']
         folder.mkdir(parents=True)
         if schema:
-            retained(self.root, self.work, f'attempts/{attempt["id"]}/schema.json', encoded(schema))
+            local_save(self.root, self.work, f'attempts/{attempt["id"]}/schema.json', encoded(schema))
         args = command(self.state['host']['executable'], scratch, folder / 'schema.json' if schema else None)
         if attempt['deadline'] is not None:
             prompt += (f' Effective host deadline: Unix timestamp {attempt["deadline"]}; '
                        f'{max(0, attempt["deadline"] - time.time()):.1f} seconds remain. '
                        'Return an honest incomplete report with remaining gaps before this deadline '
                        'if the required work cannot finish. Do not weaken coverage or claim unverified success.')
-        retained(self.root, self.work, f'attempts/{attempt["id"]}/launch.json', encoded({
+        local_save(self.root, self.work, f'attempts/{attempt["id"]}/launch.json', encoded({
             'attempt_id': attempt['id'], 'stage': stage, 'inputs': inputs, 'command': args, 'prompt': prompt,
             'configuration': host_config(scratch), 'model_provenance': 'inherited configured preference'}))
         print(f'{stage} started [{attempt["id"]}]; deadline {attempt["deadline"]}', file=sys.stderr, flush=True)
@@ -745,7 +927,7 @@ class Delivery:
             result = launch(args, prompt, folder / 'events.jsonl', folder / 'stderr.txt', attempt['deadline'])
             result.update(attempt_id=attempt['id'], inputs=inputs,
                           event_sha256=fs.digest((folder / 'events.jsonl').read_bytes()))
-            retained(self.root, self.work, f'attempts/{attempt["id"]}/exit.json', encoded(result))
+            local_save(self.root, self.work, f'attempts/{attempt["id"]}/exit.json', encoded(result))
             print(f'{stage} {result["outcome"]} [{attempt["id"]}]; '
                   f'{result["elapsed_seconds"]:.1f}s elapsed; exit {result["exit_code"]}', file=sys.stderr, flush=True)
         except BaseException:
@@ -763,7 +945,7 @@ class Delivery:
                 continue
             probe = self.runtime / ('probe-' + str(index) + '.py')
             git_dir = Path(fs.git(self.root, 'rev-parse', '--absolute-git-dir').decode().strip())
-            protected = [git_dir / 'HEAD', git_dir / 'index', self.item, self.directory / 'admission.json', self.directory / 'base-manifest.json', self.runtime / 'repository.git/HEAD',
+            protected = [git_dir / 'HEAD', git_dir / 'index', self.item, self.runtime / 'admission.json', self.runtime / 'base-tree-key', self.runtime / 'repository.git/HEAD',
                          self.workspace / self.work]
             protected += [self.workspace / item['path'] for item in self.state['binding_inputs']]
             sentinel = self.runtime / 'candidate-sentinel'
@@ -820,7 +1002,7 @@ assert results['scratch'] == 'ok'
         self.save()
 
     def stage_inputs(self, candidate):
-        result = identity(candidate)
+        result = report_identity(candidate)
         if self.state.get('routing') is not None:
             result['routing'] = self.state['routing']
         return result
@@ -935,17 +1117,18 @@ assert results['scratch'] == 'ok'
                     if any(not evidence[k].strip() for k in ('assertion', 'observation', 'artifact')):
                         raise ValueError('proof evidence is incomplete: ' + row['id'])
         path = f'attempts/{attempt["id"]}/report.json'
-        stored = self.directory / path
+        stored = self.local / path
         if stored.exists() and stored.read_bytes() != encoded(report):
             raise ValueError('conflicting duplicate stage result: ' + attempt['id'])
-        retained(self.root, self.work, path, encoded(report))
+        local_save(self.root, self.work, path, encoded(report))
         attempt['destination_observation'] = self.state.get('destination_observation')
         summary = (review_markdown(report, self.work, self.state['contract'], self.state['candidate'],
                                    fs.snapshot(self.workspace, self.state['comparison_base']),
-                                   attempt['destination_observation'])
+                                   attempt['destination_observation'], self.verification_environment(),
+                                   attempt['session_id'])
                    if name == 'review' else report['details']).encode()
-        retained(self.root, self.work, f'attempts/{attempt["id"]}/report.md', summary)
-        retained(self.root, self.work, name + '.md', summary)
+        local_save(self.root, self.work, f'attempts/{attempt["id"]}/report.md', summary)
+        local_save(self.root, self.work, name + '.md', summary)
         attempt.update(status='complete', report=path, report_sha256=fs.digest(encoded(report)))
         self.state.setdefault('reports', {})[name] = {'path': path, 'sha256': attempt['report_sha256'],
                                                      'attempt_id': attempt['id'], 'inputs': inputs}
@@ -954,7 +1137,7 @@ assert results['scratch'] == 'ok'
 
     def read_report(self, name):
         record = self.state['reports'][name]
-        data = (self.directory / record['path']).read_bytes()
+        data = (self.local / record['path']).read_bytes()
         if fs.digest(data) != record['sha256']:
             raise ValueError('report/evidence content changed or lost: ' + name)
         attempt = next(a for a in self.state['attempts'] if a['id'] == record['attempt_id'])
@@ -965,22 +1148,120 @@ assert results['scratch'] == 'ok'
         if name == 'review' and 'coverage' in report:
             summary = review_markdown(report, self.work, self.state['contract'], self.state['candidate'],
                                       fs.snapshot(self.workspace, self.state['comparison_base']),
-                                      attempt.get('destination_observation'))
+                                      attempt.get('destination_observation'), self.verification_environment(),
+                                      attempt.get('session_id'))
         elif name == 'review' and 'details' in report:
             summary = report['details']
             if not isinstance(summary, str):
                 raise ValueError('legacy review report details are invalid')
         else:
             summary = report_markdown(report) if name == 'review' else report['details']
-        if (self.directory / (name + '.md')).read_bytes() != summary.encode():
+        if (self.local / (name + '.md')).read_bytes() != summary.encode():
             raise ValueError('canonical report content changed or lost: ' + name)
         if name == 'review' and 'coverage' not in report:
             summary = report_markdown(report)
         report['details'] = summary
         return report
 
-    def complete(self):
-        candidate = self.current()
+    def final_record(self, cleanup=None, retained_artifacts=()):
+        candidate = self.state['candidate']
+        candidate_bytes = encoded(candidate)
+        review_bytes = self.state['final_review'].encode()
+        proof_bytes = self.state['final_proof'].encode()
+        value = {
+            'schema': 'promise-to-proof/delivery-record/v1',
+            'status': 'REVIEWED_AND_PROVEN',
+            'work_item': self.work,
+            'invocation_id': self.state['invocation_id'],
+            'contract': {key: self.state['contract'][key] for key in ('source', 'revision', 'sha256')},
+            'binding_inputs': self.state['binding_inputs'],
+            'comparison_base': self.state['comparison_base'],
+            'candidate_key': candidate_key(candidate),
+            'candidate_record_sha256': fs.digest(candidate_bytes),
+            'candidate_changes_sha256': fs.digest(fs.canonical(candidate.get('changes', []))),
+            'review_sha256': fs.digest(review_bytes),
+            'proof_sha256': fs.digest(proof_bytes),
+            'completed_at': self.state['completed_at'],
+            'cleanup': cleanup or self.state.get('cleanup', 'awaiting exact source checkout match'),
+            'routing': route_record(self.state['routing']),
+            'destination_observation': self.state.get('destination_observation'),
+        }
+        if retained_artifacts:
+            value['retained_artifacts'] = list(retained_artifacts)
+        if self.state.get('cleanup_verified_at'):
+            value.update(cleanup='source checkout identity verified',
+                         cleanup_source_identity_sha256=self.state['cleanup_source_identity_sha256'],
+                         cleanup_verified_at=self.state['cleanup_verified_at'])
+        return value
+
+    def persist_final(self):
+        candidate = self.state['candidate']
+        retained_artifacts = []
+        for name, reason in RETAINED_ARTIFACTS.items():
+            path = self.directory / name
+            if path.is_file() and not path.is_symlink():
+                retained_artifacts.append({'path': name, 'reason': reason,
+                                           'sha256': fs.digest(path.read_bytes())})
+        values = {'candidate.json': encoded(candidate), 'review.md': self.state['final_review'].encode(),
+                  'proof.md': self.state['final_proof'].encode()}
+        values['delivery.json'] = encoded(self.final_record(retained_artifacts=retained_artifacts))
+        compact = check_final_footprint(self.root, self.work, values)
+        for name, expected in compact.items():
+            previous = self.state.get('superseded_artifacts', {}).get(name)
+            if previous is not None and previous != expected:
+                raise ValueError('superseded durable artifact changed during cleanup: ' + name)
+            data = fs.safe(self.directory, name).read_bytes()
+            if fs.digest(data) != expected:
+                raise ValueError('superseded durable artifact changed during cleanup: ' + name)
+            local_save(self.root, self.work, 'runtime/superseded-records/' + name, data)
+        self.state['superseded_artifacts'] = self.state.get('superseded_artifacts', {}) | compact
+        self.save()
+        for name, data in values.items():
+            save_final(self.root, self.work, name, data)
+        for name, data in values.items():
+            if fs.safe(self.directory, name).read_bytes() != data:
+                raise ValueError('durable completion record readback failed: ' + name)
+        return compact
+
+    def verify_final_readback(self, source_change_error):
+        source_identity = fs.digest(fs.canonical(fs.tree_identity(fs.snapshot(self.root))))
+        if source_identity != self.state.get('cleanup_source_identity_sha256'):
+            raise ValueError(source_change_error)
+        self.verify_superseded_recovery()
+        value = completed_result(self.root, self.work, self.directory)
+        if (value['invocation_id'] != self.state['invocation_id'] or
+                value['candidate'] != identity(self.state['candidate']) or
+                value['comparison_base'] != self.state['comparison_base'] or
+                value['candidate'].get('binding_inputs') != self.state.get('binding_inputs')):
+            raise ValueError('durable completed delivery unavailable: final records differ from local invocation identity')
+        record = json.loads((self.directory / 'delivery.json').read_text())
+        expected_contract = {key: self.state['contract'][key] for key in ('source', 'revision', 'sha256')}
+        if (record.get('contract') != expected_contract or
+                record.get('candidate_record_sha256') != fs.digest(encoded(self.state['candidate'])) or
+                record.get('review_sha256') != fs.digest(self.state.get('final_review', '').encode()) or
+                record.get('proof_sha256') != fs.digest(self.state.get('final_proof', '').encode())):
+            raise ValueError('durable completed delivery unavailable: final records differ from local invocation identity')
+        values = {name: fs.safe(self.directory, name).read_bytes()
+                  for name in ('candidate.json', 'delivery.json', 'review.md', 'proof.md')}
+        compact = check_final_footprint(self.root, self.work, values)
+        if any(self.state.get('superseded_artifacts', {}).get(name) != digest
+               for name, digest in compact.items()):
+            raise ValueError('superseded durable artifacts changed after cleanup finalization')
+        return value
+
+    def remove_superseded_artifacts(self):
+        for name, expected in self.state.get('superseded_artifacts', {}).items():
+            if name in FINAL_RECORDS:
+                continue
+            path = fs.safe(self.directory, name)
+            if not path.exists() and not path.is_symlink():
+                continue
+            if path.is_symlink() or not path.is_file() or fs.digest(path.read_bytes()) != expected:
+                raise ValueError('superseded durable artifact changed during cleanup: ' + name)
+            path.unlink()
+
+    def complete(self, check_source=True):
+        candidate = self.current(check_source=check_source)
         review, proof = self.read_report('review'), self.read_report('proof')
         for name, report in (('review', review), ('proof', proof)):
             if json.loads(report['input_identity_json']) != self.stage_inputs(candidate):
@@ -993,7 +1274,7 @@ assert results['scratch'] == 'ok'
             raise ValueError('review contains unresolved findings')
         if 'findings' not in review and any(row.get('verdict') != 'reviewed' for row in review['requirements']):
             raise ValueError('legacy review contains unresolved requirement findings')
-        manifest = candidate.get('manifest') or fs.snapshot(self.workspace, candidate['commit'])
+        manifest = fs.snapshot(self.workspace)
         key = 'snapshot:sha256:' + fs.digest(fs.canonical(manifest))
         contract_identity = {k: self.state['contract'][k] for k in ('source', 'revision', 'sha256')}
         text = lambda content: {'content': content, 'sha256': fs.digest(content.encode())}
@@ -1021,10 +1302,42 @@ assert results['scratch'] == 'ok'
         issues = bundle.verify_bundle(value)
         if issues:
             raise ValueError('acceptance bundle rejected: ' + json.dumps(issues))
-        retained(self.root, self.work, 'acceptance-bundle.json', encoded(value))
-        self.current()
-        self.state.update(status='REVIEWED_AND_PROVEN', blocker=None)
+        local_save(self.root, self.work, 'runtime/acceptance-bundle.json', encoded(value))
+        self.current(check_source=check_source)
+        self.state.update(status='REVIEWED_AND_PROVEN', blocker=None,
+                          completed_at=self.state.get('completed_at') or now(),
+                          final_review=review['details'],
+                          final_proof=proof_markdown(proof, self.work, self.state['contract'], candidate,
+                                                     self.verification_environment(),
+                                                     next(a for a in self.state['attempts']
+                                                          if a['id'] == self.state['reports']['proof']['attempt_id'])['session_id']))
         self.save()
+
+    def cleanup(self):
+        if self.state.get('status') != 'REVIEWED_AND_PROVEN':
+            raise ValueError('only a REVIEWED_AND_PROVEN delivery can be cleaned')
+        if self.state.get('cleanup_verified_at') and self.state.get('final_records_written'):
+            self.verify_final_readback('source checkout changed after cleanup identity verification')
+            self.remove_superseded_artifacts()
+            shutil.rmtree(self.local)
+            return
+        self.complete(check_source=False)
+        candidate_tree = fs.snapshot(self.workspace)
+        source_tree = fs.snapshot(self.root)
+        if source_tree != candidate_tree:
+            raise ValueError('source checkout does not match the exact accepted candidate identity')
+        if fs.tree_changes(fs.snapshot(self.workspace, self.state['comparison_base']), candidate_tree) != self.state['candidate'].get('changes', []):
+            raise ValueError('candidate compact identity changed before cleanup')
+        source_identity = fs.digest(fs.canonical(fs.tree_identity(source_tree)))
+        self.state.update(cleanup_verified_at=self.state.get('cleanup_verified_at') or now(),
+                          cleanup_source_identity_sha256=source_identity,
+                          cleanup='source checkout identity verified')
+        self.persist_final()
+        self.state['final_records_written'] = True
+        self.save()
+        self.verify_final_readback('source checkout changed during cleanup finalization')
+        self.remove_superseded_artifacts()
+        shutil.rmtree(self.local)
 
     def run(self):
         self.current()
@@ -1120,17 +1433,24 @@ def create(root, args):
             raise ValueError('agreement input missing from candidate: ' + path)
         manifest[path] = new[path]
     _, directory = fs.paths(root, args.work)
-    runtime = directory / 'runtime'
-    if runtime.exists():
-        raise ValueError('runtime exists without a delivery record; preserve it and reconcile admission')
+    local = local_directory(root, args.work)
+    if local.exists():
+        raise ValueError('local runtime exists without an active delivery record; preserve it and reconcile admission')
+    runtime = local / 'runtime'
     runtime.mkdir(parents=True)
     repository = runtime / 'repository.git'
-    result = subprocess.run(['git', 'clone', '--bare', '--no-hardlinks', '--', str(root), str(repository)], capture_output=True)
+    result = subprocess.run(['git', 'clone', '--bare', '--', str(root), str(repository)], capture_output=True)
     if result.returncode:
         raise ValueError('isolated Git metadata copy failed: ' + result.stderr.decode())
-    fs.git(root, 'bundle', 'create', str(runtime / 'base.bundle'), 'HEAD', base)
-    base_bundle_sha256 = fs.digest((runtime / 'base.bundle').read_bytes())
-    retained(root, args.work, 'base-manifest.json', encoded(fs.snapshot(root, base)))
+    base_tree_key = fs.snapshot_key(fs.snapshot(root, base))
+    local_save(root, args.work, 'runtime/base-tree-key', (base_tree_key + '\n').encode())
+    previous_records = {}
+    for name in ('candidate.json', 'delivery.json', 'review.md', 'proof.md'):
+        old = directory / name
+        if old.is_file():
+            data = old.read_bytes()
+            local_save(root, args.work, 'runtime/previous-records/' + name, data)
+            previous_records[name] = fs.digest(data)
     workspace = runtime / 'workspace'
     materialize(workspace, sorted(manifest.values(), key=lambda e:e['path']))
     materialize(workspace, records)
@@ -1142,11 +1462,12 @@ def create(root, args):
     state = {'schema': 'promise-to-proof/delivery/v1', 'policy': POLICY, 'invocation_id': str(uuid.uuid4()),
              'status': 'RUNNING', 'blocker': None, 'work_item': args.work, 'comparison_base': base,
              'contract': agreement, 'requirements': requirements, 'binding_inputs': inputs,
-             'source_manifest': current, 'source_head': head,
+             'source_tree_key': fs.snapshot_key(current), 'source_head': head,
              'source_index_sha256': fs.digest(fs.git(root, 'ls-files', '--stage', '-z')),
              'excluded_dirty': sorted(excluded), 'skills': installed,
              'routing': decision, 'routing_records': records, 'starting_commit': starting,
-             'base_bundle_sha256': base_bundle_sha256,
+             'base_tree_key': base_tree_key,
+             'previous_records': previous_records,
              'destination_observation': destination_observation(root, decision, base),
              'authority': {'local_stages': True, 'external_effects': False},
              'limits': {'dispatches': args.max_dispatches, 'elapsed_seconds': args.max_seconds,
@@ -1161,7 +1482,7 @@ def create(root, args):
                       'elapsed_limit': 'admission and process termination; provider billing may continue',
                       'trust': 'controller and OS trusted; no arbitrary same-user tamper resistance'}}
     delivery = Delivery(root, args.work, state)
-    retained(root, args.work, 'admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_manifest', 'source_head', 'source_index_sha256', 'excluded_dirty', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_bundle_sha256', 'authority', 'limits', 'deadline', 'host')}))
+    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'excluded_dirty', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'previous_records', 'authority', 'limits', 'deadline', 'host')}))
     delivery.save()
     delivery.capture()
     delivery.save()
@@ -1170,7 +1491,7 @@ def create(root, args):
 
 def controller_running(delivery):
     try:
-        with (delivery.directory / 'delivery.lock').open('rb') as lock:
+        with (delivery.local.parent / (delivery.local.name + '.lock')).open('rb') as lock:
             try:
                 fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError:
@@ -1188,7 +1509,7 @@ def result(delivery):
     activity = []
     if attempt:
         for name in ('events.jsonl', 'stderr.txt'):
-            path = delivery.directory / 'attempts' / attempt['id'] / name
+            path = delivery.local / 'attempts' / attempt['id'] / name
             try:
                 activity.append(path.stat().st_mtime)
             except OSError:
@@ -1215,19 +1536,91 @@ def result(delivery):
                              if state['status'] == 'REVIEWED_AND_PROVEN' else None),
         'acceptance_boundary': ('Acceptance applies to the exact candidate against its frozen comparison base. '
                                 'Compatibility with the current destination has not been established by this delivery.'),
-        'progress': progress,
+        'progress': (progress | {'candidate_validation': 'verified durable compact identity'}
+                     if state.get('cleanup_verified_at') else progress),
         'starting_commit': state.get('starting_commit'),
         'candidate': identity(state['candidate']) if state.get('candidate') else None,
-        'reports': state.get('reports', {}), 'attempts': state['attempts'],
+        'candidate_workspace': str(delivery.workspace) if delivery.workspace.exists() else None,
+        'reports': ({'review': {'path': '.p2p/work/' + Path(delivery.work).stem + '/review.md'},
+                     'proof': {'path': '.p2p/work/' + Path(delivery.work).stem + '/proof.md'}}
+                    if state.get('cleanup_verified_at') else state.get('reports', {})),
+        'attempts': [] if state.get('cleanup_verified_at') else state['attempts'],
         'records': str(delivery.directory),
-        'resume': f'python3 {Path(__file__).resolve()} --repo {delivery.root} resume {delivery.work}'}
+        'local_runtime': str(delivery.local) if delivery.local.exists() else None,
+        'resume': f'python3 {Path(__file__).resolve()} --repo {delivery.root} resume {delivery.work}',
+        'cleanup': f'python3 {Path(__file__).resolve()} --repo {delivery.root} cleanup {delivery.work}'}
+
+
+def completed_result(root, work, directory):
+    try:
+        record = json.loads((directory / 'delivery.json').read_text())
+        candidate_path = directory / 'candidate.json'
+        review_path, proof_path = directory / 'review.md', directory / 'proof.md'
+        candidate_bytes = candidate_path.read_bytes()
+        candidate = json.loads(candidate_bytes)
+        review, proof = review_path.read_bytes(), proof_path.read_bytes()
+        if record.get('schema') != 'promise-to-proof/delivery-record/v1' or record.get('status') != 'REVIEWED_AND_PROVEN':
+            raise ValueError('durable completion record is malformed')
+        if (record.get('work_item') != work or record.get('candidate_record_sha256') != fs.digest(candidate_bytes) or
+                record.get('candidate_key') != candidate_key(candidate) or
+                record.get('comparison_base') != candidate.get('comparison_base') or
+                record.get('binding_inputs') != candidate.get('binding_inputs') or
+                record.get('candidate_changes_sha256') != fs.digest(fs.canonical(candidate.get('changes', []))) or
+                record.get('review_sha256') != fs.digest(review) or record.get('proof_sha256') != fs.digest(proof)):
+            raise ValueError('durable completion record identity changed or lost')
+        item, _ = fs.paths(root, work)
+        agreement, _ = contract(root, work)
+        if record.get('contract') != {key: agreement[key] for key in ('source', 'revision', 'sha256')}:
+            raise ValueError('durable completion record contract identity changed or lost')
+        if (candidate.get('work_item') != work or candidate.get('work_item_sha256') != fs.digest(item.read_bytes()) or
+                candidate.get('binding_inputs') != fs.bindings(root, work)):
+            raise ValueError('contract or binding inputs changed since completion')
+        retained = record.get('retained_artifacts', [])
+        expected_retained = []
+        for name, reason in RETAINED_ARTIFACTS.items():
+            path = directory / name
+            if path.is_file() and not path.is_symlink():
+                expected_retained.append({'path': name, 'reason': reason,
+                                          'sha256': fs.digest(path.read_bytes())})
+        if retained != expected_retained:
+            raise ValueError('durable retained-artifact receipts changed or lost')
+        if not record.get('cleanup_verified_at') or record.get('cleanup') != 'source checkout identity verified':
+            raise ValueError('candidate cleanup has not been verified')
+        identity_sha = fs.digest(fs.canonical(fs.tree_identity(fs.snapshot(root))))
+        if identity_sha != record.get('cleanup_source_identity_sha256'):
+            raise ValueError('source checkout changed after cleanup identity verification')
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError) as error:
+        raise ValueError('durable completed delivery unavailable: ' + str(error)) from error
+    return {
+        'status': record['status'], 'blocker': None, 'invocation_id': record['invocation_id'],
+        'work_item': work, 'comparison_base': record['comparison_base'],
+        'candidate': identity(candidate), 'routing': record.get('routing'),
+        'destination_observation': record.get('destination_observation'),
+        'completion_scope': 'Acceptance is for the exact candidate against the frozen comparison base; compatibility with the current destination is not established.',
+        'acceptance_boundary': 'Acceptance applies to the exact candidate against its frozen comparison base. Compatibility with the current destination has not been established by this delivery.',
+        'progress': {'stage': 'complete', 'status': 'complete', 'controller_running': False,
+                     'candidate_validation': 'verified durable compact identity'},
+        'starting_commit': None, 'reports': {'review': {'path': 'review.md', 'sha256': record['review_sha256']},
+                                             'proof': {'path': 'proof.md', 'sha256': record['proof_sha256']}},
+        'attempts': [], 'records': str(directory), 'local_runtime': None, 'candidate_workspace': None,
+        'cleanup': 'already complete',
+        'resume': f'python3 {Path(__file__).resolve()} --repo {root} status {work}',
+    }
+
+
+def completed_without_local_runtime(root, work, directory, local, missing_record):
+    if local.exists():
+        raise ValueError('local runtime exists but its invocation state is missing')
+    if not (directory / 'delivery.json').exists():
+        raise ValueError(missing_record)
+    return completed_result(root, work, directory)
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo', default='.')
     commands = parser.add_subparsers(dest='action', required=True)
-    for name in ('run', 'resume', 'status'):
+    for name in ('run', 'resume', 'status', 'cleanup'):
         child = commands.add_parser(name)
         child.add_argument('work')
         if name == 'run':
@@ -1247,10 +1640,14 @@ def main(argv=None):
     try:
         root = Path(fs.git(Path(args.repo), 'rev-parse', '--show-toplevel').decode().strip()).resolve()
         item, directory = fs.paths(root, args.work)
-        state_path = directory / 'delivery.json'
+        local = local_directory(root, args.work)
+        state_path = local / 'delivery.json'
         if args.action == 'status':
             if not state_path.exists():
-                raise ValueError('no delivery invocation exists')
+                output = completed_without_local_runtime(root, args.work, directory, local,
+                                                          'no delivery invocation exists')
+                print(json.dumps(output, indent=2))
+                return 0
             delivery = Delivery(root, args.work, json.loads(state_path.read_text()))
             delivery.read_only = True
             # A live writer legitimately changes the candidate before its next capture.
@@ -1258,6 +1655,8 @@ def main(argv=None):
             pending = progress['candidate_validation'] == 'pending active implementation or repair'
             if pending:
                 delivery.source_stable()
+            elif delivery.state['status'] == 'REVIEWED_AND_PROVEN':
+                delivery.current()
             else:
                 delivery.current()
             for name in delivery.state.get('reports', {}):
@@ -1267,12 +1666,17 @@ def main(argv=None):
                 output.update(status='RUNNING', blocker=None)
             print(json.dumps(output, indent=2))
             return 0 if output['status'] == 'REVIEWED_AND_PROVEN' else 1
-        directory.mkdir(parents=True, exist_ok=True)
-        lock = (directory / 'delivery.lock').open('a')
+        local.parent.mkdir(parents=True, exist_ok=True)
+        lock = (local.parent / (local.name + '.lock')).open('a')
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             raise ValueError('another controller holds the work-item lock')
+        if args.action == 'cleanup' and not state_path.exists():
+            output = completed_without_local_runtime(root, args.work, directory, local,
+                                                      'no local candidate workspace is available for cleanup')
+            print(json.dumps(output, indent=2))
+            return 0
         if state_path.exists():
             delivery = Delivery(root, args.work, json.loads(state_path.read_text()))
             if args.action == 'run':
@@ -1286,20 +1690,25 @@ def main(argv=None):
                     raise ValueError('run cannot change persisted authority, scope, base or limits; use resume')
         elif args.action == 'resume':
             raise ValueError('missing delivery invocation; no effects can be reconciled')
-        else:
+        elif args.action == 'run':
             if args.max_dispatches < 0 or any(not math.isfinite(value) or value < 0
                                             for value in (args.max_seconds, args.max_stage_seconds)):
                 raise ValueError('resource limits must be finite and nonnegative')
             delivery = create(root, args)
-        if delivery.state['status'] == 'REVIEWED_AND_PROVEN':
-            delivery.complete()
-        else:
+        if args.action == 'cleanup':
+            delivery.cleanup()
+        elif args.action == 'resume' or delivery.state['status'] != 'REVIEWED_AND_PROVEN':
             delivery.run()
         print(json.dumps(result(delivery), indent=2))
         return 0
     except (ValueError, OSError, KeyError, TypeError, UnicodeError, subprocess.SubprocessError) as error:
         message = str(error)
         if delivery:
+            if args.action == 'cleanup' and delivery.state.get('status') == 'REVIEWED_AND_PROVEN':
+                output = result(delivery)
+                output.update(blocker=message, cleanup_status='BLOCKED')
+                print(json.dumps(output, indent=2))
+                return 1
             delivery.state.update(status='BLOCKED', blocker=message)
             if args.action != 'status':
                 try:
