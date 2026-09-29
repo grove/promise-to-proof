@@ -53,19 +53,26 @@ def repo(path):
 
 
 def apply_candidate(root, workspace):
+    records = list((workspace / '.p2p/work').glob('*/candidate.json'))
+    if len(records) != 1:
+        raise AssertionError('expected one captured product candidate')
+    candidate = json.loads(records[0].read_text())
+    entries = {entry['path']: entry for entry in d.fs.snapshot(workspace)}
     current = {entry['path']: entry for entry in d.fs.snapshot(root)}
-    candidate = {entry['path']: entry for entry in d.fs.snapshot(workspace)}
-    for path in current.keys() - candidate.keys():
+    for change in candidate['changes']:
+        path = change['path']
         target = root / path
-        if target.is_symlink() or target.is_file():
-            target.unlink()
-    for path, entry in candidate.items():
-        if current.get(path) == entry:
-            continue
-        target = root / path
-        if target.is_symlink() or target.is_file():
-            target.unlink()
-        d.materialize(root, [entry])
+        if change['state'] == 'deleted':
+            if target.is_symlink() or target.is_file():
+                target.unlink()
+            current.pop(path, None)
+        else:
+            entry = entries[path]
+            if current.get(path) != entry:
+                if target.is_symlink() or target.is_file():
+                    target.unlink()
+                d.materialize(root, [entry])
+            current[path] = entry
 
 
 def p2p_metrics(root, tree, slug):
@@ -258,7 +265,11 @@ class DeliveryTests(unittest.TestCase):
         apply_candidate(self.root, d.local_directory(self.root, 'work/tiny.md') / 'runtime/workspace')
         code, cleaned = self.cli('cleanup')
         self.assertEqual(code, 0, cleaned)
-        self.assertFalse((d.local_directory(self.root, 'work/tiny.md')).exists())
+        local = d.local_directory(self.root, 'work/tiny.md')
+        self.assertFalse((local / 'runtime').exists())
+        self.assertFalse((local / 'attempts').exists())
+        self.assertFalse((local / 'delivery.json').exists())
+        self.assertTrue((d.delivery_paths(self.root, 'work/tiny.md')[1] / 'delivery.json').is_file())
         return cleaned
 
     def run_without_destination(self):
@@ -268,6 +279,127 @@ class DeliveryTests(unittest.TestCase):
         with contextlib.redirect_stdout(output):
             code = d.main(args)
         return code, json.loads(output.getvalue())
+
+    def test_migration_guidance_covers_legacy_state_without_history_rewrite(self):
+        guide = (Path(__file__).resolve().parents[1] / 'docs/p2p-state-migration.md').read_text()
+        for promised in ("`.p2p/**`", "P2P-owned", "equivalent P2P records",
+                         "git rm", "without rewriting", "project-owned paths"):
+            self.assertIn(promised, guide)
+
+        legacy = self.root
+        (legacy / '.p2p/work/legacy').mkdir(parents=True)
+        (legacy / '.p2p/work/legacy/candidate.json').write_text('{"legacy":true}\n')
+        (legacy / 'work/legacy.md').write_text('P2P contract\n')
+        (legacy / 'work/project-plan.md').write_text('Project-authored plan\n')
+        (legacy / 'p2p-state.json').write_text('{"legacy":true}\n')
+        d.fs.git(legacy, 'add', '--', '.p2p/work/legacy/candidate.json',
+                 'work/legacy.md', 'work/project-plan.md', 'p2p-state.json')
+        d.fs.git(legacy, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost',
+                 'commit', '-qm', 'Add legacy P2P state')
+        old_head = d.fs.full_commit(legacy, 'HEAD')
+
+        backup = Path(self.temp.name) / 'local-backup'
+        for relative in ('.p2p/work/legacy', 'work/legacy.md', 'p2p-state.json'):
+            source, target = legacy / relative, backup / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if source.is_dir():
+                shutil.copytree(source, target, symlinks=True)
+            else:
+                shutil.copy2(source, target, follow_symlinks=False)
+        d.fs.git(legacy, 'rm', '-r', '--', '.p2p/work/legacy', 'work/legacy.md', 'p2p-state.json')
+        d.fs.git(legacy, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost',
+                 'commit', '-qm', 'Move P2P state out of the current tree')
+
+        new_head = d.fs.full_commit(legacy, 'HEAD')
+        self.assertNotEqual(old_head, new_head)
+        self.assertEqual(d.fs.git(legacy, 'rev-parse', 'HEAD^').decode().strip(), old_head)
+        self.assertEqual(set(d.fs.git(legacy, 'ls-files').decode().splitlines()),
+                         {'spec.txt', '.gitignore', 'work/project-plan.md'})
+        self.assertTrue((backup / '.p2p/work/legacy/candidate.json').is_file())
+        self.assertEqual((backup / 'work/legacy.md').read_text(), 'P2P contract\n')
+        self.assertTrue((backup / 'p2p-state.json').is_file())
+        self.assertEqual(d.fs.git(legacy, 'cat-file', '-e', old_head + ':.p2p/work/legacy/candidate.json'), b'')
+        self.assertEqual(d.fs.git(legacy, 'cat-file', '-e', old_head + ':work/legacy.md'), b'')
+
+    def test_clean_project_delivery_uses_local_contract_and_records(self):
+        root = Path(self.temp.name) / 'clean'
+        root.mkdir()
+        d.fs.git(root, 'init', '-q')
+        d.fs.git(root, 'config', 'user.name', 'Fixture')
+        d.fs.git(root, 'config', 'user.email', 'fixture@localhost')
+        (root / 'spec.txt').write_text('A CLI prints hello followed by a newline and exits zero.\n')
+        d.fs.git(root, 'add', 'spec.txt')
+        d.fs.git(root, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost',
+                 'commit', '-qm', 'Clean project base')
+        base = d.fs.full_commit(root, 'HEAD')
+        d.fs.git(root, 'branch', 'delivery-target', base)
+        agreement = d.agreement_root(root, 'work/tiny.md')
+        (agreement / 'work').mkdir(parents=True)
+        source = agreement / 'work/tiny-source.md'
+        source.write_text('Imported issue source text.\n')
+        contract = CONTRACT.replace('Source: [Specification](../spec.txt)',
+                                    'Source: [Imported issue #46](tiny-source.md)')
+        (agreement / 'work/tiny.md').write_text(contract)
+        (agreement / 'spec.txt').write_text((root / 'spec.txt').read_text())
+
+        code, value = self.run_root(root, 'work/tiny.md', base)
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['status'], 'REVIEWED_AND_PROVEN')
+        local = d.local_directory(root, 'work/tiny.md')
+        apply_candidate(root, local / 'runtime/workspace')
+        d.fs.git(root, 'add', '--', 'greet.py')
+        d.fs.git(root, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost',
+                 'commit', '-qm', 'Apply product candidate')
+        code, cleaned = self.run_root(root, 'work/tiny.md', base, 'cleanup')
+        self.assertEqual(code, 0, cleaned)
+        self.assertEqual(cleaned['status'], 'REVIEWED_AND_PROVEN')
+        self.assertFalse((local / 'runtime').exists())
+        self.assertFalse((local / 'delivery.json').exists())
+        self.assertFalse((root / 'work').exists())
+        self.assertFalse((root / 'specs').exists())
+        self.assertFalse((root / '.p2p').exists())
+        self.assertEqual([item['path'] for item in value['candidate']['changes']], ['greet.py'])
+        tree = d.fs.git(root, 'ls-tree', '-r', '--name-only', 'HEAD').decode().splitlines()
+        self.assertEqual(set(tree), {'spec.txt', 'greet.py'})
+        self.assertEqual(d.fs.git(root, 'diff', '--name-only', base, 'HEAD').decode().splitlines(), ['greet.py'])
+        artifacts = d.delivery_paths(root, 'work/tiny.md')[1]
+        candidate_path, delivery_path = artifacts / 'candidate.json', artifacts / 'delivery.json'
+        review_path, proof_path = artifacts / 'review.md', artifacts / 'proof.md'
+        candidate = json.loads(candidate_path.read_text())
+        delivery = json.loads(delivery_path.read_text())
+        contract_sha = d.fs.digest((agreement / 'work/tiny.md').read_bytes())
+        self.assertEqual(delivery['contract']['sha256'], contract_sha)
+        self.assertEqual(delivery['comparison_base'], base)
+        self.assertEqual(delivery['candidate_key'], candidate['key'])
+        for report_path in (review_path, proof_path):
+            report = report_path.read_text()
+            self.assertIn(contract_sha, report)
+            self.assertIn(base, report)
+            self.assertIn(candidate['key'], report)
+        self.assertEqual(delivery['review_sha256'], d.fs.digest(review_path.read_bytes()))
+        self.assertEqual(delivery['proof_sha256'], d.fs.digest(proof_path.read_bytes()))
+        self.assertEqual(sorted(path.name for path in artifacts.iterdir()),
+                         ['candidate.json', 'delivery.json', 'proof.md', 'review.md'])
+        self.assertTrue((agreement / 'work/tiny.md').is_file())
+        self.assertTrue(source.is_file())
+
+    def test_final_footprint_counts_replaced_record_size(self):
+        artifacts = d.delivery_paths(self.root, 'work/tiny.md')[1]
+        artifacts.mkdir(parents=True)
+        (artifacts / 'candidate.json').write_bytes(b'old')
+        with self.assertRaisesRegex(ValueError, 'local P2P footprint exceeds limits'):
+            d.check_final_footprint(self.root, 'work/tiny.md', {'candidate.json': b'x' * 262145})
+
+    def test_symlinked_local_storage_roots_block_reads_and_writes(self):
+        local = d.local_directory(self.root, 'work/tiny.md')
+        local.mkdir(parents=True)
+        outside = Path(self.temp.name) / 'outside'
+        outside.mkdir()
+        for name in ('agreement', 'artifacts'):
+            (local / name).symlink_to(outside, target_is_directory=True)
+            with self.assertRaisesRegex(ValueError, 'user-local P2P ' + name):
+                d.delivery_paths(self.root, 'work/tiny.md')
+            (local / name).unlink()
 
     def test_unsliced_admission_requires_explicit_or_unambiguous_upstream(self):
         code, value = self.run_without_destination()
@@ -883,15 +1015,16 @@ Pending actions: none.
         cleaned = self.complete_and_cleanup()
         self.assertEqual(cleaned['status'], 'REVIEWED_AND_PROVEN')
         self.assertEqual(cleaned['progress']['candidate_validation'], 'verified durable compact identity')
-        records = sorted(path.name for path in (self.root / '.p2p/work/tiny').iterdir())
+        artifact = d.delivery_paths(self.root, 'work/tiny.md')[1]
+        records = sorted(path.name for path in artifact.iterdir())
         self.assertEqual(records, ['candidate.json', 'delivery.json', 'proof.md', 'review.md'])
         self.assertFalse(any('experience' in path.name or 'transcript' in path.name
-                             for path in (self.root / '.p2p/work/tiny').rglob('*')))
+                             for path in artifact.rglob('*')))
         self.assertEqual(self.cli('status')[0], 0)
 
     def test_completed_identity_record_survives_local_cleanup(self):
         self.complete_and_cleanup()
-        directory = self.root / '.p2p/work/tiny'
+        directory = d.delivery_paths(self.root, 'work/tiny.md')[1]
         candidate = json.loads((directory / 'candidate.json').read_bytes())
         delivery = json.loads((directory / 'delivery.json').read_bytes())
         review = (directory / 'review.md').read_text()
@@ -908,9 +1041,109 @@ Pending actions: none.
         self.assertIn('Assertion: stdout equals hello newline and status zero', proof)
         self.assertIn('Observation: fixture output hello newline, status zero', proof)
 
+    def test_issue_record_requires_preview_bound_write_and_fresh_status(self):
+        source_body = 'Issue request body captured for the accepted contract.\n'
+        (self.root / 'work/tiny-source.md').write_text(source_body)
+        contract = CONTRACT.replace('Source: [Specification](../spec.txt)',
+            'Source: [Imported issue #46](tiny-source.md)\n'
+            'Source attribution: https://github.com/grove/promise-to-proof/issues/46; captured fixture source. ')
+        (self.root / 'work/tiny.md').write_text(contract)
+
+        code, value = self.cli()
+        self.assertEqual(code, 0, value)
+        local = d.local_directory(self.root, 'work/tiny.md')
+        apply_candidate(self.root, local / 'runtime/workspace')
+        d.fs.git(self.root, 'add', '--', 'greet.py')
+        d.fs.git(self.root, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost',
+                 'commit', '-qm', 'Deliver accepted product candidate')
+        commit = d.fs.full_commit(self.root, 'HEAD')
+
+        code, blocked = self.cli('cleanup')
+        self.assertEqual(code, 1)
+        self.assertIn('requires a verified durable GitHub record', blocked['blocker'])
+        self.assertTrue((local / 'runtime').is_dir())
+
+        code, preview = self.cli_item('work/tiny.md', 'github-record-preview',
+                                      '--delivered-commit', commit)
+        self.assertEqual(code, 0, preview)
+        self.assertEqual(preview['sha256'], d.fs.digest(preview['body'].encode()))
+        self.assertIn(d.fs.digest(source_body.encode()), preview['body'])
+        self.assertIn(d.fs.digest(contract.encode()), preview['body'])
+
+        with patch.object(d, 'github_issue') as issue_read, \
+             patch.object(d, 'github_comments') as comment_read, \
+             patch.object(d, 'github_create_comment') as comment_write:
+            code, denied = self.cli_item('work/tiny.md', 'github-record-publish',
+                '--delivered-commit', commit, '--authorize-comment-sha256', '0' * 64)
+        self.assertEqual(code, 1)
+        self.assertIn('publication authorization does not match preview', denied['blocker'])
+        issue_read.assert_not_called(); comment_read.assert_not_called(); comment_write.assert_not_called()
+        self.assertEqual(self.state()['status'], 'REVIEWED_AND_PROVEN')
+
+        comments = []
+        def create_comment(repository, issue, body):
+            comments.append({'body': body, 'html_url': 'https://github.com/grove/promise-to-proof/issues/46#issuecomment-1'})
+            raise ValueError('fixture lost the write response')
+        with patch.object(d, 'github_issue', return_value={'body': source_body, 'title': 'Issue 46'}), \
+             patch.object(d, 'github_comments', side_effect=lambda *args: list(comments)), \
+             patch.object(d, 'github_create_comment', side_effect=create_comment) as comment_write:
+            code, published = self.cli_item('work/tiny.md', 'github-record-publish',
+                '--delivered-commit', commit, '--authorize-comment-sha256', preview['sha256'])
+        self.assertEqual(code, 0, published)
+        self.assertEqual(comment_write.call_count, 1)
+        self.assertEqual(published['status'], 'RECORDED')
+        self.assertEqual(self.state()['github_record']['body_sha256'], preview['sha256'])
+
+        with patch.object(d, 'github_issue', return_value={'body': source_body, 'title': 'Issue 46'}), \
+             patch.object(d, 'github_comments', side_effect=lambda *args: list(comments)), \
+             patch.object(d, 'github_create_comment') as retry_write:
+            code, retried = self.cli_item('work/tiny.md', 'github-record-publish',
+                '--delivered-commit', commit, '--authorize-comment-sha256', preview['sha256'])
+        self.assertEqual(code, 0, retried)
+        retry_write.assert_not_called()
+        self.assertEqual(len(comments), 1)
+
+        changed_comments = [{'body': comments[0]['body'] + '\nchanged', 'html_url': comments[0]['html_url']}]
+        with patch.object(d, 'github_issue', return_value={'body': source_body}), \
+             patch.object(d, 'github_comments', return_value=changed_comments):
+            code, changed = self.cli('cleanup')
+        self.assertEqual(code, 1)
+        self.assertIn('readback changed before cleanup', changed['blocker'])
+        self.assertTrue((local / 'runtime').is_dir())
+        self.assertFalse((d.delivery_paths(self.root, 'work/tiny.md')[1] / 'delivery.json').exists())
+
+        with patch.object(d, 'github_issue', return_value={'body': source_body, 'title': 'Issue 46'}), \
+             patch.object(d, 'github_comments', side_effect=lambda *args: list(comments)):
+            code, cleaned = self.cli('cleanup')
+        self.assertEqual(code, 0, cleaned)
+        self.assertFalse((local / 'runtime').exists())
+        self.assertFalse((local / 'attempts').exists())
+        self.assertFalse((local / 'delivery.json').exists())
+
+        args = ['--repo', str(self.root), 'github-status', '--repository', 'grove/promise-to-proof', '--issue', '46']
+        output = io.StringIO()
+        with patch.object(d, 'github_issue', return_value={'body': source_body, 'title': 'Issue 46'}), \
+             patch.object(d, 'github_comments', return_value=comments):
+            with contextlib.redirect_stdout(output): status_code = d.main(args)
+        status = json.loads(output.getvalue())
+        self.assertEqual(status_code, 0, status)
+        preview_record = json.loads(preview['body'].split('```json\n', 1)[1].rsplit('\n```', 1)[0])
+        self.assertEqual(status['status'], 'REVIEWED_AND_PROVEN')
+        self.assertEqual(status['contract']['text'], contract)
+        self.assertEqual(status['delivered_commit'], commit)
+        self.assertEqual(status['candidate_key'], preview_record['candidate_key'])
+
+        with patch.object(d, 'github_issue', return_value={'body': source_body}), \
+             patch.object(d, 'github_comments', return_value=comments * 2):
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output): duplicate_code = d.main(args)
+        duplicate = json.loads(output.getvalue())
+        self.assertEqual(duplicate_code, 1)
+        self.assertIn('exactly one durable delivery record', duplicate['blocker'])
+
     def test_review_report_remains_evidence_backed_after_runtime_cleanup(self):
         self.complete_and_cleanup()
-        directory = self.root / '.p2p/work/tiny'
+        directory = d.delivery_paths(self.root, 'work/tiny.md')[1]
         review = (directory / 'review.md').read_text()
         self.assertIn('## Contract fidelity', review)
         self.assertIn('python3 greet.py', review)
@@ -918,21 +1151,21 @@ Pending actions: none.
 
     def test_proof_report_remains_evidence_backed_after_runtime_cleanup(self):
         self.complete_and_cleanup()
-        proof = (self.root / '.p2p/work/tiny/proof.md').read_text()
+        proof = (d.delivery_paths(self.root, 'work/tiny.md')[1] / 'proof.md').read_text()
         self.assertIn('## Requirement verdicts', proof)
         self.assertIn('### R1: proven', proof)
         self.assertIn('## Proof details', proof)
-        self.assertFalse((d.local_directory(self.root, 'work/tiny.md')).exists())
+        self.assertFalse((d.local_directory(self.root, 'work/tiny.md') / 'runtime').exists())
 
     def test_footprint_metrics_tiny_delivery(self):
-        before = d.fs.git(self.root, 'rev-parse', self.base + '^{tree}').decode().strip()
+        before = d.fs.git(self.root, 'write-tree').decode().strip()
         before_metrics = p2p_metrics(self.root, before, 'tiny')
         self.assertEqual((before_metrics['files'], before_metrics['bytes']), (0, 0))
         self.complete_and_cleanup()
-        d.fs.git(self.root, 'add', '--', '.p2p/work/tiny')
         after = d.fs.git(self.root, 'write-tree').decode().strip()
         metrics = p2p_metrics(self.root, after, 'tiny')
-        self.assertEqual(metrics['files'], 4)
+        self.assertEqual(after, before)
+        self.assertEqual(metrics['files'], 0)
         self.assertGreater(metrics['bytes'], 0)
         self.assertLessEqual(metrics['files'], 6)
         self.assertLessEqual(metrics['bytes'], 65536)
@@ -940,39 +1173,34 @@ Pending actions: none.
 
     def test_steady_state_footprint_ceiling(self):
         self.complete_and_cleanup()
-        d.fs.git(self.root, 'add', '--', '.p2p/work/tiny')
         tree = d.fs.git(self.root, 'write-tree').decode().strip()
         metrics = p2p_metrics(self.root, tree, 'tiny')
-        self.assertEqual([path.rsplit('/', 1)[-1] for path, _ in metrics['paths']],
+        self.assertEqual(metrics['files'], 0)
+        artifact = d.delivery_paths(self.root, 'work/tiny.md')[1]
+        self.assertEqual(sorted(path.name for path in artifact.iterdir()),
                          ['candidate.json', 'delivery.json', 'proof.md', 'review.md'])
-        self.assertLessEqual(metrics['files'], 6)
-        self.assertLessEqual(metrics['bytes'], 65536)
 
     def test_cleanup_blocks_over_limit_durable_artifacts(self):
         self.assertEqual(self.cli()[0], 0)
         workspace = d.local_directory(self.root, 'work/tiny.md') / 'runtime/workspace'
         apply_candidate(self.root, workspace)
-        artifact = self.root / '.p2p/work/tiny'
+        artifact = d.delivery_paths(self.root, 'work/tiny.md')[1]
         artifact.mkdir(parents=True, exist_ok=True)
-        extras = [artifact / f'extra-{index}.md' for index in range(3)]
-        for path in extras:
-            path.write_text('unrelated retained note\n')
+        extra = artifact / 'archive.md'
+        extra.write_bytes(b'x' * 262145)
         code, value = self.cli('cleanup')
         self.assertEqual(code, 1)
-        self.assertIn('durable P2P footprint would exceed limits: 7 files', value['blocker'])
+        self.assertIn('local P2P footprint exceeds limits', value['blocker'])
         self.assertTrue(workspace.is_dir())
         self.assertFalse((artifact / 'candidate.json').exists())
-        for path in extras:
-            path.unlink()
+        extra.unlink()
         self.assertEqual(self.cli('cleanup')[0], 0)
 
     def test_cleanup_compacts_superseded_records_and_keeps_receipts(self):
-        artifact = self.root / '.p2p/work/tiny'
-        (artifact / 'history/old').mkdir(parents=True)
+        artifact = d.delivery_paths(self.root, 'work/tiny.md')[1]
+        artifact.mkdir(parents=True)
         (artifact / 'implementation.md').write_text('old implementation report\n')
         (artifact / 'repair.md').write_text('old repair report\n')
-        for name in ('candidate.json', 'implementation.md', 'repair.md', 'review.md', 'proof.md'):
-            (artifact / 'history/old' / name).write_text('superseded ' + name + '\n')
         support = {'planning-handoff.md': 'approved contract receipt\n',
                    'archive.md': 'historical recovery map\n'}
         for name, content in support.items():
@@ -992,9 +1220,7 @@ Pending actions: none.
         self.assertEqual(code, 1)
         local = d.local_directory(self.root, 'work/tiny.md') / 'runtime/superseded-records'
         self.assertEqual((local / 'implementation.md').read_text(), 'old implementation report\n')
-        self.assertEqual((local / 'history/old/review.md').read_text(), 'superseded review.md\n')
         self.assertTrue((artifact / 'implementation.md').is_file())
-        self.assertTrue((artifact / 'history/old/review.md').is_file())
 
         code, value = self.cli('cleanup')
 
@@ -1006,14 +1232,13 @@ Pending actions: none.
         self.assertEqual({item['path']: item['reason'] for item in delivery['retained_artifacts']}, {
             'archive.md': 'Historical recovery map.',
             'planning-handoff.md': 'Approval and contract provenance.'})
-        d.fs.git(self.root, 'add', '--', '.p2p/work/tiny')
         metrics = p2p_metrics(self.root, d.fs.git(self.root, 'write-tree').decode().strip(), 'tiny')
-        self.assertEqual(metrics['files'], 6)
+        self.assertEqual(metrics['files'], 0)
         self.assertLessEqual(metrics['bytes'], 65536)
-        self.assertFalse((d.local_directory(self.root, 'work/tiny.md')).exists())
+        self.assertFalse((d.local_directory(self.root, 'work/tiny.md') / 'runtime').exists())
 
     def test_cleanup_preserves_uncommitted_final_records_until_readback(self):
-        artifact = self.root / '.p2p/work/tiny'
+        artifact = d.delivery_paths(self.root, 'work/tiny.md')[1]
         artifact.mkdir(parents=True)
         previous = {'candidate.json': b'{"work_item":"work/tiny.md","note":"old candidate"}\n',
                     'review.md': b'old review\n',
@@ -1033,14 +1258,14 @@ Pending actions: none.
 
         self.assertEqual(code, 1)
         self.assertIn('fixture interruption after final record readback', value['blocker'])
-        recovery = d.local_directory(self.root, 'work/tiny.md') / 'runtime/superseded-records'
+        recovery = d.local_directory(self.root, 'work/tiny.md') / 'runtime/previous-records'
         for name, data in previous.items():
             self.assertEqual((recovery / name).read_bytes(), data)
             self.assertNotEqual((artifact / name).read_bytes(), data)
 
         code, value = self.cli('cleanup')
         self.assertEqual(code, 0, value)
-        self.assertFalse((d.local_directory(self.root, 'work/tiny.md')).exists())
+        self.assertFalse((d.local_directory(self.root, 'work/tiny.md') / 'runtime').exists())
         self.assertTrue(all((artifact / name).is_file() for name in previous))
 
     def test_cleanup_retry_rechecks_durable_records_before_deleting_recovery(self):
@@ -1054,7 +1279,7 @@ Pending actions: none.
         self.assertEqual(blocked['cleanup_status'], 'BLOCKED')
         self.assertTrue(local.is_dir())
 
-        review = self.root / '.p2p/work/tiny/review.md'
+        review = d.delivery_paths(self.root, 'work/tiny.md')[1] / 'review.md'
         original = review.read_bytes()
         review.unlink()
         dispatches = len(self.fake.calls)
@@ -1067,9 +1292,9 @@ Pending actions: none.
 
         review.write_bytes(original)
         self.assertEqual(self.cli('cleanup')[0], 0)
-        self.assertFalse(local.exists())
+        self.assertFalse((local / 'runtime').exists())
 
-    def test_cleanup_blocks_staged_artifacts_missing_from_worktree(self):
+    def test_cleanup_preserves_staged_legacy_paths(self):
         self.assertEqual(self.cli()[0], 0)
         workspace = d.local_directory(self.root, 'work/tiny.md') / 'runtime/workspace'
         apply_candidate(self.root, workspace)
@@ -1079,17 +1304,16 @@ Pending actions: none.
         d.fs.git(self.root, 'add', '--', str(staged.relative_to(self.root)))
         staged.unlink()
 
+        index_before = d.fs.git(self.root, 'ls-files', '--stage', '-z')
         code, value = self.cli('cleanup')
-        self.assertEqual(code, 1)
-        self.assertIn('unclassified staged P2P artifact blocks cleanup', value['blocker'])
-        self.assertIn('staged-extra.md', value['blocker'])
-        self.assertTrue(workspace.is_dir())
-        self.assertFalse((staged.parent / 'candidate.json').exists())
+        self.assertEqual(code, 0, value)
+        self.assertFalse(workspace.exists())
+        self.assertEqual(d.fs.git(self.root, 'ls-files', '--stage', '-z'), index_before)
+        self.assertFalse(staged.exists())
 
         d.fs.git(self.root, 'reset', '-q', 'HEAD', '--', str(staged.relative_to(self.root)))
-        self.assertEqual(self.cli('cleanup')[0], 0)
 
-    def test_cleanup_blocks_small_staged_only_artifact(self):
+    def test_cleanup_preserves_small_staged_only_artifact(self):
         self.assertEqual(self.cli()[0], 0)
         workspace = d.local_directory(self.root, 'work/tiny.md') / 'runtime/workspace'
         apply_candidate(self.root, workspace)
@@ -1102,18 +1326,14 @@ Pending actions: none.
         index_before = d.fs.git(self.root, 'ls-files', '--stage', '-z')
 
         code, value = self.cli('cleanup')
-
-        self.assertEqual(code, 1)
-        self.assertIn('unclassified staged P2P artifact blocks cleanup', value['blocker'])
-        self.assertIn('staged-only.blob', value['blocker'])
-        self.assertTrue(workspace.is_dir())
-        self.assertFalse((artifact / 'candidate.json').exists())
+        self.assertEqual(code, 0, value)
+        self.assertFalse(workspace.exists())
         self.assertEqual(d.fs.git(self.root, 'ls-files', '--stage', '-z'), index_before)
 
         d.fs.git(self.root, 'reset', '-q', 'HEAD', '--', str(staged.relative_to(self.root)))
         self.assertEqual(self.cli('cleanup')[0], 0)
 
-    def test_cleanup_blocks_stale_staged_final_reports(self):
+    def test_cleanup_preserves_stale_staged_final_reports(self):
         self.assertEqual(self.cli()[0], 0)
         local = d.local_directory(self.root, 'work/tiny.md')
         workspace = local / 'runtime/workspace'
@@ -1128,26 +1348,21 @@ Pending actions: none.
         index_before = d.fs.git(self.root, 'ls-files', '--stage', '-z')
 
         code, value = self.cli('cleanup')
-
-        self.assertEqual(code, 1)
-        self.assertIn('staged P2P artifact differs from final cleanup record', value['blocker'])
-        self.assertTrue(any(name in value['blocker'] for name in stale))
-        self.assertTrue(workspace.is_dir())
-        self.assertEqual({name: (artifact / name).read_bytes() for name in stale}, stale)
-        self.assertFalse((artifact / 'candidate.json').exists())
-        self.assertTrue(local.is_dir())
+        self.assertEqual(code, 0, value)
+        self.assertFalse(workspace.exists())
         self.assertEqual(d.fs.git(self.root, 'ls-files', '--stage', '-z'), index_before)
+        self.assertEqual({name: (artifact / name).read_bytes() for name in stale}, stale)
 
         d.fs.git(self.root, 'reset', '-q', 'HEAD', '--', *paths)
         for name in stale:
             (artifact / name).unlink()
-        self.assertEqual(self.cli('cleanup')[0], 0)
-        self.assertFalse(local.exists())
+        self.assertEqual(self.cli('status')[0], 0)
+        self.assertFalse((local / 'runtime').exists())
 
-    def test_cleanup_blocks_unknown_committed_index_artifact_missing_from_worktree(self):
-        artifact = self.root / '.p2p/work/tiny'
-        artifact.mkdir(parents=True)
-        extra = artifact / 'old-extra.md'
+    def test_cleanup_preserves_committed_legacy_artifact(self):
+        legacy = self.root / '.p2p/work/tiny'
+        legacy.mkdir(parents=True)
+        extra = legacy / 'old-extra.md'
         extra.write_text('committed but unclassified\n')
         d.fs.git(self.root, 'add', '--', str(extra.relative_to(self.root)))
         d.fs.git(self.root, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost',
@@ -1163,11 +1378,8 @@ Pending actions: none.
         index_before = d.fs.git(self.root, 'ls-files', '--stage', '-z')
 
         code, value = self.cli('cleanup')
-
-        self.assertEqual(code, 1)
-        self.assertIn('unclassified indexed P2P artifact blocks cleanup', value['blocker'])
-        self.assertIn('old-extra.md', value['blocker'])
-        self.assertTrue(workspace.is_dir())
+        self.assertEqual(code, 0, value)
+        self.assertFalse(workspace.exists())
         self.assertFalse(extra.exists())
         self.assertEqual(d.fs.git(self.root, 'ls-files', '--stage', '-z'), index_before)
 
@@ -1175,28 +1387,28 @@ Pending actions: none.
         self.complete_and_cleanup()
         local = d.local_directory(self.root, 'work/tiny.md')
         (local / 'runtime/workspace').mkdir(parents=True)
-        durable_record = (self.root / '.p2p/work/tiny/delivery.json').read_bytes()
+        durable_record = (d.delivery_paths(self.root, 'work/tiny.md')[1] / 'delivery.json').read_bytes()
         dispatches = len(self.fake.calls)
 
         for action in ('status', 'cleanup'):
             code, value = self.cli(action)
             self.assertEqual(code, 1, value)
-            self.assertIn('local runtime exists but its invocation state is missing', value['blocker'])
+            self.assertIn('local execution state exists but its invocation record is missing', value['blocker'])
             self.assertTrue((local / 'runtime/workspace').is_dir())
-            self.assertEqual((self.root / '.p2p/work/tiny/delivery.json').read_bytes(), durable_record)
+            self.assertEqual((d.delivery_paths(self.root, 'work/tiny.md')[1] / 'delivery.json').read_bytes(), durable_record)
         code, value = self.cli('resume')
         self.assertEqual(code, 1, value)
         self.assertIn('missing delivery invocation; no effects can be reconciled', value['blocker'])
         self.assertEqual(len(self.fake.calls), dispatches)
 
     def test_cleanup_replaces_clean_head_stale_final_records(self):
-        artifact = self.root / '.p2p/work/tiny'
-        artifact.mkdir(parents=True)
+        legacy = self.root / '.p2p/work/tiny'
+        legacy.mkdir(parents=True)
         stale = {'candidate.json': b'{"work_item":"work/tiny.md","note":"old candidate"}\n',
                  'delivery.json': b'{"status":"REVIEWED_AND_PROVEN","note":"old delivery"}\n',
                  'review.md': b'committed stale review\n', 'proof.md': b'committed stale proof\n'}
         for name, data in stale.items():
-            (artifact / name).write_bytes(data)
+            (legacy / name).write_bytes(data)
         paths = [f'.p2p/work/tiny/{name}' for name in stale]
         d.fs.git(self.root, 'add', '--', *paths)
         d.fs.git(self.root, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost',
@@ -1213,12 +1425,13 @@ Pending actions: none.
         code, value = self.cli('cleanup')
 
         self.assertEqual(code, 0, value)
-        self.assertFalse(local.exists())
+        self.assertFalse((local / 'runtime').exists())
         self.assertEqual(d.fs.git(self.root, 'ls-files', '--stage', '-z'), index_before)
+        artifact = d.delivery_paths(self.root, 'work/tiny.md')[1]
         self.assertEqual(sorted(path.name for path in artifact.iterdir()),
                          ['candidate.json', 'delivery.json', 'proof.md', 'review.md'])
         for name, data in stale.items():
-            self.assertNotEqual((artifact / name).read_bytes(), data)
+            self.assertEqual((legacy / name).read_bytes(), data)
             self.assertEqual(d.fs.git(self.root, 'show', 'HEAD:' + f'.p2p/work/tiny/{name}'), data)
         candidate = json.loads((artifact / 'candidate.json').read_bytes())
         delivery = json.loads((artifact / 'delivery.json').read_bytes())
@@ -1226,11 +1439,11 @@ Pending actions: none.
         self.assertEqual(delivery['candidate_key'], candidate['key'])
         self.assertIn(candidate['key'], (artifact / 'review.md').read_text())
         self.assertIn(candidate['key'], (artifact / 'proof.md').read_text())
-        self.assertLessEqual(sum(path.stat().st_size for path in artifact.iterdir()), 65536)
+        self.assertLessEqual(sum(path.stat().st_size for path in artifact.iterdir()), 262144)
         for name, data in stale.items():
             self.assertEqual(d.fs.git(self.root, 'show', ':' + f'.p2p/work/tiny/{name}'), data)
 
-    def test_cleanup_allows_staged_final_records_with_exact_bytes_and_modes(self):
+    def test_cleanup_preserves_staged_legacy_final_records(self):
         self.assertEqual(self.cli()[0], 0)
         local = d.local_directory(self.root, 'work/tiny.md')
         workspace = local / 'runtime/workspace'
@@ -1240,15 +1453,21 @@ Pending actions: none.
         self.assertEqual(code, 1)
         self.assertTrue(local.is_dir())
 
+        legacy = self.root / '.p2p/work/tiny'
+        legacy.mkdir(parents=True)
         records = [f'.p2p/work/tiny/{name}' for name in
                    ('candidate.json', 'delivery.json', 'review.md', 'proof.md')]
+        for relative in records:
+            (self.root / relative).write_text('legacy project record\n')
         d.fs.git(self.root, 'add', '--', *records)
         index_before = d.fs.git(self.root, 'ls-files', '--stage', '-z')
         code, value = self.cli('cleanup')
 
         self.assertEqual(code, 0, value)
         self.assertEqual(d.fs.git(self.root, 'ls-files', '--stage', '-z'), index_before)
-        self.assertFalse(local.exists())
+        self.assertFalse((local / 'runtime').exists())
+        self.assertTrue(all((self.root / relative).read_text() == 'legacy project record\n'
+                            for relative in records))
 
     def test_cleanup_rechecks_source_after_final_records_are_written(self):
         self.assertEqual(self.cli()[0], 0)
@@ -1267,11 +1486,11 @@ Pending actions: none.
         self.assertEqual(code, 1)
         self.assertIn('source checkout changed during cleanup finalization', value['blocker'])
         self.assertTrue(workspace.is_dir())
-        self.assertTrue((self.root / '.p2p/work/tiny/candidate.json').is_file())
+        self.assertTrue((d.delivery_paths(self.root, 'work/tiny.md')[1] / 'candidate.json').is_file())
 
         spec.write_bytes(accepted)
         self.assertEqual(self.cli('cleanup')[0], 0)
-        self.assertFalse((d.local_directory(self.root, 'work/tiny.md')).exists())
+        self.assertFalse((d.local_directory(self.root, 'work/tiny.md') / 'runtime').exists())
 
     def test_incomplete_run_preserves_local_recovery_artifacts(self):
         for mode in ('blocked', 'uncertain', 'interrupted'):

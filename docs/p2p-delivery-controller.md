@@ -39,6 +39,38 @@ receipts, blocks on unclassified or staged extras, and removes the ignored
 workspace only after another final-record readback. A mismatch keeps the
 workspace. Cleanup does not apply, commit, publish, or merge code.
 
+## Record an issue-backed delivery
+
+For a contract imported from one GitHub issue, apply and commit the accepted
+product candidate first. Preview the compact issue comment using the full
+delivered commit SHA:
+
+```sh
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source github-record-preview work/example.md --delivered-commit FULL_SHA
+```
+
+The JSON output contains the exact comment body and its SHA-256. Publication
+requires an explicit grant for that preview hash:
+
+```sh
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source github-record-publish work/example.md --delivered-commit FULL_SHA --authorize-comment-sha256 PREVIEW_SHA256
+```
+
+The controller writes one comment only, reads it back exactly, and retains local
+recovery state if the write is uncertain or conflicts with an existing record.
+Issue-backed cleanup checks the comment again before deleting local execution
+state. A fresh checkout with the delivered commit can inspect completed status
+without prior P2P files:
+
+```sh
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source github-status --repository OWNER/REPO --issue NUMBER
+```
+
+Status requires exactly one valid record and verifies its contract digest,
+requirement coverage, frozen base, candidate tree, candidate changes, and
+delivered commit against local Git history. It reports a blocker on missing,
+duplicate, conflicting, or unavailable inputs.
+
 For sliced work, resolve the approved plan through the child's Parent link before
 running the controller. Use the resolved destination's current local tip for
 `--comparison-base`. The controller starts from that destination tree, retains

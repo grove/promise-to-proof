@@ -42,18 +42,10 @@ def encoded(value):
     return json.dumps(value, sort_keys=True, indent=2, ensure_ascii=False).encode() + b'\n'
 
 
-def retained(root, work, name, data):
-    path = fs.save(root, work, name, data)
-    if fs.safe(root, path).read_bytes() != data:
-        raise ValueError('storage readback failed: ' + name)
-    return path
-
-
 def save_final(root, work, name, data):
-    _, artifact = fs.paths(root, work)
+    _, artifact = delivery_paths(root, work)
     target = fs.safe(artifact, name)
-    relative = str(target.relative_to(root))
-    fs.trackable(root, [relative])
+    relative = str(target)
     target.parent.mkdir(parents=True, exist_ok=True)
     # The current record replaces its predecessor; committed versions already live in Git history.
     fs.atomic_write(target, data)
@@ -63,103 +55,24 @@ def save_final(root, work, name, data):
 
 
 def check_final_footprint(root, work, values):
-    _, artifact = fs.paths(root, work)
-    replacing = {artifact / name for name in values}
+    _, artifact = delivery_paths(root, work)
+    artifact.mkdir(parents=True, exist_ok=True)
+    allowed = set(values) | set(RETAINED_ARTIFACTS) | SUPERSEDED_RECORDS
     existing = [path for path in artifact.rglob('*') if path.is_file() or path.is_symlink()]
-    compact = {}
-    retained = []
-    unknown = []
-    expected_index = {name: (data, '100644') for name, data in values.items()}
-    def superseded_record(relative):
-        return (relative in ('implementation.md', 'repair.md') or
-                (relative.startswith('history/') and Path(relative).name in SUPERSEDED_RECORDS))
-
-    for path in existing:
-        relative = path.relative_to(artifact).as_posix()
-        if path in replacing:
-            if path.is_symlink():
-                raise ValueError('final durable artifact is a symlink: ' + relative)
-            if path.is_file():
-                old = path.read_bytes()
-                if old != values[relative]:
-                    try:
-                        committed = fs.git(root, 'show', 'HEAD:' + str(path.relative_to(root)))
-                    except ValueError:
-                        committed = None
-                    if committed != old:
-                        compact[relative] = fs.digest(old)
-            continue
-        if not path.is_symlink() and path.is_file() and superseded_record(relative):
-            data = path.read_bytes()
-            compact[relative] = fs.digest(data)
-            expected_index[relative] = (data, '100755' if path.stat().st_mode & 0o111 else '100644')
-        else:
-            retained.append(path)
-            if (relative not in RETAINED_ARTIFACTS or path.is_symlink() or not path.is_file()):
-                unknown.append(relative)
-            elif relative in RETAINED_ARTIFACTS:
-                mode = '100755' if path.stat().st_mode & 0o111 else '100644'
-                expected_index[relative] = (path.read_bytes(), mode)
-    worktree = {path.relative_to(artifact).as_posix():
-                len(os.readlink(path).encode()) if path.is_symlink() else path.stat().st_size
-                for path in retained}
-    worktree.update({name: len(data) for name, data in values.items()})
-    count, size = len(worktree), sum(worktree.values())
-    if count > 6 or size > 65536:
-        raise ValueError(f'durable P2P footprint would exceed limits: {count} files, {size} logical bytes; limit is 6 files and 65536 bytes')
+    unknown = [path.relative_to(artifact).as_posix() for path in existing
+               if path.is_symlink() or not path.is_file() or
+               path.relative_to(artifact).as_posix() not in allowed]
     if unknown:
-        raise ValueError('unclassified durable P2P artifacts block cleanup: ' + ', '.join(sorted(unknown)))
-    prefix = str(artifact.relative_to(root))
-    staged = fs.git(root, 'ls-files', '--stage', '-z', '--', prefix).split(b'\0')
-    indexed = {}
-    for record in filter(None, staged):
-        metadata, raw_path = record.split(b'\t', 1)
-        mode, oid, stage = metadata.decode().split()
-        if stage != '0':
-            raise ValueError('unresolved P2P artifact index conflict: ' + prefix)
-        full_path = raw_path.decode()
-        if full_path != prefix and not full_path.startswith(prefix + '/'):
-            continue
-        if mode not in ('100644', '100755', '120000'):
-            raise ValueError('unclassified indexed P2P artifact blocks cleanup: ' + full_path)
-        path = full_path[len(prefix) + 1:] if full_path.startswith(prefix + '/') else ''
-        indexed[path] = (mode, oid, int(fs.git(root, 'cat-file', '-s', oid).decode()))
-    staged_changes = fs.git(root, 'diff', '--cached', '--no-renames', '--name-only', '-z',
-                            'HEAD', '--', prefix).split(b'\0')
-    staged_paths = {path.decode()[len(prefix) + 1:] for path in filter(None, staged_changes)
-                    if path.decode().startswith(prefix + '/')}
-    for path, (mode, oid, _) in indexed.items():
-        expected = expected_index.get(path)
-        if expected is None:
-            if path not in RETAINED_ARTIFACTS and not superseded_record(path):
-                if path in staged_paths:
-                    continue
-                raise ValueError('unclassified indexed P2P artifact blocks cleanup: ' + prefix + '/' + path)
-            if mode not in ('100644', '100755'):
-                raise ValueError('unclassified indexed P2P artifact blocks cleanup: ' + prefix + '/' + path)
-    # Clean index entries are prior committed records; only staged deltas must match new finals.
-    for raw_path in filter(None, staged_changes):
-        path = raw_path.decode()
-        relative = path[len(prefix) + 1:] if path.startswith(prefix + '/') else ''
-        expected = expected_index.get(relative)
-        entry = indexed.get(relative)
-        if expected is None:
-            if relative in RETAINED_ARTIFACTS or superseded_record(relative):
-                continue
-            raise ValueError('unclassified staged P2P artifact blocks cleanup: ' + path)
-        if (entry is None or entry[0] != expected[1] or
-                fs.git(root, 'cat-file', 'blob', entry[1]) != expected[0]):
-            raise ValueError('staged P2P artifact differs from final cleanup record: ' + path)
-    index_count, index_size = len(indexed), sum(entry[2] for entry in indexed.values())
-    if index_count > 6 or index_size > 65536:
-        raise ValueError(f'durable P2P footprint in staged index would exceed limits: {index_count} files, {index_size} logical bytes; limit is 6 files and 65536 bytes')
-    projected = dict(worktree)
-    for path, (_, _, blob_size) in indexed.items():
-        projected[path] = max(projected.get(path, 0), blob_size)
-    count, size = len(projected), sum(projected.values())
-    if count > 6 or size > 65536:
-        raise ValueError(f'combined durable P2P footprint would exceed limits: {count} files, {size} logical bytes; limit is 6 files and 65536 bytes')
-    return compact
+        raise ValueError('unclassified local P2P artifacts block cleanup: ' + ', '.join(sorted(unknown)))
+    count = len(set(path.relative_to(artifact).as_posix() for path in existing) | set(values))
+    size = sum(len(data) for data in values.values()) + sum(
+        path.stat().st_size for path in existing
+        if path.relative_to(artifact).as_posix() not in values and path.is_file())
+    if count > 12 or size > 262144:
+        raise ValueError(f'local P2P footprint exceeds limits: {count} files, {size} logical bytes')
+    return {path.relative_to(artifact).as_posix(): fs.digest(path.read_bytes())
+            for path in existing if path.relative_to(artifact).as_posix() in SUPERSEDED_RECORDS
+            and path.relative_to(artifact).as_posix() not in values}
 
 
 def local_directory(root, work):
@@ -173,6 +86,67 @@ def local_directory(root, work):
         if path.is_symlink():
             raise ValueError('user-local P2P state path contains a symlink: ' + str(path))
     return local
+
+
+def agreement_root(root, work):
+    return local_storage_directory(root, work, 'agreement')
+
+
+def local_storage_directory(root, work, name):
+    path = local_directory(root, work) / name
+    if path.is_symlink() or (path.exists() and not path.is_dir()):
+        raise ValueError('user-local P2P ' + name + ' path is not a directory')
+    return path
+
+
+def agreement_bindings(root, work):
+    local_item = fs.safe(agreement_root(root, work), work)
+    if local_item.is_file():
+        return fs.bindings(agreement_root(root, work), work, require_trackable=False)
+    return fs.bindings(root, work)
+
+
+def imported_issue_sources(root, work):
+    item, _ = delivery_paths(root, work)
+    paths = []
+    for line in fs.document_lines(item.read_text()):
+        if not re.match(r'^Source:\s*', line):
+            continue
+        for label, target in re.findall(r'\[([^\]]+)\]\(([^)]+)\)', line):
+            if not label.lower().startswith('imported issue') or re.match(r'[a-zA-Z][a-zA-Z0-9+.-]*:', target):
+                continue
+            relative = os.path.normpath(str(Path(work).parent / target.split('#', 1)[0]))
+            fs.safe(root, relative)
+            paths.append(relative)
+    return sorted(set(paths))
+
+
+def delivery_paths(root, work):
+    """Resolve agreements from user-local state and keep delivery records there."""
+    agreement = fs.safe(agreement_root(root, work), work)
+    source = fs.safe(root, work)
+    if not agreement.is_file():
+        agreement = source
+    return agreement, local_storage_directory(root, work, 'artifacts')
+
+
+def localize_agreement(root, work, bindings):
+    local = local_directory(root, work)
+    agreement_root = local / 'agreement'
+    for relative in [work, *(item['path'] for item in bindings)]:
+        target = fs.safe(agreement_root, relative)
+        source = fs.safe(root, relative)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if not source.is_file() and target.is_file():
+            continue
+        data = source.read_bytes()
+        if target.exists() and target.read_bytes() != data:
+            raise ValueError('user-local agreement input changed: ' + relative)
+        if not target.exists():
+            fs.atomic_write(target, data)
+        if fs.digest(target.read_bytes()) != fs.digest(data):
+            raise ValueError('user-local agreement readback failed: ' + relative)
+    return fs.safe(agreement_root, work)
 
 
 def local_save(root, work, name, data):
@@ -229,7 +203,7 @@ def record_generation(delivery, candidate, stage):
     target = fs.safe(local, path)
     if target.exists():
         raise ValueError('local generation record exists outside recovery state: ' + path)
-    manifest = fs.snapshot(workspace)
+    manifest = fs.snapshot(workspace, exclude=delivery.state.get('agreement_paths', ()))
     tree = git_generation_tree(workspace, manifest)
     parent = generations[-1]['commit'] if generations else state['local_git_base']['local_commit']
     commit = subprocess.run(['git', '-C', str(workspace), '-c', 'user.name=Promise-to-Proof',
@@ -279,7 +253,7 @@ def materialize(root, manifest):
 
 
 def contract(root, work):
-    item, _ = fs.paths(root, work)
+    item, _ = delivery_paths(root, work)
     text = item.read_text()
     revision = re.findall(r'^Contract revision: (v[1-9][0-9]*)$', text, re.M)
     heading = re.findall(r'^# Acceptance contract: (.+)$', text, re.M)
@@ -303,6 +277,232 @@ def report_identity(candidate):
 
 def candidate_key(candidate):
     return candidate.get('key') or 'git:' + candidate['commit']
+
+
+ISSUE_RECORD_PREFIX = '<!-- promise-to-proof-delivery:v1:'
+
+
+def issue_source(root, work, content):
+    urls = re.findall(r'^Source attribution:\s*(https://github\.com/[^\s;]+/issues/\d+)',
+                      content, re.M)
+    if not urls:
+        return None
+    if len(set(urls)) != 1:
+        raise ValueError('contract has conflicting GitHub source issues')
+    match = re.fullmatch(r'https://github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)/issues/(\d+)', urls[0])
+    if not match:
+        raise ValueError('contract GitHub source issue URL is invalid')
+    sources = imported_issue_sources(root, work)
+    if len(sources) != 1:
+        raise ValueError('contract must bind exactly one imported issue source document')
+    agreement, _ = delivery_paths(root, work)
+    source = fs.safe(agreement.parent.parent, sources[0])
+    if not source.is_file():
+        source = fs.safe(root, sources[0])
+    return {'repository': match[1] + '/' + match[2], 'issue': int(match[3]), 'url': urls[0],
+            'body_sha256': fs.digest(source.read_bytes())}
+
+
+def issue_record_preview(delivery, delivered_commit, pull_request=None):
+    state = delivery.state
+    if state.get('status') != 'REVIEWED_AND_PROVEN':
+        raise ValueError('GitHub record requires a REVIEWED_AND_PROVEN delivery')
+    source = issue_source(delivery.root, delivery.work, state['contract']['content'])
+    if source is None:
+        raise ValueError('work item has no imported GitHub issue source')
+    if not re.fullmatch(r'[0-9a-f]{40}|[0-9a-f]{64}', delivered_commit):
+        raise ValueError('delivered commit must be a full commit SHA')
+    if fs.full_commit(delivery.root, delivered_commit) != delivered_commit:
+        raise ValueError('delivered commit identity changed')
+    candidate = state['candidate']
+    agreement_paths = state.get('agreement_paths', [delivery.work])
+    tree_key = fs.snapshot_key(fs.snapshot(delivery.root, delivered_commit, exclude=agreement_paths))
+    if tree_key != candidate_key(candidate):
+        raise ValueError('delivered commit product tree does not match the accepted candidate')
+    contract_text = state['contract']['content']
+    if fs.digest(contract_text.encode()) != state['contract']['sha256']:
+        raise ValueError('accepted contract text does not match its recorded digest')
+    if pull_request is not None and not re.fullmatch(r'https://github\.com/[^/]+/[^/]+/pull/\d+', pull_request):
+        raise ValueError('pull request must be a full GitHub pull request URL')
+    record = {
+        'schema': 'promise-to-proof/durable-delivery/v1',
+        'id': state['invocation_id'],
+        'work_item': delivery.work,
+        'repository': source['repository'],
+        'source_issue': {'url': source['url'], 'body_sha256': source['body_sha256']},
+        'contract': {'revision': state['contract']['revision'], 'sha256': state['contract']['sha256'],
+                     'text': contract_text},
+        'comparison_base': state['comparison_base'],
+        'candidate_key': candidate_key(candidate),
+        'candidate_changes_sha256': fs.digest(fs.canonical(candidate.get('changes', []))),
+        'review': {'status': 'REVIEWED', 'sha256': fs.digest(state['final_review'].encode())},
+        'proof': {'status': 'PROVEN', 'sha256': fs.digest(state['final_proof'].encode())},
+        'requirements': sorted(state['requirements']),
+        'agreement_paths': agreement_paths,
+        'delivered_commit': delivered_commit,
+        'pull_request': pull_request,
+        'completed_at': state['completed_at'],
+    }
+    marker = ISSUE_RECORD_PREFIX + state['invocation_id'] + ' -->'
+    body = marker + '\n```json\n' + json.dumps(record, sort_keys=True, indent=2, ensure_ascii=False) + '\n```\n'
+    if len(body.encode()) > 60000:
+        raise ValueError('durable GitHub record exceeds the 60 KB comment limit')
+    return {'repository': source['repository'], 'issue': source['issue'], 'id': state['invocation_id'],
+            'record': record, 'body': body, 'sha256': fs.digest(body.encode())}
+
+
+def github_issue(repository, issue):
+    result = subprocess.run(['gh', 'api', f'repos/{repository}/issues/{issue}'],
+                            capture_output=True, text=True)
+    if result.returncode:
+        raise ValueError('GitHub issue read failed: ' + result.stderr.strip())
+    return json.loads(result.stdout)
+
+
+def github_comments(repository, issue):
+    result = subprocess.run(['gh', 'api', '--paginate', '--jq', '.[]',
+                             f'repos/{repository}/issues/{issue}/comments'],
+                            capture_output=True, text=True)
+    if result.returncode:
+        raise ValueError('GitHub issue comments read failed: ' + result.stderr.strip())
+    return [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
+
+
+def github_create_comment(repository, issue, body):
+    with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', newline='', delete=True) as file:
+        file.write(body)
+        file.flush()
+        result = subprocess.run(['gh', 'issue', 'comment', str(issue), '--repo', repository,
+                                 '--body-file', file.name], capture_output=True, text=True)
+    if result.returncode:
+        raise ValueError('GitHub delivery record write failed; read comments before retrying: ' + result.stderr.strip())
+    return result.stdout.strip()
+
+
+def publish_issue_record(delivery, delivered_commit, pull_request, authorized_sha256):
+    preview = issue_record_preview(delivery, delivered_commit, pull_request)
+    if authorized_sha256 != preview['sha256']:
+        raise ValueError('publication authorization does not match preview SHA-256 ' + preview['sha256'])
+    issue = github_issue(preview['repository'], preview['issue'])
+    if fs.digest((issue.get('body') or '').encode()) != preview['record']['source_issue']['body_sha256']:
+        raise ValueError('source issue body changed since the accepted contract was captured')
+    comments = github_comments(preview['repository'], preview['issue'])
+    marker = ISSUE_RECORD_PREFIX + preview['id'] + ' -->'
+    records = [comment for comment in comments if ISSUE_RECORD_PREFIX in comment.get('body', '')]
+    matches = [comment for comment in records if marker in comment.get('body', '')]
+    if len(records) > 1 or len(matches) > 1:
+        raise ValueError('multiple durable delivery records exist on the source issue')
+    if records and not matches:
+        raise ValueError('source issue has a conflicting durable delivery record')
+    if matches and matches[0].get('body') != preview['body']:
+        raise ValueError('existing durable delivery record conflicts with this preview')
+    if not matches:
+        try:
+            github_create_comment(preview['repository'], preview['issue'], preview['body'])
+        except ValueError:
+            # The server may have accepted a write whose response was lost; read before any retry.
+            comments = github_comments(preview['repository'], preview['issue'])
+            matches = [comment for comment in comments if marker in comment.get('body', '')]
+            if len(matches) != 1 or matches[0].get('body') != preview['body']:
+                raise
+    comments = github_comments(preview['repository'], preview['issue'])
+    matches = [comment for comment in comments if marker in comment.get('body', '')]
+    if len(matches) != 1 or matches[0].get('body') != preview['body']:
+        raise ValueError('durable GitHub record readback failed; local state retained')
+    comment = matches[0]
+    delivery.state['github_record'] = {'id': preview['id'], 'repository': preview['repository'],
+                                       'issue': preview['issue'], 'url': comment.get('html_url'),
+                                       'delivered_commit': delivered_commit, 'pull_request': pull_request,
+                                       'body_sha256': preview['sha256'], 'verified_at': now()}
+    delivery.save()
+    return delivery.state['github_record']
+
+
+def resolve_github_record(root, repository, issue_number):
+    issue = github_issue(repository, issue_number)
+    comments = github_comments(repository, issue_number)
+    records = []
+    for comment in comments:
+        body = comment.get('body', '')
+        if ISSUE_RECORD_PREFIX not in body:
+            continue
+        match = re.search(re.escape(ISSUE_RECORD_PREFIX) + r'([0-9a-f-]+) -->\n```json\n(.*?)\n```\n?$',
+                          body, re.S)
+        if not match:
+            raise ValueError('durable GitHub delivery record is malformed')
+        record = json.loads(match[2])
+        if match[1] != record.get('id'):
+            raise ValueError('durable GitHub delivery record marker conflicts with its identity')
+        records.append((comment, record))
+    if len(records) != 1:
+        raise ValueError('expected exactly one durable delivery record on the source issue')
+    comment, record = records[0]
+    if (record.get('schema') != 'promise-to-proof/durable-delivery/v1' or
+            record.get('repository') != repository or
+            record.get('source_issue', {}).get('url') != f'https://github.com/{repository}/issues/{issue_number}'):
+        raise ValueError('durable GitHub delivery record belongs to another source issue')
+    contract = record.get('contract', {})
+    if (not isinstance(contract.get('text'), str) or
+            fs.digest(contract['text'].encode()) != contract.get('sha256') or
+            not re.fullmatch(r'v[1-9][0-9]*', contract.get('revision', ''))):
+        raise ValueError('durable GitHub record contract text or digest is invalid')
+    source_names = re.findall(r'^# Acceptance contract: (.+)$', contract['text'], re.M)
+    if len(source_names) != 1:
+        raise ValueError('durable GitHub record contract heading is invalid')
+    issues = []
+    _, _, _, requirement_ids = bundle._validate_contract(
+        {'source': source_names[0], 'revision': contract['revision'], 'content': contract['text'],
+         'sha256': contract['sha256']}, issues)
+    if issues or record.get('requirements') != sorted(requirement_ids):
+        raise ValueError('durable GitHub record requirement coverage does not match the exact contract')
+    work = record.get('work_item', '')
+    if not isinstance(work, str) or not fs.WORK.fullmatch(work):
+        raise ValueError('durable GitHub delivery record has an invalid work item')
+    sources = []
+    for target in re.findall(r'\[Imported issue[^\]]*\]\(([^)]+)\)', contract['text'], re.I):
+        if not re.match(r'[A-Za-z][A-Za-z0-9+.-]*:', target):
+            sources.append(os.path.normpath(str(Path(work).parent / target.split('#', 1)[0])))
+    expected_agreement_paths = sorted({work, *sources})
+    if record.get('agreement_paths') != expected_agreement_paths:
+        raise ValueError('durable GitHub record has invalid contract exclusion paths')
+    for key in ('comparison_base', 'delivered_commit'):
+        if not re.fullmatch(r'[0-9a-f]{40}|[0-9a-f]{64}', record.get(key, '')):
+            raise ValueError('durable GitHub delivery record has an invalid ' + key)
+    if (not re.fullmatch(r'[0-9a-f]{64}', record.get('candidate_changes_sha256', '')) or
+            not re.fullmatch(r'snapshot:sha256:[0-9a-f]{64}', record.get('candidate_key', '')) or
+            not re.fullmatch(r'[0-9a-f]{64}', record.get('source_issue', {}).get('body_sha256', ''))):
+        raise ValueError('durable GitHub delivery record has an invalid candidate or source digest')
+    pull_request = record.get('pull_request')
+    if pull_request is not None and not re.fullmatch(r'https://github\.com/[^/]+/[^/]+/pull/\d+', pull_request):
+        raise ValueError('durable GitHub delivery record has an invalid pull request URL')
+    for key, status in (('review', 'REVIEWED'), ('proof', 'PROVEN')):
+        item = record.get(key, {})
+        if item.get('status') != status or not re.fullmatch(r'[0-9a-f]{64}', item.get('sha256', '')):
+            raise ValueError('durable GitHub record has invalid ' + key + ' status or digest')
+    commit = fs.full_commit(root, record['delivered_commit'])
+    if commit != record['delivered_commit']:
+        raise ValueError('delivered commit identity changed')
+    fs.full_commit(root, record['comparison_base'])
+    ancestry = subprocess.run(['git', '-C', str(root), 'merge-base', '--is-ancestor',
+                               record['comparison_base'], commit], capture_output=True)
+    if ancestry.returncode:
+        raise ValueError('delivered commit is not based on the frozen comparison base')
+    tree_key = fs.snapshot_key(fs.snapshot(root, commit, exclude=record.get('agreement_paths', ())))
+    if tree_key != record.get('candidate_key'):
+        raise ValueError('delivered Git commit product tree does not match the accepted candidate')
+    delivered_tree = fs.snapshot(root, commit, exclude=record['agreement_paths'])
+    base_tree = fs.snapshot(root, record['comparison_base'], exclude=record['agreement_paths'])
+    if fs.digest(fs.canonical(fs.tree_changes(base_tree, delivered_tree))) != record.get('candidate_changes_sha256'):
+        raise ValueError('delivered Git commit changes do not match the accepted candidate digest')
+    return {'status': 'REVIEWED_AND_PROVEN', 'repository': repository,
+            'source_issue': {'url': f'https://github.com/{repository}/issues/{issue_number}',
+                             'body_sha256': record['source_issue'].get('body_sha256')},
+            'contract': contract, 'comparison_base': record['comparison_base'],
+            'candidate_key': record['candidate_key'], 'candidate_changes_sha256': record['candidate_changes_sha256'],
+            'review': record['review'], 'proof': record['proof'], 'requirements': record['requirements'],
+            'delivered_commit': commit, 'pull_request': record.get('pull_request'),
+            'completed_at': record['completed_at'], 'record_url': comment.get('html_url'),
+            'record_sha256': fs.digest(comment['body'].encode()), 'live_issue_title': issue.get('title')}
 
 
 def skills():
@@ -357,7 +557,8 @@ def explicit_destination(root, value):
 
 def routing(root, work, destination=None, require_tip=True):
     """Read the approved Markdown decision; never infer approval or a child target."""
-    item, own_directory = fs.paths(root, work)
+    item, _ = delivery_paths(root, work)
+    own_directory = local_directory(root, work) / 'artifacts'
     parents = []
     for line in fs.document_lines(item.read_text()):
         if re.match(r'^Parent(?: contract)?:', line):
@@ -806,7 +1007,7 @@ class Delivery:
     def __init__(self, root, work, state):
         self.root, self.work, self.state = root, work, state
         self.read_only = False
-        self.item, self.directory = fs.paths(root, work)
+        self.item, self.directory = delivery_paths(root, work)
         self.local = local_directory(root, work)
         self.runtime = self.local / 'runtime'
         self.workspace = self.runtime / 'workspace'
@@ -855,8 +1056,9 @@ class Delivery:
                     raise ValueError('retained routing history/evidence changed: ' + record['path'])
         current = fs.snapshot(self.root)
         current_key = fs.snapshot_key(current)
+        product_key = fs.snapshot_key(fs.snapshot(self.root, exclude=self.state.get('agreement_paths', ())))
         applied_key = self.state.get('candidate', {}).get('key')
-        candidate_applied = self.state.get('status') == 'REVIEWED_AND_PROVEN' and current_key == applied_key
+        candidate_applied = self.state.get('status') == 'REVIEWED_AND_PROVEN' and product_key == applied_key
         if current_key != self.state['source_tree_key'] and not candidate_applied:
             raise ValueError('source checkout changed since admission')
         if (self.workspace / '.git').read_text() != 'gitdir: ' + str(self.runtime / 'repository.git') + '\n':
@@ -888,7 +1090,7 @@ class Delivery:
             if actual != expected:
                 raise ValueError('retained prior delivery record changed or lost: ' + name)
         self.verify_superseded_recovery()
-        if fs.bindings(self.root, self.work) != self.state['binding_inputs']:
+        if agreement_bindings(self.root, self.work) != self.state['binding_inputs']:
             raise ValueError('binding inputs changed')
         if fs.digest(self.item.read_bytes()) != self.state['contract']['sha256']:
             raise ValueError('work item changed')
@@ -910,9 +1112,11 @@ class Delivery:
         base = {e['path']: e for e in fs.snapshot(self.workspace, self.state['comparison_base'])}
         actual = {e['path']: e for e in fs.snapshot(self.workspace)}
         changed = [p for p in excluded if actual.get(p) != base.get(p)]
+        changed = [p for p in changed if p not in self.state.get('agreement_paths', ())]
         if changed:
             raise ValueError('implementation changed excluded scope paths: ' + ', '.join(changed))
-        candidate = fs.capture(self.workspace, self.work, self.state['comparison_base'])
+        candidate = fs.capture(self.workspace, self.work, self.state['comparison_base'],
+                              exclude=self.state.get('agreement_paths', ()))
         self.state['candidate'] = candidate
         record_generation(self, candidate, stage)
         self._generation_chain_verified = False
@@ -1010,7 +1214,8 @@ class Delivery:
         expected = self.state.get('candidate')
         if expected:
             self.verify_generation_chain()
-            actual = fs.validate(self.workspace, self.work, self.state['comparison_base'])
+            actual = fs.validate(self.workspace, self.work, self.state['comparison_base'],
+                                 exclude=self.state.get('agreement_paths', ()))
             saved = json.loads((self.workspace / '.p2p/work' / Path(self.work).stem / 'candidate.json').read_text())
             if actual != expected or saved != expected:
                 raise ValueError('retained candidate identity changed')
@@ -1360,6 +1565,7 @@ assert results['scratch'] == 'ok'
             'candidate_key': candidate_key(candidate),
             'candidate_record_sha256': fs.digest(candidate_bytes),
             'candidate_changes_sha256': fs.digest(fs.canonical(candidate.get('changes', []))),
+            'agreement_paths': self.state.get('agreement_paths', [self.work]),
             'review_sha256': fs.digest(review_bytes),
             'proof_sha256': fs.digest(proof_bytes),
             'completed_at': self.state['completed_at'],
@@ -1369,6 +1575,8 @@ assert results['scratch'] == 'ok'
         }
         if retained_artifacts:
             value['retained_artifacts'] = list(retained_artifacts)
+        if self.state.get('github_record'):
+            value['github_record'] = self.state['github_record']
         if self.state.get('cleanup_verified_at'):
             value.update(cleanup='source checkout identity verified',
                          cleanup_source_identity_sha256=self.state['cleanup_source_identity_sha256'],
@@ -1405,7 +1613,8 @@ assert results['scratch'] == 'ok'
         return compact
 
     def verify_final_readback(self, source_change_error):
-        source_identity = fs.digest(fs.canonical(fs.tree_identity(fs.snapshot(self.root))))
+        source = fs.snapshot(self.root, exclude=self.state.get('agreement_paths', ()))
+        source_identity = fs.digest(fs.canonical(fs.tree_identity(source)))
         if source_identity != self.state.get('cleanup_source_identity_sha256'):
             raise ValueError(source_change_error)
         self.verify_superseded_recovery()
@@ -1422,6 +1631,8 @@ assert results['scratch'] == 'ok'
                 record.get('review_sha256') != fs.digest(self.state.get('final_review', '').encode()) or
                 record.get('proof_sha256') != fs.digest(self.state.get('final_proof', '').encode())):
             raise ValueError('durable completed delivery unavailable: final records differ from local invocation identity')
+        if record.get('github_record') != self.state.get('github_record'):
+            raise ValueError('durable completed delivery unavailable: GitHub record receipt differs from local state')
         values = {name: fs.safe(self.directory, name).read_bytes()
                   for name in ('candidate.json', 'delivery.json', 'review.md', 'proof.md')}
         compact = check_final_footprint(self.root, self.work, values)
@@ -1441,6 +1652,15 @@ assert results['scratch'] == 'ok'
                 raise ValueError('superseded durable artifact changed during cleanup: ' + name)
             path.unlink()
 
+    def remove_local_execution_state(self):
+        attempts = self.local / 'attempts'
+        if attempts.is_symlink():
+            raise ValueError('local attempt records are a symlink')
+        if attempts.exists():
+            shutil.rmtree(attempts)
+        (self.local / 'delivery.json').unlink(missing_ok=True)
+        shutil.rmtree(self.runtime)
+
     def complete(self, check_source=True):
         candidate = self.current(check_source=check_source)
         review, proof = self.read_report('review'), self.read_report('proof')
@@ -1455,7 +1675,7 @@ assert results['scratch'] == 'ok'
             raise ValueError('review contains unresolved findings')
         if 'findings' not in review and any(row.get('verdict') != 'reviewed' for row in review['requirements']):
             raise ValueError('legacy review contains unresolved requirement findings')
-        manifest = fs.snapshot(self.workspace)
+        manifest = fs.snapshot(self.workspace, exclude=self.state.get('agreement_paths', ()))
         key = 'snapshot:sha256:' + fs.digest(fs.canonical(manifest))
         contract_identity = {k: self.state['contract'][k] for k in ('source', 'revision', 'sha256')}
         text = lambda content: {'content': content, 'sha256': fs.digest(content.encode())}
@@ -1494,20 +1714,42 @@ assert results['scratch'] == 'ok'
                                                           if a['id'] == self.state['reports']['proof']['attempt_id'])['session_id']))
         self.save()
 
+    def verify_github_readback(self):
+        receipt = self.state.get('github_record')
+        if not receipt:
+            if issue_source(self.root, self.work, self.state['contract']['content']):
+                raise ValueError('issue-backed cleanup requires a verified durable GitHub record')
+            return
+        preview = issue_record_preview(self, receipt['delivered_commit'], receipt.get('pull_request'))
+        if (receipt.get('id') != preview['id'] or receipt.get('repository') != preview['repository'] or
+                receipt.get('issue') != preview['issue'] or receipt.get('body_sha256') != preview['sha256']):
+            raise ValueError('local GitHub record receipt does not match the accepted delivery preview')
+        issue = github_issue(preview['repository'], preview['issue'])
+        if fs.digest((issue.get('body') or '').encode()) != preview['record']['source_issue']['body_sha256']:
+            raise ValueError('source issue body changed before cleanup')
+        marker = ISSUE_RECORD_PREFIX + preview['id'] + ' -->'
+        matches = [comment for comment in github_comments(preview['repository'], preview['issue'])
+                   if marker in comment.get('body', '')]
+        if len(matches) != 1 or matches[0].get('body') != preview['body'] or matches[0].get('html_url') != receipt.get('url'):
+            raise ValueError('durable GitHub record readback changed before cleanup')
+        receipt['cleanup_verified_at'] = now()
+        self.save()
+
     def cleanup(self):
         if self.state.get('status') != 'REVIEWED_AND_PROVEN':
             raise ValueError('only a REVIEWED_AND_PROVEN delivery can be cleaned')
         if self.state.get('cleanup_verified_at') and self.state.get('final_records_written'):
             self.verify_final_readback('source checkout changed after cleanup identity verification')
             self.remove_superseded_artifacts()
-            shutil.rmtree(self.local)
+            self.remove_local_execution_state()
             return
         self.complete(check_source=False)
-        candidate_tree = fs.snapshot(self.workspace)
-        source_tree = fs.snapshot(self.root)
+        self.verify_github_readback()
+        candidate_tree = fs.snapshot(self.workspace, exclude=self.state.get('agreement_paths', ()))
+        source_tree = fs.snapshot(self.root, exclude=self.state.get('agreement_paths', ()))
         if source_tree != candidate_tree:
             raise ValueError('source checkout does not match the exact accepted candidate identity')
-        if fs.tree_changes(fs.snapshot(self.workspace, self.state['comparison_base']), candidate_tree) != self.state['candidate'].get('changes', []):
+        if fs.tree_changes(fs.snapshot(self.workspace, self.state['comparison_base'], exclude=self.state.get('agreement_paths', ())), candidate_tree) != self.state['candidate'].get('changes', []):
             raise ValueError('candidate compact identity changed before cleanup')
         source_identity = fs.digest(fs.canonical(fs.tree_identity(source_tree)))
         self.state.update(cleanup_verified_at=self.state.get('cleanup_verified_at') or now(),
@@ -1518,7 +1760,7 @@ assert results['scratch'] == 'ok'
         self.save()
         self.verify_final_readback('source checkout changed during cleanup finalization')
         self.remove_superseded_artifacts()
-        shutil.rmtree(self.local)
+        self.remove_local_execution_state()
 
     def run(self):
         self.current()
@@ -1589,7 +1831,9 @@ def create(root, args):
     committed = fs.snapshot(root, head)
     old, new = ({e['path']: e for e in entries} for entries in (committed, current))
     dirty = {p for p in old.keys() | new.keys() if old.get(p) != new.get(p)}
-    inputs = fs.bindings(root, args.work)
+    inputs = agreement_bindings(root, args.work)
+    localize_agreement(root, args.work, inputs)
+    agreement_paths = sorted({args.work, *imported_issue_sources(root, args.work)})
     agreements = {args.work} | {entry['path'] for entry in inputs}
     excluded = set(args.exclude_dirty)
     for path in excluded:
@@ -1610,14 +1854,20 @@ def create(root, args):
         else:
             manifest.pop(path, None)
     for path in agreements:
-        if path not in new:
-            raise ValueError('agreement input missing from candidate: ' + path)
-        manifest[path] = new[path]
-    _, directory = fs.paths(root, args.work)
+        source = fs.safe(root, path)
+        if source.is_file():
+            manifest[path] = next(entry for entry in current if entry['path'] == path)
+        else:
+            local_input = fs.safe(agreement_root(root, args.work), path)
+            if not local_input.is_file():
+                raise ValueError('agreement input missing from user-local storage: ' + path)
+            manifest[path] = {'path': path, 'mode': '100644', 'type': 'file',
+                              'content_base64': base64.b64encode(local_input.read_bytes()).decode()}
+    _, directory = delivery_paths(root, args.work)
     local = local_directory(root, args.work)
-    if local.exists():
-        raise ValueError('local runtime exists without an active delivery record; preserve it and reconcile admission')
     runtime = local / 'runtime'
+    if runtime.exists():
+        raise ValueError('local runtime exists without an active delivery record; preserve it and reconcile admission')
     runtime.mkdir(parents=True)
     repository = runtime / 'repository.git'
     result = subprocess.run(['git', 'clone', '--bare', '--', str(root), str(repository)], capture_output=True)
@@ -1663,6 +1913,7 @@ def create(root, args):
     state = {'schema': 'promise-to-proof/delivery/v1', 'policy': POLICY, 'invocation_id': str(uuid.uuid4()),
              'status': 'RUNNING', 'blocker': None, 'work_item': args.work, 'comparison_base': base,
              'contract': agreement, 'requirements': requirements, 'binding_inputs': inputs,
+             'agreement_paths': agreement_paths,
              'source_tree_key': fs.snapshot_key(current), 'source_head': head,
              'source_index_sha256': fs.digest(fs.git(root, 'ls-files', '--stage', '-z')),
              'excluded_dirty': sorted(excluded), 'skills': installed,
@@ -1684,7 +1935,7 @@ def create(root, args):
                       'elapsed_limit': 'admission and process termination; provider billing may continue',
                       'trust': 'controller and OS trusted; no arbitrary same-user tamper resistance'}}
     delivery = Delivery(root, args.work, state)
-    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'excluded_dirty', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'limits', 'deadline', 'host')}))
+    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'limits', 'deadline', 'host')}))
     delivery.save()
     delivery.capture('admission')
     delivery.save()
@@ -1743,8 +1994,8 @@ def result(delivery):
         'starting_commit': state.get('starting_commit'),
         'candidate': identity(state['candidate']) if state.get('candidate') else None,
         'candidate_workspace': str(delivery.workspace) if delivery.workspace.exists() else None,
-        'reports': ({'review': {'path': '.p2p/work/' + Path(delivery.work).stem + '/review.md'},
-                     'proof': {'path': '.p2p/work/' + Path(delivery.work).stem + '/proof.md'}}
+        'reports': ({'review': {'path': str(delivery.directory / 'review.md')},
+                     'proof': {'path': str(delivery.directory / 'proof.md')}}
                     if state.get('cleanup_verified_at') else state.get('reports', {})),
         'attempts': [] if state.get('cleanup_verified_at') else state['attempts'],
         'records': str(delivery.directory),
@@ -1770,12 +2021,14 @@ def completed_result(root, work, directory):
                 record.get('candidate_changes_sha256') != fs.digest(fs.canonical(candidate.get('changes', []))) or
                 record.get('review_sha256') != fs.digest(review) or record.get('proof_sha256') != fs.digest(proof)):
             raise ValueError('durable completion record identity changed or lost')
-        item, _ = fs.paths(root, work)
+        item, _ = delivery_paths(root, work)
         agreement, _ = contract(root, work)
         if record.get('contract') != {key: agreement[key] for key in ('source', 'revision', 'sha256')}:
             raise ValueError('durable completion record contract identity changed or lost')
+        if issue_source(root, work, agreement['content']) and not record.get('github_record'):
+            raise ValueError('issue-backed completion record has no verified GitHub record')
         if (candidate.get('work_item') != work or candidate.get('work_item_sha256') != fs.digest(item.read_bytes()) or
-                candidate.get('binding_inputs') != fs.bindings(root, work)):
+                candidate.get('binding_inputs') != agreement_bindings(root, work)):
             raise ValueError('contract or binding inputs changed since completion')
         retained = record.get('retained_artifacts', [])
         expected_retained = []
@@ -1788,7 +2041,8 @@ def completed_result(root, work, directory):
             raise ValueError('durable retained-artifact receipts changed or lost')
         if not record.get('cleanup_verified_at') or record.get('cleanup') != 'source checkout identity verified':
             raise ValueError('candidate cleanup has not been verified')
-        identity_sha = fs.digest(fs.canonical(fs.tree_identity(fs.snapshot(root))))
+        identity_sha = fs.digest(fs.canonical(fs.tree_identity(
+            fs.snapshot(root, exclude=record.get('agreement_paths', (work,))))))
         if identity_sha != record.get('cleanup_source_identity_sha256'):
             raise ValueError('source checkout changed after cleanup identity verification')
     except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError) as error:
@@ -1805,14 +2059,15 @@ def completed_result(root, work, directory):
         'starting_commit': None, 'reports': {'review': {'path': 'review.md', 'sha256': record['review_sha256']},
                                              'proof': {'path': 'proof.md', 'sha256': record['proof_sha256']}},
         'attempts': [], 'records': str(directory), 'local_runtime': None, 'candidate_workspace': None,
+        'github_record': record.get('github_record'),
         'cleanup': 'already complete',
         'resume': f'python3 {Path(__file__).resolve()} --repo {root} status {work}',
     }
 
 
 def completed_without_local_runtime(root, work, directory, local, missing_record):
-    if local.exists():
-        raise ValueError('local runtime exists but its invocation state is missing')
+    if (local / 'runtime').exists() or (local / 'attempts').exists():
+        raise ValueError('local execution state exists but its invocation record is missing')
     if not (directory / 'delivery.json').exists():
         raise ValueError(missing_record)
     return completed_result(root, work, directory)
@@ -1836,12 +2091,28 @@ def main(argv=None):
             child.add_argument('--max-stage-seconds', type=float, default=600,
                                help='seconds per stage, capped by the overall deadline (default: 600)')
             child.add_argument('--hard-cost-cap', type=float)
+    preview = commands.add_parser('github-record-preview')
+    preview.add_argument('work')
+    preview.add_argument('--delivered-commit', required=True)
+    preview.add_argument('--pull-request')
+    publish = commands.add_parser('github-record-publish')
+    publish.add_argument('work')
+    publish.add_argument('--delivered-commit', required=True)
+    publish.add_argument('--pull-request')
+    publish.add_argument('--authorize-comment-sha256', required=True)
+    github_status = commands.add_parser('github-status')
+    github_status.add_argument('--repository', required=True)
+    github_status.add_argument('--issue', required=True, type=int)
     args = parser.parse_args(argv)
     delivery = None
     lock = None
     try:
         root = Path(fs.git(Path(args.repo), 'rev-parse', '--show-toplevel').decode().strip()).resolve()
-        item, directory = fs.paths(root, args.work)
+        if args.action == 'github-status':
+            output = resolve_github_record(root, args.repository, args.issue)
+            print(json.dumps(output, indent=2, ensure_ascii=False))
+            return 0
+        item, directory = delivery_paths(root, args.work)
         local = local_directory(root, args.work)
         state_path = local / 'delivery.json'
         if args.action == 'status':
@@ -1874,6 +2145,20 @@ def main(argv=None):
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             raise ValueError('another controller holds the work-item lock')
+        if args.action in ('github-record-preview', 'github-record-publish'):
+            if not state_path.exists():
+                raise ValueError('no local delivery invocation is available for the GitHub record')
+            delivery = Delivery(root, args.work, json.loads(state_path.read_text()))
+            delivery.complete(check_source=False)
+            preview = issue_record_preview(delivery, args.delivered_commit, args.pull_request)
+            if args.action == 'github-record-preview':
+                print(json.dumps({key: preview[key] for key in ('repository', 'issue', 'id', 'body', 'sha256')},
+                                 indent=2, ensure_ascii=False))
+                return 0
+            receipt = publish_issue_record(delivery, args.delivered_commit, args.pull_request,
+                                           args.authorize_comment_sha256)
+            print(json.dumps({'status': 'RECORDED', 'github_record': receipt}, indent=2))
+            return 0
         if args.action == 'cleanup' and not state_path.exists():
             output = completed_without_local_runtime(root, args.work, directory, local,
                                                       'no local candidate workspace is available for cleanup')
@@ -1906,6 +2191,11 @@ def main(argv=None):
     except (ValueError, OSError, KeyError, TypeError, UnicodeError, subprocess.SubprocessError) as error:
         message = str(error)
         if delivery:
+            if args.action in ('github-record-preview', 'github-record-publish'):
+                output = result(delivery)
+                output.update(blocker=message, github_record_status='BLOCKED')
+                print(json.dumps(output, indent=2))
+                return 1
             if args.action == 'cleanup' and delivery.state.get('status') == 'REVIEWED_AND_PROVEN':
                 output = result(delivery)
                 output.update(blocker=message, cleanup_status='BLOCKED')
@@ -1920,8 +2210,10 @@ def main(argv=None):
             output = result(delivery)
             output.update(status='BLOCKED', blocker=message)
         else:
-            output = {'status': 'BLOCKED', 'blocker': message, 'work_item': args.work,
-                      'resume': f'python3 {Path(__file__).resolve()} --repo {args.repo} resume {args.work}'}
+            work = getattr(args, 'work', None)
+            output = {'status': 'BLOCKED', 'blocker': message, 'work_item': work,
+                      'resume': (f'python3 {Path(__file__).resolve()} --repo {args.repo} resume {work}'
+                                 if work else None)}
         print(json.dumps(output, indent=2))
         return 1
     finally:

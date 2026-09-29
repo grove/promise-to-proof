@@ -74,24 +74,12 @@ def trackable(root, names):
 
 
 def setup(root):
-    for name in ("specs", "work", ".p2p/work", ".p2p/tmp"):
-        safe(root, name).mkdir(parents=True, exist_ok=True)
-    probes = ["specs/p2p-trackability-check.md", "work/p2p-trackability-check.md",
-              ".p2p/work/p2p-trackability-check/candidate.json",
-              ".p2p/work/p2p-trackability-check/history/check/proof.md",
-              ".p2p/work/p2p-trackability-check/evidence/check.log"]
-    existing = [str(path.relative_to(root)) for directory in ("specs", "work", ".p2p/work")
-                for path in safe(root, directory).rglob("*") if path.is_file()]
-    trackable(root, probes + existing)
-    ignore = safe(root, ".gitignore")
-    content = ignore.read_bytes() if ignore.exists() else b""
-    if b"/.p2p/tmp/" not in content.splitlines():
-        ignore.write_bytes(content + (b"\n" if content and not content.endswith(b"\n") else b"") + b"/.p2p/tmp/\n")
-    git(root, "check-ignore", "--no-index", ".p2p/tmp/p2p-check")
-    return {"directories": ["specs/", "work/", ".p2p/work/", ".p2p/tmp/"]}
+    """Validate project access without creating repository-local P2P paths."""
+    return {"storage": "user-local"}
 
 
-def snapshot(root, commit=None):
+def snapshot(root, commit=None, exclude=()):
+    excluded = set(exclude)
     entries = []
     if commit:
         records = git(root, "ls-tree", "-rz", "--full-tree", commit).split(b"\0")
@@ -100,7 +88,7 @@ def snapshot(root, commit=None):
             meta, name = record.split(b"\t", 1)
             mode, kind, oid = meta.decode().split()
             path = name.decode("utf-8")
-            if path == ".p2p" or path.startswith(".p2p/"):
+            if path == ".p2p" or path.startswith(".p2p/") or path in excluded:
                 continue
             if kind != "blob":
                 raise ValueError(f"submodules are not supported: {path}")
@@ -110,7 +98,7 @@ def snapshot(root, commit=None):
         sources = []
         for name in filter(None, names):
             path = name.decode("utf-8")
-            if path == ".p2p" or path.startswith(".p2p/"):
+            if path == ".p2p" or path.startswith(".p2p/") or path in excluded:
                 continue
             file = safe(root, path, leaf_symlink=True)
             if file.is_symlink():
@@ -167,7 +155,7 @@ def document_lines(text):
             yield line
 
 
-def bindings(root, work):
+def bindings(root, work, require_trackable=True):
     found = {}
     def visit(relative):
         if relative == ".p2p" or relative.startswith(".p2p/"):
@@ -175,7 +163,8 @@ def bindings(root, work):
         if relative in found:
             return
         file = safe(root, relative)
-        trackable(root, [relative])
+        if require_trackable:
+            trackable(root, [relative])
         data = file.read_bytes()
         found[relative] = digest(data)
         for line in document_lines(data.decode()):
@@ -273,16 +262,16 @@ def check_index(root):
         raise ValueError("partially staged path needs one candidate version (content or mode): " + path)
 
 
-def capture(root, work, base, commit=None):
+def capture(root, work, base, commit=None, exclude=()):
     item, _ = paths(root, work)
     check_index(root)
-    manifest = snapshot(root)
+    manifest = snapshot(root, exclude=exclude)
     chosen = full_commit(root, commit or "HEAD")
-    committed = snapshot(root, chosen)
+    committed = snapshot(root, chosen, exclude=exclude)
     if commit and manifest != committed:
         raise ValueError("working tree differs from requested committed candidate")
     comparison_base = full_commit(root, base)
-    base_manifest = snapshot(root, comparison_base)
+    base_manifest = snapshot(root, comparison_base, exclude=exclude)
     record = {"work_item": work, "work_item_sha256": digest(item.read_bytes()),
               "comparison_base": comparison_base, "binding_inputs": bindings(root, work),
               "key": snapshot_key(manifest), "changes": tree_changes(base_manifest, manifest)}
@@ -292,7 +281,7 @@ def capture(root, work, base, commit=None):
     return record
 
 
-def validate(root, work, base):
+def validate(root, work, base, exclude=()):
     check_index(root)
     item, artifact = paths(root, work)
     record = json.loads((artifact / "candidate.json").read_text())
@@ -333,13 +322,13 @@ def validate(root, work, base):
     if "commit" in record:
         if not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", record["commit"]):
             raise ValueError("candidate commit must be a full commit SHA")
-        expected = snapshot(root, full_commit(root, record["commit"]))
+        expected = snapshot(root, full_commit(root, record["commit"]), exclude=exclude)
     else:
         expected = record.get("manifest")
         if expected is not None and record["key"] != snapshot_key(expected):
             raise ValueError("snapshot digest mismatch")
-    base_manifest = snapshot(root, full_commit(root, record["comparison_base"]))
-    current = snapshot(root)
+    base_manifest = snapshot(root, full_commit(root, record["comparison_base"]), exclude=exclude)
+    current = snapshot(root, exclude=exclude)
     if expected is not None and current != expected:
         raise ValueError("product candidate changed")
     if "changes" in record and tree_changes(base_manifest, current) != record["changes"]:

@@ -138,12 +138,13 @@ def projection(code, saved):
     attempts = saved['attempts']
     candidate = saved.get('candidate')
     workspace = LOCAL / 'runtime/workspace'
-    manifest = d.fs.snapshot(workspace) if workspace.exists() else []
+    excluded = saved.get('agreement_paths', ())
+    manifest = d.fs.snapshot(workspace, exclude=excluded) if workspace.exists() else []
     current = 1
     if candidate:
         current = int(candidate.get('key') == d.fs.snapshot_key(manifest) and
                       candidate.get('changes') == d.fs.tree_changes(
-                          d.fs.snapshot(workspace, candidate['comparison_base']), manifest))
+                          d.fs.snapshot(workspace, candidate['comparison_base'], exclude=excluded), manifest))
     entries = {x['path']: x for x in manifest}
     generation = 0
     if 'greet.py' in entries:

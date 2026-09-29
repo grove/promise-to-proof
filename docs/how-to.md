@@ -481,6 +481,9 @@ preserves newer records. Missing evidence still blocks reuse.
 This reduces the working tree size. Existing Git objects
 remain in history, so the repository's Git storage does not shrink.
 
+For a P2P state migration that removes selected records from the current Git
+tree while keeping history intact, follow the [migration guide](./p2p-state-migration.md).
+
 ## Pick a command
 
 | Command | Use it to |

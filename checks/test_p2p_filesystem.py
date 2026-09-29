@@ -17,6 +17,12 @@ p2p = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(p2p)
 
 
+def prepare(root):
+    for name in ("specs", "work", ".p2p/work", ".p2p/tmp"):
+        (root / name).mkdir(parents=True, exist_ok=True)
+    return p2p.setup(root)
+
+
 def rejects(fn, message):
     try:
         fn()
@@ -33,7 +39,7 @@ def compact_identity_case():
         p2p.git(root, "init", "-q")
         p2p.git(root, "config", "user.name", "Filesystem Check")
         p2p.git(root, "config", "user.email", "check@example.invalid")
-        p2p.setup(root)
+        prepare(root)
         (root / "unchanged.txt").write_text("same\n")
         (root / "original.txt").write_text("old\n")
         (root / "old-link").symlink_to("original.txt")
@@ -71,7 +77,7 @@ def run():
         p2p.git(root, "init", "-q")
         p2p.git(root, "config", "user.name", "Filesystem Check")
         p2p.git(root, "config", "user.email", "check@example.invalid")
-        p2p.setup(root)
+        prepare(root)
         source = Path(directory) / "source.md"
         source.write_text("# Standalone\n")
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
@@ -176,7 +182,7 @@ def run():
         p2p.git(root, "reset", "-q", "HEAD", "app.txt")
         p2p.git(root, "config", "core.filemode", "true")
         (root / ".gitignore").write_text("/.p2p/tmp/\n/.p2p/work/*/history/\n")
-        rejects(lambda: p2p.setup(root), "conflicting ignore")
+        prepare(root)
         proof = root / ".p2p/work/feature-api/proof.md"
         proof.write_bytes(proof.read_bytes() + b" uncommitted")
         original_proof = proof.read_bytes()
@@ -209,13 +215,25 @@ def run():
         (root / ".gitignore").write_text("/specs/feature.md\n")
         rejects(lambda: p2p.bindings(root, work), "conflicting ignore")
         (root / ".gitignore").write_text("/.p2p/\n")
-        rejects(lambda: p2p.setup(root), "conflicting ignore")
+        prepare(root)
         (root / ".gitignore").write_text("/work/\n")
-        rejects(lambda: p2p.setup(root), "conflicting ignore")
+        prepare(root)
     print("P2P filesystem checks passed")
 
 
 class FilesystemTests(unittest.TestCase):
+    def test_default_setup_does_not_create_repository_state(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "repo"
+            root.mkdir()
+            p2p.git(root, "init", "-q")
+            before = sorted(path.name for path in root.iterdir())
+            self.assertEqual(p2p.setup(root), {"storage": "user-local"})
+            self.assertEqual(sorted(path.name for path in root.iterdir()), before)
+            self.assertFalse((root / "specs").exists())
+            self.assertFalse((root / "work").exists())
+            self.assertFalse((root / ".p2p").exists())
+
     def test_disposable_repository(self):
         run()
 
