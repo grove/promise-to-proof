@@ -1,5 +1,11 @@
 # Move existing P2P state out of Git
 
+New active deliveries keep their ignored state under `.p2p/work/<slug>/`.
+Unresolved state from the legacy `~/.p2p/work/<repo-id>/<work-item>/` layout
+must remain there until it is reconciled. This procedure applies when selected
+P2P-owned files are already tracked in Git; it does not migrate or delete
+unresolved runtime state.
+
 This removes P2P-owned files, including tracked `.p2p/**` records and P2P-owned `work/*.md` files, from the current Git tree without rewriting prior
 commits. Earlier history continues to contain the old files. Keep the backup
 outside the checkout while active work still needs it.

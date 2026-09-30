@@ -130,8 +130,8 @@ Missing binding content blocks the handoff. Keep provenance
 in the report rather than adding it to the approved contract bytes.
 
 After import, the local contract remains canonical under the rules above. There
-is no automatic synchronization. The contract and reports can travel with the
-implementation PR; neither planning nor delivery requires a preliminary PR.
+is no automatic synchronization. The contract can travel with the implementation
+PR; generated `.p2p/` records remain local and ignored.
 
 ## Durable generated records
 
@@ -139,9 +139,9 @@ Save work-item output under `.p2p/work/<slug>/`: `implementation.md`,
 `candidate.json`, `review.md`, `proof.md`, and `evidence/`. Other stages use
 `audit.md`, `repair.md`, `publication.md`, and `retrospective.md` as applicable.
 Use descriptive kebab-case evidence names. Read back every saved artifact before
-claiming a durable handoff. These files are committed project records, although
-writing them does not authorize staging, committing, pushing, tracker writes,
-publishing a PR, merging, or deploying.
+claiming a durable handoff. These local records are excluded from project Git
+history. Writing them does not authorize tracker writes, publishing a PR,
+merging, or deploying.
 
 After a successful local delivery, cleanup reads back the four final records
 before removing superseded implementation, repair, and generated history
@@ -149,9 +149,9 @@ reports. The final `delivery.json` records hashes and reasons for a retained
 `planning-handoff.md` or `archive.md`. Unclassified artifacts and staged extras
 block cleanup; cleanup never changes the Git index.
 
-Ignore only `/.p2p/tmp/` under the P2P convention. Setup detects conflicting
-repository, local, and global ignores affecting `specs/`, `work/`, or
-`.p2p/work/`; report the actual conflict rather than overriding unrelated rules.
+Ignore `/.p2p/` under the P2P convention. Setup detects conflicting repository,
+local, and global ignores affecting project paths; report the actual conflict
+rather than overriding unrelated rules.
 Git does not retain empty directories. Setup creates them locally; their first
 real files carry them into a checkout, so placeholder files are unnecessary.
 
@@ -170,46 +170,41 @@ access limitations. Without a safe durable copy, mark evidence unavailable.
 A checksum or inaccessible old temporary path alone is insufficient.
 
 The outer `deliver-issue` workflow keeps its invocation record, fixed review
-snapshot, reports, and scratch under the user-level work root's
-`orchestration/` directory while active or unresolved.
-The `p2p_delivery.py` controller keeps its execution records, attempts,
-prompts, events, receipts, reports, and scratch under
-`~/.p2p/work/<repo-id>/<work-item>/runtime`, with its local Git workspace under
-`~/.p2p/work/<repo-id>/<work-item>/`. After `REVIEWED_AND_PROVEN`, explicit
-cleanup waits for the source checkout to match the candidate, writes and reads back only
-`candidate.json`, `delivery.json`, `review.md`, and `proof.md`, then deletes the
-local payload. These current records replace prior records without an extra
-`.p2p/work/` history copy. The controller keeps any uncommitted prior record
-bytes in ignored local recovery until replacement has been read back; committed
-versions remain available in Git history. Successful compact records do not
+snapshot, reports, and scratch under `.p2p/work/<slug>/orchestration/` while
+active or unresolved. The `p2p_delivery.py` controller keeps its execution
+records, attempts, prompts, events, receipts, reports, and scratch under
+`.p2p/work/<slug>/runtime/`. Its local Git workspace is under the same work
+root. New deliveries use this repo-local layout. An unresolved delivery from
+the legacy `~/.p2p/work/<repo-id>/<work-item>/` layout remains there until the
+controller reconciles it; conflicting local and legacy roots block use.
+
+After `REVIEWED_AND_PROVEN`, explicit cleanup waits for the source checkout to
+match the candidate, writes and reads back the durable records, then deletes
+the local payload. The current records replace prior records without an extra
+history copy. The controller keeps any uncommitted prior record bytes in
+ignored local recovery until replacement has been read back. Versions already
+committed under legacy workflows remain in their existing Git history; current
+P2P records never enter project Git history. Successful compact records do not
 reconstruct the candidate in a different checkout.
 
-For other stage saves, before replacing a report, candidate, evidence, or uncommitted agreement, retain
-its previous bytes in Git history or `.p2p/work/<slug>/history/<sha256>/<name>`.
-When the exact old bytes already exist at the same path in `HEAD`, Git supplies
-that history; do not also copy them into `history/`. Staged bytes alone do not
-qualify. Preserve uncommitted versions in `history/` before replacement.
+Before replacing a report, candidate, evidence, or uncommitted agreement,
+retain its previous bytes in ignored
+`.p2p/work/<slug>/history/<sha256>/<name>`. If exact old bytes already exist in
+legacy Git history, keep that commit as an additional recovery source. Never
+add P2P records to a new project commit. Preserve uncommitted versions in
+`history/` before replacement.
 Retain related evidence and snapshots so historical reports remain interpretable.
 Rerunning the owning stage updates verdicts and identities. A manually edited
 verdict does not establish acceptance. Acceptance is derived from matching
 current reports, never from an authoritative `accepted: true` flag.
 
-### Archive inactive records
+### Recover legacy committed records
 
-For inactive work, bulky records may live in existing Git history instead of
-the current checkout. Keep the top-level reports, candidate record, and any
-source records directly referenced by current contracts. Before removing other
-files, verify their exact bytes and modes against a reachable commit. Preserve
-all uncommitted files and all records needed by an active or interrupted run.
-
-Save `archive.md` in the work item's directory with the full commit SHA,
-repository-relative paths, Git tree identities, recovery command, and access
-limitations. Read it before interpreting missing evidence or resuming the work.
-Recover required files from that commit before verification; a missing commit
-or failed recovery blocks reuse. Historical inspection can use a temporary
-directory. Restoration into the working tree must preserve newer records.
-Archiving changes storage, not historical verdicts or current acceptance.
-It reduces checkout size, not Git history size. See [Reduce retained work
+Some legacy P2P records were already committed before the repo-local ignore
+rule. Those old versions may be recovered from their existing commits for
+historical inspection. Do not create new commits to archive current P2P records;
+use explicit delivery cleanup to remove runtime data while retaining the final
+records in ignored local storage. See [Reduce retained work
 data](./how-to.md#reduce-retained-work-data).
 
 ## Candidate identity and resume
@@ -239,12 +234,11 @@ including executable modes and symlink targets. A compact record keeps the full
 candidate key plus only changed path/mode/type/content digests relative to the
 comparison base; it does not retain product payloads or unchanged paths. The
 controller keeps its full local execution workspace under
-`~/.p2p/work/<repo-id>/<work-item>/` while a run is active or unresolved. The
-outer workflow keeps its invocation record, fixed review snapshot, reports,
-and scratch under the user-level work root's `orchestration/` directory; the
-Python controller keeps its stage records, attempts, prompts, events, receipts,
-reports, and scratch under
-`~/.p2p/work/<repo-id>/<work-item>/runtime`. After `REVIEWED_AND_PROVEN`, apply
+`.p2p/work/<slug>/` while a run is active or unresolved. The outer workflow
+keeps its invocation record, fixed review snapshot, reports, and scratch under
+that work root's `orchestration/` directory. The Python controller keeps its
+stage records, attempts, prompts, events, receipts, reports, and scratch under
+`.p2p/work/<slug>/runtime/`. After `REVIEWED_AND_PROVEN`, apply
 the candidate to the source checkout and run explicit cleanup; cleanup verifies the
 complete source tree and reads back the durable records before deleting the
 local payload. After that cleanup, the records do not reconstruct the candidate
@@ -254,7 +248,7 @@ submodules instead of dropping inputs. Resolve those inputs before capture.
 Isolate unrelated changes before capture without resetting, stashing, or
 discarding the user's work.
 
-A product candidate A can be followed by commit B recording `.p2p/` artifacts.
+A product candidate A can be followed by commit B that excludes `.p2p/` records.
 Review and proof remain bound to A. To reuse them for B, compare the complete
 tracked tree outside `.p2p/`, check relevant uncommitted content, and recheck the
 exact work item, every binding input, and the requested comparison base. A
@@ -268,9 +262,10 @@ Given only `work/<slug>.md`, resolve its source and parent links, children,
 artifact directory, candidate, reports, and evidence. Recompute their identities
 before reuse and resume the earliest incomplete or stale stage. Missing evidence
 or recoverable candidate content is a blocked handoff, not a reason to infer
-success from chat or file existence. A fresh checkout needs the committed records
-and candidate Git objects or retained snapshot. An authorized transfer must
-include them before the previous checkout or temporary files are removed.
+success from chat or file existence. A fresh checkout needs the ignored work-item
+records copied from the local work root and candidate Git objects or a retained
+snapshot. An authorized transfer must include them before the previous checkout
+or temporary files are removed.
 
 The dependency-free `scripts/p2p_filesystem.py` shipped with the skills implements
 setup, path resolution, safe creation and replacement, candidate capture,
@@ -676,9 +671,9 @@ snapshot key.
 
 When a snapshot needs a commit, create it in an isolated publication workspace
 and compare its complete Git tree outside `.p2p/` with the captured candidate.
-Include authorized durable `.p2p/work/` records in the publication commit and
-inspect them separately for secrets and consistency. Record their exact commit
-inputs in the preview; they do not change the report-bound product identity. Record the exact
+Exclude all `.p2p/**` records from the publication commit. If a durable handoff
+is needed, use the separately authorized GitHub issue-record flow and verify its
+readback; PR publication does not authorize an issue write. Record the exact
 snapshot-to-commit mapping. A content-equivalent commit preserves candidate-bound
 review and proof only when behaviorally relevant build and execution inputs are
 unchanged or explicitly shown equivalent. These inputs include Git metadata when

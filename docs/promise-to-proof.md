@@ -341,12 +341,14 @@ Save `implementation.md` and a compact `candidate.json` under
 base, agreement/binding hashes, and base-relative changed path, mode, type, and
 content digests; it does not contain product payloads or unchanged-path rows.
 Keep the active execution/recovery workspace and candidate payload under
-`~/.p2p/work/<repo-id>/<work-item>/`. The Python controller keeps its delivery
-records, attempts, prompts, events, receipts, reports, and runtime scratch
-under that work item's `runtime/` directory. The outer workflow keeps its
-fixed review snapshot, invocation record, reports, and scratch under that
-work item's `orchestration/` directory. Exclude all of `.p2p/` from the product
-candidate and use the fixed review base.
+`.p2p/work/<slug>/`. The Python controller keeps its delivery records,
+attempts, prompts, events, receipts, reports, and runtime scratch under that
+work item's `runtime/` directory. The outer workflow keeps its fixed review
+snapshot, invocation record, reports, and scratch under that work item's
+`orchestration/` directory. New deliveries use this repo-local layout. Keep
+unresolved legacy state under `~/.p2p/work/<repo-id>/<work-item>/` until it is
+reconciled; conflicting local and legacy roots block use. Exclude all of
+`.p2p/` from the product candidate and use the fixed review base.
 
 Record exact work-item and binding parent/specification hashes. A compact
 candidate identity is sufficient after successful cleanup and does not rebuild
@@ -358,20 +360,21 @@ binding documents. Preserve source attribution when importing external text.
 A mutable issue or branch name cannot identify the fixed candidate during an
 active delivery; use the local candidate workspace and its exact identity.
 
-Before replacing records, retain prior bytes and related evidence in Git or the
-work item's `history/` directory. The controller's successful finalizer is a
-specific exception: it keeps any uncommitted prior four-record set in ignored
-local recovery until the new compact set is read back. Never save secrets,
+Before replacing P2P records, retain prior bytes and related evidence in the
+ignored work item's `history/` directory. The controller's successful finalizer
+keeps any uncommitted prior four-record set in ignored local recovery until the
+new compact set is read back. Never commit `.p2p/**` records or save secrets,
 including inside snapshots.
 For unsuitable evidence, retain a safe durable reference, checksum, and access
 limitations; otherwise report it unavailable. Required observations must survive
 deletion of `.p2p/tmp/` and OS temporary files.
 
-Commit durable records only when authorized. If candidate A is followed by a
-commit B containing reports, reports still describe A. Compare the complete tree
-outside `.p2p/`, current work-item and binding-input bytes, and comparison base
-before reuse. A fresh checkout resumes from `work/<slug>.md` and the retained
-candidate, reports, and evidence, without manually supplied artifact paths.
+P2P records stay local and ignored; authorized issue-record publication is a
+separate effect. Local record updates do not change candidate A's identity.
+Compare the complete tree outside `.p2p/`, current work-item and binding-input
+bytes, and comparison base before reuse. A fresh checkout resumes from
+`work/<slug>.md` after the ignored records and retained candidate data have been
+transferred through an authorized channel.
 
 ## Review the captured implementation
 

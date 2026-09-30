@@ -163,15 +163,17 @@ and preserves the notes. Retain actual stage identities and independent command
 observations. A test of another function with the original fixture's promises
 does not establish this case. Record limitations separately from the result.
 
-## D12. Artifact commits and binding input drift
+## D12. Ignored records and binding input drift
 
-Review and prove candidate A, then authorize commit B containing only `.p2p/`
-records. Resume from the work-item path. Pass when reports still name A and
-reuse succeeds after comparing the complete tracked tree outside `.p2p/`.
+Review and prove candidate A, then update its local ignored `.p2p/` records.
+Resume from the work-item path. Pass when `.p2p/**` remains outside Git history,
+reports still name A, and reuse succeeds after comparing the complete product
+tree outside `.p2p/`.
 Independently change product bytes, the work item, a linked binding parent or
 specification, and the comparison base. Each change must reject incompatible
-report reuse. Repeat a run before committing its first reports; verify the
-previous candidate, reports, and evidence remain recoverable after replacement.
+report reuse. Repeat a run before replacing its first reports; verify the
+previous candidate, reports, and evidence remain recoverable from ignored local
+history after replacement.
 
 ## D13. Retain safe evidence
 

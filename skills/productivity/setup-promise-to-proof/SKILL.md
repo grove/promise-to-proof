@@ -48,12 +48,13 @@ continue independent local filesystem setup.
 ## Write and verify
 
 Create `specs/`, `work/`, `.p2p/work/`, and `.p2p/tmp/` without replacing
-existing content. Add only `/.p2p/tmp/` to `.gitignore`, preserving unrelated
+existing content. Add `/.p2p/` to `.gitignore`, preserving unrelated
 rules and comments. Check effective rules with `git check-ignore --no-index -v`
 for probes in all four directories, including repository, global, and
-`.git/info/exclude` rules. `specs/`, `work/`, and `.p2p/work/` must be trackable.
-Report conflicting patterns with their source and line; do not hide them with
-force-add or silently rewrite unrelated policy. Empty directories need no
+`.git/info/exclude` rules. Only `specs/` and project-authored `work/` must be
+trackable; `.p2p/work/` must be ignored by the project rule.
+Report setup errors and use `git check-ignore -v` to locate conflicting patterns;
+do not hide them with force-add or silently rewrite unrelated policy. Empty directories need no
 placeholder files. Run `python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> setup`;
 its error output identifies conflicts.
 

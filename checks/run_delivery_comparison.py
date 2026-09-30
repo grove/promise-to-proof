@@ -80,7 +80,7 @@ def configured():
 def fixture(root, task):
     root.mkdir(parents=True)
     subprocess.run(['git', 'init', '-q', str(root)], check=True)
-    (root / '.gitignore').write_text('/.p2p/tmp/\n')
+    (root / '.gitignore').write_text('/.p2p/\n')
     if task == 'greeting':
         requirements = [('greet.py prints hello followed by a newline and exits zero.',
                          'python3 greet.py', 'exact stdout and exit status')]

@@ -29,10 +29,12 @@ and snapshot-to-commit mappings automatically in
 `.p2p/work/<slug>/publication.md`; preserve prior records under the protocol
 retention rule. Local record saving is authorized independently of publication.
 
-The exact publication preview must include the reports, evidence, and recovery
-records needed to retrieve every referenced handoff from the published commit.
-List their exact paths and byte identities. Exclude
-`.p2p/tmp/` and secrets. A later artifact commit never rebinds old reports: compare
+The exact publication preview must include project files needed for the PR and
+their exact paths and byte identities. Exclude all `.p2p/**` records and secrets.
+Keep P2P reports and recovery records in ignored local storage. A separately
+authorized GitHub issue-record flow may persist a handoff after readback; PR
+publication does not authorize that issue write. A later artifact commit never
+rebinds old reports: compare
 the complete tracked tree outside `.p2p/`, exact work-item and binding input hashes,
 and comparison base before reusing results. Retain report-bound candidate A
 explicitly when the published head B adds records only. No source issue is required.
@@ -231,7 +233,7 @@ publication effect, even when no remote write began.
 After commit creation, compare the complete tracked tree outside `.p2p/`,
 including every path, byte, mode, symlink, deletion, and fixture, with the
 candidate's full-tree key and base-relative changed-file identities (or its
-legacy manifest). Separately verify the approved durable `.p2p/work/` files.
+legacy manifest). Confirm that `.p2p/**` remains excluded.
 Also confirm the commit parent and approved metadata inputs. A mismatch is `BLOCKED`: retain the
 diagnostic, do not push, and do not recapture the changed tree as the candidate.
 When complete content equivalence is established, record the snapshot-to-commit
@@ -260,8 +262,9 @@ reconciliation and no new pull request.
 
 Create the remote head branch only when it is absent. If it exists at the exact
 approved commit, reuse it. If it points elsewhere during initial publication, return `BLOCKED`;
-never force-push it. An explicitly authorized records-only follow-up uses the
-separate procedure under "Finish the local handoff" below. After a push, read the remote ref and require its full SHA to
+never force-push it. All `.p2p/**` records stay local and ignored; never include
+them in a commit or push, even when requested. If a durable handoff is needed,
+use the separately authorized GitHub issue-record flow. After a push, read the remote ref and require its full SHA to
 match the verified publication commit before creating the pull request.
 
 Create the pull request as a draft using the approved target, head, title, and
@@ -277,25 +280,19 @@ repeat the write. Never delete a successful branch or pull request as rollback.
 
 ## Finish the local handoff
 
-After remote readback, compare issue-owned files in the operator's checkout with
-the published commit by path, bytes, mode, and symlink target. Report separately:
-files already published unchanged, files that differ, and local-only records.
-An untracked copy on another branch is not evidence that publication omitted it.
-
-For local-only publication records, prepare a records-only follow-up preview
-when the user wants them published. Freeze the exact paths and bytes, parent
-commit, message, destination and head. Obtain explicit authority for that commit
-and its non-force push unless the current request already grants it. This is a
-separate update of the existing PR, not permission inferred from its original
-publication. Before writing, require the remote head to equal the named parent.
+After remote readback, compare the published commit with the candidate by path,
+bytes, mode, and symlink target. Confirm all `.p2p/**` records remain local and
+ignored. If a durable handoff is needed, use the separately authorized GitHub
+issue-record flow and verify its readback. PR publication does not authorize
+committing local P2P records or writing to an issue.
 Verify that the complete product tree and original review/proof bytes are
 unchanged, retain the original report-bound candidate identity, and confirm the
 new remote SHA. Preserve the PR's current ready/draft state, title and body.
 
 Treat the frozen publication receipt as a historical record of the first
-publication. Confirm the later records commit by its Git ancestry and remote
-SHA; do not recursively create another receipt commit about each receipt commit.
-Keep the original snapshot-to-commit mapping and report the later head separately.
+publication. Keep later P2P receipts local and ignored; never create a records
+commit containing `.p2p/**`. If a durable handoff is needed, use the separately
+authorized GitHub issue-record flow. Keep the original snapshot-to-commit mapping.
 
 Complete the approved local handoff before ending the publication task:
 

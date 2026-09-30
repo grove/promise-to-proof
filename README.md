@@ -59,11 +59,10 @@ host, with agreed tasks, independent correctness judgments, and an improvement
 threshold. Additional hosts and automatic strategy selection remain later work.
 See the [optimization plan](./plans/promise_to_proof_optimization_handoff.md).
 
-Specifications live in `specs/` and local acceptance contracts in `work/`.
-Standalone skills save handoffs in `.p2p/work/`; the controller keeps active
-execution state under `~/.p2p/work/<repo-id>/<work-item>/`. Issue-backed controller
-delivery uses a compact GitHub completion record rather than requiring P2P files
-in the delivered commit. GitHub remains optional for local work.
+Specifications live in `specs/`, and local acceptance contracts live in `work/`.
+Generated records and active delivery state live under ignored `.p2p/work/`.
+Keep `.p2p/**` out of Git. GitHub Issues are optional import and publication
+destinations.
 See the [controller guide](./docs/p2p-delivery-controller.md) for the storage and
 cleanup paths, and the [migration guide](./docs/p2p-state-migration.md) for removing
 existing P2P-owned files from the current Git tree without rewriting history.

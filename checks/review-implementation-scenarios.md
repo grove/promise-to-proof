@@ -205,12 +205,12 @@ without requiring unrelated sibling functionality or claiming whole-parent deliv
 Missing prerequisites and affected amendments stay explicit before dependent work.
 The handoff preserves qualified parent references and exact agreement identities.
 
-## Local discovery and artifact-only commits
+## Local discovery and ignored records
 
 Invoke `/review-implementation work/foo-bar.md` with no artifact paths. Pass
 when the skill discovers the saved candidate and base, reviews fixed content,
-and saves `review.md` in `.p2p/work/foo-bar/`. Commit only generated records
-with separate authority; the report keeps the original candidate identity.
+and saves `review.md` in ignored `.p2p/work/foo-bar/`. Updating local records
+requires no Git write and keeps the original candidate identity.
 Changing product content, the work item, binding parent/spec bytes, or the
 comparison base rejects reuse. The reviewer never repairs product content.
 

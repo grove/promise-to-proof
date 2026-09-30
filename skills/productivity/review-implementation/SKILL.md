@@ -166,7 +166,8 @@ prior runs under the protocol's history rule. In a read-only stage context,
 return exact report text for the enclosing workflow to save and reread.
 Validate work-item and binding parent/spec hashes and the comparison-base SHA
 against `candidate.json`; product changes outside `.p2p/` invalidate reuse.
-Reports keep the original candidate identity after an artifact-only commit.
+Saving reports under ignored `.p2p/` keeps the original candidate identity;
+those records stay out of Git history.
 Follow the protocol's report storage and transfer rules. Preserve the report,
 contract identity, and captured comparison identities across sessions. Refresh
 review and any stale proof after candidate changes. Leave canonical contract

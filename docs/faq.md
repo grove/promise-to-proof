@@ -127,35 +127,34 @@ contract; the revision and captured text identify its meaning. A candidate
 digest can help verify content, but it cannot replace the content needed to
 resume work.
 
-### Why commit generated reports if they are outside the candidate?
+### Where do generated reports live?
 
 The candidate excludes `.p2p/`. Active controller state and attempt evidence
-stay under the user-level work root's `runtime/`; outer workflow candidate
-payloads, transcripts, reports, and invocation state stay under its
-`orchestration/` directory. After the
-candidate is applied and explicit cleanup verifies its identity, the compact
-candidate, delivery, review, and proof records live in `.p2p/work/<slug>/` and
-travel with authorized commits. If review and
-proof examined commit A, a later commit B recording those artifacts does not
-change their subject to B. Reuse requires identical content outside `.p2p/`,
+stay under `.p2p/work/<slug>/runtime/`; outer workflow candidate payloads,
+transcripts, reports, and invocation state stay under its `orchestration/`
+directory. After the candidate is applied and explicit cleanup verifies its
+identity, compact candidate, delivery, review, and proof records remain under
+ignored `.p2p/work/<slug>/`. They do not travel with product commits. If review
+and proof examined commit A, a later commit B recording other authorized
+artifacts does not change their subject to B. Reuse requires identical content outside `.p2p/`,
 unchanged agreements, and the same comparison base. Git-dependent builds also
 need execution-input equivalence.
 
 ### What happens to old reports and temporary evidence?
 
-Before replacement, retain old records in Git or the work item's `history/`
-directory, except the `deliver-issue` controller's explicit compact finalizer:
-it keeps prior uncommitted final bytes in ignored local recovery until the new
-four-record set is read back. Keep recovery data while the controller run is
+Before replacement, retain old records in the work item's ignored `history/`
+directory. The `deliver-issue` controller's compact finalizer keeps prior
+uncommitted final bytes in ignored local recovery until the new four-record set
+is read back. Keep recovery data while the controller run is
 active, blocked, interrupted, or uncertain; successful cleanup removes it after
 the source identity matches. Disposable scratch can be removed earlier.
 Required observations must already be retained in a report or evidence file.
 Sensitive or large evidence needs a safe durable reference,
 checksum, and access limitations. Unavailable evidence stays unavailable.
 
-Keep exploratory runs and generated fixtures in scratch. For inactive work,
-bulky committed records can stay in Git history with an `archive.md` recovery
-reference beside the reports. Restore required evidence before reuse. See
+Keep exploratory runs and generated fixtures in scratch. P2P files already
+present in legacy Git history can be recovered from those existing commits;
+current P2P records stay local and ignored. Restore required evidence before reuse. See
 [Reduce retained work data](./how-to.md#reduce-retained-work-data).
 
 ## Review, proof, and repair

@@ -42,13 +42,22 @@ def encoded(value):
     return json.dumps(value, sort_keys=True, indent=2, ensure_ascii=False).encode() + b'\n'
 
 
+def require_repo_local_ignored(root, path):
+    path = Path(os.path.abspath(path))
+    try:
+        relative = path.relative_to(Path(root).resolve())
+    except ValueError:  # Reconciled legacy state lives outside the project Git tree.
+        return
+    fs.require_ignored(root, relative.as_posix())
+
+
 def save_final(root, work, name, data):
     _, artifact = delivery_paths(root, work)
     target = fs.safe(artifact, name)
+    require_repo_local_ignored(root, target)
     relative = str(target)
     target.parent.mkdir(parents=True, exist_ok=True)
-    # The current record replaces its predecessor; committed versions already live in Git history.
-    fs.atomic_write(target, data)
+    fs.atomic_write(target, data, ignored_root=root)
     if target.read_bytes() != data:
         raise ValueError('storage readback failed: ' + name)
     return relative
@@ -56,6 +65,7 @@ def save_final(root, work, name, data):
 
 def check_final_footprint(root, work, values):
     _, artifact = delivery_paths(root, work)
+    require_repo_local_ignored(root, artifact)
     artifact.mkdir(parents=True, exist_ok=True)
     allowed = set(values) | set(RETAINED_ARTIFACTS) | SUPERSEDED_RECORDS
     existing = [path for path in artifact.rglob('*') if path.is_file() or path.is_symlink()]
@@ -78,13 +88,28 @@ def check_final_footprint(root, work, values):
 def local_directory(root, work):
     common = fs.git(root, 'rev-parse', '--path-format=absolute', '--git-common-dir').decode().strip()
     repo_id = Path(root).name + '-' + fs.digest(str(Path(common).resolve()).encode())[:16]
+    root = Path(root).resolve()
+    repo_local = root / '.p2p' / 'work' / Path(work).stem
     home = Path.home().resolve()
     local_root = home / '.p2p' / 'work'
-    # Keep the configured user-level root from redirecting delivery state elsewhere.
-    local = local_root / repo_id / Path(work).stem
-    for path in (home / '.p2p', local_root, local_root / repo_id, local):
+    legacy = local_root / repo_id / Path(work).stem
+    legacy_orchestration = legacy / 'orchestration'
+    # Continue an unresolved pre-v1 delivery in place; new work always stays in the checkout.
+    legacy_present = legacy.exists() and (any((legacy / name).exists() for name in ('delivery.json', 'runtime'))
+                                          or (legacy / 'artifacts/delivery.json').is_file()
+                                          or (legacy_orchestration.is_dir() and not legacy_orchestration.is_symlink()
+                                              and any(legacy_orchestration.iterdir())))
+    if legacy_present and not repo_local.exists():
+        local = legacy
+    elif legacy_present and repo_local.exists():
+        raise ValueError('both repo-local and legacy P2P state exist; reconcile without overwriting either')
+    else:
+        local = repo_local
+        fs.setup(root)
+    for path in (root / '.p2p', root / '.p2p' / 'work', repo_local, home / '.p2p', local_root,
+                 local_root / repo_id, legacy, legacy_orchestration, local):
         if path.is_symlink():
-            raise ValueError('user-local P2P state path contains a symlink: ' + str(path))
+            raise ValueError('P2P state path contains a symlink: ' + str(path))
     return local
 
 
@@ -95,7 +120,7 @@ def agreement_root(root, work):
 def local_storage_directory(root, work, name):
     path = local_directory(root, work) / name
     if path.is_symlink() or (path.exists() and not path.is_dir()):
-        raise ValueError('user-local P2P ' + name + ' path is not a directory')
+        raise ValueError('repo-local P2P ' + name + ' path is not a directory')
     return path
 
 
@@ -122,7 +147,7 @@ def imported_issue_sources(root, work):
 
 
 def delivery_paths(root, work):
-    """Resolve agreements from user-local state and keep delivery records there."""
+    """Resolve agreements and records inside this checkout's ignored P2P root."""
     agreement = fs.safe(agreement_root(root, work), work)
     source = fs.safe(root, work)
     if not agreement.is_file():
@@ -136,23 +161,25 @@ def localize_agreement(root, work, bindings):
     for relative in [work, *(item['path'] for item in bindings)]:
         target = fs.safe(agreement_root, relative)
         source = fs.safe(root, relative)
+        require_repo_local_ignored(root, target)
         target.parent.mkdir(parents=True, exist_ok=True)
         if not source.is_file() and target.is_file():
             continue
         data = source.read_bytes()
         if target.exists() and target.read_bytes() != data:
-            raise ValueError('user-local agreement input changed: ' + relative)
+            raise ValueError('repo-local agreement input changed: ' + relative)
         if not target.exists():
-            fs.atomic_write(target, data)
+            fs.atomic_write(target, data, ignored_root=root)
         if fs.digest(target.read_bytes()) != fs.digest(data):
-            raise ValueError('user-local agreement readback failed: ' + relative)
+            raise ValueError('repo-local agreement readback failed: ' + relative)
     return fs.safe(agreement_root, work)
 
 
 def local_save(root, work, name, data):
     local = fs.safe(local_directory(root, work), name)
+    require_repo_local_ignored(root, local)
     local.parent.mkdir(parents=True, exist_ok=True)
-    fs.atomic_write(local, data)
+    fs.atomic_write(local, data, ignored_root=root)
     if local.read_bytes() != data:
         raise ValueError('local storage readback failed: ' + name)
     return local
@@ -201,6 +228,7 @@ def record_generation(delivery, candidate, stage):
         raise ValueError('local generation ref exists outside recovery state: ' + generation_ref)
     path = f'runtime/generations/{sequence:06d}.json'
     target = fs.safe(local, path)
+    require_repo_local_ignored(delivery.root, target)
     if target.exists():
         raise ValueError('local generation record exists outside recovery state: ' + path)
     manifest = fs.snapshot(workspace, exclude=delivery.state.get('agreement_paths', ()))
@@ -232,7 +260,7 @@ def record_generation(delivery, candidate, stage):
               'ref': generation_ref}
     data = encoded(record)
     target.parent.mkdir(parents=True, exist_ok=True)
-    fs.atomic_write(target, data)
+    fs.atomic_write(target, data, ignored_root=delivery.root)
     if target.read_bytes() != data:
         raise ValueError('local generation record readback failed: ' + path)
     summary = record | {'record_path': path, 'record_sha256': fs.digest(data)}
@@ -240,10 +268,14 @@ def record_generation(delivery, candidate, stage):
     return summary
 
 
-def materialize(root, manifest):
+def materialize(root, manifest, ignored_root=None):
+    if ignored_root is not None:
+        require_repo_local_ignored(ignored_root, root)
     root.mkdir(parents=True, exist_ok=True)
     for entry in manifest:
         target = fs.safe(root, entry['path'])
+        if ignored_root is not None:
+            require_repo_local_ignored(ignored_root, target)
         target.parent.mkdir(parents=True, exist_ok=True)
         if entry['type'] == 'symlink':
             target.symlink_to(entry['target'])
@@ -1046,7 +1078,8 @@ class Delivery:
         active_route = routing(self.root, self.work, explicit, require_tip=False)
         if route_identity(active_route) != route_identity(admitted_route):
             raise ValueError('approved delivery plan or destination changed; reconcile routing before resume')
-        if admitted_route.get('path') and route_record(routing(self.workspace, self.work)) != route_record(admitted_route):
+        if admitted_route.get('path') and route_identity(
+                routing(self.workspace, self.work, require_tip=False)) != route_identity(admitted_route):
             raise ValueError('transferred approved delivery plan changed')
         for record in self.state.get('routing_records', []):
             if self.state['routing'].get('path') and record['path'] == self.state['routing']['path']:
@@ -1288,10 +1321,13 @@ class Delivery:
                 raise ValueError('reserved stage inputs differ; uncertain dispatch: ' + attempt['id'])
             return attempt, self.receipt(attempt)
         scratch = writable or (self.runtime / 'scratch' / str(uuid.uuid4()))
+        require_repo_local_ignored(self.root, scratch)
         scratch.mkdir(parents=True, exist_ok=True)
+        require_repo_local_ignored(self.root, scratch / '.p2p/tmp')
         (scratch / '.p2p/tmp').mkdir(parents=True, exist_ok=True)
         attempt = self.reserve(stage, inputs, scratch)
         folder = self.local / 'attempts' / attempt['id']
+        require_repo_local_ignored(self.root, folder)
         folder.mkdir(parents=True)
         if schema:
             local_save(self.root, self.work, f'attempts/{attempt["id"]}/schema.json', encoded(schema))
@@ -1306,6 +1342,8 @@ class Delivery:
             'configuration': host_config(scratch), 'model_provenance': 'inherited configured preference'}))
         print(f'{stage} started [{attempt["id"]}]; deadline {attempt["deadline"]}', file=sys.stderr, flush=True)
         try:
+            require_repo_local_ignored(self.root, folder / 'events.jsonl')
+            require_repo_local_ignored(self.root, folder / 'stderr.txt')
             result = launch(args, prompt, folder / 'events.jsonl', folder / 'stderr.txt', attempt['deadline'])
             result.update(attempt_id=attempt['id'], inputs=inputs,
                           event_sha256=fs.digest((folder / 'events.jsonl').read_bytes()))
@@ -1331,6 +1369,7 @@ class Delivery:
                          self.workspace / self.work]
             protected += [self.workspace / item['path'] for item in self.state['binding_inputs']]
             sentinel = self.runtime / 'candidate-sentinel'
+            require_repo_local_ignored(self.root, sentinel)
             sentinel.write_text('protected\n')
             protected.append(sentinel)
             before = {str(p): fs.digest(p.read_bytes()) for p in protected}
@@ -1360,6 +1399,7 @@ print('P2P_BOUNDARY=' + json.dumps(results, sort_keys=True))
 assert all(v == 'denied' for k,v in results.items() if k != 'scratch')
 assert results['scratch'] == 'ok'
 '''.replace('PROTECTED', repr([str(p) for p in protected]))
+            require_repo_local_ignored(self.root, probe)
             probe.write_text(script)
             inputs = {'contract_sha256': self.state['contract']['sha256'], 'probe_sha256': fs.digest(probe.read_bytes())}
             prompt = ('Authorized local host preflight. Run exactly `python3 ' + str(probe) +
@@ -1446,7 +1486,8 @@ assert results['scratch'] == 'ok'
         self.source_stable()
         if name in ('review', 'proof'):
             self.current()
-        report = json.loads(host['message'])
+        raw_report = host['message'].encode('utf-8')
+        report = json.loads(raw_report)
         expected_fields = {'status', 'input_identity_json', 'requirements', 'gaps'}
         if name == 'review':
             expected_fields.update({'findings', 'coverage', 'checks', 'limitations', 'missing_input', 'expected_result'})
@@ -1504,9 +1545,9 @@ assert results['scratch'] == 'ok'
                         raise ValueError('proof evidence is incomplete: ' + row['id'])
         path = f'attempts/{attempt["id"]}/report.json'
         stored = self.local / path
-        if stored.exists() and stored.read_bytes() != encoded(report):
+        if stored.exists() and stored.read_bytes() != raw_report:
             raise ValueError('conflicting duplicate stage result: ' + attempt['id'])
-        local_save(self.root, self.work, path, encoded(report))
+        local_save(self.root, self.work, path, raw_report)
         attempt['destination_observation'] = self.state.get('destination_observation')
         summary = (review_markdown(report, self.work, self.state['contract'], self.state['candidate'],
                                    fs.snapshot(self.workspace, self.state['comparison_base']),
@@ -1515,7 +1556,7 @@ assert results['scratch'] == 'ok'
                    if name == 'review' else report['details']).encode()
         local_save(self.root, self.work, f'attempts/{attempt["id"]}/report.md', summary)
         local_save(self.root, self.work, name + '.md', summary)
-        attempt.update(status='complete', report=path, report_sha256=fs.digest(encoded(report)))
+        attempt.update(status='complete', report=path, report_sha256=fs.digest(raw_report))
         self.state.setdefault('reports', {})[name] = {'path': path, 'sha256': attempt['report_sha256'],
                                                      'attempt_id': attempt['id'], 'inputs': inputs}
         self.save()
@@ -1528,7 +1569,7 @@ assert results['scratch'] == 'ok'
             raise ValueError('report/evidence content changed or lost: ' + name)
         attempt = next(a for a in self.state['attempts'] if a['id'] == record['attempt_id'])
         host = self.receipt(attempt)
-        if encoded(json.loads(host['message'])) != data:
+        if host['message'].encode('utf-8') != data:
             raise ValueError('report differs from host return: ' + name)
         report = json.loads(data)
         if name == 'review' and 'coverage' in report:
@@ -1658,6 +1699,11 @@ assert results['scratch'] == 'ok'
             raise ValueError('local attempt records are a symlink')
         if attempts.exists():
             shutil.rmtree(attempts)
+        agreement = self.local / 'agreement'
+        if agreement.exists():
+            shutil.rmtree(agreement)
+        for name in ('implementation.md', 'repair.md', 'review.md', 'proof.md'):
+            (self.local / name).unlink(missing_ok=True)
         (self.local / 'delivery.json').unlink(missing_ok=True)
         shutil.rmtree(self.runtime)
 
@@ -1816,6 +1862,11 @@ def create(root, args):
     executable = shutil.which('codex')
     if not executable:
         raise ValueError('unsupported host: codex executable missing')
+    try:
+        version = subprocess.run([executable, '--version'], capture_output=True, text=True,
+                                  timeout=10, check=True).stdout.strip()
+    except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as error:
+        raise ValueError('unsupported host: codex version probe failed or timed out') from error
     if not re.fullmatch(r'[0-9a-f]{40}|[0-9a-f]{64}', args.comparison_base):
         raise ValueError('comparison base must be an explicit full commit SHA')
     base = fs.full_commit(root, args.comparison_base)
@@ -1860,7 +1911,7 @@ def create(root, args):
         else:
             local_input = fs.safe(agreement_root(root, args.work), path)
             if not local_input.is_file():
-                raise ValueError('agreement input missing from user-local storage: ' + path)
+                raise ValueError('agreement input missing from repo-local storage: ' + path)
             manifest[path] = {'path': path, 'mode': '100644', 'type': 'file',
                               'content_base64': base64.b64encode(local_input.read_bytes()).decode()}
     _, directory = delivery_paths(root, args.work)
@@ -1868,11 +1919,15 @@ def create(root, args):
     runtime = local / 'runtime'
     if runtime.exists():
         raise ValueError('local runtime exists without an active delivery record; preserve it and reconcile admission')
+    require_repo_local_ignored(root, runtime)
     runtime.mkdir(parents=True)
     repository = runtime / 'repository.git'
-    result = subprocess.run(['git', 'clone', '--bare', '--', str(root), str(repository)], capture_output=True)
+    require_repo_local_ignored(root, repository)
+    subprocess.run(['git', 'init', '--bare', '--quiet', str(repository)], check=True)
+    result = subprocess.run(['git', '-C', str(repository), 'fetch', '--no-tags', '--depth=1',
+                             str(root), base], capture_output=True)
     if result.returncode:
-        raise ValueError('isolated Git metadata copy failed: ' + result.stderr.decode())
+        raise ValueError('isolated exact-base fetch failed: ' + result.stderr.decode())
     base_manifest = fs.snapshot(repository, base)
     base_tree_key = fs.snapshot_key(base_manifest)
     base_tree = git_generation_tree(repository, base_manifest)
@@ -1903,9 +1958,11 @@ def create(root, args):
             local_save(root, args.work, 'runtime/previous-records/' + name, data)
             previous_records[name] = fs.digest(data)
     workspace = runtime / 'workspace'
-    materialize(workspace, sorted(manifest.values(), key=lambda e:e['path']))
-    materialize(workspace, records)
-    (workspace / '.git').write_text('gitdir: ' + str(repository) + '\n')
+    materialize(workspace, sorted(manifest.values(), key=lambda e:e['path']), ignored_root=root)
+    materialize(workspace, records, ignored_root=root)
+    git_pointer = workspace / '.git'
+    require_repo_local_ignored(root, git_pointer)
+    git_pointer.write_text('gitdir: ' + str(repository) + '\n')
     fs.git(workspace, 'config', '--local', 'core.bare', 'false')
     fs.git(workspace, 'update-ref', '--no-deref', 'HEAD', starting)
     fs.git(workspace, 'read-tree', starting)
@@ -1928,7 +1985,7 @@ def create(root, args):
              'deadline': None if args.max_seconds is None else time.time() + args.max_seconds,
              'created': now(), 'repair_used': False, 'attempts': [], 'reports': {},
              'host': {'name': 'Codex CLI on macOS', 'executable': executable,
-                      'version': subprocess.check_output([executable, '--version'], text=True).strip(),
+                      'version': version,
                       'hard_monetary_cap': 'unsupported', 'cost': 'unknown',
                       'enforced': ['scratch-only verification writes', 'network denied', 'approval escalation disabled',
                                    'isolated configuration', 'dispatch admission', 'one repair reservation'],
@@ -1970,6 +2027,14 @@ def result(delivery):
     latest = max(activity) if activity else None
     running = controller_running(delivery)
     pending = running and attempt and attempt['status'] == 'reserved' and attempt['stage'] in ('implementation', 'repair')
+    completion = delivery.local / 'attempts' / attempt['id'] / 'exit.json' if attempt else None
+    uncertain = bool(attempt and attempt['status'] == 'reserved' and running is not True)
+    status = 'BLOCKED' if uncertain else state['status']
+    blocker = state['blocker']
+    if uncertain and completion and not completion.is_file():
+        blocker = f'uncertain dispatch {attempt["id"]}: missing controller host completion {completion}'
+    elif uncertain and completion:
+        blocker = f'controller stopped with unreconciled dispatch {attempt["id"]}; resume to reconcile {completion}'
     progress = {'stage': attempt['stage'] if attempt else None,
                 'attempt_id': attempt['id'] if attempt else None,
                 'status': attempt['status'] if attempt else None,
@@ -1981,8 +2046,8 @@ def result(delivery):
                 'last_activity_at': datetime.datetime.fromtimestamp(latest, datetime.timezone.utc).isoformat() if latest is not None else None,
                 'last_activity_age_seconds': max(0, time.time() - latest) if latest is not None else None,
                 'activity_meaning': 'Log file activity only; not verified useful progress.'}
-    return {key: state[key] for key in ('status', 'blocker', 'invocation_id', 'work_item', 'comparison_base',
-                                      'limits', 'repair_used', 'host')} | {
+    return {'status': status, 'blocker': blocker} | {key: state[key] for key in (
+        'invocation_id', 'work_item', 'comparison_base', 'limits', 'repair_used', 'host')} | {
         'routing': state.get('routing'),
         'destination_observation': state.get('destination_observation'),
         'completion_scope': ('Acceptance is for the exact candidate against the frozen comparison base; compatibility with the current destination is not established.'
@@ -2139,8 +2204,11 @@ def main(argv=None):
                 output.update(status='RUNNING', blocker=None)
             print(json.dumps(output, indent=2))
             return 0 if output['status'] == 'REVIEWED_AND_PROVEN' else 1
+        lock_path = local.parent / (local.name + '.lock')
+        require_repo_local_ignored(root, lock_path)
+        require_repo_local_ignored(root, lock_path.parent)
         local.parent.mkdir(parents=True, exist_ok=True)
-        lock = (local.parent / (local.name + '.lock')).open('a')
+        lock = lock_path.open('a')
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:

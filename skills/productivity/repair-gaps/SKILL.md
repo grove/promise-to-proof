@@ -35,7 +35,8 @@ complete in depth.
    and `proof.md` under `.p2p/work/<slug>/`; also accept an explicit proof
    reference that resolves to the same work item. Read the exact local contract
    revision and matching `NOT PROVEN` proof result. Recheck binding parent/spec
-   hashes and comparison base; `.p2p/`-only commits preserve candidate identity.
+   hashes and comparison base; local `.p2p/` record updates preserve candidate
+   identity and must stay out of Git history.
 2. Confirm the candidate identity and the unresolved requirement IDs.
 3. Apply the smallest complete implementation or evidence repair for the named
    requirements, when editing is authorized. Preserve authorization already given.

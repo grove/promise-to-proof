@@ -42,10 +42,10 @@ does not silently invent a GitHub destination, and names the unsupported externa
 ## 5. Local setup, ignore conflicts, and idempotence
 
 Use a disposable Git repository without a remote or tracker. Run setup twice.
-Pass when `specs/`, `work/`, `.p2p/work/`, and `.p2p/tmp/` exist, only
-`/.p2p/tmp/` is added to `.gitignore`, and the second run changes nothing.
-Existing human edits survive. Probe effective ignore behavior with
-`git check-ignore --no-index -v` for all four directories. Repeat with a broad
-`.p2p/` ignore in `.gitignore`, `.git/info/exclude`, and global excludes.
-Pass when each conflict identifies its source rather than force-adding artifacts.
+Pass when `specs/`, `work/`, `.p2p/work/`, and `.p2p/tmp/` exist, `/.p2p/` is
+added to `.gitignore`, and the second run changes nothing. Existing human edits
+survive. Probe effective ignore behavior with `git check-ignore --no-index -v`
+for all four directories. Pass when `.p2p/work/` and `.p2p/tmp/` are ignored by
+the project rule, project directories stay trackable, and conflicting patterns
+are reported rather than force-added.
 No staging, commits, labels, or issues occur.

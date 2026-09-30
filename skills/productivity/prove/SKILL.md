@@ -84,7 +84,8 @@ captured contract identity, target or base when relevant, and verification
 environment. Follow the protocol's identity rules and confirm both identities
 before checks begin. Validate the work-item hash, binding parent/spec hashes,
 and comparison-base SHA against `candidate.json`. Compare product content
-outside `.p2p/`; artifact-only commits retain the original candidate identity.
+outside `.p2p/`; local `.p2p/` record updates retain the original candidate
+identity and stay out of Git history.
 If any identity cannot be established, return `NOT PROVEN`.
 If the candidate or contract drifts, or observations cannot be tied to them,
 return `NOT PROVEN`.

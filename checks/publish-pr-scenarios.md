@@ -158,13 +158,14 @@ establish installed agent behavior.
 ## 12. Discover durable state and preserve candidate A
 
 Supply only `work/<slug>.md` and target branch. Candidate A has matching review
-and proof; commit B adds only `.p2p/work/<slug>/` records. Pass when publication
-finds the reports automatically, saves `publication.md`, compares the complete
-tracked tree outside `.p2p/`, checks all binding hashes and the comparison base,
-and keeps A as the report-bound identity while recording B as the publishable head.
+and proof; its `.p2p/` records remain local and ignored. Pass when publication
+finds the reports automatically, saves local `publication.md`, compares the
+complete tracked tree outside `.p2p/`, excludes `.p2p/**`, checks all binding
+hashes and the comparison base, and keeps A as the report-bound identity while
+recording the publishable head.
 Repeat with an unrelated tracked product change, a binding parent/spec edit, and
-a changed review base: each prevents reuse. Include retained artifacts explicitly
-in the publication preview; never silently omit them from the durable handoff.
+a changed review base: each prevents reuse. If a durable handoff is needed,
+require separate authorization for the GitHub issue-record flow.
 A saved preview does not stage, commit, push, or create a PR.
 
 ## 13. Reconcile untracked copies after isolated publication
@@ -191,23 +192,17 @@ Repeat the original case with a publication-only preview and no cleanup authorit
 Pass when no copies are moved; the skill presents exact proposed paths and an
 archive destination, and reports what remains without inferring cleanup approval.
 
-## 14. Publish a frozen receipt without an endless commit cycle
+## 14. Keep local publication receipts out of Git
 
-Input: provide the local-only publication records from scenario 13 and authorize
-a concrete records-only commit and non-force push on the existing PR branch.
-The human has marked the PR ready. Repeat with the remote head advanced, a
-changed review report, and an attempted product-file addition.
+Input: provide the local-only publication records from scenario 13 and request
+a records-only commit and non-force push on the existing PR branch. Repeat with
+explicit approval for that commit and push, and with the PR marked ready.
 
-Pass when the unchanged case adds only the frozen records, preserves the complete
-product tree and report bytes, retains the original snapshot mapping, and reads
-back the new head. PR state, title and body stay unchanged. Git ancestry and the
-remote SHA establish the follow-up commit without another receipt-about-receipt
-commit. Each conflicting case stops before push and preserves local records.
-
-Repeat with the same frozen records and original publication approval, but no
-authority for the follow-up commit and push. Pass when the skill presents the
-exact follow-up preview and requests its authorization; it creates no commit,
-pushes nothing, changes no PR content or state, and preserves the local records.
+Pass when the skill keeps every `.p2p/**` record local and ignored, refuses to
+stage or commit those paths, and makes no GitHub or remote Git changes. It may
+offer the separately authorized GitHub issue-record flow for a durable handoff.
+The original snapshot-to-commit mapping remains intact; no receipt-about-receipt
+commit is created.
 
 ## 15. Include and complete the local handoff
 

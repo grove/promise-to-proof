@@ -9,7 +9,7 @@ from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import sys
-import tempfile
+import uuid
 
 
 WORK = re.compile(r"work/[a-z0-9]+(?:-[a-z0-9]+)*\.md\Z")
@@ -49,6 +49,7 @@ def safe(root, relative, leaf_symlink=False):
 def paths(root, work):
     if not WORK.fullmatch(work):
         raise ValueError("work item must be work/<lowercase-kebab-case>.md")
+    setup(root)
     item = safe(root, work)
     artifact = safe(root, f".p2p/work/{item.stem}")
     if item.exists() and not item.is_file():
@@ -73,9 +74,50 @@ def trackable(root, names):
         raise ValueError("conflicting ignore rules hide durable paths: " + detail.stdout.decode().strip())
 
 
+def require_ignored(root, *names):
+    """Require this exact repo-local path to stay out of Git."""
+    relatives = [PurePosixPath(name).as_posix() for name in names]
+    for relative in relatives:
+        if PurePosixPath(relative).is_absolute() or any(part in ("", ".", "..") for part in relative.split("/")):
+            raise ValueError("unsafe repository path: " + relative)
+    if not relatives:
+        return
+    result = subprocess.run(["git", "-C", str(root), "check-ignore", "--no-index", "-z", "--stdin"],
+                            input=b"\0".join(os.fsencode(path) for path in relatives) + b"\0",
+                            capture_output=True)
+    if result.returncode not in (0, 1):
+        raise ValueError("could not verify repo-local ignore rules")
+    ignored = set(filter(None, result.stdout.split(b"\0")))
+    exposed = [relative for relative in relatives if os.fsencode(relative) not in ignored]
+    if exposed:
+        raise ValueError("repo-local artifact path is not ignored: " + exposed[0])
+
+
 def setup(root):
-    """Validate project access without creating repository-local P2P paths."""
-    return {"storage": "user-local"}
+    """Validate the project-owned ignored P2P namespace without changing it."""
+    root = Path(root).resolve()
+    tracked = git(root, "ls-files", "-z", "--", ".p2p").split(b"\0")
+    if any(tracked):
+        raise ValueError("tracked P2P state blocks repo-local storage: " + ", ".join(
+            name.decode() for name in tracked if name))
+    state = root / ".p2p"
+    if state.is_symlink() or (state.exists() and not state.is_dir()):
+        raise ValueError("repo-local P2P state path collides with a non-directory: .p2p")
+    ignore = root / ".gitignore"
+    if not ignore.is_file() or "/.p2p/" not in ignore.read_text().splitlines():
+        raise ValueError("project .gitignore must contain the exact /.p2p/ rule")
+    result = subprocess.run(["git", "-C", str(root), "check-ignore", "--no-index", "--", ".p2p/work/probe"],
+                            capture_output=True)
+    if result.returncode != 0:
+        raise ValueError("repo-local .p2p state is not effectively ignored; resolve conflicting ignore rules")
+    detail = subprocess.run(["git", "-C", str(root), "check-ignore", "-v", "--no-index", "--", ".p2p/work/probe"],
+                            capture_output=True, text=True, check=True).stdout
+    if not detail.startswith(".gitignore:") and not detail.startswith(str(ignore) + ":"):
+        raise ValueError("project .gitignore rule is overridden by a higher-priority ignore source")
+    if state.is_dir():
+        require_ignored(root, *(path.relative_to(root).as_posix() for path in state.rglob("*")
+                                if path.is_file() or path.is_symlink()))
+    return {"storage": "repository-local", "root": ".p2p/work"}
 
 
 def snapshot(root, commit=None, exclude=()):
@@ -183,10 +225,19 @@ def bindings(root, work, require_trackable=True):
     return [{"path": path, "sha256": value} for path, value in sorted(found.items())]
 
 
-def atomic_write(target, data):
+def atomic_write(target, data, ignored_root=None):
     """Retain either the previous complete bytes or the new complete bytes."""
-    with tempfile.NamedTemporaryFile(dir=target.parent, prefix=target.name + ".", delete=False) as output:
-        temporary = Path(output.name)
+    target = Path(target)
+    temporary = target.with_name(target.name + "." + uuid.uuid4().hex)
+    if ignored_root is not None:
+        root = Path(os.path.abspath(ignored_root))
+        for path in (target, temporary):
+            try:
+                relative = Path(os.path.abspath(path)).relative_to(root)
+            except ValueError:
+                continue  # Reconciled legacy state lives outside the project Git tree.
+            require_ignored(root, relative.as_posix())
+    with temporary.open("xb") as output:
         try:
             output.write(data)
             output.flush()
@@ -207,7 +258,8 @@ def save(root, work, name, data):
     if not item.is_file():
         raise ValueError("work item does not exist")
     target = safe(artifact, name)
-    trackable(root, [str(target.relative_to(root)), work])
+    trackable(root, [work])
+    require_ignored(root, str(target.relative_to(root)))
     if PurePosixPath(name).parts[0] == "history":
         raise ValueError("history is reserved")
     if target.exists():
@@ -219,13 +271,12 @@ def save(root, work, name, data):
             capture_output=True)
         if committed.returncode or committed.stdout != old:
             archived = safe(root, str(artifact.relative_to(root) / "history" / digest(old) / name))
-            trackable(root, [str(archived.relative_to(root))])
             archived.parent.mkdir(parents=True, exist_ok=True)
             if archived.exists() and archived.read_bytes() != old:
                 raise ValueError("history collision")
-            atomic_write(archived, old)
+            atomic_write(archived, old, ignored_root=root)
     target.parent.mkdir(parents=True, exist_ok=True)
-    atomic_write(target, data)
+    atomic_write(target, data, ignored_root=root)
     return str(target.relative_to(root))
 
 

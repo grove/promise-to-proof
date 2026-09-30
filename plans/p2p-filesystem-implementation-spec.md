@@ -2,13 +2,12 @@
 
 **Implementation specification · Version 3.0 · 26 September 2026**
 
-**Status: Implemented in commit `70b27bb` on 26 September 2026.**
+**Status: Historical and superseded on 30 September 2026 by [issue #49's contract](../work/minimal-repo-local-p2p-state.md). Do not use this document as current guidance.**
 
-Automated checks and a manual local delivery/fresh-checkout exercise passed.
-See the [implementation report](../.p2p/work/p2p-filesystem/implementation.md)
-for validation details and limits. This specification is retained as the source
-agreement; the report and candidate record describe the implementation before
-this status note was added.
+This document records the earlier filesystem design. Its instructions to commit
+`.p2p/work/` and ignore only `.p2p/tmp/` are obsolete. Issue #49's contract now
+requires `/.p2p/` to be ignored, with all `.p2p/**` state kept out of project Git
+history. Preserve the text below only as a historical design record.
 
 This document defines the filesystem and Git conventions for Promise to Proof. It is intentionally small: ordinary Markdown files hold specifications and work items, Git holds the durable project record, and `.p2p/` holds generated Promise to Proof records.
 

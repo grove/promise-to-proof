@@ -8,8 +8,8 @@ phase in depth. The [FAQ](./faq.md) answers questions about what the results mea
 ## Choose a starting point
 
 Run `/setup-promise-to-proof` in a new project. It creates `specs/`, `work/`,
-`.p2p/work/`, and `.p2p/tmp/` and checks Git ignore rules. Only temporary P2P
-files are ignored. Tracker configuration is optional.
+`.p2p/work/`, and `.p2p/tmp/` and checks Git ignore rules. All `.p2p/**` state
+is ignored and stays out of project Git history. Tracker configuration is optional.
 
 For one coherent delivery, start with `/deliver-issue work/<slug>.md`. If you
 have a specification instead, run `/plan-acceptance specs/<slug>.md` first.
@@ -422,9 +422,9 @@ review requirements still apply after proof succeeds.
 
 ## Carry work to another session or checkout
 
-Commit durable work files and `.p2p/work/` records when authorized, then transfer
-or clone the repository. An active delivery needs its ignored local recovery
-directory and comparison-base Git objects transferred separately. After
+Do not commit `.p2p/` records. When moving an active delivery, copy its local
+`.p2p/work/<slug>/` state and comparison-base Git objects separately, preserving
+their bytes and access limits. After
 successful explicit cleanup, the compact durable identity does not reconstruct
 the candidate. Keep secrets out of snapshots and evidence, and delete scratch
 files only after durable records are read back.
@@ -437,9 +437,9 @@ In the new checkout, resume with the work-item path:
 
 The workflow discovers linked specifications, parent and children, candidate,
 reports, and evidence. It checks current identities before reusing results.
-A later commit containing only `.p2p/` records leaves reports bound to their
-original candidate. Product, agreement, or comparison-base changes require
-fresh applicable verification. File presence alone is not acceptance.
+Local `.p2p/` record updates leave reports bound to their original candidate.
+Product, agreement, or comparison-base changes require fresh applicable
+verification. File presence alone is not acceptance.
 
 For manual inspection, use the installed skill's `scripts/p2p_filesystem.py`
 with `resolve` to list records or `resume` with the intended comparison base to
@@ -454,29 +454,23 @@ assertion, actual result, and environment in the final report. Retain separate
 files when they supply required evidence, such as replayable traces and host
 receipts. Keep one recoverable candidate snapshot; reference it from reports.
 
-To remove bulky records from an inactive work item's checkout:
+After a successful verified delivery, run the controller's explicit cleanup.
+It checks that the source matches the candidate, reads back the four final local
+records, and removes the runtime workspace and superseded artifacts. Keep the
+remaining `.p2p/` records ignored; they are never committed to the project.
 
-1. Identify the records referenced by its reports and current contracts. Keep
-   the top-level reports, candidate record, and directly referenced source files.
-2. Verify that every file to remove matches its bytes and mode in a reachable
-   Git commit. Preserve dirty, untracked, active, and interrupted-run records.
-3. Write `.p2p/work/<slug>/archive.md` with the full commit SHA, exact paths,
-   Git tree identities, and a recovery command. Check recovery in a temporary
-   directory before removing files, then commit the removals and archive record
-   when authorized. Do not rewrite Git history.
-
-For historical inspection, recover into a new temporary directory:
+For historical inspection of P2P files already present in an older Git commit,
+recover them into a new temporary directory:
 
 ```sh
 recovery_dir=$(mktemp -d)
 git archive FULL_COMMIT_SHA .p2p/work/SLUG | tar -x -C "$recovery_dir"
 ```
 
-Use the commit and path recorded in `archive.md`. A full clone retains the
-referenced ancestor; a shallow clone or source export may need the missing Git
-history before recovery. Restore required files before verification or resume.
-Copy only the needed archived paths into the checkout after checking that this
-preserves newer records. Missing evidence still blocks reuse.
+Use only a full commit that already contains the legacy files. A full clone
+retains the referenced ancestor; a shallow clone or source export may need the
+missing Git history before recovery. Restore required files before verification
+or resume. Do not create new commits that add `.p2p/` records.
 
 This reduces the working tree size. Existing Git objects
 remain in history, so the repository's Git storage does not shrink.

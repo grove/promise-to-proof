@@ -18,6 +18,7 @@ spec.loader.exec_module(p2p)
 
 
 def prepare(root):
+    (root / ".gitignore").write_text("/.p2p/\n")
     for name in ("specs", "work", ".p2p/work", ".p2p/tmp"):
         (root / name).mkdir(parents=True, exist_ok=True)
     return p2p.setup(root)
@@ -121,24 +122,19 @@ def run():
         (root / ".p2p/tmp/scratch").write_text("disposable")
         shutil.rmtree(root / ".p2p/tmp")
         p2p.validate(root, work, base)
-        p2p.git(root, "add", ".p2p")
-        p2p.git(root, "commit", "-qm", "artifact B")
+        p2p.git(root, "add", "-A")
+        p2p.git(root, "commit", "--allow-empty", "-qm", "artifact B")
         assert p2p.validate(root, work, base)["commit"] == base
+        assert not p2p.git(root, "ls-tree", "-r", "--name-only", "HEAD").decode().startswith(".p2p/")
         rejects(lambda: p2p.validate(root, work, "HEAD"), "comparison base changed")
-        clone = Path(directory) / "clone"
-        subprocess.run(["git", "clone", "-q", str(root), str(clone)], check=True)
-        assert p2p.validate(clone, work, base)["commit"] == base
-        assert "evidence/local-run.log" in " ".join(p2p.resolve(clone, work)["artifacts"])
         report = root / ".p2p/work/feature-api/review.md"
         committed_report = report.read_bytes()
         history = report.parent / "history"
         p2p.save(root, work, "review.md", b"uncommitted report")
-        assert not (history / p2p.digest(committed_report) / "review.md").exists()
-        assert p2p.git(root, "show", "HEAD:.p2p/work/feature-api/review.md") == committed_report
-        p2p.git(root, "add", str(report))
+        assert (history / p2p.digest(committed_report) / "review.md").read_bytes() == committed_report
         p2p.save(root, work, "review.md", b"next report")
         assert (history / p2p.digest(b"uncommitted report") / "review.md").read_bytes() == b"uncommitted report"
-        p2p.git(root, "reset", "-q", "HEAD", str(report))
+        assert p2p.git(root, "ls-files", "--", ".p2p") == b""
         for path, expected in (("app.txt", "product candidate changed"), (work, "work item changed"),
                                ("work/parent.md", "binding inputs changed"), ("specs/feature.md", "binding inputs changed")):
             file = root / path
@@ -169,7 +165,8 @@ def run():
         assert p2p.validate(root, work, base) == dirty
         snapshot_clone = Path(directory) / "snapshot-clone"
         subprocess.run(["git", "clone", "-q", str(root), str(snapshot_clone)], check=True)
-        assert p2p.validate(snapshot_clone, work, base) == dirty
+        assert not (snapshot_clone / ".p2p").exists()
+        assert not p2p.git(snapshot_clone, "ls-tree", "-r", "--name-only", "HEAD").decode().startswith(".p2p/")
         (root / "app.txt").write_text("staged\n")
         p2p.git(root, "add", "app.txt")
         (root / "app.txt").write_text("two\n")
@@ -181,14 +178,13 @@ def run():
         rejects(lambda: p2p.validate(root, work, base), "partially staged")
         p2p.git(root, "reset", "-q", "HEAD", "app.txt")
         p2p.git(root, "config", "core.filemode", "true")
-        (root / ".gitignore").write_text("/.p2p/tmp/\n/.p2p/work/*/history/\n")
-        prepare(root)
+        (root / ".gitignore").write_text("/.p2p/\n!/.p2p/\n")
         proof = root / ".p2p/work/feature-api/proof.md"
         proof.write_bytes(proof.read_bytes() + b" uncommitted")
         original_proof = proof.read_bytes()
-        rejects(lambda: p2p.save(root, work, "proof.md", b"replacement"), "conflicting ignore")
+        rejects(lambda: p2p.save(root, work, "proof.md", b"replacement"), "not effectively ignored")
         assert proof.read_bytes() == original_proof
-        (root / ".gitignore").write_text("/.p2p/tmp/\n")
+        (root / ".gitignore").write_text("/.p2p/\n")
         rejects(lambda: p2p.paths(root, "work/../escape.md"), "work item must")
         rejects(lambda: p2p.save(root, work, "../../escape", b"bad"), "unsafe repository path")
         rejects(lambda: p2p.save(root, work, "./history/old/proof.md", b"bad"), "unsafe repository path")
@@ -213,23 +209,73 @@ def run():
         rejects(lambda: p2p.resolve(root, "work/parent.md"), "work item must")
         parent.write_text(original_parent)
         (root / ".gitignore").write_text("/specs/feature.md\n")
-        rejects(lambda: p2p.bindings(root, work), "conflicting ignore")
+        rejects(lambda: p2p.setup(root), "must contain the exact /.p2p/ rule")
         (root / ".gitignore").write_text("/.p2p/\n")
         prepare(root)
-        (root / ".gitignore").write_text("/work/\n")
-        prepare(root)
+        (root / ".gitignore").write_text("/.p2p/\n/work/\n")
+        rejects(lambda: p2p.bindings(root, work), "conflicting ignore")
     print("P2P filesystem checks passed")
 
 
 class FilesystemTests(unittest.TestCase):
+    def test_setup_rejects_existing_selectively_unignored_p2p_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "repo"
+            root.mkdir()
+            p2p.git(root, "init", "-q")
+            (root / ".gitignore").write_text(
+                "/.p2p/\n!/.p2p/\n!/.p2p/work/\n/.p2p/work/*\n"
+                "!/.p2p/work/tiny/\n/.p2p/work/tiny/*\n!/.p2p/work/tiny/runtime/\n"
+                "/.p2p/work/tiny/runtime/*\n!/.p2p/work/tiny/runtime/admission.json\n")
+            state = root / ".p2p/work/tiny/runtime/admission.json"
+            state.parent.mkdir(parents=True)
+            state.write_text("preserve me\n")
+            self.assertEqual(p2p.git(root, "check-ignore", "--no-index", ".p2p/work/probe")
+                             .decode().strip(), ".p2p/work/probe")
+            before = p2p.git(root, "status", "--short")
+            self.assertIn(b".p2p/", before)
+            rejects(lambda: p2p.setup(root), ".p2p/work/tiny/runtime/admission.json")
+            self.assertEqual(state.read_text(), "preserve me\n")
+            self.assertEqual(p2p.git(root, "status", "--short"), before)
+
+    def test_setup_rejects_tracked_state_and_path_collisions_unchanged(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "tracked"
+            root.mkdir()
+            p2p.git(root, "init", "-q")
+            (root / ".gitignore").write_text("/.p2p/\n")
+            state = root / ".p2p/work/old/state.json"
+            state.parent.mkdir(parents=True)
+            state.write_text("preserve me\n")
+            p2p.git(root, "add", ".gitignore")
+            p2p.git(root, "add", "-f", "--", ".p2p/work/old/state.json")
+            p2p.git(root, "-c", "user.name=Fixture", "-c", "user.email=fixture@localhost",
+                    "commit", "-qm", "tracked P2P state")
+            before = p2p.full_commit(root, "HEAD")
+            tracked = p2p.git(root, "ls-files", "--stage", "-z")
+            rejects(lambda: p2p.setup(root), "tracked P2P state blocks")
+            assert state.read_text() == "preserve me\n"
+            assert p2p.full_commit(root, "HEAD") == before
+            assert p2p.git(root, "ls-files", "--stage", "-z") == tracked
+
+            collision = Path(directory) / "collision"
+            collision.mkdir()
+            p2p.git(collision, "init", "-q")
+            (collision / ".gitignore").write_text("/.p2p/\n")
+            (collision / ".p2p").write_text("project data\n")
+            rejects(lambda: p2p.setup(collision), "collides with a non-directory")
+            assert (collision / ".p2p").read_text() == "project data\n"
+
     def test_default_setup_does_not_create_repository_state(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory) / "repo"
             root.mkdir()
             p2p.git(root, "init", "-q")
+            (root / ".gitignore").write_text("/.p2p/\n")
             before = sorted(path.name for path in root.iterdir())
-            self.assertEqual(p2p.setup(root), {"storage": "user-local"})
+            self.assertEqual(p2p.setup(root), {"storage": "repository-local", "root": ".p2p/work"})
             self.assertEqual(sorted(path.name for path in root.iterdir()), before)
+            self.assertEqual(p2p.git(root, "check-ignore", "--no-index", ".p2p/work/probe").decode().strip(), ".p2p/work/probe")
             self.assertFalse((root / "specs").exists())
             self.assertFalse((root / "work").exists())
             self.assertFalse((root / ".p2p").exists())
