@@ -9,18 +9,15 @@ in substance, no more in scope.
 
 ## Current focus
 
-> [!IMPORTANT]
-> Promise to Proof is being hardened around one primary goal: **implement exactly what was promised, prove it thoroughly, and deliver that exact high-quality result.**
->
-> We are currently working toward:
-> - **Much smaller repository footprint** — temporary P2P artifacts stay local and Git keeps only what is truly necessary (#38).
-> - **Eventually zero P2P-generated files in Git by default** — completed deliveries leave product code/tests in Git and only compact delivery metadata elsewhere (#46).
-> - **Better acceptance contracts** — make promises precise, complete, and verifiable before implementation begins (#44).
-> - **Stronger delivery quality** — trace requirements to code and proof, verify important seams and edge cases based on risk, and enforce high implementation quality without unnecessary ceremony (#40–#43).
-> - **Less churn in busy repositories** — normal movement of `main` should not force unnecessary re-review or block draft publication (#39).
->
-> **Principle:** be strict about correctness, scope, evidence, and candidate identity — but flexible about the process used to establish them.
+Implement exactly what was promised, prove it thoroughly, and deliver that exact
+result. The controller now keeps active execution and recovery state in disposable
+local Git storage outside the project checkout. Issue-backed deliveries can save
+compact completion metadata on GitHub, leaving product code and tests in Git.
 
+Further work focuses on precise acceptance contracts, requirement-to-evidence
+traceability, and verification of important seams and edge cases without unnecessary
+ceremony. Fixed delivery strategy comparison remains the next evaluation step;
+automatic strategy selection is later work.
 
 ## Why this exists
 
@@ -40,7 +37,14 @@ The project now has an executable delivery controller and model-based checks:
 - The [delivery controller](./docs/p2p-delivery-controller.md) runs one established
   local agreement through implementation, independent review and proof, and at
   most one automatic repair. It supports macOS with Codex CLI and retains progress
-  for resume in an isolated workspace.
+  for resume in an isolated, disposable Git workspace outside the source checkout.
+  Dispatch and elapsed-time limits bound execution; a hard monetary cap is unsupported.
+- Delivery freezes its comparison base at admission. Later destination movement
+  is recorded separately and does not trigger another review or proof run by itself.
+  Completion against that base does not establish compatibility with the current target.
+- Issue-backed completion supports an explicitly authorized, read-back-verified
+  GitHub comment and fresh-checkout status inspection. Cleanup removes local execution
+  state only after the source candidate and required records have been verified.
 - [Conformance tests](./checks/delivery-model/README.md#controller-conformance-phase-3)
   drive the controller's public CLI against FizzBee-generated action sequences.
   They check restart, stale reports, interrupted storage, repair limits, and
@@ -55,10 +59,14 @@ host, with agreed tasks, independent correctness judgments, and an improvement
 threshold. Additional hosts and automatic strategy selection remain later work.
 See the [optimization plan](./plans/promise_to_proof_optimization_handoff.md).
 
-Specifications live in `specs/`, acceptance contracts in `work/`, and generated
-records in `.p2p/work/`. Commit durable records; ignore only `.p2p/tmp/`.
-[GitHub Issues](https://github.com/grove/promise-to-proof/issues) are optional
-import and publication destinations.
+Specifications live in `specs/` and local acceptance contracts in `work/`.
+Standalone skills save handoffs in `.p2p/work/`; the controller keeps active
+execution state under `~/.p2p/work/<repo-id>/<work-item>/`. Issue-backed controller
+delivery uses a compact GitHub completion record rather than requiring P2P files
+in the delivered commit. GitHub remains optional for local work.
+See the [controller guide](./docs/p2p-delivery-controller.md) for the storage and
+cleanup paths, and the [migration guide](./docs/p2p-state-migration.md) for removing
+existing P2P-owned files from the current Git tree without rewriting history.
 
 ## How Promise to Proof works
 
@@ -155,8 +163,9 @@ optional import, triage, or publication flows.
 
 A separate specification is optional. Give `plan-acceptance` an agreed outcome
 to create a standalone work item. The work file holds the acceptance contract;
-implementation, candidate identity, review, proof, and evidence go under
-`.p2p/work/retry-safe-uploads/`. Resume with the same work-item path.
+standalone stage reports and evidence go under `.p2p/work/retry-safe-uploads/`.
+Coordinated delivery keeps its active workspace, reports, and recovery state under
+the user-level work root outside the checkout. Resume with the same work-item path.
 
 `deliver-issue` retains its command name and also accepts a tracker reference
 for import. It coordinates independent review and proof when the host supports
@@ -166,9 +175,18 @@ See the [delivery checks](./checks/deliver-issue-scenarios.md).
 For direct CLI execution on macOS, follow the
 [controller guide](./docs/p2p-delivery-controller.md). It requires Python 3.11 or
 newer, Git, an authenticated Codex CLI, and installed delivery stage skills.
-The controller exposes `run`, `status`, and `resume`; a successful run returns
-an isolated candidate with matching full `REVIEWED` and `PROVEN` reports.
-Applying that candidate to the source checkout or publishing it is a separate step.
+Use `run`, `status`, and `resume` to execute and inspect a delivery. A successful
+run returns an isolated candidate with matching full `REVIEWED` and `PROVEN`
+reports. Apply that candidate to the source checkout before explicit `cleanup`.
+Commit and publication remain separately authorized steps.
+
+For an issue-backed delivery, commit the accepted product candidate, then use
+`github-record-preview` to inspect the compact completion comment.
+`github-record-publish` requires authorization for that exact preview hash.
+`github-status` validates the completed record against local Git history in a fresh
+checkout. Cleanup verifies the issue comment again before deleting execution state.
+For local delivery, cleanup retains compact candidate, delivery, review, and proof
+records in `.p2p/work/<slug>/`; these records do not reconstruct the candidate.
 
 ## Plan on an issue before delivery
 
@@ -283,20 +301,24 @@ PR near merge, `/merge-readiness` checks the current review, proof, CI, and
 repository merge conditions without merging the PR. Read the
 [FAQ](./docs/faq.md) for the distinction between acceptance and merge readiness.
 
-## Keep durable records small
+## Keep delivery state out of product history
 
-Run exploratory checks and dependency installs in `.p2p/tmp/` or an OS temporary
-directory. Save the command, assertion, result, and environment in the report;
-retain separate evidence files when the report cannot carry the required evidence.
-Reuse the candidate snapshot across stages. When replacing a record whose exact
-old bytes already exist at the same path in `HEAD`, Git supplies its history.
-Preserve uncommitted versions before replacement.
+The controller stores candidate generations and recovery state in disposable
+local Git storage under `~/.p2p/work/<repo-id>/<work-item>/`. Keep that storage
+while delivery is active, interrupted, or unresolved. Explicit cleanup checks the
+source checkout against the accepted candidate before removing it.
 
-Bulky inactive records can also move out of the checkout when their exact bytes
-and modes are recoverable from Git. Keep the reports, candidate record, directly
-referenced sources, and an `archive.md` recovery index. Preserve active and
-interrupted-run records. See [Reduce retained work data](./docs/how-to.md#reduce-retained-work-data)
-before archiving or restoring evidence.
+Issue-backed deliveries retain compact completion metadata on GitHub under exact
+comment authority. Local deliveries retain four final records in `.p2p/work/`.
+Standalone skills still use the [protocol's durable handoffs](./docs/acceptance-contract-protocol.md#durable-generated-records).
+Do not blanket-delete project-authored files in `work/` or `specs/` when migrating
+old P2P state. Follow the [migration guide](./docs/p2p-state-migration.md).
+
+For standalone checks, use `.p2p/tmp/` or an OS temporary directory. Save meaningful
+commands, assertions, results, and environment details in the report, and retain
+separate evidence only when needed. The setup convention ignores `/.p2p/tmp/`.
+Existing committed evidence can use Git history and an `archive.md` recovery index;
+see [Reduce retained work data](./docs/how-to.md#reduce-retained-work-data).
 
 ## Detailed docs
 
