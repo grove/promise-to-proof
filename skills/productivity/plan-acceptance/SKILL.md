@@ -13,11 +13,14 @@ It defines the spec envelope, revision rules, evidence terms, and handoffs.
 
 ## Build the contract
 
-1. Resolve `work/<slug>.md` using the protocol's naming and collision rules.
+1. Accept a supported tracker issue, direct agreed text, or project-authored
+   source file from any repository path, including `specs/` and `work/`. Derive
+   the work-item slug and save the generated contract at
+   `.p2p/work/<slug>/contract.md`; check for conflicts before writing.
    For an issue input, read the configured tracker instructions and the issue's
    body, comments, existing planning handoffs, approvals, and amendments first.
    A standalone local work item needs neither a specification nor a tracker.
-   Normalize minimal acceptance bullets into the matrix below in that same file;
+   Normalize minimal acceptance bullets into the matrix in the generated contract;
    preserve existing IDs and promises. Import external source promises locally
    when requested; the tracker remains an optional source or mirror. Retain
    imported binding text in the work item or a linked local source file, with
@@ -68,7 +71,7 @@ Return the contract using the shape below. Use only `planned` or `gap` for plan
 state. Move any legacy proof verdicts into a separately identified proof report
 with their original candidate and context, or flag missing provenance as a gap.
 
-Save and reread the contract at `work/<slug>.md` before handing off. Keep a
+Save and reread the contract at `.p2p/work/<slug>/contract.md` before handing off. Keep a
 lasting optional specification in `specs/`, and link it with `Source`. Link a
 parent work item with `Parent` and retain its exact snapshot and contribution
 mapping. Preserve previous revisions under the protocol's history rule. If

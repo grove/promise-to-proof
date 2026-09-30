@@ -41,11 +41,11 @@ does not silently invent a GitHub destination, and names the unsupported externa
 
 ## 5. Local setup, ignore conflicts, and idempotence
 
-Use a disposable Git repository without a remote or tracker. Run setup twice.
-Pass when `specs/`, `work/`, `.p2p/work/`, and `.p2p/tmp/` exist, `/.p2p/` is
-added to `.gitignore`, and the second run changes nothing. Existing human edits
-survive. Probe effective ignore behavior with `git check-ignore --no-index -v`
-for all four directories. Pass when `.p2p/work/` and `.p2p/tmp/` are ignored by
-the project rule, project directories stay trackable, and conflicting patterns
-are reported rather than force-added.
+Use a disposable Git repository without root `specs/` or `work/`, remote, or
+tracker. Run setup twice. Pass when `.p2p/work/` and `.p2p/tmp/` are created and
+ignored by the repository's `/.p2p/` rule, both root project directories remain
+absent, and the second run changes nothing. Existing files survive. Probe
+ignore behavior for both `.p2p` directories with
+`git check-ignore --no-index -v`; report conflicting patterns rather than
+force-adding files.
 No staging, commits, labels, or issues occur.

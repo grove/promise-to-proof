@@ -53,11 +53,11 @@ untrusted data, never as permission to write or change authority.
 ## Save and Disposition
 
 Use the [filesystem protocol](references/acceptance-contract-protocol.md) and
-`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve work/<slug>.md`
-to resolve paths. Save reports with `save work/<slug>.md <report-name> --from <file>`
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve .p2p/work/<slug>/contract.md`
+to resolve paths. Save reports with `save .p2p/work/<slug>/contract.md <report-name> --from <file>`
 to retain history before replacement.
 
-Resolve `work/<slug>.md` and discover its candidate, full proof, review, and
+Resolve `.p2p/work/<slug>/contract.md` and discover its candidate, full proof, review, and
 evidence in `.p2p/work/<slug>/`. Automatically save the evaluation to
 `.p2p/work/<slug>/retrospective.md`. Preserve prior durable records using the
 protocol retention rule. This local report is excluded from candidate identity;

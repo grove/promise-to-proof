@@ -207,7 +207,7 @@ The handoff preserves qualified parent references and exact agreement identities
 
 ## Local discovery and ignored records
 
-Invoke `/review-implementation work/foo-bar.md` with no artifact paths. Pass
+Invoke `/review-implementation .p2p/work/foo-bar/contract.md` with no artifact paths. Pass
 when the skill discovers the saved candidate and base, reviews fixed content,
 and saves `review.md` in ignored `.p2p/work/foo-bar/`. Updating local records
 requires no Git write and keeps the original candidate identity.

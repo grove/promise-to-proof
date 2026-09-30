@@ -15,11 +15,11 @@ already established in that conversation. Either skill works on its own.
 ## Local work and durable records
 
 Use the [filesystem protocol](references/acceptance-contract-protocol.md) and
-`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve work/<slug>.md`
-to resolve paths. Save reports with `save work/<slug>.md <report-name> --from <file>`
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve .p2p/work/<slug>/contract.md`
+to resolve paths. Save reports with `save .p2p/work/<slug>/contract.md <report-name> --from <file>`
 to retain history before replacement.
 
-When the subject resolves to `work/<slug>.md`, read its linked context and save
+When the subject resolves to `.p2p/work/<slug>/contract.md`, read its linked context and save
 the findings or agreed discussion handoff to `.p2p/work/<slug>/discussion.md`.
 Preserve prior durable records using the protocol retention rule. Keep the work
 item and any spec unchanged; amendment requests remain pending until normalized

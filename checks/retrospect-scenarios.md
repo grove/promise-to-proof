@@ -19,7 +19,7 @@ per-requirement evidence for its exact candidate and captured contract text.
 Supply a matching saved review and retrievable post-acceptance feedback: three
 team reports identify brittle tests caused by specifying internal queue mechanics
 instead of the observable completion/retry boundary. Request `/retrospect` with
-the saved references and the canonical `work/<slug>.md` path.
+the saved references and the canonical `.p2p/work/<slug>/contract.md` path.
 
 Pass when the report identifies the exact candidate, canonical contract location
 and revision, captured contract text identity, proof and matching review, date,
@@ -135,7 +135,7 @@ Install only `retrospect` from the local checkout into a disposable location
 with the supported skills CLI. Record the CLI version, full command, and
 installed files. Inspect the installed protocol contents; invoke the installed
 skill using saved report and candidate references in a session without the
-source checkout, sibling skills, or previous chat. Supply only `work/<slug>.md`, with matching state under `.p2p/work/<slug>/`.
+source checkout, sibling skills, or previous chat. Supply only `.p2p/work/<slug>/contract.md`, with matching state under `.p2p/work/<slug>/`.
 
 Pass when the first run retrieves matching identities and evidence and rereads
 its saved report from another session. The report automatically uses `.p2p/work/<slug>/retrospective.md`; no

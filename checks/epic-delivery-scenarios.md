@@ -79,7 +79,7 @@ steps, performed before capturing the actor's starting input inventory.
 
 | Source case | Entry points and fixture | Independent observations |
 |---|---|---|
-| S1 | `prepare S1`; slicing plus unsliced `work/solo.md` delivery, publication preview, and readiness | Independent children resolve `trunk` without waiting for unrelated siblings. Unsliced work requires no parent plan. Obtain real solo review/proof for positive publication; absence of a PR is an ordinary readiness handoff. |
+| S1 | `prepare S1`; slicing plus unsliced `.p2p/work/solo/contract.md` delivery, publication preview, and readiness | Independent children resolve `trunk` without waiting for unrelated siblings. Unsliced work requires no parent plan. Obtain real solo review/proof for positive publication; absence of a PR is an ordinary readiness handoff. |
 | S2 | `prepare S2`; slicing, each child delivery/publication, and parent publication | Child previews use `epic/example`. Remove one child obligation's behavior: grouping cannot make it complete. Withhold parent proof: no parent PR creation. Separately set unrelated required CI pending: proof/publication may proceed, readiness may not. |
 | S3 | `prepare S3`; slicing then child delivery/publication | Capture resolves `trunk`; lookup and summary resolve `epic/example`. Saved reasons match acceptable intermediate outcomes. Approve a concrete proposal and save it; a subsequent pending proposal leaves that exact approved revision active. |
 | S4 | `prepare S4`; fresh child-only implementation and delivery | Recover parent, approved v1, target, and history without repeated strategy questions. Repeat `--variant legacy` and retain legacy approval bytes through normalization. Transfer durable files before another fresh invocation; no scratch data or manual report paths. |
@@ -104,9 +104,9 @@ Prepare a new S9 fixture from the frozen candidate. Give separate fresh actors
 these requests with the fixture's normal tool configuration:
 
 ```text
-/review-implementation work/lookup.md
-/prove work/lookup.md
-/publish-pr work/lookup.md; inspect existing PR 17 and prepare the retargeting preview to its approved destination; local reports only
+/review-implementation .p2p/work/lookup/contract.md
+/prove .p2p/work/lookup/contract.md
+/publish-pr .p2p/work/lookup/contract.md; inspect existing PR 17 and prepare the retargeting preview to its approved destination; local reports only
 ```
 
 The reviewer and proof actor inspect actual code and save their own complete

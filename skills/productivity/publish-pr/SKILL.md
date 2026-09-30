@@ -18,11 +18,11 @@ and the repository's tracker, contribution, pull-request, and branch rules.
 ## Local work and durable records
 
 Use the [filesystem protocol](references/acceptance-contract-protocol.md) and
-`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve work/<slug>.md`
-to resolve paths. Save reports with `save work/<slug>.md <report-name> --from <file>`
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve .p2p/work/<slug>/contract.md`
+to resolve paths. Save reports with `save .p2p/work/<slug>/contract.md <report-name> --from <file>`
 to retain history before replacement.
 
-Accept `/publish-pr work/<slug>.md; target <branch>; draft only` and discover
+Accept `/publish-pr .p2p/work/<slug>/contract.md; target <branch>; draft only` and discover
 `candidate.json`, `review.md`, `proof.md`, evidence, and source/parent links
 from that work item and `.p2p/work/<slug>/`. Save previews, publication outcomes,
 and snapshot-to-commit mappings automatically in

@@ -10,12 +10,14 @@ for one exact candidate.
 
 | Artifact | Contents | Identity |
 |---|---|---|
-| Acceptance contract | Requirements, boundaries, seams, oracles, planned evidence, gaps, and exclusions | Source and contract revision, such as `work/retry-safe-uploads.md v3` |
+| Acceptance contract | Requirements, boundaries, seams, oracles, planned evidence, gaps, and exclusions | Source and contract revision, such as `.p2p/work/retry-safe-uploads/contract.md v3` |
 | Proof report | Observations, durable evidence references, and requirement verdicts | Exact contract revision and exact candidate commit or snapshot |
 
-The contract is candidate-independent. Its acceptance matrix uses only `planned`
-and `gap` as plan states. Candidate-specific verdicts belong only in proof
-reports, including verdicts imported from earlier runs.
+The contract is candidate-independent. New P2P-owned contracts live at
+`.p2p/work/<slug>/contract.md`; this ignored location is their durable identity.
+`specs/` and `work/` remain ordinary project paths and may supply source material.
+The acceptance matrix uses only `planned` and `gap` as plan states. Candidate-
+specific verdicts belong only in proof reports, including imported verdicts.
 
 Proof and merge readiness are separate. Proof requires neither an open PR nor
 green CI. Unrelated failed or pending checks do not block `PROVEN`, and proof
@@ -54,9 +56,10 @@ them. Satisfying them does not constitute product scope expansion.
 
 ## Durable contract handoff
 
-Keep one canonical acceptance contract in `work/<lowercase-kebab-case-slug>.md`.
-The repository-relative path is its durable identity. A lasting specification
-may live in `specs/<slug>.md`; small work needs no separate specification.
+Keep one canonical generated acceptance contract in `.p2p/work/<slug>/contract.md`.
+The contract revision and content digest identify its exact agreement. Project
+sources may live in `specs/`, `work/`, or any supported repository path; small
+work needs no separate specification.
 Use relative Markdown links on `Source:` and `Parent:` lines for local binding
 inputs. A parent lists child links and their contributions in `## Children`.
 Children normally use the parent stem plus a slice name. Preserve existing
@@ -77,13 +80,13 @@ changes to the canonical agreement. Local delivery requires no tracker access.
 Only explicitly authorized tracker operations update remote links or mirrors;
 a pending mirror update does not block a complete local handoff.
 
-For an existing tracker or `docs/acceptance-contracts/` contract, explicitly
-migrate the agreement to `work/<slug>.md` under local write authority. Preserve
-its revision, IDs, source identity, and prior text, and replace the old local
-entry with a pointer if authorized. A tracker copy becomes historical or a
-mirror. Resolve conflicting copies before proceeding. Migration changes the
-contract location and candidate inputs, so old results remain historical until
-fresh matching review and proof establish the new handoff.
+For an explicitly identified legacy P2P contract, reconcile it into
+`.p2p/work/<slug>/contract.md` under local write authority. Preserve its exact
+bytes, revision, IDs, approval evidence, source identity, and prior text; retain
+relative-link resolution and binding inputs. Never infer P2P ownership from a
+`specs/` or `work/` path, or move, rewrite, or delete a file based on location.
+Resolve conflicts before dependent work. Changed contract locations make old
+results historical until fresh matching review and proof establish the handoff.
 
 ### Standalone planning on an issue
 
@@ -95,7 +98,7 @@ not issue-body replacement, labels, closure, commits, or PRs. Planning invoked b
 local unless issue publication was separately authorized.
 
 Save the proposal locally first. Post its exact UTF-8 text in a fenced block,
-with the intended `work/<slug>.md` path, revision, and SHA-256 outside the block.
+with its `.p2p/work/<slug>/contract.md` path, revision, and SHA-256 outside the block.
 End the proposal with one newline before hashing and presenting it for approval.
 Choose a fence longer than any fence in the contract. The fenced content includes
 that final newline; fence lines are excluded from the hash. Include retrievable copies
@@ -119,8 +122,8 @@ receipt explicitly or have the approving human record approval on the issue.
 Report this transfer requirement instead of claiming an issue-only handoff is ready.
 
 On issue import, delivery reads the handoff, approval, and subsequent amendments.
-It saves the exact approved text to `work/<slug>.md`, restores and checks binding
-inputs, and rereads them before implementation. Matching text and inputs retain
+It saves the exact approved text to `.p2p/work/<slug>/contract.md`, restores and checks binding
+inputs without overwriting project files, and rereads them before implementation. Matching text and inputs retain
 their approval without another approval request. Missing or ambiguous approval,
 changed text even at the same revision, conflicting local content, or later
 amendments require reconciliation before dependent work. Preserve prior local
@@ -258,7 +261,7 @@ a report's candidate identity with `HEAD` merely because artifacts were committe
 If Git metadata affects the build, also establish execution-input equivalence
 under the publication rules below.
 
-Given only `work/<slug>.md`, resolve its source and parent links, children,
+Given only `.p2p/work/<slug>/contract.md`, resolve its source and parent links, children,
 artifact directory, candidate, reports, and evidence. Recompute their identities
 before reuse and resume the earliest incomplete or stale stage. Missing evidence
 or recoverable candidate content is a blocked handoff, not a reason to infer
@@ -329,7 +332,7 @@ as an immutable reference or retrievable captured text with a digest. Link the
 canonical decomposition and record the child's precise contribution and
 prerequisite outcomes. These references must be retrievable in a fresh checkout.
 Use qualified obligations in durable cross-ticket references, for example
-`work/retry-safe-uploads.md v2:R4`, or an unambiguous repository/source path, revision,
+`.p2p/work/retry-safe-uploads/contract.md v2:R4`, or an unambiguous repository/source path, revision,
 and ID for local work. Child IDs are local to the child contract. Its `R1` does
 not mean parent `R1`; map each child row through its `Source` to the qualified
 parent obligations it refines. Planning IDs such as `S1` are separate from both.
@@ -389,7 +392,7 @@ delivery controller can retain and check the same decision:
 ## Approved delivery plan
 Plan revision: v1
 Approval source: <actual approval text and retrievable source>
-Parent: work/checkout.md
+Parent: .p2p/work/checkout/contract.md
 Final destination: trunk
 Integration branch: epic/checkout
 Integration start: <full approved starting commit SHA>
@@ -397,9 +400,9 @@ Default choice: grouped
 
 | Child | Choice | Destination | Reason | State |
 |---|---|---|---|---|
-| work/checkout-api.md | independent | trunk | Useful without checkout. | remaining |
-| work/checkout-flow.md | default | epic/checkout | Requires validation to be acceptable. | remaining |
-| work/checkout-validation.md | default | epic/checkout | Completes checkout behavior. | remaining |
+| .p2p/work/checkout-api/contract.md | independent | trunk | Useful without checkout. | remaining |
+| .p2p/work/checkout-flow/contract.md | default | epic/checkout | Requires validation to be acceptable. | remaining |
+| .p2p/work/checkout-validation/contract.md | default | epic/checkout | Completes checkout behavior. | remaining |
 
 Parent completion: <contributions, interactions, inherited invariants and final integration checks>
 Pending actions: <exact setup or strategy-change effects, authority, confirmed effects and unresolved state>

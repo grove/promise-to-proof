@@ -31,7 +31,7 @@ complete in depth.
 
 ## Workflow
 
-1. Accept `work/<slug>.md` and discover its linked inputs, `candidate.json`,
+1. Accept `.p2p/work/<slug>/contract.md` and discover its linked inputs, `candidate.json`,
    and `proof.md` under `.p2p/work/<slug>/`; also accept an explicit proof
    reference that resolves to the same work item. Read the exact local contract
    revision and matching `NOT PROVEN` proof result. Recheck binding parent/spec

@@ -166,7 +166,7 @@ The handoff was written against `f5917ce0471d56aac01711e720426748626c99d0`.
 The modeled revision is `41bebc726a8cc71c1d2f22d822ade006f4e78121`, not that older
 tree. In the older protocol, a tracker could locate the canonical agreement and
 local storage defaulted to `docs/acceptance-contracts/`. The current protocol uses
-canonical `work/<slug>.md`, optional tracker imports, durable `.p2p/work/<slug>/`
+canonical `.p2p/work/<slug>/contract.md`, optional tracker imports, durable `.p2p/work/<slug>/`
 records, exact binding-input hashes, recoverable candidate manifests, and a
 filesystem helper. Current delivery also specifies host invocation records and
 read-only verification boundaries more explicitly.

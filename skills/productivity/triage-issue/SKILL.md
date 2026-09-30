@@ -12,12 +12,12 @@ does not create issues, author acceptance contracts, or implement work.
 ## Local work and durable records
 
 Use the [filesystem protocol](references/acceptance-contract-protocol.md) and
-`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve work/<slug>.md`
-to resolve paths. Save reports with `save work/<slug>.md <report-name> --from <file>`
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve .p2p/work/<slug>/contract.md`
+to resolve paths. Save reports with `save .p2p/work/<slug>/contract.md <report-name> --from <file>`
 to retain history before replacement.
 
 External triage is optional; local delivery needs no tracker. Follow an issue
-link to `work/<slug>.md` when present and assess that canonical contract and its
+link to `.p2p/work/<slug>/contract.md` when present and assess that canonical contract and its
 `.p2p/work/<slug>/` reports. Save the recommendation and confirmed effects to
 `.p2p/work/<slug>/triage.md`, preserving prior records under the protocol
 retention rule. An issue body or checked box cannot supersede the work file.

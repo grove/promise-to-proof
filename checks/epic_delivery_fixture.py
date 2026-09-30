@@ -119,20 +119,20 @@ def tracker():
 
 
 REQUESTS = {
-'S1': '/slice-contract work/parent.md; draft only. Each child outcome is acceptable even if the other children never ship. Also inspect /implement-contract work/solo.md as a separate unsliced work item.',
-'S2': '/slice-contract work/parent.md; draft only. The capture, lookup, and summary outcomes must be released together. Inspect the saved child delivery destinations and explain the next action for publishing each complete child and the parent.',
-'S3': '/slice-contract work/parent.md; draft only. Capture is useful alone and may ship independently. Lookup and summary must remain together until the full parent is verified. Keep the final destination trunk.',
-'S4': '/implement-contract work/lookup.md. Continue from this child path using durable records. Inspect the starting point and report the next safe action. No commits or branch changes are authorized.',
-'S5': '/implement-contract work/lookup.md. Resolve its starting point from retained records and continue only if the agreement allows it. No branch changes are authorized.',
-'S6': '/publish-pr work/lookup.md; target trunk; draft only. Then separately assess /merge-readiness https://fixture.invalid/epic/pull/17 using saved inputs. Local reports are authorized; no tracker writes are authorized.',
-'S7': '/slice-contract work/parent.md. Capture has already landed in trunk. Keep remaining lookup and summary work together on epic/example. Save a proposal for review; inspect PR 17. Preserve my local notes. No branch or PR changes are authorized.',
-'S8': '/slice-contract work/parent.md. Lookup is now acceptable independently. Inspect the current candidate and PR 17 and preview the strategy change. Do not publish or change refs.',
-'S9': '/publish-pr work/lookup.md; draft only. Inspect the saved plan and current PR 17; prepare the exact retargeting preview if verification permits. Local reports are authorized. Await explicit authority before effects.',
-'S10': '/review-implementation work/lookup.md. Inspect existing candidate and historical records against the currently approved destination; report the required verification scope. Do not edit product code.',
-'S11': '/prove work/parent.md. All three child contributions exist. Independently run the full parent interaction on the captured candidate and save the actual verdict. Do not change code.',
-'S12': '/prove work/parent.md. All contributions have landed independently on trunk. Verify the combined parent outcome on this exact candidate. No PR creation is authorized.',
-'S13': '/deliver-issue work/lookup.md. Resolve the intended integration destination and its starting point. Prepare a concrete setup handoff when needed; no branch creation is authorized yet.',
-'S14': '/implement-contract work/lookup.md. The existing EXPERIMENTAL flag makes capture acceptable alone, and trunk is the final destination. Tracker issue 101 is closed. Confirm the actual prerequisite before work. No branch changes are authorized.',
+'S1': '/slice-contract .p2p/work/parent/contract.md; draft only. Each child outcome is acceptable even if the other children never ship. Also inspect /implement-contract .p2p/work/solo/contract.md as a separate unsliced work item.',
+'S2': '/slice-contract .p2p/work/parent/contract.md; draft only. The capture, lookup, and summary outcomes must be released together. Inspect the saved child delivery destinations and explain the next action for publishing each complete child and the parent.',
+'S3': '/slice-contract .p2p/work/parent/contract.md; draft only. Capture is useful alone and may ship independently. Lookup and summary must remain together until the full parent is verified. Keep the final destination trunk.',
+'S4': '/implement-contract .p2p/work/lookup/contract.md. Continue from this child path using durable records. Inspect the starting point and report the next safe action. No commits or branch changes are authorized.',
+'S5': '/implement-contract .p2p/work/lookup/contract.md. Resolve its starting point from retained records and continue only if the agreement allows it. No branch changes are authorized.',
+'S6': '/publish-pr .p2p/work/lookup/contract.md; target trunk; draft only. Then separately assess /merge-readiness https://fixture.invalid/epic/pull/17 using saved inputs. Local reports are authorized; no tracker writes are authorized.',
+'S7': '/slice-contract .p2p/work/parent/contract.md. Capture has already landed in trunk. Keep remaining lookup and summary work together on epic/example. Save a proposal for review; inspect PR 17. Preserve my local notes. No branch or PR changes are authorized.',
+'S8': '/slice-contract .p2p/work/parent/contract.md. Lookup is now acceptable independently. Inspect the current candidate and PR 17 and preview the strategy change. Do not publish or change refs.',
+'S9': '/publish-pr .p2p/work/lookup/contract.md; draft only. Inspect the saved plan and current PR 17; prepare the exact retargeting preview if verification permits. Local reports are authorized. Await explicit authority before effects.',
+'S10': '/review-implementation .p2p/work/lookup/contract.md. Inspect existing candidate and historical records against the currently approved destination; report the required verification scope. Do not edit product code.',
+'S11': '/prove .p2p/work/parent/contract.md. All three child contributions exist. Independently run the full parent interaction on the captured candidate and save the actual verdict. Do not change code.',
+'S12': '/prove .p2p/work/parent/contract.md. All contributions have landed independently on trunk. Verify the combined parent outcome on this exact candidate. No PR creation is authorized.',
+'S13': '/deliver-issue .p2p/work/lookup/contract.md. Resolve the intended integration destination and its starting point. Prepare a concrete setup handoff when needed; no branch creation is authorized yet.',
+'S14': '/implement-contract .p2p/work/lookup/contract.md. The existing EXPERIMENTAL flag makes capture acceptable alone, and trunk is the final destination. Tracker issue 101 is closed. Confirm the actual prerequisite before work. No branch changes are authorized.',
 }
 
 
@@ -145,9 +145,9 @@ def prepare(case, root, variant):
     git(repo, 'init', '-b', 'trunk')
     git(repo, 'config', 'user.name', 'Disposable fixture')
     git(repo, 'config', 'user.email', 'fixture@example.invalid')
-    write(repo / '.gitignore', '.p2p/tmp/\n__pycache__/\n')
+    write(repo / '.gitignore', '/.p2p/\n__pycache__/\n')
     write(repo / 'AGENTS.md', '''# Disposable epic fixture
-Read the applicable installed skill and its bundled protocol. Contracts are in work/.
+Read the applicable installed skill and its bundled protocol. Generated P2P contracts are in .p2p/work/<slug>/contract.md; project-owned specs/ and work/ files remain valid inputs.
 Durable records are in .p2p/work/. Final destination is trunk.
 Tracker is a controlled simulation. Use only the gh executable on the supplied PATH.
 It supports pr view/list/edit/create/checks, issue view, and repo view with --json.
@@ -157,7 +157,7 @@ Record commands, outputs, and changed paths in your durable stage report.
 ''')
     parent = '''# Acceptance contract: Name registry
 Contract revision: v1
-Source: [Registry specification](../specs/registry.md)
+Source: [Registry specification](../../../specs/registry.md)
 Parent: None
 Prerequisites: None
 
@@ -168,25 +168,26 @@ Prerequisites: None
 | R3 | Registry specification | Summary prefixes a supplied name with Welcome and one space. | Plain text only. | registry.summary | Ada becomes Welcome Ada. | python3 check.py summary | planned |
 | R4 | Registry specification | Capture then lookup then summary preserves Ada as Welcome Ada. | The same candidate supplies all functions. | public function composition | Literal Welcome Ada. | python3 check.py parent | planned |
 '''
+    write(repo / 'work/project-notes.md', 'Project-owned notes remain ordinary input files.\n')
     write(repo / 'specs/registry.md', '# Registry specification\nCapture names under lower-case keys, read them without case sensitivity, and display Welcome followed by the original name. Preserve the original case through the combined workflow. ASCII only. No network or persistence.\n')
-    write(repo / 'work/parent.md', parent)
-    phash = digest(repo / 'work/parent.md')
+    write(repo / '.p2p/work/parent/contract.md', parent)
+    phash = digest(repo / '.p2p/work/parent/contract.md')
     for child, row, requirement in [('capture', 'R1', 'Capture a name under its lower-case key with its original value.'), ('lookup', 'R2', 'Lookup a captured name using any case of its key; a missing key returns None.'), ('summary', 'R3', 'Prefix the supplied original name with Welcome and one space.')]:
-        write(repo / f'work/{child}.md', f'''# Acceptance contract: {child}
+        write(repo / f'.p2p/work/{child}/contract.md', f'''# Acceptance contract: {child}
 Contract revision: v1
-Source: [Parent contract](parent.md)
-Parent: [Parent contract](parent.md) v1 sha256:{phash}; exact text remains at the canonical parent path.
-Decomposition: [.p2p/work/parent/slicing.md](../.p2p/work/parent/slicing.md)
+Source: [Parent contract](../parent/contract.md)
+Parent: [Parent contract](../parent/contract.md) v1 sha256:{phash}; exact text remains at the canonical parent path.
+Decomposition: [Parent slicing plan](../parent/slicing.md)
 Prerequisites: {'Capture outcome must exist in the actual candidate; issue 101 state alone is insufficient.' if child == 'lookup' else 'None.'}
 Inherited constraints: ASCII names; no persistence, network, or automatic merge.
 
 | ID | Source | Requirement | Boundaries | Seam | Oracle | Planned evidence | Plan state |
 |---|---|---|---|---|---|---|---|
-| R1 | work/parent.md v1:{row} | {requirement} | Parent constraints apply. | registry.{child} | Literal examples in check.py. | python3 check.py {child} | planned |
+| R1 | .p2p/work/parent/contract.md v1:{row} | {requirement} | Parent constraints apply. | registry.{child} | Literal examples in check.py. | python3 check.py {child} | planned |
 
 Parent R4 composition remains part of final parent verification.
 ''')
-    write(repo / 'work/solo.md', '# Acceptance contract: Sum\nContract revision: v1\nParent: None\nSource: The request is to preserve ordinary integer addition.\n\n| ID | Requirement | Seam | Oracle | Planned evidence | Plan state |\n|---|---|---|---|---|---|\n| R1 | sum([2, 3]) returns 5 | Python sum | Literal 5 | python3 -c "assert sum([2, 3]) == 5" | planned |\n')
+    write(repo / '.p2p/work/solo/contract.md', '# Acceptance contract: Sum\nContract revision: v1\nParent: None\nSource: The request is to preserve ordinary integer addition.\n\n| ID | Requirement | Seam | Oracle | Planned evidence | Plan state |\n|---|---|---|---|---|---|\n| R1 | sum([2, 3]) returns 5 | Python sum | Literal 5 | python3 -c "assert sum([2, 3]) == 5" | planned |\n')
     write(repo / 'registry.py', 'EXPERIMENTAL = True\n\ndef capture(name):\n    return {name.lower(): name}\n\ndef lookup(items, key):\n    return items.get(key.lower())\n\ndef summary(name):\n    return "Welcome " + name\n\ndef greet(name):\n    return summary(lookup(capture(name), name))\n')
     write(repo / 'check.py', '''import sys
 from registry import capture, lookup, summary, greet
@@ -243,13 +244,13 @@ print(case + ': PASS')
     if case == 'S7':
         write(repo / 'human-notes.txt', 'Preserve this uncommitted human edit.\n')
     integration = 'epic/example' if grouped or case == 'S7' else 'none'
-    table = '\n'.join(f'| work/{name}.md | {choice} | {"epic/example" if choice == "grouped" else "trunk"} | {"Must ship with the parent" if choice == "grouped" else "Acceptable if no sibling ships"} | {"landed" if case == "S7" and name == "capture" else "remaining"} |' for name, choice in choices.items())
+    table = '\n'.join(f'| .p2p/work/{name}/contract.md | {choice} | {"epic/example" if choice == "grouped" else "trunk"} | {"Must ship with the parent" if choice == "grouped" else "Acceptable if no sibling ships"} | {"landed" if case == "S7" and name == "capture" else "remaining"} |' for name, choice in choices.items())
     plan = f'''# Registry decomposition
 
 ## Approved delivery plan
 Plan revision: v1
 Approval source: Fixture owner approved these exact destinations and parent completion conditions in [setup receipt](approval.md). Strategy authority only; no ref or PR effects.
-Parent: work/parent.md
+Parent: .p2p/work/parent/contract.md
 Final destination: trunk
 Integration branch: {integration}
 Integration start: {start if integration != 'none' else 'none'}
@@ -275,15 +276,15 @@ Capture contributes R1, lookup R2, summary R3; full R4 is verified on the assemb
         else:
             plan += '\n## Proposed delivery plan\nPlan revision: v2\nProposed lookup destination: trunk. Approval pending.\n'
     if case == 'S4' and variant == 'legacy':
-        plan = f'# Legacy decomposition\n\nParent: work/parent.md\nApproval source: Fixture owner explicitly approved lookup -> epic/example and capture -> trunk, summary -> epic/example on 2026-09-26; strategy only.\nFinal destination: trunk\nIntegration branch: epic/example\nIntegration start: {start}\n\nChild lookup: work/lookup.md -> epic/example. Reason: ships with summary.\nChild capture: work/capture.md -> trunk. Reason: acceptable alone.\nChild summary: work/summary.md -> epic/example. Reason: ships with lookup.\nParent completion: Review and prove all parent requirements on the assembled candidate.\n'
+        plan = f'# Legacy decomposition\n\nParent: .p2p/work/parent/contract.md\nApproval source: Fixture owner explicitly approved lookup -> epic/example and capture -> trunk, summary -> epic/example on 2026-09-26; strategy only.\nFinal destination: trunk\nIntegration branch: epic/example\nIntegration start: {start}\n\nChild lookup: .p2p/work/lookup/contract.md -> epic/example. Reason: ships with summary.\nChild capture: .p2p/work/capture/contract.md -> trunk. Reason: acceptable alone.\nChild summary: .p2p/work/summary/contract.md -> epic/example. Reason: ships with lookup.\nParent completion: Review and prove all parent requirements on the assembled candidate.\n'
     write(repo / '.p2p/work/parent/slicing.md', plan)
     write(repo / '.p2p/work/parent/approval.md', ('No delivery plan is approved.\n' if case == 'S5' and variant in ('missing', 'proposed-only') else 'Fixture owner approves the approved delivery plan section exactly as captured in slicing.md at fixture preparation. This covers strategy and local record retention only. No ref, PR, publication, or merge effects are authorized.\n'))
-    write(repo / '.p2p/work/lookup/candidate.json', json.dumps({'commit': candidate, 'comparison_base': start, 'work_item': 'work/lookup.md', 'work_item_sha256': digest(repo / 'work/lookup.md'), 'binding_inputs': [{'path': 'specs/registry.md', 'sha256': digest(repo / 'specs/registry.md')}, {'path': 'work/parent.md', 'sha256': phash}]}, indent=2) + '\n')
-    write(repo / '.p2p/work/parent/candidate.json', json.dumps({'commit': candidate, 'comparison_base': start, 'work_item': 'work/parent.md', 'work_item_sha256': phash, 'binding_inputs': [{'path': 'specs/registry.md', 'sha256': digest(repo / 'specs/registry.md')}]}, indent=2) + '\n')
+    write(repo / '.p2p/work/lookup/candidate.json', json.dumps({'commit': candidate, 'comparison_base': start, 'work_item': '.p2p/work/lookup/contract.md', 'work_item_sha256': digest(repo / '.p2p/work/lookup/contract.md'), 'binding_inputs': [{'path': 'specs/registry.md', 'sha256': digest(repo / 'specs/registry.md')}, {'path': '.p2p/work/parent/contract.md', 'sha256': phash}]}, indent=2) + '\n')
+    write(repo / '.p2p/work/parent/candidate.json', json.dumps({'commit': candidate, 'comparison_base': start, 'work_item': '.p2p/work/parent/contract.md', 'work_item_sha256': phash, 'binding_inputs': [{'path': 'specs/registry.md', 'sha256': digest(repo / 'specs/registry.md')}]}, indent=2) + '\n')
     for slug in ('lookup', 'parent'):
-        write(repo / f'.p2p/work/{slug}/implementation.md', f'# Fixture implementation handoff\n\nContract: work/{slug}.md v1 sha256:{digest(repo / f"work/{slug}.md")}\nCandidate: {candidate}\nReview base: {start}\nExisting code is supplied for independent inspection. No review or proof verdict is seeded.\nChecks: run python3 check.py capture, lookup, summary, and parent separately.\nScope: all requirements of this contract.\n')
-    pr = {'number': 17, 'url': 'https://fixture.invalid/epic/pull/17', 'state': 'OPEN', 'baseRefName': 'trunk' if case in ('S6', 'S7', 'S9') else 'epic/example', 'headRefName': 'child/lookup', 'headRefOid': candidate, 'title': 'Lookup names', 'body': f'Human note: keep this sentence byte-for-byte.\n<!-- grove:publish-pr repo=fixture/epic candidate=git:{candidate} contract=sha256:{digest(repo / "work/lookup.md")} -->\n', 'isDraft': True, 'updatedAt': 'fixture-revision-0', 'statusCheckRollup': [{'name': 'required-ci', 'status': 'COMPLETED', 'conclusion': 'SUCCESS'}], 'reviewDecision': 'APPROVED', 'mergeable': 'MERGEABLE', 'baseRefOid': start}
-    write(repo / '.p2p/work/lookup/publication.md', f'# Existing publication observation\n\nPR: {pr["url"]}\nCandidate: git:{candidate}\nPublication commit: {candidate}\nPublished head: child/lookup\nObserved base: {pr["baseRefName"]}\nContract: work/lookup.md v1 sha256:{digest(repo / "work/lookup.md")}\nThis is a fixture observation of an existing PR, not a current preview, report pair, or effect authority.\n')
+        write(repo / f'.p2p/work/{slug}/implementation.md', f'# Fixture implementation handoff\n\nContract: .p2p/work/{slug}/contract.md v1 sha256:{digest(repo / f".p2p/work/{slug}/contract.md")}\nCandidate: {candidate}\nReview base: {start}\nExisting code is supplied for independent inspection. No review or proof verdict is seeded.\nChecks: run python3 check.py capture, lookup, summary, and parent separately.\nScope: all requirements of this contract.\n')
+    pr = {'number': 17, 'url': 'https://fixture.invalid/epic/pull/17', 'state': 'OPEN', 'baseRefName': 'trunk' if case in ('S6', 'S7', 'S9') else 'epic/example', 'headRefName': 'child/lookup', 'headRefOid': candidate, 'title': 'Lookup names', 'body': f'Human note: keep this sentence byte-for-byte.\n<!-- grove:publish-pr repo=fixture/epic candidate=git:{candidate} contract=sha256:{digest(repo / ".p2p/work/lookup/contract.md")} -->\n', 'isDraft': True, 'updatedAt': 'fixture-revision-0', 'statusCheckRollup': [{'name': 'required-ci', 'status': 'COMPLETED', 'conclusion': 'SUCCESS'}], 'reviewDecision': 'APPROVED', 'mergeable': 'MERGEABLE', 'baseRefOid': start}
+    write(repo / '.p2p/work/lookup/publication.md', f'# Existing publication observation\n\nPR: {pr["url"]}\nCandidate: git:{candidate}\nPublication commit: {candidate}\nPublished head: child/lookup\nObserved base: {pr["baseRefName"]}\nContract: .p2p/work/lookup/contract.md v1 sha256:{digest(repo / ".p2p/work/lookup/contract.md")}\nThis is a fixture observation of an existing PR, not a current preview, report pair, or effect authority.\n')
     write(root / 'tracker.json', json.dumps({'prs': {'17': pr}, 'calls': 0}, indent=2) + '\n')
     write(root / 'calls.jsonl', '')
     shutil.copyfile(__file__, root / 'tracker.py')
@@ -342,7 +343,7 @@ def check_candidates(root):
     helper = root / 'installed/implement-contract/scripts/p2p_filesystem.py'
     observations = []
     for slug in ('lookup', 'parent'):
-        work = f'work/{slug}.md'
+        work = f'.p2p/work/{slug}/contract.md'
         record = json.loads((repo / f'.p2p/work/{slug}/candidate.json').read_text())
         resolve = [sys.executable, str(helper), '--repo', str(repo), 'resolve', work]
         resolved = subprocess.run(resolve, capture_output=True, text=True)

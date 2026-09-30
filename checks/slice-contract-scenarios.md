@@ -184,10 +184,11 @@ started publication gives `PARTIAL`. Neither run invents API success or CLI flag
 
 ## T13. Slice locally by default
 
-Create `work/retry-safe-uploads.md` with a versioned parent contract. Disable
-external tracker access and invoke slicing with an approved breakdown.
+Create `.p2p/work/retry-safe-uploads/contract.md` with a versioned parent
+contract. Disable external tracker access and invoke slicing with an approved
+breakdown.
 
-Pass when children use `work/retry-safe-uploads-<slice>.md`, the plan is saved as
+Pass when children use `.p2p/work/retry-safe-uploads-<slice>/contract.md`, the plan is saved as
 `.p2p/work/retry-safe-uploads/slicing.md`, and parent/child relative links and
 contribution mappings resolve. No extra specs, tracker issues, or competing
 contracts appear. Child planning normalizes those same work files in place.

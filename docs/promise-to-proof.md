@@ -9,7 +9,7 @@ look right while one sentence from the issue never reaches a test. A test suite
 can pass while its assertions miss the promised result. A green pull request can
 hide a weakened check.
 
-Use `/deliver-issue work/<slug>.md` for one coherent local work item on a host that supports
+Use `/deliver-issue .p2p/work/<slug>/contract.md` for one coherent local work item on a host that supports
 separate stage invocations and independent read-only review and proof contexts.
 It coordinates the native skills to plan acceptance, implement the agreed
 capability, review a captured candidate, and prove the result. Optional external
@@ -38,9 +38,10 @@ Install the skills:
 npx skills@latest add grove/promise-to-proof
 ```
 
-In a new project, run `/setup-promise-to-proof` to establish `specs/`, `work/`,
-`.p2p/work/`, and `.p2p/tmp/` with validated ignore rules. Existing configuration
-and human edits are preserved. Tracker configuration is optional.
+In a new project, run `/setup-promise-to-proof` to establish ignored
+`.p2p/work/` and `.p2p/tmp/` storage with validated ignore rules. It does not
+create `specs/` or `work/`; projects may use them for their own files. Existing
+configuration and human edits are preserved. Tracker configuration is optional.
 External planning or TDD tools are also optional; install Matt Pocock's
 collection separately if you want them:
 
@@ -79,14 +80,15 @@ final candidate, and the repository's review requirements.
 
 ## Start from a local work item
 
-A lasting specification belongs in `specs/<slug>.md`. Plan one coherent delivery
-in `work/<slug>.md`; a small task needs no separate specification. The work file
-holds the only canonical acceptance contract. The remaining examples use
-`work/retry-safe-uploads.md` and its child `work/retry-safe-uploads-api.md`.
+A project-authored specification may live wherever the project keeps it,
+including `specs/`. Plan one coherent delivery; P2P saves the generated contract at
+`.p2p/work/<slug>/contract.md`. A small task needs no separate project
+specification. The remaining examples use `.p2p/work/retry-safe-uploads/contract.md`
+and its child `.p2p/work/retry-safe-uploads-api/contract.md`.
 
 ```text
 /plan-acceptance specs/retry-safe-uploads.md
-/deliver-issue work/retry-safe-uploads.md
+/deliver-issue .p2p/work/retry-safe-uploads/contract.md
 ```
 
 A GitHub issue can be imported through `plan-acceptance` or `deliver-issue`.
@@ -155,7 +157,7 @@ workflow cannot preserve a promise that nobody has made concrete.
 Run `plan-acceptance` against the source:
 
 ```text
-/plan-acceptance work/retry-safe-uploads-api.md
+/plan-acceptance .p2p/work/retry-safe-uploads-api/contract.md
 ```
 
 Follow the [acceptance contract protocol](./acceptance-contract-protocol.md)
@@ -211,7 +213,7 @@ For an independent check before approval, run:
 the missing source, identity, authority, parent context, or outcome decision.
 The audit does not revise or save the proposal and does not inspect a candidate.
 
-Save and reread the contract in `work/<slug>.md` under the planning request's
+Save and reread the contract in `.p2p/work/<slug>/contract.md` under the planning request's
 local write authority. Keep required agreement approval separate from saving
 its proposal. Preserve the acceptance matrix and revision in that same file.
 Minimal acceptance bullets can be enriched in place; they do not require a
@@ -224,7 +226,7 @@ Keep one coherent task on the direct path. For larger work, save the parent
 contract and request local children:
 
 ```text
-/slice-contract work/retry-safe-uploads.md
+/slice-contract .p2p/work/retry-safe-uploads/contract.md
 ```
 
 The skill inspects the exact parent, existing work, and implementation. It
@@ -234,22 +236,23 @@ its children; each child links back through a `Parent:` Markdown link.
 `NO SPLIT` means separate work items add no useful boundary. A missing parent
 contract returns to `plan-acceptance`.
 
-By default, children use names such as `work/retry-safe-uploads-api.md` and
-`work/retry-safe-uploads-browser.md`. A child gets a separate specification
-only when it defines an independently reusable product or design concept.
+By default, child contracts live at paths such as
+`.p2p/work/retry-safe-uploads-api/contract.md` and
+`.p2p/work/retry-safe-uploads-browser/contract.md`. A child gets a separate
+project specification only when it defines an independently reusable product or design concept.
 Saving local work does not authorize tracker writes, commits, or pushes.
 For a preview without writes, request `draft only`.
 
 Resolve consequential outcome and dependency choices before dependent work.
 The exact parent bytes, source specification, and inherited constraints remain
 binding. Each child's local IDs map to qualified parent requirements such as
-`work/retry-safe-uploads.md v2:R4`; equal ID numbers do not imply equal promises.
+`.p2p/work/retry-safe-uploads/contract.md v2:R4`; equal ID numbers do not imply equal promises.
 
 Plan acceptance in each child file, then deliver it:
 
 ```text
-/plan-acceptance work/retry-safe-uploads-api.md
-/deliver-issue work/retry-safe-uploads-api.md
+/plan-acceptance .p2p/work/retry-safe-uploads-api/contract.md
+/deliver-issue .p2p/work/retry-safe-uploads-api/contract.md
 ```
 
 Resume slicing with the parent work-item path. Inspect existing files and
@@ -268,7 +271,7 @@ When the implementation has a consequential choice, run `interrogate` after
 the contract and before editing code:
 
 ```text
-/interrogate work/retry-safe-uploads-api.md
+/interrogate .p2p/work/retry-safe-uploads-api/contract.md
 ```
 
 Ask the agent to name the affected files, the proposed flow, the assumptions
@@ -306,7 +309,7 @@ small diffs can omit behavior too.
 Pass the ticket or canonical contract path to the implementation skill:
 
 ```text
-/implement-contract work/retry-safe-uploads-api.md
+/implement-contract .p2p/work/retry-safe-uploads-api/contract.md
 ```
 
 Explicit invocation authorizes scoped local implementation and safe development
@@ -373,7 +376,7 @@ P2P records stay local and ignored; authorized issue-record publication is a
 separate effect. Local record updates do not change candidate A's identity.
 Compare the complete tree outside `.p2p/`, current work-item and binding-input
 bytes, and comparison base before reuse. A fresh checkout resumes from
-`work/<slug>.md` after the ignored records and retained candidate data have been
+`.p2p/work/<slug>/contract.md` after the ignored records and retained candidate data have been
 transferred through an authorized channel.
 
 ## Review the captured implementation
@@ -627,10 +630,10 @@ nor its disposition becomes a merge gate.
 For a standalone work item with a settled design, use the compact path:
 
 ```text
-/plan-acceptance work/retry-safe-uploads-api.md
+/plan-acceptance .p2p/work/retry-safe-uploads-api/contract.md
 # Optionally audit the exact proposal before any required approval and saving.
 /audit-acceptance <exact proposed contract> against <source>
-/implement-contract work/retry-safe-uploads-api.md
+/implement-contract .p2p/work/retry-safe-uploads-api/contract.md
 /review-implementation <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
 /publish-pr <saved candidate and reports>; target <branch>; draft only
@@ -642,21 +645,21 @@ For a larger feature, start with a specification and local slices:
 
 ```text
 /plan-acceptance specs/retry-safe-uploads.md
-/slice-contract work/retry-safe-uploads.md
-/plan-acceptance work/retry-safe-uploads-api.md
-/deliver-issue work/retry-safe-uploads-api.md
+/slice-contract .p2p/work/retry-safe-uploads/contract.md
+/plan-acceptance .p2p/work/retry-safe-uploads-api/contract.md
+/deliver-issue .p2p/work/retry-safe-uploads-api/contract.md
 /plan-acceptance work/retry-safe-uploads-browser.md
-/deliver-issue work/retry-safe-uploads-browser.md
-/review-implementation work/retry-safe-uploads.md; candidate <integrated candidate>
-/prove work/retry-safe-uploads.md; candidate <integrated candidate>
+/deliver-issue .p2p/work/retry-safe-uploads-browser/contract.md
+/review-implementation .p2p/work/retry-safe-uploads/contract.md; candidate <integrated candidate>
+/prove .p2p/work/retry-safe-uploads/contract.md; candidate <integrated candidate>
 ```
 
 For a difficult bug, optionally use an external `diagnosing-bugs` skill before implementation:
 
 ```text
-/plan-acceptance work/retry-safe-uploads-api.md
+/plan-acceptance .p2p/work/retry-safe-uploads-api/contract.md
 /diagnosing-bugs
-/implement-contract work/retry-safe-uploads-api.md
+/implement-contract .p2p/work/retry-safe-uploads-api/contract.md
 /review-implementation <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
 ```

@@ -280,6 +280,88 @@ class FilesystemTests(unittest.TestCase):
             self.assertFalse((root / "work").exists())
             self.assertFalse((root / ".p2p").exists())
 
+    def test_setup_does_not_create_specs_or_work(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "repo"
+            root.mkdir()
+            p2p.git(root, "init", "-q")
+            (root / ".gitignore").write_text("/.p2p/\n")
+            p2p.setup(root)
+            self.assertFalse((root / "specs").exists())
+            self.assertFalse((root / "work").exists())
+
+    def test_generated_contract_is_ignored_and_project_paths_remain_inputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "repo"
+            root.mkdir()
+            p2p.git(root, "init", "-q")
+            (root / ".gitignore").write_text("/.p2p/\n")
+            specs = root / "specs/foo.md"
+            work = root / "work/foo.md"
+            specs.parent.mkdir(); work.parent.mkdir()
+            specs.write_text("Specification bytes\n")
+            work.write_text("Project plan bytes\n")
+            original = {path: (path.read_bytes(), path.stat().st_mode & 0o777) for path in (specs, work)}
+            contract = root / ".p2p/work/task/contract.md"
+            contract.parent.mkdir(parents=True)
+            contract.write_text("# Acceptance contract: inputs\n\nContract revision: v1\n"
+                                "Source: [Spec](../../../specs/foo.md)\n"
+                                "Parent: [Plan](../../../work/foo.md)\n")
+            self.assertEqual([item["path"] for item in p2p.bindings(root, ".p2p/work/task/contract.md")],
+                             ["specs/foo.md", "work/foo.md"])
+            detail = p2p.git(root, "check-ignore", "--no-index", "-v", "--",
+                             ".p2p/work/task/contract.md").decode()
+            self.assertIn(".gitignore:", detail)
+            self.assertIn("/.p2p/", detail)
+            self.assertFalse(p2p.git(root, "ls-files", "--", ".p2p"))
+            self.assertEqual({path: (path.read_bytes(), path.stat().st_mode & 0o777)
+                              for path in (specs, work)}, original)
+            (root / ".p2p/work/task/candidate.json").write_text(
+                json.dumps({"work_item": ".p2p/work/foreign/contract.md"}))
+            rejects(lambda: p2p.paths(root, ".p2p/work/task/contract.md"),
+                    "artifact directory belongs to another work item")
+
+    def test_legacy_contract_reconciliation_preserves_identity_and_siblings(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "repo"
+            root.mkdir()
+            p2p.git(root, "init", "-q")
+            (root / ".gitignore").write_text("/.p2p/\n")
+            (root / "specs").mkdir()
+            (root / "work").mkdir()
+            (root / "specs/source.md").write_text("Source\n")
+            legacy = root / "work/task.md"
+            data = b"# Acceptance contract: task\n\nContract revision: v3\n"
+            data += b"Source: [Spec](../specs/source.md)\n\n## Acceptance matrix\n| R17 | stable\n"
+            legacy.write_bytes(data)
+            siblings = [root / "specs/unrelated.md", root / "work/unrelated.md"]
+            for path in siblings:
+                path.write_bytes(b"human-owned\n")
+                path.chmod(0o640)
+            before = {path: (path.read_bytes(), path.stat().st_mode & 0o777) for path in [*siblings, legacy]}
+            artifact = root / ".p2p/work/task"
+            artifact.mkdir(parents=True)
+            (artifact / "planning-handoff.md").write_text("approved receipt\n")
+            candidate = {"work_item": "work/task.md", "work_item_sha256": p2p.digest(data),
+                         "binding_inputs": p2p.bindings(root, "work/task.md")}
+            (artifact / "candidate.json").write_text(json.dumps(candidate))
+
+            result = p2p.reconcile(root, "work/task.md")
+            active = root / ".p2p/work/task/contract.md"
+            receipt = json.loads((artifact / "contract-origin.json").read_text())
+            self.assertEqual(result["sha256"], p2p.digest(data))
+            self.assertEqual(active.read_bytes(), data)
+            self.assertEqual(receipt["path"], "work/task.md")
+            self.assertEqual(p2p.bindings(root, ".p2p/work/task/contract.md"), candidate["binding_inputs"])
+            self.assertEqual(p2p.bindings(root, "work/task.md"), candidate["binding_inputs"])
+            self.assertEqual(json.loads((artifact / "candidate.json").read_text()), candidate)
+            self.assertEqual((artifact / "planning-handoff.md").read_text(), "approved receipt\n")
+            self.assertEqual({path: (path.read_bytes(), path.stat().st_mode & 0o777)
+                              for path in [*siblings, legacy]}, before)
+            active.write_bytes(data + b"human edit\n")
+            rejects(lambda: p2p.reconcile(root, "work/task.md"), "origin or bytes changed")
+            self.assertEqual(active.read_bytes(), data + b"human edit\n")
+
     def test_disposable_repository(self):
         run()
 

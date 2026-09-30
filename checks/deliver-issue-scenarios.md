@@ -1,7 +1,7 @@
 # Local work-item delivery checks
 
 These are human-runnable scenarios, not execution results. Invoke
-`/deliver-issue work/save-report.md` once per case in a disposable repository.
+`/deliver-issue .p2p/work/save-report/contract.md` once per case in a disposable repository.
 Use the public `save_report` fixture and independent R1-R4 oracles in
 [proof and repair checks](./proof-repair-scenarios.md). Use a standalone `work/save-report.md` with no tracker configured.
 Start the successful case with only the work-item path;
@@ -23,7 +23,7 @@ Repeat authority and drift cases in fresh contexts. Use the existing
 Configure a supported host with separate
 stage invocations and isolated read-only review and proof contexts. Use one
 coherent standalone work item for the R1-R4 fixture with settled promises and approval where
-required. Begin with `/deliver-issue work/save-report.md`, no paths or commands. Inspect the
+required. Begin with `/deliver-issue .p2p/work/save-report/contract.md`, no paths or commands. Inspect the
 saved contract, implementation report, candidate, review, proof, and evidence.
 Exercise GitHub-specific number resolution separately in D2.
 
@@ -191,7 +191,7 @@ Use the standalone issue planning scenario in a fresh checkout with no planning
 branch. Give delivery only the issue reference and a human approval identifying
 the proposal's comment and exact text hash. Pass when delivery retrieves the
 contract and binding inputs, verifies their bytes, saves the contract unchanged
-in `work/<slug>.md`, and retains approval evidence in `planning-handoff.md`.
+in `.p2p/work/<slug>/contract.md`, and retains approval evidence in `planning-handoff.md`.
 It proceeds without repeating approval or requiring a preliminary PR. Planning
 inside delivery remains local. Publication later includes the local contract
 and records with the implementation under its existing authority rules.

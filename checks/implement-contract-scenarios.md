@@ -236,7 +236,7 @@ The handoff preserves qualified parent references and exact agreement identities
 
 ## Automatic filesystem handoff
 
-Invoke `/implement-contract work/foo-bar.md` without report paths. Pass when
+Invoke `/implement-contract .p2p/work/foo-bar/contract.md` without report paths. Pass when
 `implementation.md`, `candidate.json`, and recoverable snapshot content appear
 in `.p2p/work/foo-bar/`, `.p2p/` is excluded from candidate content, and exact
 work-item, binding parent/spec, and comparison-base identities are recorded.

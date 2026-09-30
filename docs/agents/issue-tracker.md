@@ -1,8 +1,8 @@
 # Issue tracker: GitHub
 
-Canonical acceptance contracts live in `work/<slug>.md`; lasting specifications
-live in `specs/`. GitHub Issues are optional import, mirror, and publication
-destinations. Local planning, slicing, delivery, and resume need no tracker.
+Generated acceptance contracts live in ignored `.p2p/work/<slug>/contract.md`.
+Project-authored sources may live in `specs/`, `work/`, or any supported path;
+GitHub Issues are optional import, mirror, and publication destinations. Local planning, slicing, delivery, and resume need no tracker.
 Use the `gh` CLI for explicitly authorized GitHub operations. Importing an issue
 does not authorize comments, labels, links, or other remote writes.
 Direct `/plan-acceptance <issue>` is the scoped exception: it posts a proposal

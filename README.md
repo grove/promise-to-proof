@@ -59,8 +59,9 @@ host, with agreed tasks, independent correctness judgments, and an improvement
 threshold. Additional hosts and automatic strategy selection remain later work.
 See the [optimization plan](./plans/promise_to_proof_optimization_handoff.md).
 
-Specifications live in `specs/`, and local acceptance contracts live in `work/`.
-Generated records and active delivery state live under ignored `.p2p/work/`.
+Projects may keep their specifications or plans in `specs/` and `work/`; P2P
+neither creates nor reserves those directories. Generated acceptance contracts,
+records, and active delivery state live under ignored `.p2p/work/<slug>/`.
 Keep `.p2p/**` out of Git. GitHub Issues are optional import and publication
 destinations.
 See the [controller guide](./docs/p2p-delivery-controller.md) for the storage and
@@ -157,7 +158,7 @@ optional import, triage, or publication flows.
 
 ```text
 /plan-acceptance specs/retry-safe-uploads.md
-/deliver-issue work/retry-safe-uploads.md
+/deliver-issue .p2p/work/retry-safe-uploads/contract.md
 ```
 
 A separate specification is optional. Give `plan-acceptance` an agreed outcome
@@ -235,7 +236,7 @@ Start with these four skills in order:
 
 ```text
 /plan-acceptance work/retry-safe-uploads.md
-/implement-contract work/retry-safe-uploads.md
+/implement-contract .p2p/work/retry-safe-uploads/contract.md
 /review-implementation <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
 ```
@@ -249,7 +250,7 @@ Start with these four skills in order:
 /critique <idea, document path, or GitHub issue reference>
 /interrogate Walk me through your proposal so I can question it.
 /audit-acceptance <exact proposed contract> against <source>
-/slice-contract work/retry-safe-uploads.md; draft only
+/slice-contract .p2p/work/retry-safe-uploads/contract.md; draft only
 /publish-pr <verified candidate and reports>; target <branch>; draft only
 /merge-readiness <PR URL>; review <saved report>; proof <saved report>
 /repair-gaps <matching proof report>; candidate <saved candidate handoff>; requirements <IDs>
@@ -381,7 +382,7 @@ runs separately and makes real model calls.
 ## Contributing
 
 1. Read [AGENTS.md](./AGENTS.md).
-2. Find or plan the relevant `work/<slug>.md` acceptance contract.
+2. Find or plan the relevant `.p2p/work/<slug>/contract.md` acceptance contract.
 3. Change the smallest relevant skill.
 4. Run the checks described by that skill.
 5. Open a pull request that explains the behavior and evidence.

@@ -1,6 +1,6 @@
 # Deliver a local work item with Codex CLI
 
-The controller runs one established `work/<slug>.md` agreement on macOS with
+The controller runs one established `.p2p/work/<slug>/contract.md` agreement on macOS with
 Python 3.11 or newer, Git, and an authenticated Codex CLI. Install the
 `implement-contract`, `review-implementation`, `prove`, and `repair-gaps` skills
 in `~/.agents/skills/` or `$CODEX_HOME/skills/`. It inherits the configured OpenAI
@@ -11,7 +11,7 @@ comparison-base SHA. For unsliced work, add `--destination BRANCH` when the
 workflow has an explicit destination.
 
 ```sh
-python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source run work/example.md --comparison-base FULL_SHA --authorize-local
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source run .p2p/work/example/contract.md --comparison-base FULL_SHA --authorize-local
 ```
 
 `--authorize-local` grants scoped local agent stages and safe checks. The
@@ -29,7 +29,7 @@ the candidate to the source checkout yourself, then run the explicit cleanup
 command:
 
 ```sh
-python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source cleanup work/example.md
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source cleanup .p2p/work/example/contract.md
 ```
 
 Cleanup compares the complete source tree with the accepted candidate, reads
@@ -47,14 +47,14 @@ product candidate first. Preview the compact issue comment using the full
 delivered commit SHA:
 
 ```sh
-python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source github-record-preview work/example.md --delivered-commit FULL_SHA
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source github-record-preview .p2p/work/example/contract.md --delivered-commit FULL_SHA
 ```
 
 The JSON output contains the exact comment body and its SHA-256. Publication
 requires an explicit grant for that preview hash:
 
 ```sh
-python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source github-record-publish work/example.md --delivered-commit FULL_SHA --authorize-comment-sha256 PREVIEW_SHA256
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source github-record-publish .p2p/work/example/contract.md --delivered-commit FULL_SHA --authorize-comment-sha256 PREVIEW_SHA256
 ```
 
 The controller writes one comment only, reads it back exactly, and retains local
@@ -119,8 +119,8 @@ billing may continue after that deadline.
 ## Read progress and resume
 
 ```sh
-python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source status work/example.md
-python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source resume work/example.md
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source status .p2p/work/example/contract.md
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source resume .p2p/work/example/contract.md
 ```
 
 `status` reads and validates existing records without writing. `resume` continues

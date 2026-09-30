@@ -12,7 +12,31 @@ import sys
 import uuid
 
 
-WORK = re.compile(r"work/[a-z0-9]+(?:-[a-z0-9]+)*\.md\Z")
+SLUG = r"[a-z0-9]+(?:-[a-z0-9]+)*"
+WORK = re.compile(rf"(?:work/(?P<legacy>{SLUG})\.md|\.p2p/work/(?P<active>{SLUG})/contract\.md)\Z")
+
+
+def work_slug(work):
+    match = WORK.fullmatch(work)
+    if not match:
+        raise ValueError("work item must be a P2P contract path")
+    return match.group("active") or match.group("legacy")
+
+
+def contract_origin(root, slug):
+    path = safe(root, f".p2p/work/{slug}/contract-origin.json")
+    return json.loads(path.read_text()) if path.is_file() else None
+
+
+def verify_contract_origin(root, slug, receipt):
+    legacy = f"work/{slug}.md"
+    active = safe(root, f".p2p/work/{slug}/contract.md")
+    source = safe(root, legacy)
+    expected = {"schema": "promise-to-proof/contract-origin/v1", "path": legacy,
+                "sha256": digest(active.read_bytes()), "binding_inputs": receipt.get("binding_inputs")}
+    if receipt != expected or not source.is_file() or digest(source.read_bytes()) != expected["sha256"]:
+        raise ValueError("legacy contract origin or bytes changed; reconcile before dependent work")
+    return active
 
 
 def digest(data):
@@ -47,19 +71,26 @@ def safe(root, relative, leaf_symlink=False):
 
 
 def paths(root, work):
-    if not WORK.fullmatch(work):
-        raise ValueError("work item must be work/<lowercase-kebab-case>.md")
+    slug = work_slug(work)
     setup(root)
     item = safe(root, work)
-    artifact = safe(root, f".p2p/work/{item.stem}")
+    receipt = contract_origin(root, slug)
+    if receipt is not None:
+        verify_contract_origin(root, slug, receipt)
+    if receipt is not None and work.startswith("work/"):
+        item = verify_contract_origin(root, slug, receipt)
+    artifact = safe(root, f".p2p/work/{slug}")
     if item.exists() and not item.is_file():
         raise ValueError("work item is not a file")
     if artifact.exists() and not artifact.is_dir():
         raise ValueError("artifact directory collides with a file")
-    candidate = safe(root, f".p2p/work/{item.stem}/candidate.json")
+    candidate = safe(root, f".p2p/work/{slug}/candidate.json")
     if candidate.exists():
         record = json.loads(candidate.read_text())
-        if not isinstance(record, dict) or record.get("work_item") != work:
+        allowed = {work}
+        if receipt is not None:
+            allowed.update({f".p2p/work/{slug}/contract.md", f"work/{slug}.md"})
+        if not isinstance(record, dict) or record.get("work_item") not in allowed:
             raise ValueError("artifact directory belongs to another work item or has malformed candidate metadata")
     return item, artifact
 
@@ -197,15 +228,34 @@ def document_lines(text):
             yield line
 
 
-def bindings(root, work, require_trackable=True):
+def bindings(root, work, require_trackable=True, _follow_origin=True):
+    legacy_match = re.fullmatch(rf"work/(?P<slug>{SLUG})\.md", work)
+    if legacy_match and _follow_origin:
+        receipt = contract_origin(root, legacy_match.group("slug"))
+        if receipt is not None:
+            active = f".p2p/work/{legacy_match.group('slug')}/contract.md"
+            verify_contract_origin(root, legacy_match.group("slug"), receipt)
+            return bindings(root, active, require_trackable)
+    if re.fullmatch(rf"\.p2p/work/{SLUG}/contract\.md", work):
+        origin = contract_origin(root, work.split("/")[2])
+        if origin is not None:
+            verify_contract_origin(root, work.split("/")[2], origin)
+            current = bindings(root, origin["path"], require_trackable, _follow_origin=False)
+            if current != origin["binding_inputs"]:
+                raise ValueError("legacy contract binding inputs changed; reconcile before dependent work")
+            return current
     found = {}
+    def is_contract(relative):
+        return bool(re.fullmatch(rf"\.p2p/work/{SLUG}/contract\.md", relative))
+    def is_imported_issue(relative):
+        return bool(re.fullmatch(rf"\.p2p/work/{SLUG}/orchestration/issue\.json", relative))
     def visit(relative):
-        if relative == ".p2p" or relative.startswith(".p2p/"):
+        if (relative == ".p2p" or relative.startswith(".p2p/")) and not (is_contract(relative) or is_imported_issue(relative)):
             raise ValueError("generated artifacts cannot be binding inputs")
         if relative in found:
             return
         file = safe(root, relative)
-        if require_trackable:
+        if require_trackable and not relative.startswith(".p2p/"):
             trackable(root, [relative])
         data = file.read_bytes()
         found[relative] = digest(data)
@@ -220,9 +270,46 @@ def bindings(root, work, require_trackable=True):
                     continue
                 resolved = os.path.normpath(str(PurePosixPath(relative).parent / target))
                 visit(resolved)
+    if require_trackable and not is_contract(work):
+        trackable(root, [work])
     visit(work)
     del found[work]
     return [{"path": path, "sha256": value} for path, value in sorted(found.items())]
+
+
+def reconcile(root, legacy):
+    """Copy an explicitly selected legacy contract into ignored active state."""
+    match = re.fullmatch(rf"work/(?P<slug>{SLUG})\.md", legacy)
+    if not match:
+        raise ValueError("reconcile requires an explicit work/<slug>.md legacy contract")
+    root = Path(root).resolve()
+    source = safe(root, legacy)
+    if not source.is_file():
+        raise ValueError("legacy contract does not exist: " + legacy)
+    # Resolve and hash every binding before copying; preserve the old relative-link origin.
+    inputs = bindings(root, legacy)
+    data = source.read_bytes()
+    slug = match.group("slug")
+    artifact = safe(root, f".p2p/work/{slug}")
+    target = safe(root, f".p2p/work/{slug}/contract.md")
+    origin = safe(root, f".p2p/work/{slug}/contract-origin.json")
+    require_ignored(root, str(target.relative_to(root)), str(origin.relative_to(root)))
+    if target.exists() and target.read_bytes() != data:
+        raise ValueError("active contract conflicts with legacy bytes")
+    receipt = {"schema": "promise-to-proof/contract-origin/v1", "path": legacy,
+               "sha256": digest(data), "binding_inputs": inputs}
+    receipt_bytes = json.dumps(receipt, indent=2, ensure_ascii=False).encode() + b"\n"
+    if origin.exists() and origin.read_bytes() != receipt_bytes:
+        raise ValueError("active contract origin conflicts with legacy binding identity")
+    artifact.mkdir(parents=True, exist_ok=True)
+    if not target.exists():
+        atomic_write(target, data, ignored_root=root)
+    if not origin.exists():
+        atomic_write(origin, receipt_bytes, ignored_root=root)
+    if target.read_bytes() != data or digest(target.read_bytes()) != receipt["sha256"]:
+        raise ValueError("active contract readback failed")
+    return {"contract": str(target.relative_to(root)), "sha256": receipt["sha256"],
+            "binding_inputs": inputs, "legacy_source_retained": legacy}
 
 
 def atomic_write(target, data, ignored_root=None):
@@ -258,7 +345,8 @@ def save(root, work, name, data):
     if not item.is_file():
         raise ValueError("work item does not exist")
     target = safe(artifact, name)
-    trackable(root, [work])
+    if not work.startswith(".p2p/"):
+        trackable(root, [work])
     require_ignored(root, str(target.relative_to(root)))
     if PurePosixPath(name).parts[0] == "history":
         raise ValueError("history is reserved")
@@ -405,7 +493,8 @@ def children(root, work):
                 item, _ = paths(root, relative)
                 if not item.is_file():
                     raise ValueError("child work item does not exist: " + relative)
-                trackable(root, [relative])
+                if not relative.startswith(".p2p/"):
+                    trackable(root, [relative])
                 result.append(relative)
     return sorted(set(result))
 
@@ -422,6 +511,8 @@ def main(argv=None):
     parser.add_argument("--repo", default=".")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("setup")
+    reconcile_command = commands.add_parser("reconcile")
+    reconcile_command.add_argument("work")
     for name in ("resolve", "create", "capture", "validate", "resume", "save"):
         command = commands.add_parser(name)
         command.add_argument("work")
@@ -438,11 +529,14 @@ def main(argv=None):
         root = Path(git(Path(args.repo), "rev-parse", "--show-toplevel").decode().strip()).resolve()
         if args.command == "setup":
             result = setup(root)
+        elif args.command == "reconcile":
+            result = reconcile(root, args.work)
         elif args.command == "create":
             item, artifact = paths(root, args.work)
             if artifact.exists() and any(artifact.iterdir()):
                 raise ValueError("artifact directory already contains records")
-            trackable(root, [args.work])
+            if not args.work.startswith(".p2p/"):
+                trackable(root, [args.work])
             data = Path(args.source).read_bytes()
             item.parent.mkdir(parents=True, exist_ok=True)
             with item.open("xb") as output:

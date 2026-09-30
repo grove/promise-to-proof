@@ -263,12 +263,13 @@ marker as authority to revise the agreement.
 
 ## Local work-item planning
 
-Start with `work/foo-bar.md` containing stable acceptance bullets and verification
-notes, with no tracker configured. Pass when planning saves the rich matrix in
-that same file, preserves IDs and promises, and creates no competing contract.
-Repeat from an optional `specs/foo-bar.md`; the work item links its source.
-An unrelated existing slug must not be overwritten. No Git or tracker write
-is authorized by local file creation.
+Start with project-authored `work/foo-bar.md` containing stable acceptance
+bullets and verification notes, with no tracker configured. Pass when planning
+saves the generated contract under `.p2p/work/foo-bar/contract.md`, preserves
+IDs and promises, leaves the source bytes unchanged, and creates no root `work/`
+contract. Repeat from `specs/foo-bar.md` and verify the same behavior. An
+unrelated existing `.p2p` contract must not be overwritten. No Git or tracker
+write is authorized by local file creation.
 
 ## Standalone issue planning handoff
 

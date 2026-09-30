@@ -14,11 +14,11 @@ oracles, evidence plans, and parent/child rules.
 ## Local work and durable records
 
 Use the [filesystem protocol](references/acceptance-contract-protocol.md) and
-`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve work/<slug>.md`
-to resolve paths. Save reports with `save work/<slug>.md <report-name> --from <file>`
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve .p2p/work/<slug>/contract.md`
+to resolve paths. Save reports with `save .p2p/work/<slug>/contract.md <report-name> --from <file>`
 to retain history before replacement.
 
-Accept `work/<slug>.md` directly and discover its source, parent, children, and
+Accept `.p2p/work/<slug>/contract.md` directly and discover its source, parent, children, and
 saved planning context from repository links. The work file is the sole canonical
 contract. Automatically save this audit to `.p2p/work/<slug>/audit.md`, recording
 the exact work-item bytes and binding source/parent identities. Preserve prior

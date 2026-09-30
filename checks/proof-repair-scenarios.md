@@ -362,7 +362,7 @@ or integration with Matt's implementation workflow.
 
 ## Local proof and repair records
 
-Invoke `/prove work/foo-bar.md` without manually supplied artifacts. Pass when
+Invoke `/prove .p2p/work/foo-bar/contract.md` without manually supplied artifacts. Pass when
 it discovers the exact candidate and saves `.p2p/work/foo-bar/proof.md` with
 retained evidence that survives temporary-directory deletion. A read-only
 verifier returns exact text for its enclosing workflow to save and reread.

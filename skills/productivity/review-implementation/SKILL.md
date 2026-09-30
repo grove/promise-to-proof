@@ -18,7 +18,7 @@ Publication belongs to a separately authorized enclosing workflow.
 
 ## Capture the agreement and review scope
 
-Accept `work/<slug>.md` and discover `candidate.json`, linked binding inputs,
+Accept `.p2p/work/<slug>/contract.md` and discover `candidate.json`, linked binding inputs,
 and `implementation.md` under its matching `.p2p/work/<slug>/` directory.
 Also accept a PR URL or saved handoff that resolves to this local work item.
 Accept an explicit comparison base,

@@ -89,10 +89,11 @@ def local_directory(root, work):
     common = fs.git(root, 'rev-parse', '--path-format=absolute', '--git-common-dir').decode().strip()
     repo_id = Path(root).name + '-' + fs.digest(str(Path(common).resolve()).encode())[:16]
     root = Path(root).resolve()
-    repo_local = root / '.p2p' / 'work' / Path(work).stem
+    slug = fs.work_slug(work)
+    repo_local = root / '.p2p' / 'work' / slug
     home = Path.home().resolve()
     local_root = home / '.p2p' / 'work'
-    legacy = local_root / repo_id / Path(work).stem
+    legacy = local_root / repo_id / slug
     legacy_orchestration = legacy / 'orchestration'
     # Continue an unresolved pre-v1 delivery in place; new work always stays in the checkout.
     legacy_present = legacy.exists() and (any((legacy / name).exists() for name in ('delivery.json', 'runtime'))
@@ -149,7 +150,7 @@ def imported_issue_sources(root, work):
 def delivery_paths(root, work):
     """Resolve agreements and records inside this checkout's ignored P2P root."""
     agreement = fs.safe(agreement_root(root, work), work)
-    source = fs.safe(root, work)
+    source, _ = fs.paths(root, work)
     if not agreement.is_file():
         agreement = source
     return agreement, local_storage_directory(root, work, 'artifacts')
@@ -158,9 +159,10 @@ def delivery_paths(root, work):
 def localize_agreement(root, work, bindings):
     local = local_directory(root, work)
     agreement_root = local / 'agreement'
+    contract_source, _ = fs.paths(root, work)
     for relative in [work, *(item['path'] for item in bindings)]:
         target = fs.safe(agreement_root, relative)
-        source = fs.safe(root, relative)
+        source = contract_source if relative == work else fs.safe(root, relative)
         require_repo_local_ignored(root, target)
         target.parent.mkdir(parents=True, exist_ok=True)
         if not source.is_file() and target.is_file():
@@ -172,6 +174,22 @@ def localize_agreement(root, work, bindings):
             fs.atomic_write(target, data, ignored_root=root)
         if fs.digest(target.read_bytes()) != fs.digest(data):
             raise ValueError('repo-local agreement readback failed: ' + relative)
+    origin = fs.contract_origin(root, fs.work_slug(work))
+    if origin is not None:
+        for relative in (origin['path'], f".p2p/work/{fs.work_slug(work)}/contract-origin.json"):
+            source = fs.safe(root, relative)
+            target = fs.safe(agreement_root, relative)
+            if not source.is_file():
+                raise ValueError('legacy contract origin input is missing: ' + relative)
+            require_repo_local_ignored(root, target)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            data = source.read_bytes()
+            if target.exists() and target.read_bytes() != data:
+                raise ValueError('repo-local agreement input changed: ' + relative)
+            if not target.exists():
+                fs.atomic_write(target, data, ignored_root=root)
+            if target.read_bytes() != data:
+                raise ValueError('repo-local agreement readback failed: ' + relative)
     return fs.safe(agreement_root, work)
 
 
@@ -223,7 +241,7 @@ def record_generation(delivery, candidate, stage):
     sequence = len(generations) + 1
     local, workspace = delivery.local, delivery.workspace
     repository = delivery.runtime / 'repository.git'
-    generation_ref = f'refs/p2p/{Path(delivery.work).stem}/generation-{sequence:06d}'
+    generation_ref = f'refs/p2p/{fs.work_slug(delivery.work)}/generation-{sequence:06d}'
     if subprocess.run(['git', '-C', str(repository), 'show-ref', '--verify', '--quiet', generation_ref]).returncode == 0:
         raise ValueError('local generation ref exists outside recovery state: ' + generation_ref)
     path = f'runtime/generations/{sequence:06d}.json'
@@ -1125,6 +1143,9 @@ class Delivery:
         self.verify_superseded_recovery()
         if agreement_bindings(self.root, self.work) != self.state['binding_inputs']:
             raise ValueError('binding inputs changed')
+        source_item, _ = fs.paths(self.root, self.work)
+        if fs.digest(source_item.read_bytes()) != self.state['contract']['sha256']:
+            raise ValueError('work item changed')
         if fs.digest(self.item.read_bytes()) != self.state['contract']['sha256']:
             raise ValueError('work item changed')
         if self.state['authority'] != {'local_stages': True, 'external_effects': False} or self.state['policy'] != POLICY:
@@ -1249,7 +1270,7 @@ class Delivery:
             self.verify_generation_chain()
             actual = fs.validate(self.workspace, self.work, self.state['comparison_base'],
                                  exclude=self.state.get('agreement_paths', ()))
-            saved = json.loads((self.workspace / '.p2p/work' / Path(self.work).stem / 'candidate.json').read_text())
+            saved = json.loads((self.workspace / '.p2p/work' / fs.work_slug(self.work) / 'candidate.json').read_text())
             if actual != expected or saved != expected:
                 raise ValueError('retained candidate identity changed')
         return expected
@@ -1886,6 +1907,11 @@ def create(root, args):
     localize_agreement(root, args.work, inputs)
     agreement_paths = sorted({args.work, *imported_issue_sources(root, args.work)})
     agreements = {args.work} | {entry['path'] for entry in inputs}
+    slug = fs.work_slug(args.work)
+    origin = fs.contract_origin(root, slug)
+    if origin is not None:
+        fs.verify_contract_origin(root, slug, origin)
+        agreements.update((origin['path'], f'.p2p/work/{slug}/contract-origin.json'))
     excluded = set(args.exclude_dirty)
     for path in excluded:
         fs.safe(root, path, leaf_symlink=True)
@@ -1907,7 +1933,12 @@ def create(root, args):
     for path in agreements:
         source = fs.safe(root, path)
         if source.is_file():
-            manifest[path] = next(entry for entry in current if entry['path'] == path)
+            entry = next((entry for entry in current if entry['path'] == path), None)
+            if entry is None:
+                data = source.read_bytes()
+                entry = {'path': path, 'mode': '100755' if source.stat().st_mode & 0o111 else '100644',
+                         'type': 'file', 'content_base64': base64.b64encode(data).decode()}
+            manifest[path] = entry
         else:
             local_input = fs.safe(agreement_root(root, args.work), path)
             if not local_input.is_file():
@@ -1931,7 +1962,7 @@ def create(root, args):
     base_manifest = fs.snapshot(repository, base)
     base_tree_key = fs.snapshot_key(base_manifest)
     base_tree = git_generation_tree(repository, base_manifest)
-    local_base_ref = f'refs/p2p/{Path(args.work).stem}/comparison-base'
+    local_base_ref = f'refs/p2p/{fs.work_slug(args.work)}/comparison-base'
     ref = subprocess.run(['git', '-C', str(repository), 'show-ref', '--verify', '--quiet', local_base_ref])
     if ref.returncode == 0:
         raise ValueError('local Git comparison-base ref already exists: ' + local_base_ref)

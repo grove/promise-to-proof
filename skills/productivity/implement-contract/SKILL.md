@@ -11,7 +11,7 @@ Support fixes, features, refactors, documentation, and configuration changes.
 
 ## Establish the agreement and starting point
 
-Accept `work/<slug>.md`; source issues, ticket URLs, and specifications resolve
+Accept `.p2p/work/<slug>/contract.md`; source issues, ticket URLs, and specifications resolve
 to that canonical local contract through planning. Discover its linked inputs
 and `.p2p/work/<slug>/` records without requiring supplied artifact paths.
 Default to the whole contract. For selected requirement IDs or saved review
@@ -227,8 +227,8 @@ of applicable actions in order, so each can be referenced by number. For
 candidate references already discoverable from the work-item path:
 
 ```text
-/review-implementation work/<slug>.md
-/prove work/<slug>.md
+/review-implementation .p2p/work/<slug>/contract.md
+/prove .p2p/work/<slug>/contract.md
 ```
 
 For `PARTIAL` or `BLOCKED`, give the exact configured check command and

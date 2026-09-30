@@ -90,7 +90,7 @@ marker pair; on reruns update only the managed section and reread it. Multiple o
 mismatched marker pairs need reconciliation. If the section cannot be safely
 written and read back, do not report complete publication.
 
-For local publication, use `work/<parent>-<slice>.md` and save the plan in
+For local publication, use `.p2p/work/<parent>-<slice>/contract.md` and save the plan in
 `.p2p/work/<parent>/slicing.md`. Link parent and children using relative Markdown
 paths and preserve contribution mappings in the parent. Inspect existing files
 before writing; reuse matching work and report unrelated filename collisions.

@@ -17,11 +17,11 @@ covers only the readiness update described below, not other PR changes or merge.
 ## Local work and durable records
 
 Use the [filesystem protocol](references/acceptance-contract-protocol.md) and
-`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve work/<slug>.md`
-to resolve paths. Save reports with `save work/<slug>.md <report-name> --from <file>`
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve .p2p/work/<slug>/contract.md`
+to resolve paths. Save reports with `save .p2p/work/<slug>/contract.md <report-name> --from <file>`
 to retain history before replacement.
 
-Resolve the PR's canonical `work/<slug>.md` and discover candidate, review, and
+Resolve the PR's canonical `.p2p/work/<slug>/contract.md` and discover candidate, review, and
 proof under `.p2p/work/<slug>/`; manually supplied report paths are optional.
 Compare the complete tracked tree outside `.p2p/`, recheck exact work-item and
 binding parent/spec identities and the review comparison base. Artifact-only

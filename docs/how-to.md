@@ -7,19 +7,21 @@ phase in depth. The [FAQ](./faq.md) answers questions about what the results mea
 
 ## Choose a starting point
 
-Run `/setup-promise-to-proof` in a new project. It creates `specs/`, `work/`,
-`.p2p/work/`, and `.p2p/tmp/` and checks Git ignore rules. All `.p2p/**` state
-is ignored and stays out of project Git history. Tracker configuration is optional.
+Run `/setup-promise-to-proof` in a new project. It creates `.p2p/work/` and
+`.p2p/tmp/` and checks Git ignore rules. It does not create `specs/` or `work/`;
+projects may use them for their own files. Generated contracts and all `.p2p/**`
+state stay out of project Git history. Tracker configuration is optional.
 
-For one coherent delivery, start with `/deliver-issue work/<slug>.md`. If you
-have a specification instead, run `/plan-acceptance specs/<slug>.md` first.
+For one coherent delivery, run `/plan-acceptance <source>`; it saves the
+contract under `.p2p/work/<slug>/contract.md`. A source file may be in `specs/`,
+`work/`, or another project path. Then run `/deliver-issue .p2p/work/<slug>/contract.md`.
 An agreed outcome can go directly into a standalone work item without a spec.
 For large work, plan the parent contract and then divide it into local children.
 
 ```text
 Local work item → deliver-issue → optional separately authorized publish-pr
 Local spec      → plan-acceptance → direct delivery or slice-contract
-Tracker issue   → import into work/<slug>.md → same local workflow
+Tracker issue   → import into .p2p/work/<slug>/contract.md → same local workflow
 ```
 
 The coordinated path needs separate stage invocations and independent review
@@ -102,17 +104,18 @@ If you approve only in conversation, transfer the saved approval receipt to the
 delivery checkout as well.
 
 Later, in the same or another checkout, run `/deliver-issue <issue>`. Delivery
-imports the approved text into `work/<slug>.md` and retains its approval when
+imports the approved text into `.p2p/work/<slug>/contract.md` and retains its approval when
 the text and binding inputs match. Changed or conflicting agreements require
-reconciliation. The local contract then follows the normal delivery workflow
-and travels with the implementation PR. No preliminary planning PR is needed.
+reconciliation. The local contract stays in ignored `.p2p/` during active work;
+a durable Delivery Record preserves completed issue-backed agreement identity.
+No preliminary planning PR is needed.
 
 Calling `deliver-issue` directly still plans locally as part of delivery. Its
 nested planning step does not post a proposal comment automatically.
 
 ## Complete a local work item
 
-On a supported host, `/deliver-issue work/retry-safe-uploads.md` runs the direct
+On a supported host, `/deliver-issue .p2p/work/retry-safe-uploads/contract.md` runs the direct
 path from the work-item reference and returns the current result and saved references. It asks for
 unresolved outcome decisions and required approval of the exact proposed
 agreement. It does not imply authority to commit, push, publish, or edit triage
@@ -124,8 +127,8 @@ invocations. Each stage skill returns a handoff for the next phase; it does not
 call the next skill for you.
 
 ```text
-/plan-acceptance work/retry-safe-uploads.md
-/implement-contract work/retry-safe-uploads.md
+/plan-acceptance .p2p/work/retry-safe-uploads/contract.md
+/implement-contract .p2p/work/retry-safe-uploads/contract.md
 /review-implementation <saved implementation handoff> against <comparison base>
 /prove <saved contract>; candidate <saved implementation handoff>
 ```
@@ -220,12 +223,13 @@ it needs its own proof and evaluation; an old report stays historical.
 Plan the parent acceptance contract, then request a split:
 
 ```text
-/plan-acceptance work/retry-safe-uploads.md
-/slice-contract work/retry-safe-uploads.md
+/plan-acceptance .p2p/work/retry-safe-uploads/contract.md
+/slice-contract .p2p/work/retry-safe-uploads/contract.md
 ```
 
-The default result is local child files such as
-`work/retry-safe-uploads-api.md` and `work/retry-safe-uploads-browser.md`.
+The default result is ignored child contracts such as
+`.p2p/work/retry-safe-uploads-api/contract.md` and
+`.p2p/work/retry-safe-uploads-browser/contract.md`.
 The parent lists children and contributions. Each child links to the parent
 and states a complete outcome, inherited constraints, and prerequisites.
 Slicing creates no extra specifications by default. `NO SPLIT` means the parent
@@ -250,7 +254,7 @@ The repository's final destination is `trunk`.
 1. Ask for a delivery preview on the established parent contract:
 
    ```text
-   /slice-contract work/registry.md; capture may ship independently; keep lookup and summary together on epic/registry; final destination trunk; draft only
+   /slice-contract .p2p/work/registry/contract.md; capture may ship independently; keep lookup and summary together on epic/registry; final destination trunk; draft only
    ```
 
    Check that capture targets `trunk`, while lookup and summary target
@@ -268,14 +272,14 @@ The repository's final destination is `trunk`.
    delivery from its work path:
 
    ```text
-   /deliver-issue work/registry-capture.md
-   /deliver-issue work/registry-lookup.md
-   /deliver-issue work/registry-summary.md
+   /deliver-issue .p2p/work/registry-capture/contract.md
+   /deliver-issue .p2p/work/registry-lookup/contract.md
+   /deliver-issue .p2p/work/registry-summary/contract.md
    ```
 
    Each workflow recovers its destination from the parent plan. Lookup waits
    until its required capture behavior exists in the actual candidate. After
-   matching full child review and proof, `/publish-pr work/registry-lookup.md`
+   matching full child review and proof, `/publish-pr .p2p/work/registry-lookup/contract.md`
    previews a child PR targeting `epic/registry`. Review its exact preview before
    authorizing publication.
 
@@ -283,7 +287,7 @@ The repository's final destination is `trunk`.
    the existing parent:
 
    ```text
-   /slice-contract work/registry.md; lookup may now ship independently to trunk; inspect its open PR and preview the change
+   /slice-contract .p2p/work/registry/contract.md; lookup may now ship independently to trunk; inspect its open PR and preview the change
    ```
 
    Check the old and new destinations, affected children, saved work, required
@@ -304,13 +308,13 @@ The repository's final destination is `trunk`.
    work from `trunk`, into one exact parent candidate. Run both stages:
 
    ```text
-   /review-implementation work/registry.md
-   /prove work/registry.md
+   /review-implementation .p2p/work/registry/contract.md
+   /prove .p2p/work/registry/contract.md
    ```
 
    A failed interaction returns to implementation or repair and requires fresh
    verification. Once full parent review and proof match, `/publish-pr
-   work/registry.md` previews the remaining parent PR to `trunk`.
+   .p2p/work/registry/contract.md` previews the remaining parent PR to `trunk`.
    `/merge-readiness` then checks the final destination's required CI and
    repository approvals. If every child landed independently, verify the
    assembled parent on `trunk`; no empty parent PR is needed.
@@ -393,7 +397,7 @@ Name every affected requirement ID, the old and proposed agreement, the reason
 for the change, and who authorized it. If authorization is pending, keep the
 proposal visible but do not proceed with work that depends on it. Once the
 owner approves the change, record that decision in the work item and run
-`/plan-acceptance work/retry-safe-uploads.md`. Only `plan-acceptance` revises the
+`/plan-acceptance .p2p/work/retry-safe-uploads/contract.md`. Only `plan-acceptance` revises the
 contract; a comment proposing or approving a change is not itself the new
 contract.
 
@@ -432,7 +436,7 @@ files only after durable records are read back.
 In the new checkout, resume with the work-item path:
 
 ```text
-/deliver-issue work/retry-safe-uploads.md
+/deliver-issue .p2p/work/retry-safe-uploads/contract.md
 ```
 
 The workflow discovers linked specifications, parent and children, candidate,

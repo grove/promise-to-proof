@@ -12,13 +12,13 @@ contract.
 ## Local work and durable records
 
 Use the [filesystem protocol](references/acceptance-contract-protocol.md) and
-`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve work/<slug>.md`
-to resolve paths. Save reports with `save work/<slug>.md <report-name> --from <file>`
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve .p2p/work/<slug>/contract.md`
+to resolve paths. Save reports with `save .p2p/work/<slug>/contract.md <report-name> --from <file>`
 to retain history before replacement.
 
 This is an explicitly chosen external publication surface, not a prerequisite
 for local planning. `plan-acceptance specs/<slug>.md` creates the canonical
-`work/<slug>.md` without an issue. If a work item already exists, link it in the
+`.p2p/work/<slug>/contract.md` without an issue. If a work item already exists, link it in the
 issue and preserve its authority; the issue is only a mirror/import source.
 Save the publication preview and confirmed issue reference to
 `.p2p/work/<slug>/source-publication.md` when that work item exists, preserving

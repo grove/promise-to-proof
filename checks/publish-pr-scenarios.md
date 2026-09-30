@@ -157,7 +157,7 @@ establish installed agent behavior.
 
 ## 12. Discover durable state and preserve candidate A
 
-Supply only `work/<slug>.md` and target branch. Candidate A has matching review
+Supply only `.p2p/work/<slug>/contract.md` and target branch. Candidate A has matching review
 and proof; its `.p2p/` records remain local and ignored. Pass when publication
 finds the reports automatically, saves local `publication.md`, compares the
 complete tracked tree outside `.p2p/`, excludes `.p2p/**`, checks all binding

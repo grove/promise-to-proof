@@ -51,7 +51,7 @@ It defines the spec envelope, identities, evidence, and verdicts.
 
 ### 1. Establish the contract
 
-Accept `work/<slug>.md` and discover its linked inputs, `candidate.json`, and
+Accept `.p2p/work/<slug>/contract.md` and discover its linked inputs, `candidate.json`, and
 reports in `.p2p/work/<slug>/` using the protocol's durable handoff convention.
 Read the source, pending amendments, applicable parent constraints,
 and exact acceptance contract revision. Preserve all requirement IDs, boundaries,
@@ -141,7 +141,7 @@ ID and must not hide an unmet promise.
 
 Requirements: <proven>/<total>
 Counterexamples tested: <count>
-Contract: <work/<slug>.md and exact revision>
+Contract: <.p2p/work/<slug>/contract.md and exact revision>
 Contract snapshot: <immutable reference or captured text and digest>
 Parent context: <parent identity, snapshot, contribution mapping and prerequisites; omit if none>
 Candidate: <commit or exact snapshot>

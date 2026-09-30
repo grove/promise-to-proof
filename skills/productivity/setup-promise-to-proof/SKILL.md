@@ -1,6 +1,6 @@
 ---
 name: setup-promise-to-proof
-description: Set up the local specs, work, and .p2p filesystem conventions, with optional tracker, triage labels, and domain-doc pointers.
+description: Set up ignored .p2p workflow storage, with optional tracker, triage labels, and domain-doc pointers.
 disable-model-invocation: true
 ---
 
@@ -47,12 +47,12 @@ continue independent local filesystem setup.
 
 ## Write and verify
 
-Create `specs/`, `work/`, `.p2p/work/`, and `.p2p/tmp/` without replacing
-existing content. Add `/.p2p/` to `.gitignore`, preserving unrelated
-rules and comments. Check effective rules with `git check-ignore --no-index -v`
-for probes in all four directories, including repository, global, and
-`.git/info/exclude` rules. Only `specs/` and project-authored `work/` must be
-trackable; `.p2p/work/` must be ignored by the project rule.
+Create `.p2p/work/` and `.p2p/tmp/` without replacing existing content. Do
+not create `specs/` or `work/`; projects may use either directory for their own
+files. Add `/.p2p/` to `.gitignore`, preserving unrelated rules and comments.
+Check effective ignore rules for probes under both `.p2p` directories, including
+repository, global, and `.git/info/exclude` rules. The repository rule must
+ignore `.p2p` state.
 Report setup errors and use `git check-ignore -v` to locate conflicting patterns;
 do not hide them with force-add or silently rewrite unrelated policy. Empty directories need no
 placeholder files. Run `python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> setup`;
@@ -74,8 +74,8 @@ End with `Next steps:` and a numbered list (`1.`, `2.`, ...) of applicable
 actions in order, so each can be referenced by number. If approval is pending,
 name the exact files and decision. For each missing GitHub label, give
 `gh label create "<label>" --repo <owner/repo>`. For an unsupported tracker,
-name that tracker and the setup capability it lacks. Once setup is verified,
-give `/plan-acceptance specs/<slug>.md` or
-`/plan-acceptance work/<slug>.md`; optionally give `/triage-issue <issue URL>`
-when the user has chosen a tracker. Saving setup files never stages, commits,
+name that tracker and the setup capability it lacks. Once setup is verified, give `/plan-acceptance <project source path or agreed text>`;
+optional source files may live in `specs/`, `work/`, or another project path.
+Generated contracts go under `.p2p/work/<slug>/contract.md`. Optionally give
+`/triage-issue <issue URL>` when the user has chosen a tracker. Saving setup files never stages, commits,
 pushes, or creates external records.

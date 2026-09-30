@@ -13,13 +13,13 @@ tracker publication is optional.
 ## Local work and durable records
 
 Use the [filesystem protocol](references/acceptance-contract-protocol.md) and
-`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve work/<slug>.md`
-to resolve paths. Save reports with `save work/<slug>.md <report-name> --from <file>`
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve .p2p/work/<slug>/contract.md`
+to resolve paths. Save reports with `save .p2p/work/<slug>/contract.md <report-name> --from <file>`
 to retain history before replacement.
 
-Resolve the canonical parent as `work/<slug>.md`. Save the decomposition and
+Resolve the canonical parent as `.p2p/work/<slug>/contract.md`. Save the decomposition and
 coverage map as `.p2p/work/<slug>/slicing.md`. Create each child as
-`work/<parent>-<slice>.md`, with a relative Parent link, complete child outcome,
+`.p2p/work/<parent>-<slice>/contract.md`, with a relative Parent link, complete child outcome,
 qualified parent contributions, inherited constraints, and evidence approach.
 Add relative child links and contribution mappings to the parent Children section.
 Preserve unrelated content and existing mappings; inspect collisions and reuse
@@ -80,7 +80,8 @@ Produce one coverage map in both directions:
   each contributes, allocation of material boundaries, and the completion check
   location. Include source promises, negative requirements, and exclusions.
 - Trace every child outcome and enabling task to a parent promise or binding
-  constraint. Use qualified references such as `work/retry-safe-uploads.md v2:R4`.
+  constraint. Use qualified references such as
+`.p2p/work/retry-safe-uploads/contract.md v2:R4`.
   Keep planning IDs such as `S1` distinct from acceptance IDs.
 - Apply shared constraints to every affected slice. For a requirement spanning
   slices, name an accountable delivery ticket or parent completion plan. Repeating
@@ -237,7 +238,7 @@ or authorized publication. Name the next step without simulating it.
 
 End with `Next steps:` and a numbered list (`1.`, `2.`, ...) of applicable
 actions in order, so each can be referenced by number. For `PUBLISHED`, give
-`/plan-acceptance work/<parent>-<slice>.md`; if none is ready, name the exact
+`/plan-acceptance .p2p/work/<parent>-<slice>/contract.md`; if none is ready, name the exact
 prerequisite outcome and its reference. For `NO SPLIT`, give
 `/plan-acceptance <source>` if no saved contract exists; with an approved,
 saved contract and no blocking gaps, give `/implement-contract <saved contract>`.

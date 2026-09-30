@@ -10,8 +10,9 @@ use the [acceptance contract protocol](./acceptance-contract-protocol.md).
 
 ### Do I need a GitHub issue?
 
-No. Start with `work/<slug>.md`, a specification in `specs/`, or an agreed
-outcome for `plan-acceptance`. The work file is the canonical acceptance contract.
+No. Start with an agreed outcome, a project source file in `specs/`, `work/`,
+or another path, or a supported tracker issue. `plan-acceptance` saves the
+canonical generated contract under ignored `.p2p/work/<slug>/contract.md`.
 `deliver-issue` accepts that path despite its historical command name.
 
 Use `create-parent-issue` only when you want an optional GitHub mirror of a
@@ -26,7 +27,7 @@ contract identifies each independently checkable promise, its boundaries, where
 to observe it, and how to determine the right result. It also records exclusions
 and unresolved evidence gaps. That gives implementation and proof a stable
 agreement to use after the issue discussion has grown or the work has moved to a
-new checkout. The contract lives in `work/<slug>.md`. The issue can link to it, and imported
+new checkout. The contract lives in `.p2p/work/<slug>/contract.md`. The issue can link to it, and imported
 issue changes require explicit reconciliation into that file.
 
 ### Can I plan now and deliver later without a planning PR?
@@ -58,7 +59,7 @@ direct implementation, review, and proof path.
 They stay with the same promises across revisions. `S1`, `S2`, and later `S`
 IDs identify slices in a decomposition. A child contract has its own local `R`
 IDs and maps each row to qualified parent obligations, such as
-`work/retry-safe-uploads.md v2:R4`. Matching numbers across a parent, a child, and a
+`.p2p/work/retry-safe-uploads/contract.md v2:R4`. Matching numbers across a parent, a child, and a
 slice do not make those records the same requirement.
 
 ### If every child is proven, is the parent proven?
