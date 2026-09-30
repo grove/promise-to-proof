@@ -1,0 +1,33 @@
+{
+  "artifact": null,
+  "assertion": "The external reviewer confirmed the documented control is present.",
+  "candidate_key": "snapshot:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "contract": {
+    "revision": "v1",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source": "work/example.md"
+  },
+  "environment": {
+    "description": "External repository review",
+    "id": "env:external-review"
+  },
+  "execution": null,
+  "id": "evidence:sha256:a1cf2bb4d58995568124cefe82d1122ad3965ee89a928f7b2e157d127a41dae4",
+  "limitations": [
+    "The validator cannot authenticate the external reviewer identity."
+  ],
+  "observation": "The reviewer comment explicitly confirms the control and names the reviewed candidate.",
+  "observed_at": "2026-09-30T17:10:00Z",
+  "oracle": "An independent reviewer must confirm the control against the exact candidate.",
+  "reference": {
+    "kind": "issue-comment",
+    "locator": "https://example.invalid/issues/1#comment-2",
+    "sha256": null
+  },
+  "requirements": [
+    "R3"
+  ],
+  "result": "passed",
+  "schema": "promise-to-proof/evidence-record/v1",
+  "type": "manual"
+}

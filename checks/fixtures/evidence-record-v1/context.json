@@ -1,0 +1,13 @@
+{
+  "candidate_key": "snapshot:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "contract": {
+    "revision": "v1",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source": "work/example.md"
+  },
+  "requirement_ids": [
+    "R1",
+    "R2",
+    "R3"
+  ]
+}

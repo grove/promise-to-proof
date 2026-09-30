@@ -332,6 +332,9 @@ after proof. The [acceptance contract protocol](./docs/acceptance-contract-proto
 sets the rules for revisions, candidate identity, evidence, and durable handoffs.
 The [acceptance bundle format](./docs/acceptance-bundle-v1.md) defines optional
 deterministic inspection of matching review and proof artifacts.
+The [Evidence Record v1 format](./docs/evidence-record-v1.md) defines a compact,
+deterministic representation of individual proof observations, including exact
+candidate/contract binding and trusted execution facts where applicable.
 Each skill ends with numbered next steps so you can refer to a specific action.
 Some completed results need no further action; stage skills do not call one
 another automatically. `/deliver-issue` coordinates them for one work item.

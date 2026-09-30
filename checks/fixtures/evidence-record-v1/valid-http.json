@@ -1,0 +1,38 @@
+{
+  "artifact": null,
+  "assertion": "The API returns 409 for a stale revision.",
+  "candidate_key": "snapshot:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "contract": {
+    "revision": "v1",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source": "work/example.md"
+  },
+  "environment": {
+    "description": "Local HTTP integration fixture",
+    "id": "env:http-fixture"
+  },
+  "execution": {
+    "candidate_key": "snapshot:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "command": "curl -i -X PUT /resource -H If-Match:stale",
+    "environment_id": "env:http-fixture",
+    "exit_status": 0,
+    "expected_exit_status": 0,
+    "finished_at": "2026-09-30T17:05:00Z",
+    "output_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "receipt_id": "run:http-stale:001",
+    "started_at": "2026-09-30T17:04:59Z",
+    "tool": "curl"
+  },
+  "id": "evidence:sha256:195913f4ddbde665f5e48c845b70ad70019b0bbffefd14974459b194000ab920",
+  "limitations": [],
+  "observation": "A request with the stale revision returned HTTP 409 and the expected conflict body.",
+  "observed_at": "2026-09-30T17:05:00Z",
+  "oracle": "The acceptance contract requires HTTP 409 for stale revisions.",
+  "reference": null,
+  "requirements": [
+    "R2"
+  ],
+  "result": "passed",
+  "schema": "promise-to-proof/evidence-record/v1",
+  "type": "http"
+}

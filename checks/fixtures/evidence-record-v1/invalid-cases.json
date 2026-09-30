@@ -1,0 +1,134 @@
+[
+  {
+    "expected_codes": [
+      "MISSING_EXECUTION_RECEIPT"
+    ],
+    "name": "missing-execution-receipt",
+    "patch": {
+      "execution": null
+    }
+  },
+  {
+    "expected_codes": [
+      "EXECUTION_CANDIDATE_MISMATCH"
+    ],
+    "name": "execution-candidate-mismatch",
+    "patch": {
+      "execution": {
+        "candidate_key": "git:1111111111111111111111111111111111111111"
+      }
+    }
+  },
+  {
+    "expected_codes": [
+      "EXECUTION_ENVIRONMENT_MISMATCH"
+    ],
+    "name": "execution-environment-mismatch",
+    "patch": {
+      "execution": {
+        "environment_id": "env:other"
+      }
+    }
+  },
+  {
+    "expected_codes": [
+      "UNKNOWN_REQUIREMENT"
+    ],
+    "name": "unknown-requirement",
+    "patch": {
+      "requirements": [
+        "R9"
+      ]
+    }
+  },
+  {
+    "expected_codes": [
+      "CONTRACT_IDENTITY_MISMATCH"
+    ],
+    "name": "contract-context-mismatch",
+    "patch": {
+      "contract": {
+        "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      }
+    }
+  },
+  {
+    "expected_codes": [
+      "CANDIDATE_IDENTITY_MISMATCH"
+    ],
+    "name": "candidate-context-mismatch",
+    "patch": {
+      "candidate_key": "git:2222222222222222222222222222222222222222"
+    }
+  },
+  {
+    "expected_codes": [
+      "INVALID_EVIDENCE_RESULT"
+    ],
+    "name": "invalid-result",
+    "patch": {
+      "result": "proven"
+    }
+  },
+  {
+    "expected_codes": [
+      "UNKNOWN_FIELD"
+    ],
+    "name": "verdict-not-part-of-record",
+    "patch": {
+      "verdict": "PROVEN"
+    }
+  },
+  {
+    "expected_codes": [
+      "INVALID_DIGEST"
+    ],
+    "name": "invalid-artifact-digest",
+    "patch": {
+      "artifact": {
+        "sha256": "not-a-digest"
+      }
+    }
+  },
+  {
+    "expected_codes": [
+      "EXECUTION_RESULT_CONFLICT"
+    ],
+    "name": "execution-result-conflict",
+    "patch": {
+      "execution": {
+        "exit_status": 1
+      }
+    }
+  },
+  {
+    "expected_codes": [
+      "UNSUPPORTED_SCHEMA"
+    ],
+    "name": "unsupported-schema",
+    "patch": {
+      "schema": "promise-to-proof/evidence-record/v2"
+    }
+  },
+  {
+    "expected_codes": [
+      "MISSING_FIELD"
+    ],
+    "name": "missing-assertion",
+    "patch": {
+      "assertion": null
+    }
+  },
+  {
+    "expected_codes": [
+      "NONCANONICAL_REQUIREMENT_ORDER"
+    ],
+    "name": "noncanonical-requirement-order",
+    "patch": {
+      "requirements": [
+        "R2",
+        "R1"
+      ]
+    }
+  }
+]

@@ -103,6 +103,16 @@ agreed public seam. If a seam or oracle needs a consequential change, report the
 decision as a gap rather than silently replacing it. A passing suite or checked
 GitHub criterion does not cover a promise whose result is never asserted.
 
+When a concrete observation benefits from machine-readable handoff, consume or
+produce a normalized `promise-to-proof/evidence-record/v1` record as documented
+in `references/evidence-record-v1.md`. Validate it against the exact proof context so
+contract, candidate, and requirement identities agree. Treat its normalized
+assertion, observation, oracle, environment, execution/reference facts, and result
+as evidence inputs only: the record must never substitute its observation result
+for this skill's requirement-level `proven`, `not proven`, or `disproven` judgment.
+For executable evidence, require the trusted execution receipt rather than
+accepting a model-authored command/result narrative as an execution fact.
+
 ### 4. Hunt counterexamples
 
 Check realistic boundaries: empty/one/many, state transitions, retries, restart,

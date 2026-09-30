@@ -1,0 +1,44 @@
+{
+  "artifact": {
+    "locator": ".p2p/work/example/evidence/cancel-test.txt",
+    "name": "cancel-test.txt",
+    "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+  },
+  "assertion": "Cancelling the request stops the retry loop.",
+  "candidate_key": "snapshot:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "contract": {
+    "revision": "v1",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source": "work/example.md"
+  },
+  "environment": {
+    "description": "Linux x64, Python 3.12",
+    "id": "env:linux-x64-python-3.12"
+  },
+  "execution": {
+    "candidate_key": "snapshot:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "command": "python3 -m unittest tests.test_cancel_retry",
+    "environment_id": "env:linux-x64-python-3.12",
+    "exit_status": 0,
+    "expected_exit_status": 0,
+    "finished_at": "2026-09-30T17:00:00Z",
+    "output_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "receipt_id": "run:cancel-test:001",
+    "started_at": "2026-09-30T16:59:58Z",
+    "tool": "python3"
+  },
+  "id": "evidence:sha256:c57f07e96527f482caf62463d45d852d86e68345ac700f673c97282ecef3d290",
+  "limitations": [
+    "This observation covers the retained test environment, not production scheduling behavior."
+  ],
+  "observation": "The cancellation test completed with no retry after the cancellation signal.",
+  "observed_at": "2026-09-30T17:00:00Z",
+  "oracle": "The retained test asserts retry_count remains unchanged after cancellation.",
+  "reference": null,
+  "requirements": [
+    "R1"
+  ],
+  "result": "passed",
+  "schema": "promise-to-proof/evidence-record/v1",
+  "type": "test"
+}
