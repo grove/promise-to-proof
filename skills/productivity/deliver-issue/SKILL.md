@@ -28,7 +28,7 @@ delivery is active or unresolved.
 
 Before the first stage dispatch, record the invocation, start time, deadline,
 stage allowance, dispatch count, and repair usage in ignored local invocation
-state. For a new invocation, default to 30 minutes overall, 10 minutes per
+state. For a new invocation, default to 45 minutes overall, 15 minutes per
 stage, and eight dispatches, including preflight and failed stages. State these
 limits before starting; use explicit user limits when supplied. Pass each stage
 its remaining allowance and reserve time to return its observations. The Python

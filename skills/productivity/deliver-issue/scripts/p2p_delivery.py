@@ -2151,10 +2151,10 @@ def main(argv=None):
             child.add_argument('--authorize-local', action='store_true')
             child.add_argument('--exclude-dirty', action='append', default=[])
             child.add_argument('--max-dispatches', type=int, default=8, help='dispatch limit (default: 8)')
-            child.add_argument('--max-seconds', type=float, default=1800,
-                               help='elapsed seconds from admission (default: 1800)')
-            child.add_argument('--max-stage-seconds', type=float, default=600,
-                               help='seconds per stage, capped by the overall deadline (default: 600)')
+            child.add_argument('--max-seconds', type=float, default=2700,
+                               help='elapsed seconds from admission (default: 2700)')
+            child.add_argument('--max-stage-seconds', type=float, default=900,
+                               help='seconds per stage, capped by the overall deadline (default: 900)')
             child.add_argument('--hard-cost-cap', type=float)
     preview = commands.add_parser('github-record-preview')
     preview.add_argument('work')

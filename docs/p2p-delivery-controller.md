@@ -98,7 +98,7 @@ bytes for those paths in its workspace, and rejects implementation changes to
 them. It preserves original source bytes, executable modes, and symlink targets.
 Partially staged paths must be resolved before admission.
 
-New invocations default to eight dispatches, 1,800 seconds overall, and 600 seconds
+New invocations default to eight dispatches, 2,700 seconds overall, and 900 seconds
 per stage. Override these defaults with `--max-dispatches N`, `--max-seconds SECONDS`,
 and `--max-stage-seconds SECONDS` when the task needs a different allowance.
 Limits must be finite and nonnegative; zero stops before dispatch. The two live
