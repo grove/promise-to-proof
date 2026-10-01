@@ -431,12 +431,12 @@ review requirements still apply after proof succeeds.
 
 ## Carry work to another session or checkout
 
-Do not commit `.p2p/` records. When moving an active delivery, copy its local
-`.p2p/work/<slug>/` state and comparison-base Git objects separately, preserving
-their bytes and access limits. After
-successful explicit cleanup, the compact durable identity does not reconstruct
-the candidate. Keep secrets out of snapshots and evidence, and delete scratch
-files only after durable records are read back.
+Do not commit `.p2p/` records. When moving an active delivery, copy its
+`.p2p/work/<slug>/` contract and compact records plus the matching
+`~/.p2p/executions/<repo-id>/<slug>/` directory, preserving bytes and access
+limits. After successful explicit cleanup, the external runtime retains the
+candidate workspace and Git objects. Keep secrets out of snapshots and
+evidence, and delete scratch files only after durable records are read back.
 
 In the new checkout, resume with the work-item path:
 
@@ -464,9 +464,11 @@ files when they supply required evidence, such as replayable traces and host
 receipts. Keep one recoverable candidate snapshot; reference it from reports.
 
 After a successful verified delivery, run the controller's explicit cleanup.
-It checks that the source matches the candidate, reads back the four final local
-records, and removes the runtime workspace and superseded artifacts. Keep the
-remaining `.p2p/` records ignored; they are never committed to the project.
+It verifies the source checkout stayed at admission, reads back the four final
+local records, and removes attempt logs and scratch. The candidate workspace
+and Git objects remain under `~/.p2p/executions/<repo-id>/<slug>/runtime/` for
+publication. Keep the remaining `.p2p/` records ignored; they are never
+committed to the project.
 
 For historical inspection of P2P files already present in an older Git commit,
 recover them into a new temporary directory:

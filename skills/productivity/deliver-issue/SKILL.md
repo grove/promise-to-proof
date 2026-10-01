@@ -21,14 +21,14 @@ identity checks. Run `--help` for arguments. `resolve` locates the work item,
 previous bytes before replacing a report. Resolve the repository root first;
 pass `--repo <root>` rather than relying on the caller's working directory.
 For unrelated dirty work, capture in the isolated authorized-scope checkout
-specified below and retain its payload only in ignored local storage while the
+specified below and retain its payload only in the external P2P execution directory while the
 delivery is active or unresolved.
 
 ## Bound the delivery
 
 Before the first stage dispatch, record the invocation, start time, deadline,
-stage allowance, dispatch count, and repair usage in ignored local invocation
-state. For a new invocation, default to 45 minutes overall, 15 minutes per
+stage allowance, dispatch count, and repair usage in the external P2P execution
+directory. For a new invocation, default to 45 minutes overall, 15 minutes per
 stage, and eight dispatches, including preflight and failed stages. State these
 limits before starting; use explicit user limits when supplied. Pass each stage
 its remaining allowance and reserve time to return its observations. The Python
@@ -99,9 +99,10 @@ destination. A plan change still invalidates routing and requires reconciliation
    for the existing planning or slicing path.
 2. Check that this host can invoke the installed stage skills in separate
    contexts and run independent, read-only review and proof contexts against a
-   fixed candidate. Check access to durable contract and report storage and to
-   the candidate and its comparison base across those contexts. Select the
-   report/snapshot destination below and verify actual write and read access
+   fixed candidate. Check access to durable contract records and the external
+   execution directory at `~/.p2p/executions/<repo-id>/<slug>/`, including the
+   candidate and its comparison base across those contexts. Select that
+   report/snapshot destination and verify actual write and read access
    **before implementation**, including a harmless disposable probe when
    permissions are uncertain. Actually launch a harmless separate read-only
    stage context and capture its distinct session ID before implementation;
@@ -131,7 +132,7 @@ destination. A plan change still invalidates routing and requires reconciliation
    Retain outer invocation output with its invocation record. Never resume or
    fork the implementation session as an independent verifier. The workspace
    sandbox must keep candidate inputs read-only. Keep controller stage reports
-   and diagnostics under `.p2p/work/<slug>/runtime/` until successful cleanup;
+   and diagnostics under the external P2P execution directory until successful cleanup;
    diagnostics may write only to controller runtime scratch.
 3. Record the work-item path, repository, branch, starting commit, and existing tracked
    and untracked work. Preserve unrelated work. When ownership of overlapping
@@ -162,38 +163,42 @@ destination. A plan change still invalidates routing and requires reconciliation
    before handing off. Missing, conflicting, or unsaved agreements block
    dependent implementation. Do not create a second checklist or contract store.
 
-Keep active execution/recovery state, candidate payloads, stage reports,
-invocation records, and scratch under `.p2p/work/<slug>/`. Store outer workflow
-artifacts under its `orchestration/` directory and direct controller artifacts
-under `runtime/`. The `p2p_delivery.py` controller stores its delivery records,
-attempts (including prompts, events, receipts, and reports), and runtime
-scratch under `.p2p/work/<slug>/runtime`. New deliveries use this repo-local
-layout; unresolved legacy state remains under
-`~/.p2p/work/<repo-id>/<work-item>/` until reconciliation, and conflicting
-roots block use. Preserve the work root while the run is active, blocked,
-interrupted, or uncertain. After review and proof succeed, keep the candidate
-locally available until it is applied to the source checkout. The explicit cleanup command verifies the source identity, writes
+Keep the canonical contract and compact final records under
+`.p2p/work/<slug>/`. Put active execution state, agreement snapshots, candidate
+payloads, stage reports, invocation records, and scratch under
+`~/.p2p/executions/<repo-id>/<slug>/`; resolve `<repo-id>` from the repository
+directory name and the first 16 hex characters of SHA-256 over the absolute
+Git common directory. Store outer workflow artifacts under
+`orchestration/` there and controller runtime under `runtime/`. New candidate
+checkouts and Git objects stay outside the source checkout. Existing active
+checkout-local runtimes and legacy state under
+`~/.p2p/work/<repo-id>/<work-item>/` remain where they are until reconciled;
+conflicting roots block use. Preserve execution state while a run
+is active, blocked, interrupted, or uncertain. After review and proof succeed,
+keep the candidate at `runtime/workspace`; do not apply it to the operator's
+checkout. Cleanup verifies that checkout is unchanged from admission, writes
 and reads back `candidate.json`, `delivery.json`, `review.md`, and `proof.md`
-under `.p2p/work/<slug>/`, then removes superseded implementation, repair, and
-generated history reports. It retains `planning-handoff.md` and `archive.md`
-with hashed reasons when present, enforces six generated files and 65,536
-logical bytes, and blocks on unclassified or staged extras. It deletes local
-runtime data only after final-record readback. `.p2p/` is excluded from the
-product candidate. A completed compact record does not reconstruct the
-candidate in another checkout.
+under `.p2p/work/<slug>/artifacts/`, then removes attempt logs and scratch while
+retaining the isolated candidate workspace and Git objects for publication.
+It retains `planning-handoff.md` and `archive.md` with hashed reasons when
+present, enforces the generated-record footprint, and blocks on unclassified
+or staged extras. `.p2p/` is excluded from the product candidate.
 
 ## Build and capture
 
-6. Invoke `implement-contract` for the whole saved agreement, including its
-   inherited constraints and agreed evidence paths. Run its meaningful checks;
-   report missing checks instead of treating a green suite as acceptance. Save
-   and reread its report outside the candidate. Do not silently include existing
-   unrelated work in the issue's result.
+6. Invoke `implement-contract` for the whole saved agreement in the isolated
+   candidate workspace, including its inherited constraints and agreed
+   evidence paths. Keep the source checkout unchanged during implementation and
+   repair; if the host cannot keep edits isolated, stop instead of editing the
+   source checkout. Run meaningful checks; report missing checks instead of
+   treating a green suite as acceptance. Save and reread its report outside the
+   candidate. Do not include unrelated work in the issue's result.
 7. Capture a fixed candidate with a full commit SHA or `snapshot:sha256:`
    full-tree key, the full comparison-base SHA, work-item hash, binding input
    hashes, and base-relative changed path/state/type/mode/content-digest rows.
    Keep the complete candidate payload and comparison-base Git objects only in
-   the ignored local workspace while the delivery is active or unresolved. If
+   the external P2P execution directory while the delivery is active or
+   unresolved. If
    unrelated dirty files exist, build that workspace from the comparison-base
    tree plus **only** the issue-owned changes (including relevant untracked
    files); do not archive the current checkout wholesale or reuse an
@@ -201,10 +206,11 @@ candidate in another checkout.
    targets and exclude all `.p2p/` content. Compare the local candidate with
    the declared scope before handoff. Independent contexts must be able to read
    the same fixed local workspace; a hash or mutable branch name alone is not
-   sufficient. After reports succeed, retain the candidate until it is applied.
-   Explicit cleanup verifies the source checkout against the full-tree key and
-   changed-file digests before deletion. Fresh-checkout reconstruction is not
-   required after cleanup. Exclude
+   sufficient. After reports succeed, retain the candidate for publication
+   outside the source checkout.
+   Explicit cleanup verifies that the source checkout still matches admission;
+   it never applies the candidate to or switches the operator's checkout.
+   Exclude
    platform metadata such as macOS `._*`
    tar entries (set `COPYFILE_DISABLE=1` when packaging with `tar`). Do not
    commit just to capture the candidate.
@@ -241,7 +247,7 @@ candidate in another checkout.
    cycle per invocation; retain all reports and return a specific blocker if
    findings or gaps remain. Never weaken the agreement or checks to get green.
 10. Resume from the same `.p2p/work/<slug>/contract.md` path by reading its linked inputs and
-    ignored local invocation state, candidate, reports, and evidence. Recheck
+    external invocation state, candidate, reports, and evidence. Recheck
     binding parent/spec hashes and comparison base, and compare the entire
     product tree outside `.p2p/`. Local `.p2p/` record updates retain the
     original reviewed candidate identity; they do not make a new HEAD proven.

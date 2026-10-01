@@ -1,8 +1,10 @@
 # Move existing P2P state out of Git
 
-New active deliveries keep their ignored state under `.p2p/work/<slug>/`.
-Unresolved state from the legacy `~/.p2p/work/<repo-id>/<work-item>/` layout
-must remain there until it is reconciled. This procedure applies when selected
+New active deliveries keep canonical contracts and compact records under
+`.p2p/work/<slug>/`; their execution workspace and candidate stay outside the
+checkout under `~/.p2p/executions/<repo-id>/<slug>/`. Unresolved state from the
+legacy `~/.p2p/work/<repo-id>/<work-item>/` layout must remain there until it
+is reconciled. This procedure applies when selected
 P2P-owned files are already tracked in Git; it does not migrate or delete
 unresolved runtime state.
 

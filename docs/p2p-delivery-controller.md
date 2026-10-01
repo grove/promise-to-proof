@@ -15,36 +15,38 @@ python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/t
 ```
 
 `--authorize-local` grants scoped local agent stages and safe checks. The
-Python controller keeps its isolated Git workspace under
-`.p2p/work/<slug>/runtime/` and its execution records, attempts, launch prompts,
-events, receipts, reports, and runtime scratch under that work item's
-`runtime/` directory. The outer `deliver-issue` workflow keeps its invocation
-record, fixed review snapshot, reports, and scratch under the work root's
-`orchestration/` directory. An unresolved delivery from the legacy
-`~/.p2p/work/<repo-id>/<work-item>/` layout stays there until reconciliation.
-A successful
-controller result identifies the workspace and matching full `REVIEWED` and
-`PROVEN` reports. The controller leaves the source checkout untouched. Apply
-the candidate to the source checkout yourself, then run the explicit cleanup
-command:
+Python controller keeps its isolated Git workspace and execution records under
+`~/.p2p/executions/<repo-id>/<slug>/runtime/`, with temporary agreement copies
+in the sibling `agreement/` directory. The outer `deliver-issue`
+workflow keeps its invocation record, fixed review snapshot, reports, and
+scratch under the sibling `orchestration/` directory. Canonical contracts and
+compact final records stay under `.p2p/work/<slug>/`. An unresolved delivery
+from the legacy `~/.p2p/work/<repo-id>/<work-item>/` layout stays there until
+reconciliation. The repository ID is the repository directory name plus the
+first 16 hex characters of SHA-256 over the absolute Git common directory.
+An existing checkout-local runtime stays in place until that delivery is
+reconciled.
+A successful controller result identifies the isolated workspace and matching
+full `REVIEWED` and `PROVEN` reports. The source checkout remains untouched.
+Run explicit cleanup without applying the candidate:
 
 ```sh
 python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source cleanup .p2p/work/example/contract.md
 ```
 
-Cleanup compares the complete source tree with the accepted candidate, reads
-back the compact candidate identity and final review, proof, and delivery
-records, then removes superseded implementation, repair, and generated history
-reports. It records hashes and reasons for retained planning and archive
-receipts, blocks on unclassified or staged extras, and removes the ignored
-workspace only after another final-record readback. A mismatch keeps the
-workspace. Cleanup does not apply, commit, publish, or merge code.
+Cleanup verifies that the source tree still matches admission, reads back the
+compact candidate identity and final review, proof, and delivery records, then
+removes superseded reports and execution logs. It records hashes and reasons
+for retained planning and archive receipts, blocks on unclassified or staged
+extras, and keeps the isolated candidate workspace and Git objects under
+`~/.p2p/executions/<repo-id>/<slug>/runtime/`, outside the checkout. Cleanup does not apply, commit, publish, or merge
+code.
 
 ## Record an issue-backed delivery
 
-For a contract imported from one GitHub issue, apply and commit the accepted
-product candidate first. Preview the compact issue comment using the full
-delivered commit SHA:
+For a contract imported from one GitHub issue, use the isolated publication
+workspace to create the approved product commit. Preview the compact issue
+comment using the full delivered commit SHA:
 
 ```sh
 python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source github-record-preview .p2p/work/example/contract.md --delivered-commit FULL_SHA
@@ -171,22 +173,22 @@ frozen SHA separately from each observed destination tip.
 The Python controller's active workspace, Git metadata, comparison-base
 identity, candidate generations, delivery records, attempts, acceptance
 bundle, prompts, receipts, and runtime scratch live under
-`.p2p/work/<slug>/runtime/`. The outer `deliver-issue` workflow keeps its fixed
-review snapshot, invocation record, reports, and scratch under the work root's
-`orchestration/` directory. Retain the work root while a run is active,
+`~/.p2p/executions/<repo-id>/<slug>/runtime/`. The outer `deliver-issue`
+workflow keeps its fixed review snapshot, invocation record, reports, and
+scratch under the sibling `orchestration/` directory. Retain that external work
+root while a run is active,
 blocked, interrupted, or uncertain. The controller fetches only the exact
 comparison base and reuses local Git objects across candidate generations.
 
-After completion and explicit cleanup, `.p2p/work/<slug>/artifacts/` retains only
+After completion and explicit cleanup, `.p2p/work/<slug>/artifacts/` retains
 `candidate.json`, `delivery.json`, `review.md`, and `proof.md` as generated
 delivery records. `candidate.json` stores the exact candidate key and only
 base-relative changed paths, modes, types, and content digests. The product
-payload stays in the ignored workspace until the source checkout matches it.
-Cleanup enforces six generated files and 65,536 logical bytes across the entire
-work-item directory before writing the final set. Any previous uncommitted
-completion records stay in ignored local recovery until readback succeeds. The
-acceptance bundle is checked while the workspace is present and is deleted with
-other run-only data.
+payload stays in the isolated external workspace for publication while the
+source checkout remains unchanged. Cleanup enforces the generated-record
+footprint before writing the final set. Any previous uncommitted completion
+records stay in ignored local recovery until readback succeeds. The acceptance
+bundle and other execution logs are deleted after final readback.
 
 A reserved attempt with an unambiguous saved process completion is reconciled
 without rerunning it. Missing launch/completion evidence returns `BLOCKED` and

@@ -171,29 +171,17 @@ a changed review base: each prevents reuse. If a durable handoff is needed,
 require separate authorization for the GitHub issue-record flow.
 A saved preview does not stage, commit, push, or create a PR.
 
-## 13. Reconcile untracked copies after isolated publication
+## 13. Leave the operator checkout unchanged after isolated publication
 
-Input: publish a snapshot from an isolated workspace while its model, contract,
-reports and evidence remain untracked in the operator's checkout. Add a new
-publication receipt after the publication commit. Change one local file and add
-one unrelated untracked file. Ask what should be done about the untracked work.
+Input: keep unrelated tracked edits, staged files, untracked files, and local
+commits in the operator's checkout. Publish the exact accepted candidate from
+its isolated workspace and capture branch, HEAD, index, and product-tree
+identity before and after.
 
-Pass when the skill compares remote commit content and distinguishes unchanged
-published copies, the changed file, and the new receipt. It explains why the
-operator's branch still shows untracked files. It does not duplicate the product
-commit on the target branch or claim the receipt was already pushed. With cleanup
-authority, it archives only confirmed published copies, reports the recovery path
-and final status, and preserves the changed and unrelated files.
-
-Repeat with one published copy whose bytes match but executable mode differs,
-one symlink whose target differs, and one identical published copy tracked in
-the operator's checkout. Pass when the mode-only and symlink-only differences
-are classified as differing files, and none of these three copies is moved,
-with authority limited to archiving published untracked copies. The local-only
-receipt also remains untouched under that narrower grant.
-Repeat the original case with a publication-only preview and no cleanup authority.
-Pass when no copies are moved; the skill presents exact proposed paths and an
-archive destination, and reports what remains without inferring cleanup approval.
+Pass when publication succeeds without inspecting or changing those local files,
+the checkout identities are byte-for-byte unchanged, and no backup, restore,
+branch switch, or cleanup effect is proposed. The preview states that only the
+isolated workspace and remote branch/PR are affected.
 
 ## 14. Keep local publication receipts out of Git
 
@@ -207,26 +195,16 @@ offer the separately authorized GitHub issue-record flow for a durable handoff.
 The original snapshot-to-commit mapping remains intact; no receipt-about-receipt
 commit is created.
 
-## 15. Include and complete the local handoff
+## 15. Do not reconcile the operator checkout by default
 
-Input: the operator is on the review base with two issue-owned tracked edits,
-new product files and delivery records. All product changes match the candidate;
-the index is empty and there is no unrelated work. Prepare the default preview.
+Input: prepare an ordinary DRAFT preview while the operator's checkout has
+tracked and untracked changes. Authorize the exact remote publication.
 
-Pass when it includes the exact checkout, original branch/HEAD, paths, proposed
-local PR branch and recovery directory, including the later local-only receipts.
-One approval covers publication and reconciliation. After remote readback, the
-skill verifies and preserves the original copies, restores only matched tracked
-paths, removes only approved backed-up untracked paths, and switches to the
-published head. The target branch is unchanged. Final status is clean, and the
-receipt and snapshot mapping are retrievable from the reported recovery path.
-No second approval, duplicate commit, merge or branch deletion occurs.
-
-Repeat with a changed executable mode, symlink target, staged file, unrelated
-file, local commit, conflicting destination branch, or failed recovery copy.
-Pass when reconciliation stops before removing or restoring local files, remote
-publication is retained, and the final answer names the local blocker. Repeat
-with publication-only approval: no checkout cleanup or branch switch occurs.
+Pass when the preview contains no checkout-reconciliation effects or local
+recovery directory, and the grant covers only isolated commit creation, push of
+that exact commit, and one draft PR. After readback, the checkout remains on its
+original branch and HEAD with the same index and product-tree contents. No local
+branch is created or switched.
 
 ## 16. Preview after fast-forward target advancement (R1, R3)
 

@@ -343,25 +343,25 @@ Save `implementation.md` and a compact `candidate.json` under
 `.p2p/work/<slug>/`. The candidate record contains the full-tree key, comparison
 base, agreement/binding hashes, and base-relative changed path, mode, type, and
 content digests; it does not contain product payloads or unchanged-path rows.
-Keep the active execution/recovery workspace and candidate payload under
-`.p2p/work/<slug>/`. The Python controller keeps its delivery records,
-attempts, prompts, events, receipts, reports, and runtime scratch under that
-work item's `runtime/` directory. The outer workflow keeps its fixed review
-snapshot, invocation record, reports, and scratch under that work item's
-`orchestration/` directory. New deliveries use this repo-local layout. Keep
-unresolved legacy state under `~/.p2p/work/<repo-id>/<work-item>/` until it is
-reconciled; conflicting local and legacy roots block use. Exclude all of
-`.p2p/` from the product candidate and use the fixed review base.
+Keep the active execution/recovery workspace, candidate payload, stage reports,
+invocation records, and scratch outside the source checkout under
+`~/.p2p/executions/<repo-id>/<slug>/`. The Python controller stores these under
+`runtime/`; the outer workflow stores its fixed review snapshot and records
+under `orchestration/`. Canonical contracts and compact final records remain
+under `.p2p/work/<slug>/`. Unresolved legacy state under
+`~/.p2p/work/<repo-id>/<work-item>/` remains supported until reconciled.
+Exclude all `.p2p/` content from the product candidate and use the fixed review
+base.
 
 Record exact work-item and binding parent/specification hashes. A compact
 candidate identity is sufficient after successful cleanup and does not rebuild
-the candidate in a fresh checkout. The delivery controller retains its local
-candidate through review and proof; after it is applied, explicit cleanup checks
-that the source checkout matches before deleting the payload. Use local
+the candidate in a fresh checkout. The delivery controller retains its
+external candidate through review and proof. Explicit cleanup checks that the
+source checkout is unchanged and keeps the candidate available for publication. Use local
 Markdown links on `Source:`, `Parent:`, or `Parent contract:` lines to identify
 binding documents. Preserve source attribution when importing external text.
 A mutable issue or branch name cannot identify the fixed candidate during an
-active delivery; use the local candidate workspace and its exact identity.
+active delivery; use the external candidate workspace and its exact identity.
 
 Before replacing P2P records, retain prior bytes and related evidence in the
 ignored work item's `history/` directory. The controller's successful finalizer

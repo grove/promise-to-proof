@@ -198,15 +198,11 @@ needed, title, complete body, and the effects requiring authorization. The
 default outcome is `DRAFT`; inspection and preview create no commit, branch,
 push, pull request, comment, label, reviewer request, or other external change.
 
-Include a local handoff plan in the default preview. Record the operator's
-checkout path, branch, HEAD, index state, exact issue-owned paths, proposed local
-branch at the published head, and a durable recovery directory outside the
-checkout. List which local-only records, including later publication receipts,
-will be retained there. A single approval can cover publication and this plan.
-If unrelated work, staged changes, local commits, or branch conflicts prevent a
-safe handoff, show the exact blocker and leave that checkout unchanged. The user
-may also request publication only. Identify those retained local changes in the
-preview rather than promising a clean checkout.
+State in the preview that publication uses the isolated candidate workspace
+under `~/.p2p/executions/<repo-id>/<slug>/runtime/workspace` and leaves the
+operator's checkout, branch, index, and files unchanged. Do not include a local
+reconciliation plan or require a clean checkout; unrelated or staged work in
+the operator's checkout does not block isolated publication.
 
 ## Require exact publication authority
 
@@ -217,9 +213,7 @@ body, and these effects as applicable:
 
 1. create one local publication commit in an isolated workspace;
 2. push that exact commit to the named new remote branch without force; and
-3. create one draft pull request with the approved title and body; and
-4. reconcile the operator's checkout according to the listed local handoff plan,
-   when included.
+3. create one draft pull request with the approved title and body.
 
 One exact grant may authorize all listed effects. Partial authority permits only
 a locally saved preview; do not create an intermediate commit or branch while waiting
@@ -229,11 +223,11 @@ preview and requires a new one.
 
 ## Preserve candidate bytes
 
-Publish from an isolated workspace. Leave the operator's working checkout
-unchanged until remote readback and authorized reconciliation under
-"Finish the local handoff" below. Use a publication workspace reconstructed from the recoverable candidate and recorded
-base. Keep credentials and temporary output outside the commit tree. Include only
-the durable reports explicitly listed in the publication preview.
+Publish from an isolated workspace reconstructed from the recoverable candidate
+and recorded base, outside the operator's checkout. Leave that checkout
+unchanged before, during, and after publication. Keep credentials and temporary output outside the commit
+tree. Include only the durable reports explicitly listed in the publication
+preview.
 
 When the candidate already has a matching full commit, verify that its complete
 Git tree outside `.p2p/` represents the captured candidate before using it.
@@ -298,7 +292,7 @@ ref, marker, and exact identities before retrying. Reuse one confirmed exact
 effect. If no unique result can be established, return `PARTIAL` and do not
 repeat the write. Never delete a successful branch or pull request as rollback.
 
-## Finish the local handoff
+## Finish publication
 
 After remote readback, compare the published commit with the candidate by path,
 bytes, mode, and symlink target. Confirm all `.p2p/**` records remain local and
@@ -314,39 +308,12 @@ publication. Keep later P2P receipts local and ignored; never create a records
 commit containing `.p2p/**`. If a durable handoff is needed, use the separately
 authorized GitHub issue-record flow. Keep the original snapshot-to-commit mapping.
 
-Complete the approved local handoff before ending the publication task:
-
-1. Recheck the checkout branch, HEAD, index, issue-owned files and destination
-   branch against the preview. Require published copies to match the remote
-   commit by path, bytes, mode, symlink target and deletion. Stop reconciliation
-   for changed files, unrelated work, staged changes, local commits, or a branch
-   conflict. Keep the successful publication and report the local blocker.
-2. Save final publication records through the filesystem protocol. Copy the
-   approved issue-owned working files and local-only records to the named durable
-   recovery directory, preserving paths, modes and literal symlinks. Verify the
-   copy before removing or restoring anything. Record the original HEAD and
-   index state there. Local-only receipts are recoverable records, not published
-   files; archive them only when the handoff plan covers their paths.
-3. Remove only approved untracked copies after that verification. For approved
-   tracked changes already present in the remote commit, restore only those paths
-   to the original HEAD after backing them up. Preserve differing and unrelated
-   files. Switch to the approved local branch at the verified published head;
-   create it only if absent, and reuse it only if it already names that head.
-   Leave the target branch at its current commit until the PR is merged.
-4. Confirm the resulting branch, HEAD and `git status`. Retain later local-only
-   receipts in the recovery directory after saving and rereading them; do not
-   recreate them in the checkout after declaring it clean. Report the recovery
-   path and any remaining changes. Never create a duplicate product commit to
-   clear the working tree.
-
-A publication-only grant does not authorize this handoff. Use existing explicit
-reconciliation authority or request the exact missing scope; do not ask again
-when the approved preview already includes it. Report remote publication and
-local handoff separately. `PUBLISHED` remains true if local reconciliation is
-blocked, but the final answer must say the checkout still needs attention.
-After a separately authorized merge, the same preservation checks can support
-switching to and fast-forwarding the target branch. Publication does not authorize
-that merge, a reset, a force update, or deleting a branch.
+After remote readback, verify the operator's checkout still has the branch, HEAD,
+index, and product-tree identity recorded at preview time. Do not copy, restore,
+remove, or switch files or branches there. If isolated publication or remote
+readback fails, preserve the operator's checkout unchanged and report the
+publication blocker. Publication does not authorize a merge, reset, force update,
+or branch deletion.
 
 ## Report
 
@@ -363,8 +330,8 @@ For every status, report the source, agreement, candidate, review and proof
 references, comparison base, destination, target and head state, approved effects,
 effects actually observed, and unresolved work. For `PUBLISHED`, include the
 candidate-to-commit mapping, remote branch, pull-request URL and draft state, and
-readback result. Include the local checkout disposition and any records still
-awaiting publication, with their exact locations.
+readback result. State that the operator's checkout remained unchanged. Include
+any records still awaiting publication, with their exact locations.
 
 State `Merge readiness: NOT ASSESSED`. Hand the confirmed pull request and
 saved reports to an explicitly invoked `/merge-readiness`; do not invoke it.

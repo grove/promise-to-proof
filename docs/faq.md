@@ -130,12 +130,14 @@ resume work.
 
 ### Where do generated reports live?
 
-The candidate excludes `.p2p/`. Active controller state and attempt evidence
-stay under `.p2p/work/<slug>/runtime/`; outer workflow candidate payloads,
-transcripts, reports, and invocation state stay under its `orchestration/`
-directory. After the candidate is applied and explicit cleanup verifies its
-identity, compact candidate, delivery, review, and proof records remain under
-ignored `.p2p/work/<slug>/`. They do not travel with product commits. If review
+The candidate excludes `.p2p/`. Active controller state, attempt evidence, and
+the candidate workspace stay outside the checkout under
+`~/.p2p/executions/<repo-id>/<slug>/runtime/`; outer workflow payloads,
+transcripts, reports, and invocation state stay in its sibling
+`orchestration/` directory. After review and proof succeed, explicit cleanup
+verifies that the source checkout is unchanged and retains the candidate for
+publication. Compact candidate, delivery, review, and proof records remain
+under ignored `.p2p/work/<slug>/`. They do not travel with product commits. If review
 and proof examined commit A, a later commit B recording other authorized
 artifacts does not change their subject to B. Reuse requires identical content outside `.p2p/`,
 unchanged agreements, and the same comparison base. Git-dependent builds also

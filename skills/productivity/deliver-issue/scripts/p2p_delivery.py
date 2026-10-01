@@ -46,7 +46,7 @@ def require_repo_local_ignored(root, path):
     path = Path(os.path.abspath(path))
     try:
         relative = path.relative_to(Path(root).resolve())
-    except ValueError:  # Reconciled legacy state lives outside the project Git tree.
+    except ValueError:  # External P2P execution data lives outside the project Git tree.
         return
     fs.require_ignored(root, relative.as_posix())
 
@@ -95,7 +95,7 @@ def local_directory(root, work):
     local_root = home / '.p2p' / 'work'
     legacy = local_root / repo_id / slug
     legacy_orchestration = legacy / 'orchestration'
-    # Continue an unresolved pre-v1 delivery in place; new work always stays in the checkout.
+    # Reuse unresolved legacy records in place; contracts and final records remain repo-local.
     legacy_present = legacy.exists() and (any((legacy / name).exists() for name in ('delivery.json', 'runtime'))
                                           or (legacy / 'artifacts/delivery.json').is_file()
                                           or (legacy_orchestration.is_dir() and not legacy_orchestration.is_symlink()
@@ -114,8 +114,46 @@ def local_directory(root, work):
     return local
 
 
+def execution_runtime(root, work):
+    """Keep delivery checkouts and their Git objects outside the source checkout."""
+    external_directory = execution_directory(root, work)
+    local = local_directory(root, work) / 'runtime'
+    external = external_directory / 'runtime'
+    for path in (external_directory, external):
+        if path.is_symlink():
+            raise ValueError('external P2P execution path contains a symlink: ' + str(path))
+    if local.exists() and external.exists():
+        raise ValueError('both checkout-local and external execution runtimes exist; reconcile without overwriting either')
+    return local if local.exists() else external
+
+
+def execution_directory(root, work):
+    """Return the stable user-local directory for one repository work item."""
+    common = fs.git(root, 'rev-parse', '--path-format=absolute', '--git-common-dir').decode().strip()
+    repo_id = Path(root).name + '-' + fs.digest(str(Path(common).resolve()).encode())[:16]
+    external_root = Path.home() / '.p2p' / 'executions'
+    external = external_root / repo_id / fs.work_slug(work)
+    for path in (Path.home() / '.p2p', external_root, external_root / repo_id, external):
+        if path.is_symlink():
+            raise ValueError('external P2P execution path contains a symlink: ' + str(path))
+    try:
+        external.resolve().relative_to(Path(root).resolve())
+    except ValueError:
+        pass
+    else:
+        raise ValueError('external P2P execution path resolves inside the source checkout')
+    return external
+
+
 def agreement_root(root, work):
-    return local_storage_directory(root, work, 'agreement')
+    local = local_directory(root, work) / 'agreement'
+    external = execution_directory(root, work) / 'agreement'
+    if local.exists() and external.exists():
+        raise ValueError('both checkout-local and external agreement copies exist; reconcile without overwriting either')
+    path = local if local.exists() else external
+    if path.is_symlink() or (path.exists() and not path.is_dir()):
+        raise ValueError('P2P agreement path is not a directory')
+    return path
 
 
 def local_storage_directory(root, work, name):
@@ -157,11 +195,10 @@ def delivery_paths(root, work):
 
 
 def localize_agreement(root, work, bindings):
-    local = local_directory(root, work)
-    agreement_root = local / 'agreement'
+    agreement_directory = agreement_root(root, work)
     contract_source, _ = fs.paths(root, work)
     for relative in [work, *(item['path'] for item in bindings)]:
-        target = fs.safe(agreement_root, relative)
+        target = fs.safe(agreement_directory, relative)
         source = contract_source if relative == work else fs.safe(root, relative)
         require_repo_local_ignored(root, target)
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -190,11 +227,17 @@ def localize_agreement(root, work, bindings):
                 fs.atomic_write(target, data, ignored_root=root)
             if target.read_bytes() != data:
                 raise ValueError('repo-local agreement readback failed: ' + relative)
-    return fs.safe(agreement_root, work)
+    return fs.safe(agreement_directory, work)
 
 
 def local_save(root, work, name, data):
-    local = fs.safe(local_directory(root, work), name)
+    directory = local_directory(root, work)
+    local = fs.safe(directory, name)
+    relative = local.relative_to(directory)
+    if relative.parts[0] in ('runtime', 'attempts'):
+        prefix = ('attempts',) if relative.parts[0] == 'attempts' else ()
+        external = execution_runtime(root, work)
+        local = fs.safe(external, '/'.join((*prefix, *relative.parts[1:])))
     require_repo_local_ignored(root, local)
     local.parent.mkdir(parents=True, exist_ok=True)
     fs.atomic_write(local, data, ignored_root=root)
@@ -239,13 +282,13 @@ def record_generation(delivery, candidate, stage):
     state = delivery.state
     generations = state.setdefault('local_git_generations', [])
     sequence = len(generations) + 1
-    local, workspace = delivery.local, delivery.workspace
+    workspace = delivery.workspace
     repository = delivery.runtime / 'repository.git'
     generation_ref = f'refs/p2p/{fs.work_slug(delivery.work)}/generation-{sequence:06d}'
     if subprocess.run(['git', '-C', str(repository), 'show-ref', '--verify', '--quiet', generation_ref]).returncode == 0:
         raise ValueError('local generation ref exists outside recovery state: ' + generation_ref)
     path = f'runtime/generations/{sequence:06d}.json'
-    target = fs.safe(local, path)
+    target = fs.safe(delivery.runtime, path.removeprefix('runtime/'))
     require_repo_local_ignored(delivery.root, target)
     if target.exists():
         raise ValueError('local generation record exists outside recovery state: ' + path)
@@ -1059,7 +1102,7 @@ class Delivery:
         self.read_only = False
         self.item, self.directory = delivery_paths(root, work)
         self.local = local_directory(root, work)
-        self.runtime = self.local / 'runtime'
+        self.runtime = execution_runtime(root, work)
         self.workspace = self.runtime / 'workspace'
         self._generation_chain_verified = False
 
@@ -1210,7 +1253,7 @@ class Delivery:
         for sequence, summary in enumerate(generations, 1):
             path = summary.get('record_path', '')
             try:
-                data = fs.safe(self.local, path).read_bytes()
+                data = fs.safe(self.runtime, path.removeprefix('runtime/')).read_bytes()
                 record = json.loads(data)
             except (OSError, ValueError, json.JSONDecodeError) as error:
                 raise ValueError('missing or corrupt local Git generation record: ' + (path or str(sequence))) from error
@@ -1301,7 +1344,7 @@ class Delivery:
         return attempt
 
     def receipt(self, attempt):
-        folder = self.local / 'attempts' / attempt['id']
+        folder = self.runtime / 'attempts' / attempt['id']
         path = folder / 'exit.json'
         if not path.exists():
             raise ValueError('uncertain dispatch ' + attempt['id'] + ': missing controller host completion ' + str(path))
@@ -1347,7 +1390,7 @@ class Delivery:
         require_repo_local_ignored(self.root, scratch / '.p2p/tmp')
         (scratch / '.p2p/tmp').mkdir(parents=True, exist_ok=True)
         attempt = self.reserve(stage, inputs, scratch)
-        folder = self.local / 'attempts' / attempt['id']
+        folder = self.runtime / 'attempts' / attempt['id']
         require_repo_local_ignored(self.root, folder)
         folder.mkdir(parents=True)
         if schema:
@@ -1565,7 +1608,7 @@ assert results['scratch'] == 'ok'
                     if any(not evidence[k].strip() for k in ('assertion', 'observation', 'artifact')):
                         raise ValueError('proof evidence is incomplete: ' + row['id'])
         path = f'attempts/{attempt["id"]}/report.json'
-        stored = self.local / path
+        stored = self.runtime / path
         if stored.exists() and stored.read_bytes() != raw_report:
             raise ValueError('conflicting duplicate stage result: ' + attempt['id'])
         local_save(self.root, self.work, path, raw_report)
@@ -1585,7 +1628,7 @@ assert results['scratch'] == 'ok'
 
     def read_report(self, name):
         record = self.state['reports'][name]
-        data = (self.local / record['path']).read_bytes()
+        data = (self.runtime / record['path']).read_bytes()
         if fs.digest(data) != record['sha256']:
             raise ValueError('report/evidence content changed or lost: ' + name)
         attempt = next(a for a in self.state['attempts'] if a['id'] == record['attempt_id'])
@@ -1631,7 +1674,7 @@ assert results['scratch'] == 'ok'
             'review_sha256': fs.digest(review_bytes),
             'proof_sha256': fs.digest(proof_bytes),
             'completed_at': self.state['completed_at'],
-            'cleanup': cleanup or self.state.get('cleanup', 'awaiting exact source checkout match'),
+            'cleanup': cleanup or self.state.get('cleanup', 'awaiting source checkout verification'),
             'routing': route_record(self.state['routing']),
             'destination_observation': self.state.get('destination_observation'),
         }
@@ -1640,7 +1683,7 @@ assert results['scratch'] == 'ok'
         if self.state.get('github_record'):
             value['github_record'] = self.state['github_record']
         if self.state.get('cleanup_verified_at'):
-            value.update(cleanup='source checkout identity verified',
+            value.update(cleanup=self.state['cleanup'],
                          cleanup_source_identity_sha256=self.state['cleanup_source_identity_sha256'],
                          cleanup_verified_at=self.state['cleanup_verified_at'])
         return value
@@ -1715,18 +1758,28 @@ assert results['scratch'] == 'ok'
             path.unlink()
 
     def remove_local_execution_state(self):
-        attempts = self.local / 'attempts'
+        attempts = self.runtime / 'attempts'
         if attempts.is_symlink():
             raise ValueError('local attempt records are a symlink')
         if attempts.exists():
             shutil.rmtree(attempts)
-        agreement = self.local / 'agreement'
+        agreement = agreement_root(self.root, self.work)
         if agreement.exists():
             shutil.rmtree(agreement)
         for name in ('implementation.md', 'repair.md', 'review.md', 'proof.md'):
             (self.local / name).unlink(missing_ok=True)
         (self.local / 'delivery.json').unlink(missing_ok=True)
-        shutil.rmtree(self.runtime)
+        # Keep the isolated candidate checkout and its Git objects for publication.
+        retained = {'workspace', 'repository.git', 'base-tree-key', 'generations'}
+        for child in self.runtime.iterdir():
+            if child.is_symlink():
+                raise ValueError('execution runtime artifact is a symlink: ' + child.name)
+            if child.name in retained:
+                continue
+            if child.is_dir():
+                shutil.rmtree(child)
+            else:
+                child.unlink()
 
     def complete(self, check_source=True):
         candidate = self.current(check_source=check_source)
@@ -1810,18 +1863,24 @@ assert results['scratch'] == 'ok'
             self.remove_superseded_artifacts()
             self.remove_local_execution_state()
             return
+        self.source_stable()
         self.complete(check_source=False)
         self.verify_github_readback()
         candidate_tree = fs.snapshot(self.workspace, exclude=self.state.get('agreement_paths', ()))
         source_tree = fs.snapshot(self.root, exclude=self.state.get('agreement_paths', ()))
-        if source_tree != candidate_tree:
-            raise ValueError('source checkout does not match the exact accepted candidate identity')
+        source_key = fs.snapshot_key(fs.snapshot(self.root))
+        if source_key == self.state['source_tree_key']:
+            cleanup = 'source checkout unchanged'
+        elif source_tree == candidate_tree:
+            cleanup = 'candidate already present in source checkout'
+        else:
+            raise ValueError('source checkout changed since admission; cleanup never applies the candidate')
         if fs.tree_changes(fs.snapshot(self.workspace, self.state['comparison_base'], exclude=self.state.get('agreement_paths', ())), candidate_tree) != self.state['candidate'].get('changes', []):
             raise ValueError('candidate compact identity changed before cleanup')
         source_identity = fs.digest(fs.canonical(fs.tree_identity(source_tree)))
         self.state.update(cleanup_verified_at=self.state.get('cleanup_verified_at') or now(),
                           cleanup_source_identity_sha256=source_identity,
-                          cleanup='source checkout identity verified')
+                          cleanup=cleanup)
         self.persist_final()
         self.state['final_records_written'] = True
         self.save()
@@ -1947,7 +2006,7 @@ def create(root, args):
                               'content_base64': base64.b64encode(local_input.read_bytes()).decode()}
     _, directory = delivery_paths(root, args.work)
     local = local_directory(root, args.work)
-    runtime = local / 'runtime'
+    runtime = execution_runtime(root, args.work)
     if runtime.exists():
         raise ValueError('local runtime exists without an active delivery record; preserve it and reconcile admission')
     require_repo_local_ignored(root, runtime)
@@ -2050,7 +2109,7 @@ def result(delivery):
     activity = []
     if attempt:
         for name in ('events.jsonl', 'stderr.txt'):
-            path = delivery.local / 'attempts' / attempt['id'] / name
+            path = delivery.runtime / 'attempts' / attempt['id'] / name
             try:
                 activity.append(path.stat().st_mtime)
             except OSError:
@@ -2058,7 +2117,7 @@ def result(delivery):
     latest = max(activity) if activity else None
     running = controller_running(delivery)
     pending = running and attempt and attempt['status'] == 'reserved' and attempt['stage'] in ('implementation', 'repair')
-    completion = delivery.local / 'attempts' / attempt['id'] / 'exit.json' if attempt else None
+    completion = delivery.runtime / 'attempts' / attempt['id'] / 'exit.json' if attempt else None
     uncertain = bool(attempt and attempt['status'] == 'reserved' and running is not True)
     status = 'BLOCKED' if uncertain else state['status']
     blocker = state['blocker']
@@ -2095,7 +2154,7 @@ def result(delivery):
                     if state.get('cleanup_verified_at') else state.get('reports', {})),
         'attempts': [] if state.get('cleanup_verified_at') else state['attempts'],
         'records': str(delivery.directory),
-        'local_runtime': str(delivery.local) if delivery.local.exists() else None,
+        'local_runtime': str(delivery.runtime) if delivery.runtime.exists() else None,
         'resume': f'python3 {Path(__file__).resolve()} --repo {delivery.root} resume {delivery.work}',
         'cleanup': f'python3 {Path(__file__).resolve()} --repo {delivery.root} cleanup {delivery.work}'}
 
@@ -2135,8 +2194,21 @@ def completed_result(root, work, directory):
                                           'sha256': fs.digest(path.read_bytes())})
         if retained != expected_retained:
             raise ValueError('durable retained-artifact receipts changed or lost')
-        if not record.get('cleanup_verified_at') or record.get('cleanup') != 'source checkout identity verified':
+        if not record.get('cleanup_verified_at') or record.get('cleanup') not in (
+                'source checkout unchanged', 'candidate already present in source checkout',
+                'source checkout identity verified'):
             raise ValueError('candidate cleanup has not been verified')
+        workspace = execution_runtime(root, work) / 'workspace'
+        if record.get('cleanup') == 'source checkout unchanged':
+            if not workspace.is_dir():
+                raise ValueError('retained isolated candidate workspace is missing')
+            repository = workspace.parent / 'repository.git'
+            if not repository.is_dir() or (workspace / '.git').read_text() != 'gitdir: ' + str(repository) + '\n':
+                raise ValueError('retained isolated Git object store is missing or changed')
+            recovered = fs.validate(workspace, work, record['comparison_base'],
+                                    exclude=record.get('agreement_paths', (work,)))
+            if candidate_key(recovered) != record['candidate_key']:
+                raise ValueError('retained isolated candidate workspace changed')
         identity_sha = fs.digest(fs.canonical(fs.tree_identity(
             fs.snapshot(root, exclude=record.get('agreement_paths', (work,))))))
         if identity_sha != record.get('cleanup_source_identity_sha256'):
@@ -2154,15 +2226,20 @@ def completed_result(root, work, directory):
                      'candidate_validation': 'verified durable compact identity'},
         'starting_commit': None, 'reports': {'review': {'path': 'review.md', 'sha256': record['review_sha256']},
                                              'proof': {'path': 'proof.md', 'sha256': record['proof_sha256']}},
-        'attempts': [], 'records': str(directory), 'local_runtime': None, 'candidate_workspace': None,
+        'attempts': [], 'records': str(directory),
+        'local_runtime': str(execution_runtime(root, work)) if execution_runtime(root, work).exists() else None,
+        'candidate_workspace': (str(workspace) if workspace.is_dir() else None),
         'github_record': record.get('github_record'),
         'cleanup': 'already complete',
         'resume': f'python3 {Path(__file__).resolve()} --repo {root} status {work}',
     }
 
 
-def completed_without_local_runtime(root, work, directory, local, missing_record):
-    if (local / 'runtime').exists() or (local / 'attempts').exists():
+def completed_without_local_runtime(root, work, directory, missing_record):
+    runtime = execution_runtime(root, work)
+    completed_runtime = ((runtime / 'repository.git').is_dir() and
+                         (directory / 'delivery.json').is_file())
+    if runtime.exists() and not completed_runtime:
         raise ValueError('local execution state exists but its invocation record is missing')
     if not (directory / 'delivery.json').exists():
         raise ValueError(missing_record)
@@ -2213,7 +2290,7 @@ def main(argv=None):
         state_path = local / 'delivery.json'
         if args.action == 'status':
             if not state_path.exists():
-                output = completed_without_local_runtime(root, args.work, directory, local,
+                output = completed_without_local_runtime(root, args.work, directory,
                                                           'no delivery invocation exists')
                 print(json.dumps(output, indent=2))
                 return 0
@@ -2259,7 +2336,7 @@ def main(argv=None):
             print(json.dumps({'status': 'RECORDED', 'github_record': receipt}, indent=2))
             return 0
         if args.action == 'cleanup' and not state_path.exists():
-            output = completed_without_local_runtime(root, args.work, directory, local,
+            output = completed_without_local_runtime(root, args.work, directory,
                                                       'no local candidate workspace is available for cleanup')
             print(json.dumps(output, indent=2))
             return 0
