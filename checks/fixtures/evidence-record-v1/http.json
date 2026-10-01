@@ -1,0 +1,37 @@
+{
+  "schema": "promise-to-proof/evidence-record/v1",
+  "id": "E2",
+  "candidate": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "contract": {
+    "source": "Fixture capability",
+    "revision": "v1",
+    "sha256": "68c39c3bf197dd1688b5bf552e58a2728229df399c201b683b7cf49646fb5b37"
+  },
+  "requirements": [
+    "R1",
+    "R2"
+  ],
+  "type": "http",
+  "assertion": "The status endpoint returns a ready response.",
+  "observation": "HTTP status 200 and ready=true.",
+  "oracle": {
+    "expected_result": "HTTP 200, ready=true",
+    "expected_exit_status": 200
+  },
+  "outcome": "passed",
+  "environment": "Local HTTP fixture server",
+  "timestamp": "2026-09-30T10:01:01Z",
+  "execution": {
+    "identity": "GET http://127.0.0.1/status",
+    "exit_status": 200,
+    "result": "HTTP 200; ready=true",
+    "started_at": "2026-09-30T10:01:00Z",
+    "finished_at": "2026-09-30T10:01:01Z"
+  },
+  "interpretation": "A successful process alone does not prove R1 or R2.",
+  "artifacts": [],
+  "limitations": [
+    "Fixture observation; does not establish production readiness."
+  ],
+  "provenance": "Observed local GET http://127.0.0.1/status; fixture capture, no host receipt"
+}

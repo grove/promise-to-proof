@@ -13,6 +13,14 @@ examines contract fidelity, scope, and engineering quality. Neither replaces pro
 Before verification, read the [acceptance contract protocol](references/acceptance-contract-protocol.md).
 It defines the spec envelope, identities, evidence, and verdicts.
 
+Optional [evidence-record v1](../../../docs/evidence-record-v1.md) records may be cited
+by evidence ID and computed SHA-256 digest, and their deterministic Markdown
+rendering may be embedded in `proof.md`. Validate records against the exact proof
+context when available. Records are optional and a valid record never implies a
+verdict: requirement-level `proven`, `not proven`, and `disproven` judgments remain
+in `proof.md`, owned by `/prove`. Without host-issued command/test receipts, keep
+self-run command observations directly in `proof.md`.
+
 ## Verdicts
 
 - `PROVEN`: every material requirement has credible evidence, no contract

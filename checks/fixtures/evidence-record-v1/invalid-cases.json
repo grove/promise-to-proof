@@ -1,0 +1,750 @@
+[
+  {
+    "name": "schema None",
+    "fixture": "command.json",
+    "patch": {
+      "schema": null
+    },
+    "expected_codes": [
+      "UNSUPPORTED_SCHEMA"
+    ]
+  },
+  {
+    "name": "schema 4",
+    "fixture": "command.json",
+    "patch": {
+      "schema": 4
+    },
+    "expected_codes": [
+      "UNSUPPORTED_SCHEMA"
+    ]
+  },
+  {
+    "name": "schema promise-to-proof/evidence-record/v2",
+    "fixture": "command.json",
+    "patch": {
+      "schema": "promise-to-proof/evidence-record/v2"
+    },
+    "expected_codes": [
+      "UNSUPPORTED_SCHEMA"
+    ]
+  },
+  {
+    "name": "schema other",
+    "fixture": "command.json",
+    "patch": {
+      "schema": "other"
+    },
+    "expected_codes": [
+      "UNSUPPORTED_SCHEMA"
+    ]
+  },
+  {
+    "name": "candidate None",
+    "fixture": "command.json",
+    "patch": {
+      "candidate": null
+    },
+    "expected_codes": [
+      "INVALID_CANDIDATE"
+    ]
+  },
+  {
+    "name": "candidate HEAD",
+    "fixture": "command.json",
+    "patch": {
+      "candidate": "HEAD"
+    },
+    "expected_codes": [
+      "INVALID_CANDIDATE"
+    ]
+  },
+  {
+    "name": "candidate git:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "fixture": "command.json",
+    "patch": {
+      "candidate": "git:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    "expected_codes": [
+      "INVALID_CANDIDATE"
+    ]
+  },
+  {
+    "name": "candidate snapshot:sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "fixture": "command.json",
+    "patch": {
+      "candidate": "snapshot:sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "expected_codes": [
+      "INVALID_CANDIDATE"
+    ]
+  },
+  {
+    "name": "contract sourceNone",
+    "fixture": "command.json",
+    "patch": {
+      "contract": {
+        "source": null
+      }
+    },
+    "expected_codes": [
+      "INVALID_TEXT"
+    ]
+  },
+  {
+    "name": "contract revisionNone",
+    "fixture": "command.json",
+    "patch": {
+      "contract": {
+        "revision": null
+      }
+    },
+    "expected_codes": [
+      "INVALID_CONTRACT_REVISION"
+    ]
+  },
+  {
+    "name": "contract sha256None",
+    "fixture": "command.json",
+    "patch": {
+      "contract": {
+        "sha256": null
+      }
+    },
+    "expected_codes": [
+      "INVALID_DIGEST"
+    ]
+  },
+  {
+    "name": "contract revisionv0",
+    "fixture": "command.json",
+    "patch": {
+      "contract": {
+        "revision": "v0"
+      }
+    },
+    "expected_codes": [
+      "INVALID_CONTRACT_REVISION"
+    ]
+  },
+  {
+    "name": "contract sha256AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "fixture": "command.json",
+    "patch": {
+      "contract": {
+        "sha256": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    "expected_codes": [
+      "INVALID_DIGEST"
+    ]
+  },
+  {
+    "name": "candidate mismatch",
+    "fixture": "command.json",
+    "patch": {
+      "candidate": "git:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "expected_codes": [
+      "CANDIDATE_MISMATCH"
+    ]
+  },
+  {
+    "name": "context contract source",
+    "fixture": "command.json",
+    "patch": {
+      "contract": {
+        "source": "Other"
+      }
+    },
+    "expected_codes": [
+      "CONTRACT_MISMATCH"
+    ]
+  },
+  {
+    "name": "context contract revision",
+    "fixture": "command.json",
+    "patch": {
+      "contract": {
+        "revision": "v2"
+      }
+    },
+    "expected_codes": [
+      "CONTRACT_MISMATCH"
+    ]
+  },
+  {
+    "name": "context contract sha256",
+    "fixture": "command.json",
+    "patch": {
+      "contract": {
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    },
+    "expected_codes": [
+      "CONTRACT_MISMATCH"
+    ]
+  },
+  {
+    "name": "edited contract bytes",
+    "fixture": "command.json",
+    "patch": {},
+    "expected_codes": [
+      "CONTRACT_DIGEST_MISMATCH"
+    ],
+    "context_patch": {
+      "contract": {
+        "content": "# Acceptance contract: Fixture capability\n\nContract revision: v1\n\n## Acceptance matrix\n\n| ID | Source | Requirement | Boundaries / counterexamples | Seam | Oracle | Planned evidence | Plan state |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| R1 | Fixture source | Observe result 1 | Failure | Public seam | Expected value | Fixture | planned |\n| R2 | Fixture source | Observe result 2 | Failure | Public seam | Expected value | Fixture | planned |\nChanged.\n"
+      }
+    }
+  },
+  {
+    "name": "requirements []",
+    "fixture": "command.json",
+    "patch": {
+      "requirements": []
+    },
+    "expected_codes": [
+      "INVALID_REQUIREMENTS"
+    ]
+  },
+  {
+    "name": "requirements ['R1', 'R1']",
+    "fixture": "command.json",
+    "patch": {
+      "requirements": [
+        "R1",
+        "R1"
+      ]
+    },
+    "expected_codes": [
+      "DUPLICATE_REQUIREMENT"
+    ]
+  },
+  {
+    "name": "requirements ['R0']",
+    "fixture": "command.json",
+    "patch": {
+      "requirements": [
+        "R0"
+      ]
+    },
+    "expected_codes": [
+      "INVALID_REQUIREMENTS"
+    ]
+  },
+  {
+    "name": "requirements ['X1']",
+    "fixture": "command.json",
+    "patch": {
+      "requirements": [
+        "X1"
+      ]
+    },
+    "expected_codes": [
+      "INVALID_REQUIREMENTS"
+    ]
+  },
+  {
+    "name": "requirements ['R99']",
+    "fixture": "command.json",
+    "patch": {
+      "requirements": [
+        "R99"
+      ]
+    },
+    "expected_codes": [
+      "UNKNOWN_REQUIREMENT"
+    ]
+  },
+  {
+    "name": "outcome proven",
+    "fixture": "command.json",
+    "patch": {
+      "outcome": "proven"
+    },
+    "expected_codes": [
+      "INVALID_OUTCOME"
+    ]
+  },
+  {
+    "name": "outcome not proven",
+    "fixture": "command.json",
+    "patch": {
+      "outcome": "not proven"
+    },
+    "expected_codes": [
+      "INVALID_OUTCOME"
+    ]
+  },
+  {
+    "name": "outcome disproven",
+    "fixture": "command.json",
+    "patch": {
+      "outcome": "disproven"
+    },
+    "expected_codes": [
+      "INVALID_OUTCOME"
+    ]
+  },
+  {
+    "name": "outcome PROVEN",
+    "fixture": "command.json",
+    "patch": {
+      "outcome": "PROVEN"
+    },
+    "expected_codes": [
+      "INVALID_OUTCOME"
+    ]
+  },
+  {
+    "name": "outcome NOT PROVEN",
+    "fixture": "command.json",
+    "patch": {
+      "outcome": "NOT PROVEN"
+    },
+    "expected_codes": [
+      "INVALID_OUTCOME"
+    ]
+  },
+  {
+    "name": "outcome None",
+    "fixture": "command.json",
+    "patch": {
+      "outcome": null
+    },
+    "expected_codes": [
+      "INVALID_OUTCOME"
+    ]
+  },
+  {
+    "name": "verdict leak",
+    "fixture": "command.json",
+    "patch": {
+      "verdict": "PROVEN"
+    },
+    "expected_codes": [
+      "UNKNOWN_FIELD"
+    ]
+  },
+  {
+    "name": "self-declared digest",
+    "fixture": "command.json",
+    "patch": {
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "expected_codes": [
+      "UNKNOWN_FIELD"
+    ]
+  },
+  {
+    "name": "assertionNone",
+    "fixture": "command.json",
+    "patch": {
+      "assertion": null
+    },
+    "expected_codes": [
+      "INVALID_TEXT"
+    ]
+  },
+  {
+    "name": "assertion",
+    "fixture": "command.json",
+    "patch": {
+      "assertion": ""
+    },
+    "expected_codes": [
+      "INVALID_TEXT"
+    ]
+  },
+  {
+    "name": "assertion ",
+    "fixture": "command.json",
+    "patch": {
+      "assertion": " "
+    },
+    "expected_codes": [
+      "INVALID_TEXT"
+    ]
+  },
+  {
+    "name": "observationNone",
+    "fixture": "command.json",
+    "patch": {
+      "observation": null
+    },
+    "expected_codes": [
+      "INVALID_TEXT"
+    ]
+  },
+  {
+    "name": "observation",
+    "fixture": "command.json",
+    "patch": {
+      "observation": ""
+    },
+    "expected_codes": [
+      "INVALID_TEXT"
+    ]
+  },
+  {
+    "name": "observation ",
+    "fixture": "command.json",
+    "patch": {
+      "observation": " "
+    },
+    "expected_codes": [
+      "INVALID_TEXT"
+    ]
+  },
+  {
+    "name": "environmentNone",
+    "fixture": "command.json",
+    "patch": {
+      "environment": null
+    },
+    "expected_codes": [
+      "INVALID_TEXT"
+    ]
+  },
+  {
+    "name": "environment",
+    "fixture": "command.json",
+    "patch": {
+      "environment": ""
+    },
+    "expected_codes": [
+      "INVALID_TEXT"
+    ]
+  },
+  {
+    "name": "environment ",
+    "fixture": "command.json",
+    "patch": {
+      "environment": " "
+    },
+    "expected_codes": [
+      "INVALID_TEXT"
+    ]
+  },
+  {
+    "name": "missing oracle",
+    "fixture": "command.json",
+    "patch": {
+      "oracle": null
+    },
+    "expected_codes": [
+      "INVALID_TYPE"
+    ]
+  },
+  {
+    "name": "empty oracle",
+    "fixture": "command.json",
+    "patch": {
+      "oracle": {
+        "expected_result": ""
+      }
+    },
+    "expected_codes": [
+      "INVALID_TEXT"
+    ]
+  },
+  {
+    "name": "passed exit contradiction",
+    "fixture": "command.json",
+    "patch": {
+      "execution": {
+        "exit_status": 1
+      }
+    },
+    "expected_codes": [
+      "INCONSISTENT_RESULT"
+    ]
+  },
+  {
+    "name": "backward execution",
+    "fixture": "command.json",
+    "patch": {
+      "execution": {
+        "finished_at": "2026-09-30T09:00:00Z"
+      }
+    },
+    "expected_codes": [
+      "INCONSISTENT_RESULT"
+    ]
+  },
+  {
+    "name": "bad timestamp",
+    "fixture": "command.json",
+    "patch": {
+      "timestamp": "yesterday"
+    },
+    "expected_codes": [
+      "INVALID_TIMESTAMP"
+    ]
+  },
+  {
+    "name": "artifact {'reference': 'out', 'sha256': 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}",
+    "fixture": "command.json",
+    "patch": {
+      "artifacts": [
+        {
+          "reference": "out",
+          "sha256": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        }
+      ]
+    },
+    "expected_codes": [
+      "INVALID_DIGEST"
+    ]
+  },
+  {
+    "name": "artifact {'reference': 'out', 'sha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}",
+    "fixture": "command.json",
+    "patch": {
+      "artifacts": [
+        {
+          "reference": "out",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ]
+    },
+    "expected_codes": [
+      "INVALID_DIGEST"
+    ]
+  },
+  {
+    "name": "artifact {'reference': 'out'}",
+    "fixture": "command.json",
+    "patch": {
+      "artifacts": [
+        {
+          "reference": "out"
+        }
+      ]
+    },
+    "expected_codes": [
+      "INVALID_DIGEST"
+    ]
+  },
+  {
+    "name": "artifact {'reference': '', 'sha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}",
+    "fixture": "command.json",
+    "patch": {
+      "artifacts": [
+        {
+          "reference": "",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ]
+    },
+    "expected_codes": [
+      "INVALID_TEXT"
+    ]
+  },
+  {
+    "name": "artifact out",
+    "fixture": "command.json",
+    "patch": {
+      "artifacts": [
+        "out"
+      ]
+    },
+    "expected_codes": [
+      "INVALID_TYPE"
+    ]
+  },
+  {
+    "name": "artifacts not array",
+    "fixture": "command.json",
+    "patch": {
+      "artifacts": {}
+    },
+    "expected_codes": [
+      "INVALID_ARTIFACT"
+    ]
+  },
+  {
+    "name": "no receipt",
+    "fixture": "command.json",
+    "patch": {
+      "execution": {
+        "receipt": null
+      }
+    },
+    "expected_codes": [
+      "MISSING_RECEIPT"
+    ]
+  },
+  {
+    "name": "missing receipt context",
+    "fixture": "command.json",
+    "patch": {},
+    "expected_codes": [
+      "MISSING_RECEIPT"
+    ],
+    "context_patch": {
+      "receipts": []
+    }
+  },
+  {
+    "name": "bad receipt digest",
+    "fixture": "command.json",
+    "patch": {
+      "execution": {
+        "receipt": {
+          "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      }
+    },
+    "expected_codes": [
+      "RECEIPT_DIGEST_MISMATCH"
+    ]
+  },
+  {
+    "name": "receipt wrong candidate",
+    "fixture": "command.json",
+    "patch": {},
+    "expected_codes": [
+      "RECEIPT_CANDIDATE_MISMATCH"
+    ],
+    "context_patch": {
+      "receipts": [
+        {
+          "id": "run-1",
+          "candidate": "git:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "environment": "Python 3; isolated fixture workspace",
+          "identity": "python3 -m unittest test_fixture",
+          "exit_status": 0,
+          "output_sha256": "fb4b199aedea37bd95ba2c2a2cb1d9e9a90499176b809dc2edda9970cd05f9ad",
+          "started_at": "2026-09-30T10:00:00Z",
+          "finished_at": "2026-09-30T10:00:01Z"
+        }
+      ]
+    }
+  },
+  {
+    "name": "receipt wrong environment",
+    "fixture": "command.json",
+    "patch": {},
+    "expected_codes": [
+      "RECEIPT_ENVIRONMENT_MISMATCH"
+    ],
+    "context_patch": {
+      "receipts": [
+        {
+          "id": "run-1",
+          "candidate": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "environment": "Other",
+          "identity": "python3 -m unittest test_fixture",
+          "exit_status": 0,
+          "output_sha256": "fb4b199aedea37bd95ba2c2a2cb1d9e9a90499176b809dc2edda9970cd05f9ad",
+          "started_at": "2026-09-30T10:00:00Z",
+          "finished_at": "2026-09-30T10:00:01Z"
+        }
+      ]
+    }
+  },
+  {
+    "name": "fact mismatch identity",
+    "fixture": "command.json",
+    "patch": {
+      "execution": {
+        "identity": "echo fabricated"
+      }
+    },
+    "expected_codes": [
+      "EXECUTION_FACT_MISMATCH"
+    ]
+  },
+  {
+    "name": "fact mismatch exit_status",
+    "fixture": "command.json",
+    "patch": {
+      "execution": {
+        "exit_status": 1
+      }
+    },
+    "expected_codes": [
+      "EXECUTION_FACT_MISMATCH"
+    ]
+  },
+  {
+    "name": "fact mismatch output_sha256",
+    "fixture": "command.json",
+    "patch": {
+      "execution": {
+        "output_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    },
+    "expected_codes": [
+      "EXECUTION_FACT_MISMATCH"
+    ]
+  },
+  {
+    "name": "fact mismatch started_at",
+    "fixture": "command.json",
+    "patch": {
+      "execution": {
+        "started_at": "2026-09-30T09:00:00Z"
+      }
+    },
+    "expected_codes": [
+      "EXECUTION_FACT_MISMATCH"
+    ]
+  },
+  {
+    "name": "fact mismatch finished_at",
+    "fixture": "command.json",
+    "patch": {
+      "execution": {
+        "finished_at": "2026-09-30T10:00:02Z"
+      }
+    },
+    "expected_codes": [
+      "EXECUTION_FACT_MISMATCH"
+    ]
+  },
+  {
+    "name": "misplaced exit",
+    "fixture": "command.json",
+    "patch": {
+      "exit_status": 0
+    },
+    "expected_codes": [
+      "MISPLACED_EXECUTION_FACT"
+    ]
+  },
+  {
+    "name": "facts in interpretation",
+    "fixture": "command.json",
+    "patch": {
+      "interpretation": {
+        "command": "echo 0"
+      }
+    },
+    "expected_codes": [
+      "MISPLACED_EXECUTION_FACT"
+    ]
+  },
+  {
+    "name": "manual provenance absent",
+    "fixture": "manual.json",
+    "patch": {
+      "provenance": null
+    },
+    "expected_codes": [
+      "MISSING_PROVENANCE"
+    ]
+  },
+  {
+    "name": "limitations absent",
+    "fixture": "command.json",
+    "patch": {
+      "limitations": null
+    },
+    "expected_codes": [
+      "INVALID_LIMITATIONS"
+    ]
+  }
+]
