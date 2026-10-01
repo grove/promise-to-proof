@@ -1,0 +1,21 @@
+{
+  "candidate": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "contract": {
+    "source": "Fixture capability",
+    "revision": "v1",
+    "sha256": "68c39c3bf197dd1688b5bf552e58a2728229df399c201b683b7cf49646fb5b37",
+    "content": "# Acceptance contract: Fixture capability\n\nContract revision: v1\n\n## Acceptance matrix\n\n| ID | Source | Requirement | Boundaries / counterexamples | Seam | Oracle | Planned evidence | Plan state |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| R1 | Fixture source | Observe result 1 | Failure | Public seam | Expected value | Fixture | planned |\n| R2 | Fixture source | Observe result 2 | Failure | Public seam | Expected value | Fixture | planned |\n"
+  },
+  "receipts": [
+    {
+      "id": "run-1",
+      "candidate": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "environment": "Python 3; isolated fixture workspace",
+      "identity": "python3 -m unittest test_fixture",
+      "exit_status": 0,
+      "output_sha256": "fb4b199aedea37bd95ba2c2a2cb1d9e9a90499176b809dc2edda9970cd05f9ad",
+      "started_at": "2026-09-30T10:00:00Z",
+      "finished_at": "2026-09-30T10:00:01Z"
+    }
+  ]
+}

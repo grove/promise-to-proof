@@ -31,6 +31,14 @@ candidate, and the repository's review requirements. Use `/fix-pr` to repair CI
 failures separately from proof. A repair that changes the candidate requires
 fresh proof under the handoff rules below.
 
+Optional [evidence-record v1](./evidence-record-v1.md) records may be cited
+by evidence ID and computed SHA-256 digest, and their deterministic Markdown
+rendering may be embedded in `proof.md`. Validate records against the exact proof
+context when available. Records are optional and a valid record never implies a
+verdict: requirement-level `proven`, `not proven`, and `disproven` judgments remain
+in `proof.md`, owned by `/prove`. Without host-issued command/test receipts, keep
+self-run command observations directly in `proof.md`.
+
 ## Spec envelope
 
 The lower bound is completeness. Every material promise must reach its complete

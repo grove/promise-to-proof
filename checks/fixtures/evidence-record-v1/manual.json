@@ -1,0 +1,29 @@
+{
+  "schema": "promise-to-proof/evidence-record/v1",
+  "id": "E3",
+  "candidate": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "contract": {
+    "source": "Fixture capability",
+    "revision": "v1",
+    "sha256": "68c39c3bf197dd1688b5bf552e58a2728229df399c201b683b7cf49646fb5b37"
+  },
+  "requirements": [
+    "R1",
+    "R2"
+  ],
+  "type": "manual",
+  "assertion": "The maintainer described the observed screen.",
+  "observation": "The maintainer reported “Ready” in the UI.",
+  "oracle": {
+    "expected_result": "Ready label visible"
+  },
+  "outcome": "passed",
+  "environment": "Maintainer desktop; browser version unavailable",
+  "timestamp": "2026-09-30T10:02:00Z",
+  "interpretation": "A successful process alone does not prove R1 or R2.",
+  "artifacts": [],
+  "limitations": [
+    "External report; prover had no direct UI access."
+  ],
+  "provenance": "Maintainer report at https://example.invalid/observation/3"
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "promise-to-proof/evidence-record/v1",
+  "id": "E1",
+  "candidate": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "contract": {
+    "source": "Fixture capability",
+    "revision": "v1",
+    "sha256": "68c39c3bf197dd1688b5bf552e58a2728229df399c201b683b7cf49646fb5b37"
+  },
+  "requirements": [
+    "R1",
+    "R2"
+  ],
+  "type": "test",
+  "assertion": "The test runner exits successfully.",
+  "observation": "The fixture runner reported exit 0.",
+  "oracle": {
+    "expected_result": "exit 0",
+    "expected_exit_status": 0
+  },
+  "outcome": "passed",
+  "environment": "Python 3; isolated fixture workspace",
+  "timestamp": "2026-09-30T10:00:01Z",
+  "execution": {
+    "identity": "python3 -m unittest test_fixture",
+    "exit_status": 0,
+    "output_sha256": "fb4b199aedea37bd95ba2c2a2cb1d9e9a90499176b809dc2edda9970cd05f9ad",
+    "started_at": "2026-09-30T10:00:00Z",
+    "finished_at": "2026-09-30T10:00:01Z",
+    "receipt": {
+      "id": "run-1",
+      "sha256": "c520e11704dafd4627363db1fc8b5e6dab121e0466eb0d28921ed4b163f3fbe4"
+    }
+  },
+  "interpretation": "A successful process alone does not prove R1 or R2.",
+  "artifacts": [],
+  "limitations": []
+}
