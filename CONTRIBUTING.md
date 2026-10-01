@@ -18,9 +18,18 @@ A thoughtful bug report, minimal reproduction, investigation, API suggestion, co
 
 Please search the existing issues before opening a new one, as the problem may already have been reported or discussed.
 
-A good bug report explains what happened, what you expected to happen, and how someone else can reproduce the problem. Include whichever details are relevant, such as the version of this project you are using, your platform or runtime, important dependency versions, logs, error messages, and a small example that demonstrates the problem.
+A useful bug report should include whichever of the following are relevant:
 
-Minimal reproductions are especially helpful. If the clearest way to demonstrate a bug is with a small failing test case, please include that test code in the issue or link to a minimal reproduction. There is no need to open a pull request simply to demonstrate that a bug exists.
+- a clear description of what happened;
+- what you expected to happen instead;
+- steps to reproduce the problem;
+- a small reproduction or example;
+- the version of this project you are using;
+- relevant platform, runtime, or dependency versions;
+- logs, stack traces, or error messages; and
+- any other information that helps narrow down the problem.
+
+Minimal reproductions are especially helpful. If the clearest way to demonstrate a bug is with a small failing test case, please include that test code directly in the issue or link to a minimal reproduction. There is no need to open a pull request simply to demonstrate that a bug exists.
 
 You do not need to know the cause of the problem before reporting it. A clear description of reproducible behavior is already useful.
 
@@ -28,9 +37,16 @@ You do not need to know the cause of the problem before reporting it. A clear de
 
 We welcome ideas for improving the project. When possible, begin by explaining the problem or use case rather than starting with a particular implementation.
 
-Tell us what you are trying to accomplish, what makes the current behavior difficult or limiting, who might benefit from the change, and how you imagine the improved behavior being used. Existing workarounds, examples from real applications, compatibility constraints, or other relevant context are also useful.
+It is helpful to describe:
 
-You are welcome to suggest a possible solution, but you do not need to design the implementation for us. Maintainers may suggest a different approach after considering the wider codebase, compatibility requirements, or future direction of the project.
+- what you are trying to accomplish;
+- why the current behavior is difficult or limiting;
+- who might benefit from the change;
+- an example of how the improved behavior would be used;
+- any workarounds you currently rely on; and
+- important compatibility or design constraints you already know about.
+
+You are welcome to suggest a possible solution, but you do not need to design the implementation for us. Maintainers may suggest a different approach after considering the wider codebase, compatibility requirements, maintenance costs, or future direction of the project.
 
 Sometimes we may decide not to make a proposed change. That does not mean the issue was unhelpful. Clear reports and proposals help us understand how the project is being used, even when they do not result in code changes.
 
@@ -40,17 +56,33 @@ An open issue is an invitation to discuss the problem, investigate it, add usefu
 
 If you are interested in implementing an issue, feel free to say so in the discussion. When outside implementation would be useful, a maintainer will say so explicitly. We may also use labels such as `help wanted`, `implementation welcome`, or `good first issue` to indicate that an issue is suitable for an external contributor.
 
-We aim to review new issues within about two weeks, although maintainer availability varies and this is not a guaranteed response time. If an issue has not received a maintainer response after that period, it is reasonable to assume that we do not currently have capacity to pursue it. Please feel free to solve the problem locally, revisit it later with new information, or continue using any workaround that works for you.
+We aim to review new issues within about two weeks, although maintainer availability varies and this is not a guaranteed response time. If an issue has not received a maintainer response after that period, it is reasonable to assume that it is not a current project priority.
 
-This expectation is intended to avoid leaving contributors waiting indefinitely and to reduce the need for repeated status requests.
+Please feel free to solve the problem locally, continue using a workaround that works for you, or revisit the issue later if you have new information. This expectation is intended to avoid leaving contributors waiting indefinitely and to reduce the need for repeated status requests.
 
 ## Pull requests
 
-We generally do not review unsolicited pull requests. Please start with an issue and wait until a maintainer has agreed that the change should be implemented and invited you to work on it.
+We generally do not review unsolicited pull requests.
 
-A pull request is usually appropriate once the underlying problem has been discussed, we have agreed on the general direction, and a maintainer has explicitly invited an implementation. This keeps the code-review queue focused on changes that the project has already decided it wants to consider.
+Please start with an issue and wait until a maintainer has agreed that the change should be implemented and invited you to work on it.
 
-If you have been invited to submit a pull request, keep the change focused on the agreed issue. Avoid unrelated refactoring, cleanup, formatting changes, or additional features unless they have also been discussed. Include tests when behavior changes, update documentation where appropriate, explain non-obvious design choices, reference the relevant issue, and mention any important differences from what was previously discussed.
+A pull request is usually appropriate once:
+
+1. the underlying problem or proposed change has been discussed;
+2. we have agreed on the general direction; and
+3. a maintainer has explicitly invited an implementation.
+
+This keeps the code-review queue focused on changes that the project has already decided it wants to consider.
+
+If you have been invited to submit a pull request, please:
+
+- keep the change focused on the agreed issue;
+- avoid unrelated refactoring, cleanup, formatting changes, or additional features;
+- include tests when behavior changes;
+- update documentation where appropriate;
+- explain non-obvious design choices;
+- reference the relevant issue; and
+- mention any important differences from what was previously discussed.
 
 If the scope changes significantly while you are working, return to the issue before continuing. A short conversation at that point is usually much easier than reviewing a large implementation that has moved away from the agreed direction.
 
@@ -66,15 +98,35 @@ If a documentation change is more substantial, please open an issue describing w
 
 ## Before opening an invited pull request
 
-Before submitting a pull request that a maintainer has invited you to work on, please validate the change locally using the development tools provided by the repository.
+Before submitting a pull request that a maintainer has invited you to work on, please run the project's local validation checks.
 
-At a minimum, run the relevant test suite and make sure the tests pass, run the project's formatter and linter, and verify that the project builds cleanly without introducing new warnings. If the repository documents additional validation commands, please run those as well.
+If this repository provides a `DEVELOPMENT.md`, development guide, or equivalent setup documentation, follow the commands documented there. At a minimum, you should:
 
-If something cannot be run in your environment, mention that clearly in the pull request rather than silently leaving it unchecked. Knowing what has and has not been validated makes review much easier.
+1. run the relevant test suite and make sure it passes;
+2. run the project's formatter and verify that no formatting changes remain;
+3. run the project's linter or static-analysis checks;
+4. build the project and verify that you have not introduced new warnings or errors; and
+5. run any additional checks documented for the part of the project you changed.
+
+Where the repository provides exact commands, use those commands rather than equivalent alternatives.
+
+If you cannot run one of the required checks in your environment, mention that clearly in the pull request. Knowing what has and has not been validated makes review much easier.
 
 ## Good issue contributions
 
-Some of the most valuable contributions do not contain code. Minimal reproductions, compatibility reports, investigations that narrow down the cause of a problem, examples of confusing or undocumented behavior, measurements, benchmarks, API usability feedback, accessibility findings, documentation gaps, and careful testing of proposed fixes are all meaningful contributions.
+Some of the most valuable contributions do not contain code. We especially appreciate:
+
+- minimal bug reproductions;
+- failing test cases that demonstrate a real problem;
+- compatibility reports;
+- investigations that narrow down the cause of a problem;
+- examples of confusing or undocumented behavior;
+- measurements and benchmarks;
+- API usability feedback;
+- real-world use cases;
+- documentation gaps;
+- accessibility findings; and
+- careful testing of proposed fixes.
 
 If you help us understand a problem more clearly, reduce the amount of investigation required, or provide evidence that helps us make a better decision, you have contributed to the project.
 
@@ -82,7 +134,14 @@ If you help us understand a problem more clearly, reduce the amount of investiga
 
 AI tools can be useful when investigating problems, preparing reproductions, explaining unfamiliar code, or working on an invited implementation. Using such tools is not a problem by itself, but the person submitting the contribution remains responsible for everything they submit.
 
-Please verify that reported behavior is real, test reproduction steps yourself, check technical claims against the actual project, understand any code you submit, and test proposed changes before asking maintainers to review them.
+Please make sure that you:
+
+- verify that reported behavior is real;
+- test reproduction steps yourself;
+- check technical claims against the actual project;
+- understand any code you submit;
+- test proposed changes before asking maintainers to review them; and
+- can discuss and support the contribution during review.
 
 Contributions containing fabricated APIs, unverified claims, irrelevant generated material, or code that the contributor cannot explain may be closed without further review. High-volume or speculative submissions may also be closed when they create disproportionate investigation work for maintainers.
 
@@ -110,17 +169,31 @@ This applies to code, tests, documentation, examples, and other material submitt
 
 ## Maintainer decisions
 
-Not every valid issue will result in a code change. Maintainers may decide not to pursue a proposal because it falls outside the project's scope, carries too much ongoing maintenance cost, serves a very specialized use case, conflicts with compatibility requirements, can already be achieved another way, does not fit the project's direction, or simply is not a current priority.
+Not every valid issue will result in a code change. Maintainers may decide not to pursue a proposal because:
+
+- it falls outside the project's scope;
+- the ongoing maintenance cost is too high;
+- the use case is very specialized;
+- the behavior can already be achieved another way;
+- it conflicts with compatibility requirements;
+- it does not fit the project's direction; or
+- it simply is not a current priority.
 
 These decisions are about the project and its maintenance constraints, not about the value of the person who raised the issue. A well-written issue can still provide useful information even when the answer is ultimately that we will not make the change.
 
-We may also close issues that have become inactive, cannot be reproduced, lack enough information to investigate, or no longer reflect the current version of the project. If new information becomes available later, it is usually fine to open a new issue or ask whether an existing one should be revisited.
+We may also close issues that have become inactive, cannot be reproduced, lack enough information to investigate, or no longer reflect the current version of the project. If useful new information becomes available later, it is usually fine to open a new issue or ask whether an existing one should be revisited.
 
 ## Community expectations
 
 Please keep discussions constructive, patient, and focused on the technical problem. Maintainers may not always be able to investigate or respond immediately, and contributors may have different levels of familiarity with the project.
 
-To help keep the project manageable, please avoid repeatedly asking for status updates, opening duplicate issues to attract attention, opening a pull request after being asked to wait, tagging individual maintainers unnecessarily, or privately contacting maintainers about ordinary project issues.
+To help keep the project manageable, please avoid:
+
+- repeatedly asking for status updates;
+- opening duplicate issues to attract attention;
+- opening a pull request after being asked to wait;
+- tagging individual maintainers unnecessarily; and
+- privately contacting maintainers about ordinary project issues.
 
 Keeping project discussions in the project's public contribution channels also makes the resulting context useful to other users and future contributors.
 
