@@ -81,13 +81,29 @@ remains historical, receives no body edit or merge handoff, and does not become
 
 ## S: Preserve current-target readiness checks
 
-Use candidate C with matching review and proof against frozen base A. Move the
-PR target to B, then run merge readiness with current PR metadata and gate
-observations. Separately leave a required CI check or repository approval absent.
+Use candidate C with matching full review and proof against frozen base A.
+Publish its draft against the same approved destination after it fast-forwards
+to B, then run merge readiness with the actual current PR metadata and gate
+observations. Record the actual PR head H, current target B, and tested
+integration-candidate SHA. Establish compatibility only from an authoritative
+integration check whose metadata ties that candidate to the exact H/B pair (or
+to the current merge-group candidate when a merge queue applies). Separately
+test a passing result, a failed result, a missing/stale/mismatched result, and a
+repository with no current-target check even though its policy requires no
+checks. Also test a conflict, missing required CI check, missing repository
+approval, changed candidate or agreement that makes a report stale, and
+unavailable material status.
 
-Pass when readiness checks the actual PR target and current head, review scope,
-proof, CI, approvals, and merge rules. Acceptance against A does not establish
-compatibility with B or produce `READY` when a current gate is missing.
+Pass when readiness checks the actual PR target and current head, confirms the
+reports still bind to C and the exact agreement, and assesses compatibility,
+conflicts, CI, approvals, and merge rules. Acceptance against A does not establish
+compatibility with commits through B. A successful exact-pair integration check
+is required; head-only CI, saved reports, or conflict-free status alone are
+insufficient. Movement alone does not rewrite A or stale otherwise matching
+reports. A failed compatibility check, conflict, CI, approval, or report gate
+blocks `READY`. Missing, stale, or mismatched compatibility evidence, including
+no configured current-target check, yields `UNKNOWN` even if conflict-free. No
+merge, approval, retarget, or new review/proof run occurs.
 
 ## Filesystem handoff
 

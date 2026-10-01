@@ -181,10 +181,15 @@ preview, then explicitly authorize its complete effects:
 
 The skill uses a matching commit or creates one in an isolated publication
 workspace, verifies that its complete tree outside `.p2p/` preserves the candidate,
-requires the target tip to match the review comparison base, pushes without
-force, and rereads the draft PR. It does not change the candidate or assess merge
-readiness. The model may prepare the read-only preview on its own; publication
-effects still require exact authorization.
+and compares the current target tip with the review's frozen comparison base. It
+allows the same destination at that base or a fast-forward descendant, while
+keeping the candidate and reports bound to the original base. The preview records
+the current target tip separately and says that acceptance evidence alone does
+not establish compatibility with later target commits. The skill checks that tip
+again before each effect, pushes without force, and rereads the draft PR. The
+model may prepare the read-only preview on its own; publication effects still
+require exact authorization. A non-fast-forward move blocks publication, and
+merge readiness remains a separate assessment of the actual current PR target.
 
 After the PR is confirmed, invoke `/merge-readiness <PR URL>` with the saved
 review and proof reports near the merge decision. It checks that the PR's current

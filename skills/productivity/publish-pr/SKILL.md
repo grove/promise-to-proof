@@ -135,12 +135,29 @@ Readiness remains a separate assessment against the actual target and all gates.
 
 Inspect the remote, default and proposed target branches, current target tip,
 existing local and remote refs, open and closed pull requests, pull-request
-template, and applicable repository conventions. Resolve the target branch and
-record its observed full commit. Require that tip to equal the review report's
-fixed comparison base so the reviewed change set matches the proposed PR change
-set. A different tip requires a fresh full `/review-implementation` against that
-tip before a new preview. Do not guess when the intended target or remote is
-ambiguous.
+template, and applicable repository conventions. Resolve the approved target
+branch and record its observed full commit D separately from the review report's
+fixed comparison base A. Require the target to be the same approved destination.
+Classify D as `unchanged` when D = A, or `fast-forward` when
+`git merge-base --is-ancestor A D` succeeds. For either relation, keep the
+candidate and review/proof identities bound to C and A; target movement alone
+does not require a fresh full review. If A or D is unavailable, or D is not a
+descendant of A, return `BLOCKED` with the observed relation and do not treat the
+movement as ordinary advancement. Do not change the approved routing, rebase,
+merge, or replace A.
+
+Record the frozen comparison base A, observed destination tip D, and relationship
+as separate preview fields. State that saved review/proof establish acceptance
+for C against A only: they do not establish compatibility with commits after A.
+The draft body must state that limitation and `Merge readiness: NOT ASSESSED`.
+Merge readiness is a later assessment of the actual current PR head and target.
+
+Immediately before each publication effect, re-read the approved destination tip
+and require it to equal the preview's D. If it moved, reject the stale preview
+and stop further effects; a new preview must observe the latest tip and classify
+it against the same A. A descendant may use the same C and saved reports, but
+the changed preview inputs require new exact publication authority. Do not guess
+when the intended target or remote is ambiguous.
 
 Choose a repository-conforming head branch named `issue/<number>` for the source
 issue when allowed; otherwise use a repository-conforming name that includes the
@@ -151,8 +168,11 @@ title and complete body containing:
 
 - the source reference and exact contract identity;
 - the candidate snapshot identity and matching or proposed commit;
-- the fixed comparison base and observed target tip;
+- the frozen review comparison base A and observed target tip D, identified
+  separately;
 - retrievable `REVIEWED` and `PROVEN` report references;
+- a statement that saved acceptance evidence does not establish compatibility
+  with commits after A;
 - `Merge readiness: NOT ASSESSED`; and
 - this stable marker, with exact values:
 

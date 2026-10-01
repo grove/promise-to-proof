@@ -58,20 +58,43 @@ Recheck the active plan before reporting or synchronizing; changed routing makes
 the prior decision stale even when code is unchanged.
 
 A delivery accepted against a frozen base does not waive these current-target
-checks. Readiness still requires the PR's actual target, head, review scope, proof,
-CI, approvals, and merge rules to match the current decision.
+checks. For a draft published after ordinary target advancement, retain the
+review and proof identities bound to candidate C and frozen base A, then inspect
+the actual current PR head and target D. Acceptance against A does not establish
+compatibility with commits after A. Assess current target compatibility and
+conflict state independently; a prior fast-forward observation in the publication
+preview is not current readiness evidence. A target-only move does not rewrite A
+or make matching reports stale by itself, but any changed candidate, agreement,
+or incomplete/mismatched report blocks applicability. Readiness still requires
+the PR's actual target, head, report applicability, required CI, repository
+approvals, and merge rules to match the current decision; unavailable material
+state remains `UNKNOWN`.
+
+Treat current-target compatibility as a separate evidence gate. It passes only
+when an authoritative integration check has completed successfully for the exact
+current PR head and target pair, with the tested merge candidate tied to both
+observed SHAs. Use the current PR test-merge candidate or current merge-group
+candidate when a merge queue applies. A head-only CI result, saved review/proof
+against A, or conflict-free mergeability status does not establish compatibility.
+A failed integration check or conflict blocks readiness. If no current-target
+check is configured, or its result is missing, stale, or cannot be tied to the
+observed head and target, compatibility is `UNKNOWN` even when repository policy
+requires no checks. Queue membership alone is not a passing result.
 
 ## Check the final candidate
 
 Confirm that the PR head represents the exact candidate covered by a current
-`PROVEN` report and a current `REVIEWED` report against the same contract revision
-and exact agreement. For a snapshot handoff, compare its recoverable content and
-comparison base with the PR head; do not infer equivalence from a matching title,
-branch name, or patch description. Confirm that the review's change set covers the
-PR against its current base and that its scope covers every applicable contract
-obligation, not only selected requirement IDs. If commit creation, rebasing, repairs, integration,
-or base changes make that identity or scope uncertain, withhold readiness and name
-the review or full proof that must be refreshed. Do not rerun either skill here.
+`PROVEN` report and a current full-scope `REVIEWED` report against the same
+contract revision and exact agreement. For a snapshot handoff, compare its
+recoverable content and frozen comparison base with the PR head; do not infer
+equivalence from a matching title, branch name, or patch description. Confirm
+that the reports remain applicable to that candidate and agreement. A target
+advance alone preserves their original identities; separately assess whether the
+candidate is compatible with the actual current target and whether conflicts are
+present. If commit creation, rebasing, repairs, integration, candidate or
+agreement changes, or an incomplete/mismatched report make identity or scope
+uncertain, withhold readiness and name the review or full proof that must be
+refreshed. Do not rerun either skill here.
 
 Check the required CI and repository review requirements for this PR and target
 branch using the authoritative repository status, including any required merge
@@ -93,14 +116,16 @@ described below. Do not commit, push, open PRs, approve, rerun checks, or merge.
 ## Report
 
 Return `READY` only when candidate identity, current proof, current review,
-required checks, and repository approval and merge rules all pass for the
-identified PR state. Return `BLOCKED` for an observed unmet gate or stale report;
-return `UNKNOWN` when a material identity, report, rule, or status cannot be
-established. Name the smallest next action for each blocker, such as `/prove`,
-`/review-implementation`, `/fix-pr`, or a human approval. Include the PR URL,
-head and base identities, contract revision, saved report references, required
-check and approval status, and the time of the observation. `READY` is advice
-about that state, not merge authorization; a later PR change needs another check.
+current-target compatibility evidence, conflict state, required checks, and
+repository approval and merge rules all pass for the identified PR state. Return
+`BLOCKED` for a failed compatibility check, conflict, other unmet gate, or stale
+report; return `UNKNOWN` when a material identity, report, rule, status, or
+exact-pair compatibility result cannot be established. Name the smallest next
+action for each blocker, such as `/prove`, `/review-implementation`, `/fix-pr`,
+or a human approval. Include the PR URL, head and base identities, contract
+revision, saved report references, compatibility-check candidate and result,
+required check and approval status, and the time of the observation. `READY` is
+advice about that state, not merge authorization; a later PR change needs another check.
 Name the actual destination in every result. For a grouped child, state that
 parent integration, review, and proof remain separate. Parent readiness requires
 assembled-parent reports and the final target's required checks and approvals;

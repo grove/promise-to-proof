@@ -61,13 +61,16 @@ the prior proof in this case.
 
 Input: separately provide a proof for an older candidate, a review covering only
 selected requirements, reports for different contract bytes at the same revision,
-and a digest whose candidate content cannot be retrieved. Also target a branch
-whose current tip differs from the review report's fixed comparison base.
+and a digest whose candidate content cannot be retrieved. Also test a target
+moved by fast-forward and one moved by non-fast-forward; the positive
+fast-forward case is specified in scenario 16 and non-fast-forward in scenario
+20.
 
-Pass when every case is `BLOCKED` before publication and names the required
-fresh review against the target tip, proof, agreement reconciliation, or
-recoverable content. Green CI, a matching branch name, and report prose do not
-repair identity mismatches.
+Pass when every stale, incomplete, or mismatched report/content case is `BLOCKED`
+before publication and names the required proof, agreement reconciliation, or
+recoverable content. A fast-forward target move alone does not block the new
+preview or require a fresh review. Green CI, a matching branch name, and report
+prose do not repair identity mismatches.
 
 ## 5. Reject changed commit content
 
@@ -225,15 +228,87 @@ Pass when reconciliation stops before removing or restoring local files, remote
 publication is retained, and the final answer names the local blocker. Repeat
 with publication-only approval: no checkout cleanup or branch switch occurs.
 
-## S: Preserve the current-target publication gate
+## 16. Preview after fast-forward target advancement (R1, R3)
 
-Use candidate C with matching review and proof against frozen base A. Move the
-remote target to B before publication. Keep C and both reports unchanged.
+Use unchanged candidate C with matching full `REVIEWED` and `PROVEN` reports
+against frozen base A. Keep the approved destination and routing unchanged, then
+advance its target to descendant B before preparing the preview. Keep C, the
+agreement, and both saved reports unchanged. Record the independent expected
+relationship with `git merge-base --is-ancestor A B` in the fixture.
 
-Pass when publication blocks or requires a fresh preview and applicable
-verification against B. Frozen-base acceptance alone does not authorize
-publication against the moved target. No commit, push, or pull request occurs
-without its separate authority.
+Pass when the preview is `DRAFT` at observed tip B without a fresh full review.
+Its report identities still name C and comparison base A; the preview records A,
+B, and `fast-forward` separately. The draft body states that saved acceptance
+evidence does not establish compatibility with commits after A and says
+`Merge readiness: NOT ASSESSED`. No commit, branch, push, PR, or other publication
+effect occurs during preview.
+
+## 17. Refresh a stale preview after repeated advancement (R2)
+
+Prepare scenario 16 at B. Advance the same approved destination from B to D,
+where D descends from B, while C and all report/agreement identities stay fixed.
+Attempt the old preview first, then prepare a fresh one against the observed D.
+
+Pass when the old preview is rejected before any effect because its exact target
+tip B is stale. The new preview records D and `fast-forward`, remains bound to C
+and A, and does not request another full review. If the target advances again
+before publication, reject that preview too. Any publication grant must bind the
+fresh preview's exact D and other inputs.
+
+## 18. Publish one authorized draft after fast-forward movement (R4)
+
+Use scenario 17's fresh preview at current descendant D and grant the complete exact authority
+for that preview only. Publish to the unchanged approved destination.
+
+Pass when one draft PR is created and read back against that destination with
+the authorized head, title, body, marker, and draft state. Its body distinguishes
+review base A from observed target D, states that post-A compatibility is not
+established by saved acceptance evidence, and says `Merge readiness: NOT ASSESSED`.
+Review/proof and candidate identities remain bound to C and A. No
+rebase, merge, retarget, readiness update, or unlisted effect occurs.
+
+## 19. Assess current-target readiness separately (R5)
+
+Run `/merge-readiness` on the PR from scenario 18 after the target has advanced.
+Keep its saved review/proof bound to C and A. Test current-target incompatibility
+or conflict, a missing required CI check, a missing required repository approval,
+an incomplete or mismatched report, and unavailable material status separately.
+For compatibility, record the actual PR head and target SHAs and require a
+passing authoritative integration-check result tied to that exact pair (or the
+current merge-group candidate). A conflict-free mergeability result, head-only
+CI, or saved evidence against A is not a compatibility pass. Also test absent,
+stale, or mismatched integration evidence and a repository with no configured
+current-target check.
+
+Pass when readiness inspects the PR's actual current head and target, report
+applicability, compatibility/conflict state, CI, approvals, and repository rules.
+It does not infer post-A compatibility from acceptance at A or mark reports stale
+solely because the unchanged target advanced. Each unmet material gate blocks
+`READY`; failed integration evidence blocks, while absent or inapplicable
+compatibility evidence returns `UNKNOWN`, even if conflict-free. No merge or
+approval occurs.
+
+## 20. Reject changed candidate, routing, and non-fast-forward movement (R6–R8)
+
+Repeat with (a) changed candidate content and the old reports, (b) a changed
+approved destination or routing plan, and (c) target D that is not a descendant
+of frozen review base A. Establish case (c) independently with
+`git merge-base --is-ancestor A D`, which must fail.
+
+Pass when (a) blocks publication and names fresh full review and proof for the
+changed candidate; (b) returns the routing reconciliation handoff and never
+retargets silently; and (c) explicitly records `non-fast-forward` and blocks the
+ordinary-advancement preview. No rebase, merge, conflict resolution, commit,
+push, or PR effect occurs in any case. Existing scenario 6 and 8 remain the
+checks for exact-preview authority and lost-response/idempotency behavior (R9).
+
+## S: Keep frozen acceptance and destination observation separate (R10)
+
+Run the existing `S: Keep admission and destination movement separate` lifecycle
+cases in [deliver-issue scenarios](./deliver-issue-scenarios.md), plus T1–T12 in
+`checks/test_p2p_delivery.py`. A destination-only movement preserves admitted
+base A, candidate and verifier identities, while a new admission at D gets a new
+base. Publication records D separately and does not rewrite acceptance at A.
 
 ## Epic delivery strategy scenarios
 

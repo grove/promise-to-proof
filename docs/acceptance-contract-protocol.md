@@ -660,10 +660,25 @@ publication effect. Model invocation grants no publication effect;
 commit creation, push, and pull-request creation require the exact authority
 bound by that preview.
 
-The proposed target tip must equal the review report's fixed comparison base.
-This keeps the reviewed change set and proposed pull-request change set aligned.
-A different target tip requires fresh full review against that tip before
-publication; merge readiness remains a later, separate check.
+Keep the review report's fixed comparison base A separate from the current
+approved destination tip D. Require the same approved destination and classify
+D as `unchanged` when D = A, or `fast-forward` when
+`git merge-base --is-ancestor A D` succeeds. Either relation preserves the
+candidate and report identities bound to C and A; ordinary fast-forward movement
+alone does not require fresh full review. If A or D is unavailable, or D is not
+a descendant of A, block publication with the observed condition. Do not replace
+the frozen base, silently change routing, or transform the candidate.
+
+The preview records A and D separately and says that saved acceptance evidence
+does not establish compatibility with commits after A. Its draft body states
+`Merge readiness: NOT ASSESSED`. Immediately before each publication effect,
+re-read the destination and require its tip to equal the preview's D. Any drift
+makes that preview and its exact authority stale. Prepare a new preview at the
+latest tip; if it remains a descendant of A, retain the same C, agreement, and
+report identities, then obtain exact authority for the changed preview before
+publishing. Merge readiness separately evaluates the actual current PR head and
+target, compatibility and conflicts, report applicability, required CI,
+repository approvals, and applicable rules.
 
 The stable publication identity uses the candidate key to which review and proof
 bind: `git:<full-object-id>` for a commit or
