@@ -19,6 +19,8 @@ import time
 import uuid
 
 import p2p_filesystem as fs
+sys.path.insert(0, str(Path(__file__).resolve().parents[4] / 'checks'))
+from p2p_delivery_measurements import build as delivery_measurement
 
 CHECKER = Path(__file__).resolve().parents[4] / 'checks/verify_acceptance_bundle.py'
 spec = importlib.util.spec_from_file_location('acceptance_bundle', CHECKER)
@@ -311,7 +313,8 @@ def record_generation(delivery, candidate, stage):
     if stage != 'admission' and source_attempt is None:
         raise ValueError('candidate generation has no completed stage attempt: ' + stage)
     record = {'schema': 'promise-to-proof/local-generation/v1', 'sequence': sequence,
-              'stage': stage, 'work_item': delivery.work, 'repository_id': local.parent.name,
+              'stage': stage, 'work_item': delivery.work,
+              'repository_id': state['local_git_base']['repository_id'],
               'invocation_id': state['invocation_id'], 'comparison_base': state['comparison_base'],
               'base_tree': state['local_git_base']['tree'],
               'contract_sha256': state['contract']['sha256'], 'parent_commit': parent,
@@ -874,7 +877,9 @@ def command(executable, scratch, schema=None):
 
 def launch(args, prompt, event_path, error_path, deadline):
     """Only transport seam. Tests replace it; the CLI has no fake-host switch."""
+    started_epoch = time.time()
     started = time.monotonic()
+    launch_started = datetime.datetime.fromtimestamp(started_epoch, datetime.timezone.utc).isoformat()
     remaining = None if deadline is None else max(0, deadline - time.time())
     stop = None if remaining is None else started + remaining
     with event_path.open('xb') as events, error_path.open('xb') as errors:
@@ -916,12 +921,16 @@ def launch(args, prompt, event_path, error_path, deadline):
             except ProcessLookupError:
                 pass
             process.wait()
+        elapsed_seconds = max(0, time.monotonic() - started)
+        launch_finished = datetime.datetime.fromtimestamp(started_epoch + elapsed_seconds,
+                                                           datetime.timezone.utc).isoformat()
         events.flush()
         errors.flush()
         os.fsync(events.fileno())
         os.fsync(errors.fileno())
-    return {'exit_code': process.returncode, 'outcome': outcome, 'finished': now(),
-            'elapsed_seconds': max(0, time.monotonic() - started)}
+    return {'exit_code': process.returncode, 'outcome': outcome, 'finished': launch_finished,
+            'launch_started': launch_started, 'launch_finished': launch_finished,
+            'elapsed_seconds': elapsed_seconds}
 
 
 def host_events(path):
@@ -1107,7 +1116,16 @@ class Delivery:
         self._generation_chain_verified = False
 
     def save(self):
+        if self.state.get('status') == 'REVIEWED_AND_PROVEN' and self.state.get('completed_at'):
+            local_save(self.root, self.work, 'delivery.json', encoded(self.state))
+            return
+        started = time.monotonic()
         local_save(self.root, self.work, 'delivery.json', encoded(self.state))
+        self._record_controller_time('persistence_readback', started)
+
+    def _record_controller_time(self, name, started):
+        timings = self.state.setdefault('controller_timing', {})
+        timings[name] = timings.get(name, 0) + time.monotonic() - started
 
     def verify_superseded_recovery(self):
         for name, expected in self.state.get('superseded_artifacts', {}).items():
@@ -1200,7 +1218,21 @@ class Delivery:
         if not self.read_only:
             self.save()
 
+    def timed_source_stable(self):
+        started = time.monotonic()
+        try:
+            self.source_stable()
+        finally:
+            self._record_controller_time('identity_snapshot_validation', started)
+
     def capture(self, stage='implementation'):
+        started = time.monotonic()
+        try:
+            return self._capture(stage)
+        finally:
+            self._record_controller_time('identity_snapshot_validation', started)
+
+    def _capture(self, stage='implementation'):
         if fs.digest((self.workspace / self.work).read_bytes()) != self.state['contract']['sha256']:
             raise ValueError('implementation changed the approved agreement')
         if fs.bindings(self.workspace, self.work) != self.state['binding_inputs']:
@@ -1306,6 +1338,13 @@ class Delivery:
         self._generation_chain_verified = True
 
     def current(self, check_source=True):
+        started = time.monotonic()
+        try:
+            return self._current(check_source)
+        finally:
+            self._record_controller_time('identity_snapshot_validation', started)
+
+    def _current(self, check_source=True):
         if check_source:
             self.source_stable()
         expected = self.state.get('candidate')
@@ -1319,7 +1358,7 @@ class Delivery:
         return expected
 
     def reserve(self, stage, inputs, scratch):
-        self.source_stable()
+        self.timed_source_stable()
         limits = self.state['limits']
         if limits['dispatches'] is not None and len(self.state['attempts']) >= limits['dispatches']:
             raise ValueError('dispatch-count limit exhausted before ' + stage)
@@ -1354,6 +1393,8 @@ class Delivery:
         if end.get('event_sha256') != fs.digest((folder / 'events.jsonl').read_bytes()):
             raise ValueError('host event content changed: ' + attempt['id'])
         attempt.update({k: end[k] for k in ('exit_code', 'outcome', 'finished', 'elapsed_seconds')})
+        attempt['launch_started'] = end.get('launch_started')
+        attempt['launch_finished'] = end.get('launch_finished')
         if end['outcome'] == 'interrupted':
             attempt['status'] = 'failed'
             if not self.read_only:
@@ -1383,6 +1424,8 @@ class Delivery:
             attempt = pending[-1]
             if attempt['stage'] != stage or attempt['inputs'] != inputs:
                 raise ValueError('reserved stage inputs differ; uncertain dispatch: ' + attempt['id'])
+            self.state['reconciliation_count'] = self.state.get('reconciliation_count', 0) + 1
+            self.save()
             return attempt, self.receipt(attempt)
         scratch = writable or (self.runtime / 'scratch' / str(uuid.uuid4()))
         require_repo_local_ignored(self.root, scratch)
@@ -1547,7 +1590,7 @@ assert results['scratch'] == 'ok'
         attempt, host = self.dispatch(name, inputs, prompt,
                                       self.workspace if name in ('implementation', 'repair') else None,
                                       report_schema(name))
-        self.source_stable()
+        self.timed_source_stable()
         if name in ('review', 'proof'):
             self.current()
         raw_report = host['message'].encode('utf-8')
@@ -1825,14 +1868,27 @@ assert results['scratch'] == 'ok'
             raise ValueError('acceptance bundle rejected: ' + json.dumps(issues))
         local_save(self.root, self.work, 'runtime/acceptance-bundle.json', encoded(value))
         self.current(check_source=check_source)
-        self.state.update(status='REVIEWED_AND_PROVEN', blocker=None,
-                          completed_at=self.state.get('completed_at') or now(),
+        already_complete = (self.state.get('status') == 'REVIEWED_AND_PROVEN' and
+                            self.state.get('completed_at'))
+        self.state.update(status='REVIEWED_AND_PROVEN' if already_complete else 'RUNNING',
+                          blocker=None,
+                          completed_at=self.state.get('completed_at') if already_complete else None,
+                          ended_at=None,
                           final_review=review['details'],
                           final_proof=proof_markdown(proof, self.work, self.state['contract'], candidate,
                                                      self.verification_environment(),
                                                      next(a for a in self.state['attempts']
                                                           if a['id'] == self.state['reports']['proof']['attempt_id'])['session_id']))
         self.save()
+        if not already_complete:
+            self.state.update(status='REVIEWED_AND_PROVEN', completed_at=now())
+            try:
+                local_save(self.root, self.work, 'delivery.json', encoded(self.state))
+            except (ValueError, OSError) as error:
+                self.state.update(status='BLOCKED',
+                                  blocker='terminal measurement finalization failed: ' + str(error),
+                                  completed_at=None, ended_at=now(), ended_epoch=time.time())
+                raise
 
     def verify_github_readback(self):
         receipt = self.state.get('github_record')
@@ -1863,7 +1919,7 @@ assert results['scratch'] == 'ok'
             self.remove_superseded_artifacts()
             self.remove_local_execution_state()
             return
-        self.source_stable()
+        self.timed_source_stable()
         self.complete(check_source=False)
         self.verify_github_readback()
         candidate_tree = fs.snapshot(self.workspace, exclude=self.state.get('agreement_paths', ()))
@@ -1931,7 +1987,7 @@ assert results['scratch'] == 'ok'
                 raise ValueError('automatic repair incomplete: ' + '; '.join(result['gaps']))
 
 
-def create(root, args):
+def create(root, args, invocation_started_epoch=None):
     agreement, requirements = contract(root, args.work)
     if not args.authorize_local:
         raise ValueError('local agent-stage authority missing; run requires --authorize-local')
@@ -2006,6 +2062,7 @@ def create(root, args):
                               'content_base64': base64.b64encode(local_input.read_bytes()).decode()}
     _, directory = delivery_paths(root, args.work)
     local = local_directory(root, args.work)
+    repository_id = Path(execution_directory(root, args.work)).parent.name
     runtime = execution_runtime(root, args.work)
     if runtime.exists():
         raise ValueError('local runtime exists without an active delivery record; preserve it and reconcile admission')
@@ -2035,7 +2092,7 @@ def create(root, args):
         raise ValueError('local Git product-only base commit failed: ' + local_base.stderr.strip())
     local_base_commit = local_base.stdout.strip()
     fs.git(repository, 'update-ref', local_base_ref, local_base_commit)
-    local_git_base = {'repository_id': local.parent.name, 'source_commit': base,
+    local_git_base = {'repository_id': repository_id, 'source_commit': base,
                       'source_tree': fs.git(repository, 'rev-parse', base + '^{tree}').decode().strip(),
                       'local_commit': local_base_commit, 'tree': base_tree,
                       'tree_key': base_tree_key, 'ref': local_base_ref}
@@ -2057,6 +2114,7 @@ def create(root, args):
     fs.git(workspace, 'update-ref', '--no-deref', 'HEAD', starting)
     fs.git(workspace, 'read-tree', starting)
     # Git metadata is outside every worker writable root; never shared with source.
+    deadline_started_epoch = time.time()
     state = {'schema': 'promise-to-proof/delivery/v1', 'policy': POLICY, 'invocation_id': str(uuid.uuid4()),
              'status': 'RUNNING', 'blocker': None, 'work_item': args.work, 'comparison_base': base,
              'contract': agreement, 'requirements': requirements, 'binding_inputs': inputs,
@@ -2072,7 +2130,11 @@ def create(root, args):
              'authority': {'local_stages': True, 'external_effects': False},
              'limits': {'dispatches': args.max_dispatches, 'elapsed_seconds': args.max_seconds,
                         'stage_seconds': args.max_stage_seconds},
-             'deadline': None if args.max_seconds is None else time.time() + args.max_seconds,
+             'deadline': None if args.max_seconds is None else deadline_started_epoch + args.max_seconds,
+             'deadline_started_epoch': deadline_started_epoch, 'started_epoch': invocation_started_epoch or time.time(),
+             'started_at': datetime.datetime.fromtimestamp(invocation_started_epoch or time.time(),
+                                                              datetime.timezone.utc).isoformat(),
+             'ended_at': None, 'resume_count': 0,
              'created': now(), 'repair_used': False, 'attempts': [], 'reports': {},
              'host': {'name': 'Codex CLI on macOS', 'executable': executable,
                       'version': version,
@@ -2082,7 +2144,7 @@ def create(root, args):
                       'elapsed_limit': 'admission and process termination; provider billing may continue',
                       'trust': 'controller and OS trusted; no arbitrary same-user tamper resistance'}}
     delivery = Delivery(root, args.work, state)
-    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'limits', 'deadline', 'host')}))
+    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host')}))
     delivery.save()
     delivery.capture('admission')
     delivery.save()
@@ -2153,6 +2215,7 @@ def result(delivery):
                      'proof': {'path': str(delivery.directory / 'proof.md')}}
                     if state.get('cleanup_verified_at') else state.get('reports', {})),
         'attempts': [] if state.get('cleanup_verified_at') else state['attempts'],
+        'measurement': delivery_measurement(state, delivery.runtime),
         'records': str(delivery.directory),
         'local_runtime': str(delivery.runtime) if delivery.runtime.exists() else None,
         'resume': f'python3 {Path(__file__).resolve()} --repo {delivery.root} resume {delivery.work}',
@@ -2247,6 +2310,7 @@ def completed_without_local_runtime(root, work, directory, missing_record):
 
 
 def main(argv=None):
+    invocation_started_epoch = time.time()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo', default='.')
     commands = parser.add_subparsers(dest='action', required=True)
@@ -2300,7 +2364,7 @@ def main(argv=None):
             progress = result(delivery)['progress']
             pending = progress['candidate_validation'] == 'pending active implementation or repair'
             if pending:
-                delivery.source_stable()
+                delivery.timed_source_stable()
             elif delivery.state['status'] == 'REVIEWED_AND_PROVEN':
                 delivery.current()
             else:
@@ -2357,7 +2421,11 @@ def main(argv=None):
             if args.max_dispatches < 0 or any(not math.isfinite(value) or value < 0
                                             for value in (args.max_seconds, args.max_stage_seconds)):
                 raise ValueError('resource limits must be finite and nonnegative')
-            delivery = create(root, args)
+            delivery = create(root, args, invocation_started_epoch)
+        if args.action == 'resume':
+            delivery.state['resume_count'] = delivery.state.get('resume_count', 0) + 1
+            delivery.state['ended_at'] = None
+            delivery.save()
         if args.action == 'cleanup':
             delivery.cleanup()
         elif args.action == 'resume' or delivery.state['status'] != 'REVIEWED_AND_PROVEN':
@@ -2377,7 +2445,10 @@ def main(argv=None):
                 output.update(blocker=message, cleanup_status='BLOCKED')
                 print(json.dumps(output, indent=2))
                 return 1
-            delivery.state.update(status='BLOCKED', blocker=message)
+            if args.action != 'status':
+                delivery.state.update(status='BLOCKED', blocker=message,
+                                      ended_at=delivery.state.get('ended_at') or now())
+                delivery.state.setdefault('ended_epoch', time.time())
             if args.action != 'status':
                 try:
                     delivery.save()
