@@ -104,3 +104,23 @@ These checks use independent hand-calculated ledgers and trusted fixture code.
 They cover overlap, failures, repair and resume accounting, false-green reports,
 unknown costs, empty cohorts, sensitivity, task identity, and uncertain dispatch.
 They make no model calls and do not execute generated candidate code.
+
+
+## Reuse P2P episode measurements
+
+P2P exports use the same compact episode shape for longitudinal or before/after
+comparisons. Keep the selected records in a caller-chosen location, combine them
+under the export schema, then run
+python3 checks/compare_p2p_delivery_measurements.py measurements.json.
+Like-for-like groups require the same repository ID, work item, contract revision
+and hash, and comparison base; any host, model, tool, or controller configuration differences
+are shown. Candidate keys and generations appear on each episode, with group
+identity differences called out so before/after candidates remain visible.
+Missing time or token categories remain unknown. The report does not
+infer a monetary charge, human effort, correctness, assurance, or priority.
+
+For benchmark use, provide independent correctness adjudications separately in
+the input. The report leaves adjudication unresolved when that separate source
+is absent; a P2P verdict is never used as its own ground truth. This descriptive
+measurement input can also be reused by #57 before/after work and #52 accounting
+without introducing another accounting schema.

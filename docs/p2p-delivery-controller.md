@@ -243,3 +243,46 @@ independent review, and independent proof stages. The check retains exact execut
 file hashes, all host receipts, protected-write results, reports, evidence, source
 and candidate content. Fixture transport tests establish controller decisions;
 they are never treated as live host isolation or independent stage evidence.
+
+
+## Delivery measurements
+
+Every controller result includes one versioned measurement keyed by the invocation
+ID. It records the canonical repository ID, admitted work item, contract revision
+and hash, frozen base,
+candidate identity when available, host/model configuration, unique attempt IDs,
+terminal outcome, dispatch/resume/repair counts, preflight usage, and stage
+intervals. Episode elapsed time is measured from controller invocation entry;
+setup before the execution deadline is shown separately. Stage durations remain
+separate and are not added to episode elapsed time.
+
+Controller wall time excludes the union of complete host-launch intervals and is
+unavailable if any launch boundary is missing or incoherent. The reservation
+timestamp remains the admission/deadline boundary; launch intervals begin after
+dispatch preparation and are recorded separately in the host receipt. Summed
+attempt seconds may exceed wall time when attempts overlap. The controller
+breakdown reports setup/admission, identity/snapshot/validation, and state
+persistence/readback, with preflight host-check attempts shown separately. These
+descriptive buckets can overlap and must not be summed.
+
+Provider input, output, cached, reasoning, and other numeric usage are kept in
+separate fields. A missing value is null (unavailable), never zero. The record
+contains identities and measurements only; it omits prompts, responses, logs,
+and product source. It is an observation of this host and configuration, not an
+assurance claim, a price, or a measure of human effort.
+
+Retention is opt-in. While the invocation record is available, explicitly export
+one compact record to a new caller-selected file:
+
+    python3 checks/export_p2p_delivery_measurement.py --repo . --work .p2p/work/example/contract.md --output /path/to/new-measurement.json
+
+The command refuses to replace an existing file. Ordinary cleanup does not need
+an export and removes temporary attempt telemetry with the rest of runtime data.
+To compare retained records, combine them into an export document and run
+python3 checks/compare_p2p_delivery_measurements.py measurements.json.
+The report groups only matching work item, contract revision/hash, and comparison
+base, discloses host/model/tool configuration differences, and leaves unavailable
+metrics unknown. Independent correctness outcomes may be supplied in the separate
+independent_adjudications input; controller verdicts are never used as ground
+truth. Time and token observations do not estimate monetary cost or human effort,
+and do not create numeric priority scores.
