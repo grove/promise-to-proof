@@ -1909,7 +1909,7 @@ Pending actions: none.
         with contextlib.redirect_stderr(progress):
             code,value=self.cli()
         self.assertEqual(code,0,value)
-        self.assertEqual(value['limits'],{'dispatches':8,'elapsed_seconds':2700,'stage_seconds':900})
+        self.assertEqual(value['limits'],{'dispatches':8,'elapsed_seconds':5400,'stage_seconds':1800})
         self.assertIn('implementation started',progress.getvalue())
         self.assertIn('proof finished',progress.getvalue())
         self.assertEqual(value['progress']['stage'],'proof')

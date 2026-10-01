@@ -100,9 +100,10 @@ bytes for those paths in its workspace, and rejects implementation changes to
 them. It preserves original source bytes, executable modes, and symlink targets.
 Partially staged paths must be resolved before admission.
 
-New invocations default to eight dispatches, 2,700 seconds overall, and 900 seconds
-per stage. Override these defaults with `--max-dispatches N`, `--max-seconds SECONDS`,
-and `--max-stage-seconds SECONDS` when the task needs a different allowance.
+New invocations default to eight dispatches, 5,400 seconds (90 minutes) overall,
+and 1,800 seconds (30 minutes) per stage. Override these defaults with
+`--max-dispatches N`, `--max-seconds SECONDS`, and `--max-stage-seconds SECONDS`
+when the task needs a different allowance.
 Limits must be finite and nonnegative; zero stops before dispatch. The two live
 preflight sessions count as dispatches, as do failed or interrupted stages.
 An ordinary delivery needs five dispatches; one repair and both fresh verifiers

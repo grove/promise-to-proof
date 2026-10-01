@@ -28,12 +28,12 @@ delivery is active or unresolved.
 
 Before the first stage dispatch, record the invocation, start time, deadline,
 stage allowance, dispatch count, and repair usage in the external P2P execution
-directory. For a new invocation, default to 45 minutes overall, 15 minutes per
-stage, and eight dispatches, including preflight and failed stages. State these
-limits before starting; use explicit user limits when supplied. Pass each stage
-its remaining allowance and reserve time to return its observations. The Python
-controller exposes these as `--max-seconds`, `--max-stage-seconds`, and
-`--max-dispatches`.
+directory. For a new invocation, default to 90 minutes overall, 30 minutes per
+stage, and eight dispatches, including preflight and failed stages. Allow at
+most one automatic repair/recheck cycle. State these limits before starting;
+use explicit user limits when supplied. Pass each stage its remaining allowance
+and reserve time to return its observations. The Python controller accepts
+`--max-seconds`, `--max-stage-seconds`, and `--max-dispatches` for these limits.
 
 Use the host's timeout or cancellation mechanism when available. While waiting,
 check elapsed time at least every 30 seconds and report the current stage,
