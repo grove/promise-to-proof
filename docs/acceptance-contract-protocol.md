@@ -140,6 +140,10 @@ inputs; reconcile differences instead of overwriting them with the saved copies.
 Missing binding content blocks the handoff. Keep provenance
 in the report rather than adding it to the approved contract bytes.
 
+Imported `source-issue.md` and `source-pr-<number>.md` snapshots in that work
+item are binding inputs when linked from its `Source:` line. Other generated
+`.p2p/` records cannot be binding inputs.
+
 After import, the local contract remains canonical under the rules above. There
 is no automatic synchronization. The contract can travel with the implementation
 PR; generated `.p2p/` records remain local and ignored.

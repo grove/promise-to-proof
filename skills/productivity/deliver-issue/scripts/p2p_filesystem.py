@@ -245,12 +245,19 @@ def bindings(root, work, require_trackable=True, _follow_origin=True):
                 raise ValueError("legacy contract binding inputs changed; reconcile before dependent work")
             return current
     found = {}
+    slug = work_slug(work)
     def is_contract(relative):
         return bool(re.fullmatch(rf"\.p2p/work/{SLUG}/contract\.md", relative))
     def is_imported_issue(relative):
         return bool(re.fullmatch(rf"\.p2p/work/{SLUG}/orchestration/issue\.json", relative))
-    def visit(relative):
-        if (relative == ".p2p" or relative.startswith(".p2p/")) and not (is_contract(relative) or is_imported_issue(relative)):
+    def is_imported_source(relative):
+        return bool(re.fullmatch(
+            rf"\.p2p/work/{re.escape(slug)}/source-(?:issue|pr-[0-9]+)\.md", relative))
+    def visit(relative, from_contract_source=False):
+        p2p_path = relative == ".p2p" or relative.startswith(".p2p/")
+        allowed = is_contract(relative) or is_imported_issue(relative) or (
+            from_contract_source and is_imported_source(relative))
+        if p2p_path and not allowed:
             raise ValueError("generated artifacts cannot be binding inputs")
         if relative in found:
             return
@@ -262,6 +269,7 @@ def bindings(root, work, require_trackable=True, _follow_origin=True):
         for line in document_lines(data.decode()):
             if not re.match(r"^(Source|Parent|Parent contract):\s*", line):
                 continue
+            source_link = line.startswith("Source:")
             for target in re.findall(r"\[[^\]]*\]\(([^)]+)\)", line):
                 if re.match(r"[a-zA-Z][a-zA-Z0-9+.-]*:", target):
                     continue
@@ -269,7 +277,7 @@ def bindings(root, work, require_trackable=True, _follow_origin=True):
                 if not target:
                     continue
                 resolved = os.path.normpath(str(PurePosixPath(relative).parent / target))
-                visit(resolved)
+                visit(resolved, from_contract_source=is_contract(relative) and source_link)
     if require_trackable and not is_contract(work):
         trackable(root, [work])
     visit(work)
