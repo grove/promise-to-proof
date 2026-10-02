@@ -1,5 +1,7 @@
 # How to deliver a change with Promise to Proof
 
+New to Promise to Proof? Start with [Getting Started](./getting-started.md) first. It walks through one small delivery from an agreed outcome to `REVIEWED + PROVEN`, so the recipes below have something concrete to build on.
+
 Start here when you have a change to deliver. Pick the path that matches your
 source, save each result, and give the next skill the saved result rather than a
 summary from chat. The [detailed workflow](./promise-to-proof.md) explains each
