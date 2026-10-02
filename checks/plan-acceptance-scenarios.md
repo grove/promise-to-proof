@@ -290,3 +290,80 @@ Repeat with `draft-only`, with `local-only`, with a local work path, and through
 authority. Missing tracker access or unavailable binding content must identify
 the incomplete issue handoff while preserving the local proposal. Record these
 tracker cases as unexecuted when no authorized test tracker is available.
+
+## 16. Plan a clear source without adding ceremony
+
+Input: in a throwaway repository, provide this complete local source and invoke
+`/plan-acceptance` without supplying expected output in the request:
+
+```text
+save_report(path, text) writes text as UTF-8 at the supplied path, overwrites
+an existing file, returns None, and propagates I/O errors. It does not create
+parent directories.
+```
+
+Pass when the contract states these observable outcomes, uses the public
+`save_report` seam, names independent checks for bytes, overwrite, return value,
+and error propagation, and proceeds without an unnecessary question. It stays
+concise and adds no durability, atomicity, or storage guarantees.
+
+## 17. Surface material ambiguity
+
+Input: the source says only “Make request retries robust.” Project context shows
+requests can fail from transient timeouts or authentication denial, but gives no
+retry policy. Invoke `/plan-acceptance` without explaining the intended policy.
+
+Pass when the planner asks which failures should retry and what retry bound or
+observable stop condition applies, then leaves implementation blocked. It does
+not invent retry behavior or present a guessed contract as ready.
+
+## 18. Preserve a contradiction for resolution
+
+Input: the source says both “Retry a transient timeout once” and “Never retry a
+transient timeout.” Invoke `/plan-acceptance` without resolving the conflict.
+
+Pass when both statements are surfaced as a material contradiction, the planner
+asks which promise governs, and the implementation handoff remains blocked. It
+does not silently choose one statement, merge them, or assign an arbitrary
+priority.
+
+## 19. Separate incomplete behavior from missing evidence
+
+Input: the source says “An accepted archive can be restored when requested; if
+restoration fails, recover safely.” The repository has no restore interface,
+Vendor Q documentation, credentials, or known-good restore check. Invoke
+`/plan-acceptance` without defining “recover safely.”
+
+Pass when the contract preserves the stated restore outcome, names the missing
+restore seam/oracle/evidence as a `gap`, and asks what failure recovery means
+because that choice can change correctness. Implementation stays blocked on
+that question; the planner neither invents a fallback nor calls the unavailable
+evidence proof of failure.
+
+## 20. Remove unsupported implementation prescription
+
+Input: the source requires exporting report text to a supplied local path through
+the existing `save_report` function and excludes remote storage. An attached
+proposal asks for a `ReportExportManager`, provider interface, and remote plugin
+registry. Invoke `/plan-acceptance` without endorsing that design.
+
+Pass when the contract retains the local export outcome and its exclusion, but
+does not turn the proposed class, interface, or plugin into requirements. It
+names the existing public seam and a direct file-content oracle, and uses only
+the detail needed to make the outcome verifiable.
+
+## 21. Keep an approved contract stable across reruns
+
+Input: seed a throwaway repository with an approved `v1` contract, exact UTF-8
+bytes, stable requirement IDs, and approval evidence bound to its SHA-256. Run
+planning once with unchanged source, then again with a new material source
+promise but no amendment authority. Finally, explicitly authorize that change
+through the normal revision process and approve the resulting exact proposal.
+Record requests, actions, approval references, and before/after hashes.
+
+Pass when the unchanged rerun preserves the exact contract bytes, revision, IDs,
+and approval binding. The unauthorized material change leaves the approved
+contract untouched and is raised as an open question. The authorized revision
+records its authorization and old/new agreement, preserves existing ID meaning,
+advances the revision, binds approval to the exact new bytes, and keeps the prior
+approved bytes retrievable.

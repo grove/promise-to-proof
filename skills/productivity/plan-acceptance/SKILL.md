@@ -59,6 +59,29 @@ It defines the spec envelope, revision rules, evidence terms, and handoffs.
 6. Apply the protocol's revision rules. Record authorized material changes and
    retain prior revisions. Surface unresolved changes as questions rather than
    silently altering the agreement.
+7. Before presenting a proposal, audit the source and relevant project context
+   for applicable ambiguity, contradiction, missing success or failure behavior,
+   important implied edges or invariants, regression constraints, unclear scope,
+   unverifiable promises, unavailable evidence or authority, and assumptions
+   about environment, data, timing, ordering, permissions, compatibility, or
+   external systems. For each material finding, capture the accepted outcome or
+   boundary, a named evidence gap, or an open question. Apply only relevant
+   categories; do not invent requirements or force every category into each
+   contract. Keep the audit concise and proportional to risk.
+8. Gate each accepted row on an observable expected result, an agreed credible
+   seam, an independent oracle, and a concrete evidence path; name the missing
+   seam, oracle, or evidence when one is unavailable. Keep evidence gaps distinct
+   from unresolved product decisions. Ask the requester and block implementation
+   only when uncertainty could change correctness or scope; do not guess. Do not
+   hand off as ready while such a question remains open.
+9. When rerunning planning for an approved contract, verify and preserve its exact
+   approved bytes, revision, requirement IDs, and approval binding. Unchanged or
+   evidence-only reruns keep those identities unchanged. A material change may
+   replace the canonical contract only through the normal explicitly authorized
+   revision process; record the authorization, old and proposed agreement, and
+   any ID mapping, and retain the prior exact bytes. Without that authorization,
+   leave the approved contract unchanged and surface the proposed change as an
+   open question.
 
 ## Audit and hand off
 
