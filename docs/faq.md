@@ -1,5 +1,7 @@
 # Frequently asked questions
 
+If this is your first time using P2P, read [Getting Started](./getting-started.md) before diving into the distinctions below. The tutorial gives terms such as contract, candidate, review, and proof a concrete meaning first.
+
 Promise to Proof keeps the source promise, the work done, and the evidence about that work
 as separate records. That separation matters most when a ticket is sliced, a
 candidate changes after review, or someone resumes the work in a fresh session.

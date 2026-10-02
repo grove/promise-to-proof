@@ -1,391 +1,359 @@
 # Promise to Proof
 
-Promise to Proof carries software requirements from an agreed outcome through
-implementation to evidence-backed acceptance.
+Promise to Proof helps coding agents deliver what was actually agreed: **no missing
+behavior, no accidental scope expansion, and no “done” claim without evidence**.
 
-It keeps the agreement, implementation, review, and proof separate so the
-promised capability does not get lost between ticket and implementation: no less
-in substance, no more in scope.
+A normal coding workflow can blur several different questions into one. Did we
+understand the request correctly? Did we implement all of it? Is the implementation
+sound? Does the promised behavior actually work? Promise to Proof keeps those
+questions separate, ties them to one exact implementation candidate, and carries the
+agreement all the way from the original promise to evidence-backed acceptance.
 
-## Current focus
+> **Start with a promise. Make “done” precise. Build it. Review it. Prove it.**
 
-Implement exactly what was promised, prove it thoroughly, and deliver that exact
-result. The controller now keeps active execution and recovery state in disposable
-local Git storage outside the project checkout. Issue-backed deliveries can save
-compact completion metadata on GitHub, leaving product code and tests in Git.
+## The idea in 30 seconds
 
-Further work focuses on precise acceptance contracts, requirement-to-evidence
-traceability, and verification of important seams and edge cases without unnecessary
-ceremony. Fixed delivery strategy comparison remains the next evaluation step;
-automatic strategy selection is later work.
-
-## Why this exists
-
-For developers using an issue tracker and coding agents, "done" can be hard to
-trust. An agent may miss part of the requested behavior yet confidently report
-success, or over-engineer a narrow task with features and abstractions nobody
-asked for. Promise to Proof grew out of that experience: give the developer
-responsible for the result a way to check that the agreed behavior was delivered,
-without unapproved scope, on the exact code being accepted.
-
-## Current status and next steps
-
-The project now has an executable delivery controller and model-based checks:
-
-- A [bounded FizzBee model](./checks/delivery-model/README.md) checks completion
-  rules for contract and candidate identity, durable evidence, repair, and restart.
-- The [delivery controller](./docs/p2p-delivery-controller.md) runs one established
-  local agreement through implementation, independent review and proof, and at
-  most one automatic repair. It supports macOS with Codex CLI and retains progress
-  for resume in an isolated, disposable Git workspace outside the source checkout.
-  Dispatch and elapsed-time limits bound execution; a hard monetary cap is unsupported.
-- Delivery freezes its comparison base at admission. Later destination movement
-  is recorded separately and does not trigger another review or proof run by itself.
-  Completion against that base does not establish compatibility with the current target.
-- Issue-backed completion supports an explicitly authorized, read-back-verified
-  GitHub comment and fresh-checkout status inspection. Cleanup removes local execution
-  state only after the source candidate and required records have been verified.
-- [Conformance tests](./checks/delivery-model/README.md#controller-conformance-phase-3)
-  drive the controller's public CLI against FizzBee-generated action sequences.
-  They check restart, stale reports, interrupted storage, repair limits, and
-  overlapping resume attempts, including deliberately broken controller variants.
-
-Model exploration is bounded, and conformance tests use substitute worker replies.
-Real host checks separately exercise isolation and stage execution. These checks
-do not establish the quality of agent judgments or prove every controller execution.
-
-The next planned step is to compare fixed delivery strategies on the supported
-host, with agreed tasks, independent correctness judgments, and an improvement
-threshold. Additional hosts and automatic strategy selection remain later work.
-See the [optimization plan](./plans/promise_to_proof_optimization_handoff.md).
-
-Projects may keep their specifications or plans in `specs/` and `work/`; P2P
-neither creates nor reserves those directories. Generated acceptance contracts,
-records, and active delivery state live under ignored `.p2p/work/<slug>/`.
-Keep `.p2p/**` out of Git. GitHub Issues are optional import and publication
-destinations.
-See the [controller guide](./docs/p2p-delivery-controller.md) for the storage and
-cleanup paths, and the [migration guide](./docs/p2p-state-migration.md) for removing
-existing P2P-owned files from the current Git tree without rewriting history.
-
-## How Promise to Proof works
-
-Promise to Proof turns an agreed outcome into a precise acceptance contract,
-builds against that contract, then independently reviews the implementation and
-proves the promised behavior on one exact candidate.
-
-```mermaid
-flowchart LR
-  promise["1. Start with a promise<br/>Issue, spec, or agreed outcome"]
-  plan["2. Propose what success means<br/>/plan-acceptance"]
-  audit["Optional independent check<br/>/audit-acceptance"]
-  contract["Saved acceptance contract<br/>What must be true + what evidence will prove it"]
-  implement["3. Build exactly that<br/>/implement-contract"]
-  candidate["Exact implementation candidate<br/>Commit or reproducible snapshot"]
-  review["4a. Review: Is the implementation sound?<br/>/review-implementation"]
-  prove["4b. Proof: Does the promised behavior actually hold?<br/>/prove"]
-  done["5. The promise is backed by evidence<br/>Review + proof match this exact contract and candidate"]
-  publish["6. Optional publication<br/>/publish-pr previews, then publishes with explicit authorization"]
-  retrospect["Optional after acceptance<br/>/retrospect evaluates and proposes advisory learnings"]
-
-  promise --> plan
-  plan --> audit
-  audit -->|Changes needed| plan
-  audit -->|Ready; obtain any required approval| contract
-  plan -->|No audit needed; obtain any required approval| contract
-  contract --> implement --> candidate
-  candidate --> review --> done
-  candidate --> prove --> done
-  done --> publish
-  prove --> retrospect
+```text
+PROMISE
+   ↓
+PLAN WHAT "DONE" MEANS
+   ↓
+IMPLEMENT
+   ↓
+REVIEW + PROVE
+   ↓
+DELIVER
 ```
 
-Each stage answers a different question:
+The core stage skills mirror that flow:
 
-- **Promise:** What are we agreeing to deliver?
-- **Plan acceptance:** What exactly would make that promise true?
-- **Audit acceptance:** Is the exact proposal complete and fit for an approval decision?
-- **Implementation:** Did we build what we agreed?
-- **Review:** Is the implementation sound, faithful to the contract, and in scope?
-- **Proof:** Does the promised behavior actually hold, with evidence for every outcome?
-- **Publication:** Does the draft PR preserve the exact reviewed and proven candidate?
-- **Retrospective (optional):** What did the accepted delivery teach us for later work?
+```text
+/plan-acceptance
+      ↓
+/implement-contract
+      ↓
+/review-implementation + /prove
+```
 
-For one coherent work item, `/deliver-issue` coordinates these distinct
-skills and their saved handoffs when the host supports separate stage and
-independent review/proof contexts. Each stage remains available on its own.
-Capture the candidate as a commit or reproducible snapshot so review and proof
-refer to the same exact implementation and contract. Start with the
-[HOW-TO](./docs/how-to.md) for the saved artifacts and commands.
+For one coherent work item, `/deliver-issue` coordinates the normal end-to-end
+path when the host can provide the separate implementation, review, and proof
+contexts that P2P requires. The stages remain available individually when you want
+more control.
 
-## Install and update
+The result is intentionally stronger than “the agent says it is done.” P2P asks
+what was promised, what evidence would establish it, what exact candidate was
+checked, and whether independent review and proof agree about that same candidate.
 
-The skills work with agent-skill-compatible coding tools. A saved acceptance
-contract carries the work item's promises through implementation, review,
-and proof. Coordinated delivery needs a host capable of separate stage invocations
-and independent read-only review and proof contexts; otherwise it reports a blocker.
+## Why use Promise to Proof?
 
-Install the full collection:
+Coding agents are very good at moving quickly, but speed makes a few failure modes
+especially easy to miss. An implementation can satisfy the obvious happy path while
+quietly missing another requirement. A test suite can be green without checking the
+specific outcome you asked for. A review can describe commit A while later changes
+produce commit B. An agent can also add abstractions, cleanup, or product behavior
+that sounded helpful but was never part of the agreement.
+
+P2P is designed to make those gaps visible. It turns the requested outcome into an
+acceptance contract with independently checkable promises, builds against that
+contract, independently reviews the implementation, and then proves the promised
+behavior on the exact candidate being accepted. Review and proof are separate on
+purpose: good code can still fail the promised behavior, and behavior can appear to
+work while the implementation contains an important engineering or scope problem.
+
+## Supported today
+
+Promise to Proof has two related ways to use the project: individual skills and the
+coordinated delivery controller. The skills are packaged for agent-skill-compatible
+coding tools. The production-validated direct controller path is currently narrower.
+
+| Capability | Supported today |
+|---|---|
+| Standalone P2P skills | Agent-skill-compatible coding tools, subject to the host capabilities required by the selected skill |
+| Coordinated local delivery controller | **macOS + Codex CLI** |
+| Controller prerequisites | **Python 3.11+**, Git, an authenticated Codex CLI, and the required P2P stage skills |
+| GitHub | Optional. It can be used for issue import, planning handoffs, completion records, and PR workflows, but local planning and delivery do not require it |
+| P2P project state | Generated project-local records live under ignored `.p2p/`; active controller execution and recovery state lives outside the source checkout |
+
+If the coordinated host cannot establish fresh stage contexts, protect the fixed
+candidate and agreement during verification, or retain the required handoffs, P2P
+blocks instead of quietly weakening review or proof. See the
+[delivery controller guide](./docs/p2p-delivery-controller.md) for the exact current
+host assumptions and checks.
+
+## 5-minute quick start
+
+This is the shortest path from “I have a small change” to a real P2P delivery.
+For a complete walkthrough with explanations and a concrete example, use
+[Getting Started](./docs/getting-started.md).
+
+### 1. Install the skills
 
 ```bash
 npx skills@latest add grove/promise-to-proof
 ```
 
-Install one skill:
+### 2. Set up your project
 
-```bash
-npx skills@latest add grove/promise-to-proof --skill plan-acceptance
-```
-
-Update one installed skill:
-
-```bash
-npx skills@latest update plan-acceptance
-```
-
-If you installed `acceptance-contract`, `review-contract`, or `repair-proof`,
-install `plan-acceptance`, `review-implementation`, and `repair-gaps` as
-applicable, then remove the old copies using your installer's normal removal
-mechanism.
-
-For a new project, run
-[`/setup-promise-to-proof`](./skills/productivity/setup-promise-to-proof/SKILL.md).
-It establishes the local directories and ignore convention, detects conflicts,
-and preserves existing configuration. Configure GitHub only when you want its
-optional import, triage, or publication flows.
-
-## Start with a local work item
-
-```text
-/plan-acceptance specs/retry-safe-uploads.md
-/deliver-issue .p2p/work/retry-safe-uploads/contract.md
-```
-
-A separate specification is optional. Give `plan-acceptance` an agreed outcome
-to create a standalone work item. The work file holds the acceptance contract;
-standalone stage reports and evidence go under `.p2p/work/retry-safe-uploads/`.
-Coordinated delivery keeps its active workspace, reports, and recovery state under
-the user-level work root outside the checkout. Resume with the same work-item path.
-
-`deliver-issue` retains its command name and also accepts a tracker reference
-for import. It coordinates independent review and proof when the host supports
-them. It does not commit, publish, or update trackers without separate authority.
-See the [delivery checks](./checks/deliver-issue-scenarios.md).
-
-For direct CLI execution on macOS, follow the
-[controller guide](./docs/p2p-delivery-controller.md). It requires Python 3.11 or
-newer, Git, an authenticated Codex CLI, and installed delivery stage skills.
-Use `run`, `status`, and `resume` to execute and inspect a delivery. A successful
-run returns an isolated candidate with matching full `REVIEWED` and `PROVEN`
-reports. Apply that candidate to the source checkout before explicit `cleanup`.
-Commit and publication remain separately authorized steps.
-
-For an issue-backed delivery, commit the accepted product candidate, then use
-`github-record-preview` to inspect the compact completion comment.
-`github-record-publish` requires authorization for that exact preview hash.
-`github-status` validates the completed record against local Git history in a fresh
-checkout. Cleanup verifies the issue comment again before deleting execution state.
-For local delivery, cleanup retains compact candidate, delivery, review, and proof
-records in `.p2p/work/<slug>/`; these records do not reconstruct the candidate.
-
-## Plan on an issue before delivery
-
-Run `/plan-acceptance <issue>` to save a local proposal and post its exact text
-as a comment on that existing issue. Add `local-only` or `draft-only` to suppress
-the comment. The handoff includes the work-item path, revision, text hash, and
-retrievable binding inputs. Posting the proposal does not approve it.
-
-Approve the specific proposal on the issue, then run `/deliver-issue <issue>`
-in the same or another checkout. Delivery imports the exact approved contract
-and binding inputs into the local workflow. Matching inputs retain their approval;
-changed or conflicting inputs require reconciliation. If approval exists only
-in conversation, transfer the saved approval receipt to the delivery checkout.
-No preliminary planning PR is required.
-
-Planning inside `/deliver-issue` stays local unless issue publication has separate
-authorization. See [Plan on an issue before delivery](./docs/how-to.md#plan-on-an-issue-before-delivery)
-for the handoff procedure.
-
-## Use the stage skills
-
-Start with these four skills in order:
-
-[`/plan-acceptance`](./skills/productivity/plan-acceptance/SKILL.md) →
-[`/implement-contract`](./skills/productivity/implement-contract/SKILL.md) →
-[`/review-implementation`](./skills/productivity/review-implementation/SKILL.md) +
-[`/prove`](./skills/productivity/prove/SKILL.md)
-
-### Other skills when you need them
-
-| Skill | Use it when | It gives you |
-|---|---|---|
-| [`/setup-promise-to-proof`](./skills/productivity/setup-promise-to-proof/SKILL.md) | A project needs local P2P storage | Local directories, validated Git rules, and optional tracker configuration |
-| [`/audit-acceptance`](./skills/productivity/audit-acceptance/SKILL.md) | A proposed contract needs an independent check before human approval | Read-only source, scope, identity, and evidence-plan findings |
-| [`/create-parent-issue`](./skills/productivity/create-parent-issue/SKILL.md) | A local specification needs one originating GitHub issue | One source issue with a durable reference to the exact spec |
-| [`/triage-issue`](./skills/productivity/triage-issue/SKILL.md) | An existing issue needs a next action or triage label | A recommendation and, when explicitly approved, a verified issue update |
-| [`/critique`](./skills/productivity/critique/SKILL.md) | You explicitly request an independent review of a proposal against its intended outcome | Evidence-backed advice and a recommendation |
-| [`/interrogate`](./skills/productivity/interrogate/SKILL.md) | You want to question the agent's proposal and reasoning | Evidence-backed answers, a revised approach, and explicit unknowns |
-| [`/slice-contract`](./skills/productivity/slice-contract/SKILL.md) | A parent contract is too large for one coherent task | Linked child work items and an approved delivery plan; [mixed destinations and strategy changes](./docs/how-to.md#deliver-an-epic-with-mixed-destinations) |
-| [`/repair-gaps`](./skills/productivity/repair-gaps/SKILL.md) | Proof found specific repairable gaps | A scoped repair report; fresh proof is still required |
-| [`/retrospect`](./skills/productivity/retrospect/SKILL.md) | A proven delivery has concrete post-acceptance experience worth examining | A historical evaluation and optional human-accepted advice for future planning |
-| [`/publish-pr`](./skills/productivity/publish-pr/SKILL.md) | A reviewed and proven candidate should become a draft PR | An exact preview or a content-verified remote PR |
-| [`/merge-readiness`](./skills/productivity/merge-readiness/SKILL.md) | An existing PR is near a merge decision | Current readiness or blockers, recorded in the PR description |
-| [`/fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request's CI failed | `FIXED` or `NOT FIXED` for the target workflow |
-
-## Use a skill
-
-```text
-/plan-acceptance work/retry-safe-uploads.md
-/implement-contract .p2p/work/retry-safe-uploads/contract.md
-/review-implementation <saved implementation handoff> against <comparison base>
-/prove <saved contract>; candidate <saved implementation handoff>
-```
-
-<details>
-<summary>Other commands</summary>
+From the project you want P2P to work on, run:
 
 ```text
 /setup-promise-to-proof
-/triage-issue #123
-/critique <idea, document path, or GitHub issue reference>
-/interrogate Walk me through your proposal so I can question it.
-/audit-acceptance <exact proposed contract> against <source>
-/slice-contract .p2p/work/retry-safe-uploads/contract.md; draft only
-/publish-pr <verified candidate and reports>; target <branch>; draft only
-/merge-readiness <PR URL>; review <saved report>; proof <saved report>
-/repair-gaps <matching proof report>; candidate <saved candidate handoff>; requirements <IDs>
-/retrospect <saved PROVEN proof>; candidate <exact proven candidate>; experience <retrievable observations>
-/fix-pr #456
 ```
+
+Setup creates the ignored local P2P workspace and checks the repository's ignore
+rules. It does **not** require GitHub, and it does not take over project-owned
+`specs/` or `work/` directories.
+
+### 3. Turn a small promise into an acceptance contract
+
+You can start from an issue, a project document, or simply agreed text:
+
+```text
+/plan-acceptance "Reject an empty username with a clear validation error."
+```
+
+P2P turns that informal outcome into a saved acceptance contract under
+`.p2p/work/<slug>/contract.md`. The contract says what must be true, what would
+falsify it, and what evidence should establish it. Inspect the proposal and approve
+the exact agreement before implementation proceeds.
+
+### 4. Deliver the saved contract
+
+Use the exact path returned by planning:
+
+```text
+/deliver-issue .p2p/work/<slug>/contract.md
+```
+
+The coordinated path implements the contract, freezes an exact candidate, runs
+independent implementation review and proof, and returns either matching
+`REVIEWED` + `PROVEN` results or a specific blocker/gap that still needs work.
+
+### 5. Read the result correctly
+
+A successful delivery separates three claims:
+
+```text
+IMPLEMENTED  → the candidate is ready for independent scrutiny
+REVIEWED     → the implementation passed independent engineering/scope review
+PROVEN       → the promised behavior has credible evidence on that exact candidate
+```
+
+Those claims are deliberately not interchangeable. A later candidate change can
+make an older review or proof inapplicable; green CI alone does not prove every
+promise; and acceptance does not itself authorize a commit, push, publication,
+merge, or deployment.
+
+**Ready to try the whole flow with a tiny example?** Follow
+[Your first Promise to Proof delivery](./docs/getting-started.md).
+
+## Which path should I use?
+
+Most work should begin with the first row. The other paths are there when the shape
+of the work actually requires them.
+
+| I have… | Start here |
+|---|---|
+| A small local change or agreed outcome | `/plan-acceptance` → `/deliver-issue` |
+| A GitHub issue | `/plan-acceptance <issue>` → `/deliver-issue <issue>` |
+| A project specification | `/plan-acceptance <path>` → direct delivery |
+| Work that is too large for one coherent delivery | Plan the parent → `/slice-contract` |
+| A proven candidate that should become a draft PR | `/publish-pr` |
+| An existing PR near the merge decision | `/merge-readiness` |
+| A failed PR workflow | `/fix-pr` |
+
+The [HOW-TO](./docs/how-to.md) covers these task-oriented paths in more detail.
+
+## A few P2P terms, in plain language
+
+**Acceptance contract** — the written definition of what must be true before the
+work counts as delivered. P2P gives each independently checkable promise a stable
+requirement ID and records its important boundaries, observation seam, expected
+result, and planned evidence.
+
+**Candidate** — the exact version of the implementation being reviewed and proven.
+A moving branch name is not enough; P2P binds results to a full commit or a
+reproducible snapshot.
+
+**Review** — the independent engineering check. It asks whether the candidate is
+faithful to the contract, stays in scope, and is sound enough to hand forward.
+
+**Proof** — evidence that the promised behavior actually holds on that exact
+candidate. Proof evaluates the contract requirement by requirement; it does not
+repair the implementation.
+
+**Comparison base** — the exact project version P2P compares the delivery against.
+The coordinated controller freezes that base at admission instead of silently
+changing it when the destination branch moves later.
+
+For the precise rules behind these terms, read the
+[acceptance contract protocol](./docs/acceptance-contract-protocol.md).
+
+## The core workflow
+
+### Plan what “done” means
+
+[`/plan-acceptance`](./skills/productivity/plan-acceptance/SKILL.md) turns a
+ticket, specification, or agreed outcome into a versioned acceptance contract. It
+separates observable promises, keeps speculative behavior out of scope, and names
+credible evidence paths before implementation begins.
+
+An optional
+[`/audit-acceptance`](./skills/productivity/audit-acceptance/SKILL.md) can
+independently inspect one exact proposed contract before a human approval decision.
+
+### Implement the agreement
+
+[`/implement-contract`](./skills/productivity/implement-contract/SKILL.md)
+builds the smallest complete solution inside the approved contract. It does not get
+to silently redefine the promise, approve its own candidate, or claim proof.
+
+### Review and prove independently
+
+[`/review-implementation`](./skills/productivity/review-implementation/SKILL.md)
+asks whether the implementation is faithful, appropriately scoped, and
+engineering-sound.
+
+[`/prove`](./skills/productivity/prove/SKILL.md) separately asks whether every
+material promised outcome has credible evidence on that same fixed candidate.
+
+For ordinary one-item delivery,
+[`/deliver-issue`](./skills/productivity/deliver-issue/SKILL.md) coordinates
+those handoffs and preserves the identities needed to resume safely after
+interruption.
+
+## More capabilities, when you need them
+
+You do not need to learn these before your first delivery. They exist for specific
+situations that appear later in real work.
+
+<details>
+<summary>Show the wider P2P skill set</summary>
+
+| Skill | Use it when |
+|---|---|
+| [`/setup-promise-to-proof`](./skills/productivity/setup-promise-to-proof/SKILL.md) | A repository needs ignored local P2P storage and optional tracker/domain pointers |
+| [`/audit-acceptance`](./skills/productivity/audit-acceptance/SKILL.md) | A proposed contract needs an independent pre-approval check |
+| [`/slice-contract`](./skills/productivity/slice-contract/SKILL.md) | One parent contract is too large for one coherent delivery |
+| [`/repair-gaps`](./skills/productivity/repair-gaps/SKILL.md) | Proof found named repairable gaps |
+| [`/publish-pr`](./skills/productivity/publish-pr/SKILL.md) | A reviewed and proven candidate should become a draft PR |
+| [`/merge-readiness`](./skills/productivity/merge-readiness/SKILL.md) | An existing PR is near a merge decision |
+| [`/fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request workflow failed |
+| [`/retrospect`](./skills/productivity/retrospect/SKILL.md) | A proven delivery has concrete experience worth learning from |
+| [`/triage-issue`](./skills/productivity/triage-issue/SKILL.md) | A tracker issue needs a next action or triage label |
+| [`/create-parent-issue`](./skills/productivity/create-parent-issue/SKILL.md) | A local specification needs an optional GitHub source issue |
+| [`/critique`](./skills/productivity/critique/SKILL.md) | You want an independent assessment of a proposal |
+| [`/interrogate`](./skills/productivity/interrogate/SKILL.md) | You want to question the agent's proposal and reasoning |
 
 </details>
 
-The skills also accept direct ticket URLs or a specification when their skill
-instructions describe that input.
+## Where P2P keeps its state
 
-## Advanced and recovery paths
+For normal project use, the simple rule is:
 
-```mermaid
-flowchart TD
-  contract["Acceptance contract"] --> large{"Too large for one coherent task?"}
-  large -->|No| core["Run the core workflow"]
-  large -->|Yes| slice["Slice into independent outcomes<br/>/slice-contract"]
-  slice --> children["Run the core workflow for each child"]
-  children --> integrated["Create one exact integrated candidate"]
-  integrated --> parent["Prove the full parent contract<br/>Review integration when needed"]
+> **P2P keeps generated project-local workflow records under ignored `.p2p/`, so
+> they do not pollute your product history.**
 
-  core --> problem{"Problem found?"}
-  parent --> problem
-  problem -->|No| pr["Local completion, existing PR, or optional publication<br/>/merge-readiness or /publish-pr when applicable"]
-  pr -->|Existing or newly published PR| ready["Check the current PR<br/>/merge-readiness"]
-  problem -->|Review finding| fix["Implement the finding"]
-  problem -->|Proof gap| repair["Repair the named gap<br/>/repair-gaps"]
-  fix --> rerun["New candidate -> review + prove again"]
-  repair --> rerun
-  rerun --> problem
-```
+Acceptance contracts and compact final records use
+`.p2p/work/<slug>/`. Temporary project-local scratch may use `.p2p/tmp/`.
+The coordinated controller keeps its active candidate workspace, invocation
+records, reports, and recovery state outside the checkout under the user-level P2P
+execution root. That lets interrupted delivery resume without mixing controller
+state into the product tree.
 
-For optional tracker work, use `/triage-issue` for an issue needing a next
-action or `/create-parent-issue` to preview a spec mirror. `/critique` and `/interrogate` can help settle a proposal first.
+You only need the deeper storage rules when debugging, migrating older state, or
+operating the controller directly. See the
+[controller guide](./docs/p2p-delivery-controller.md) and
+[state migration guide](./docs/p2p-state-migration.md).
 
-For local children, plan acceptance in each child work file and run the direct
-path for that child. Child proof does not replace `/prove` for the integrated parent. Review
-the integrated candidate if it differs from the reviewed child candidates or
-contains shared integration code. After any repair, capture the changed candidate
-and refresh review and proof. `/fix-pr` addresses failed CI. If a promise changes,
-reconcile the authorized amendment through `/plan-acceptance` before continuing.
+## What P2P does — and does not — establish
 
-After matching review and proof, `/publish-pr` prepares a read-only preview and,
-with exact authorization, publishes that candidate as a draft PR. For an existing
-PR near merge, `/merge-readiness` checks the current review, proof, CI, and
-repository merge conditions without merging the PR. Read the
-[FAQ](./docs/faq.md) for the distinction between acceptance and merge readiness.
+P2P is intentionally careful about the claims it makes. A matching review and
+proof say something strong about **one exact agreement and one exact candidate**.
+They do not prove that every future change is safe, that every possible environment
+has been explored, or that the repository is automatically ready to merge.
 
-## Keep delivery state out of product history
+Likewise, a test suite is evidence only to the extent that its checks actually
+establish the promised outcomes. P2P prefers behavioral evidence through real
+interfaces and independent expected results, while still allowing other credible
+evidence paths for work that is not naturally test-driven.
 
-The controller stores candidate generations and recovery state in disposable
-local Git storage under `~/.p2p/work/<repo-id>/<work-item>/`. Keep that storage
-while delivery is active, interrupted, or unresolved. Explicit cleanup checks the
-source checkout against the accepted candidate before removing it.
+The project also has model-based and deterministic checks for controller
+invariants, artifact identity, restart behavior, and other workflow properties.
+Those checks strengthen the orchestration layer; they do not magically prove the
+quality of every future agent judgment. See the
+[delivery-model documentation](./checks/delivery-model/README.md) for the exact
+scope of those checks.
 
-Issue-backed deliveries retain compact completion metadata on GitHub under exact
-comment authority. Local deliveries retain four final records in `.p2p/work/`.
-Standalone skills still use the [protocol's durable handoffs](./docs/acceptance-contract-protocol.md#durable-generated-records).
-Do not blanket-delete project-authored files in `work/` or `specs/` when migrating
-old P2P state. Follow the [migration guide](./docs/p2p-state-migration.md).
+## Project status
 
-For standalone checks, use `.p2p/tmp/` or an OS temporary directory. Save meaningful
-commands, assertions, results, and environment details in the report, and retain
-separate evidence only when needed. The setup convention ignores `/.p2p/tmp/`.
-Existing committed evidence can use Git history and an `archive.md` recovery index;
-see [Reduce retained work data](./docs/how-to.md#reduce-retained-work-data).
+P2P currently has an executable local delivery controller, durable acceptance
+handoffs, independent review/proof stages, bounded repair and resume behavior,
+compact completion records, deterministic artifact checks, and a bounded FizzBee
+delivery model with conformance tests.
 
-## Detailed docs
+The current production controller path is macOS + Codex CLI. Work on broader host
+portability is tracked separately so new adapters can preserve the same
+`REVIEWED` and `PROVEN` meanings rather than creating weaker host-specific
+workflows. Fixed delivery-strategy comparison and further optimization work remain
+separate from the assurance semantics.
 
-New here? Start with the [HOW-TO](./docs/how-to.md) to choose and run a delivery
-path. For questions about issues, slicing, review, and proof, read the
-[FAQ](./docs/faq.md).
+## Documentation
 
-The [detailed workflow](./docs/promise-to-proof.md) includes examples and
-recovery paths, including an optional
-[retrospective walkthrough](./docs/promise-to-proof.md#learn-from-a-proven-delivery-optional)
-after proof. The [acceptance contract protocol](./docs/acceptance-contract-protocol.md)
-sets the rules for revisions, candidate identity, evidence, and durable handoffs.
-The [acceptance bundle format](./docs/acceptance-bundle-v1.md) defines optional
-deterministic inspection of matching review and proof artifacts.
-Each skill ends with numbered next steps so you can refer to a specific action.
-Some completed results need no further action; stage skills do not call one
-another automatically. `/deliver-issue` coordinates them for one work item.
+**New here?** Start with
+[Getting Started](./docs/getting-started.md). It walks through one complete small
+delivery and explains what each stage is doing while you use it.
+
+**Know the basics and need a recipe?** Use the
+[HOW-TO](./docs/how-to.md) for issues, slicing, publication, repair, recovery, and
+other task-oriented paths.
+
+**Have a conceptual question?** Read the [FAQ](./docs/faq.md) for the difference
+between review and proof, candidate identity, parent/child acceptance, merge
+readiness, and other common questions.
+
+**Need the exact rules?** The
+[acceptance contract protocol](./docs/acceptance-contract-protocol.md) defines
+agreement ownership, revisions, candidate identity, evidence, durable handoffs,
+and applicability. The
+[delivery controller guide](./docs/p2p-delivery-controller.md) documents the
+current direct controller environment and operations.
+
+Additional references:
+
+- [Detailed Promise to Proof workflow](./docs/promise-to-proof.md)
+- [Evidence Record v1](./docs/evidence-record-v1.md)
+- [Acceptance Bundle v1](./docs/acceptance-bundle-v1.md)
+- [State migration](./docs/p2p-state-migration.md)
+- [Delivery strategy comparison](./docs/delivery-strategy-comparison.md)
 
 ## Repository structure
 
 ```text
-skills/productivity/
-├── audit-acceptance/
-├── create-parent-issue/
-├── deliver-issue/
-├── plan-acceptance/
-├── critique/
-├── fix-pr/
-├── implement-contract/
-├── interrogate/
-├── merge-readiness/
-├── prove/
-├── publish-pr/
-├── repair-gaps/
-├── retrospect/
-├── review-implementation/
-├── slice-contract/
-├── setup-promise-to-proof/
-└── triage-issue/
+skills/productivity/   P2P skills
+docs/                  user, workflow, and protocol documentation
+checks/                deterministic, scenario, model, and conformance checks
+specs/                 project-owned specifications used by this repository
+plans/                 project planning material
 ```
 
-Each skill has a `SKILL.md`. Some also have an `agents/openai.yaml` display
-metadata file. The [`checks/`](./checks/) directory contains workflow scenarios,
-filesystem and controller tests, the acceptance bundle checker, and the
-FizzBee model and conformance suite.
+Each skill has a `SKILL.md`. Shared protocol references resolve to the canonical
+documentation so individual skill installs keep the rules they depend on.
 
-Shared protocol references are symlinks to `docs/acceptance-contract-protocol.md`.
-The installer copies their contents into each selected skill, so individual
-installs keep the protocol. Shared `scripts/p2p_filesystem.py` links likewise
-resolve to the implementation in `deliver-issue/scripts/`. Edit the canonical
-files to change shared behavior. Run the Python fixture tests with:
+Run the repository's Python checks with:
 
 ```bash
 python3 -m unittest discover -s checks -p 'test_*.py'
 ```
 
-The [model and conformance checks](./checks/delivery-model/README.md) have separate
-commands and pinned tool requirements. The [live host check](./docs/p2p-delivery-controller.md#host-boundary-and-checks)
-runs separately and makes real model calls.
+The model/conformance checks and live host checks have additional pinned
+requirements documented in their own guides.
 
 ## Contributing
 
-1. Read [AGENTS.md](./AGENTS.md).
-2. Find or plan the relevant `.p2p/work/<slug>/contract.md` acceptance contract.
-3. Change the smallest relevant skill.
-4. Run the checks described by that skill.
-5. Open a pull request that explains the behavior and evidence.
+Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before starting work. This project
+uses an issue-first contribution model, and substantial pull requests should follow
+an agreed issue and maintainer invitation.
 
 ## License
 
