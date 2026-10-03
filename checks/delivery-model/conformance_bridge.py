@@ -77,7 +77,7 @@ def child():
 
 def command(action='resume', **settings):
     write(ROOT / 'command.json', settings)
-    args = [sys.executable, str(Path(__file__).resolve()), 'child', '--repo', str(SOURCE), action, 'work/tiny.md']
+    args = [sys.executable, str(Path(__file__).resolve()), 'child', '--repo', str(SOURCE), action, '.p2p/work/tiny/contract.md']
     if action == 'run':
         args += ['--comparison-base', (ROOT / 'base').read_text(), '--destination', 'delivery-target']
         if CASE != 'unauthorized-before-dispatch':
@@ -101,12 +101,12 @@ def invoke(action='resume', **settings):
 def corrupt():
     saved = state()
     attempt = saved['attempts'][-1]
-    folder = LOCAL / 'attempts' / attempt['id']
+    folder = d.execution_runtime(SOURCE, '.p2p/work/tiny/contract.md') / 'attempts' / attempt['id']
     if CASE == 'candidate-mutated-during-verification':
-        (LOCAL / 'runtime/workspace/greet.py').write_text("print('mutated after launch')\n")
+        (d.execution_runtime(SOURCE, '.p2p/work/tiny/contract.md') / 'workspace/greet.py').write_text("print('mutated after launch')\n")
     elif CASE == 'incomplete-archive':
         # Remove the saved comparison-base identity used by current recovery checks.
-        (LOCAL / 'runtime/base-tree-key').unlink()
+        (d.execution_runtime(SOURCE, '.p2p/work/tiny/contract.md') / 'base-tree-key').unlink()
     elif CASE == 'late-stage-result':
         value = read(folder / 'exit.json')
         value['attempt_id'] = 'late-result-from-another-launch'
@@ -137,7 +137,7 @@ def projection(code, saved):
         return f'{code}|ABSENT|0|0||0|0|0|0|1'
     attempts = saved['attempts']
     candidate = saved.get('candidate')
-    workspace = LOCAL / 'runtime/workspace'
+    workspace = d.execution_runtime(SOURCE, '.p2p/work/tiny/contract.md') / 'workspace'
     excluded = saved.get('agreement_paths', ())
     manifest = d.fs.snapshot(workspace, exclude=excluded) if workspace.exists() else []
     current = 1
@@ -163,7 +163,7 @@ def projection(code, saved):
         if not record:
             verifiers.append(0)
             continue
-        report = read(LOCAL / record['path'])
+        report = read(d.execution_runtime(SOURCE, '.p2p/work/tiny/contract.md') / record['path'])
         exact = json.loads(report['input_identity_json']) == expected_identity
         full = [row['id'] for row in report['requirements']] == ['R1']
         verifiers.append(generation if exact and full and report['status'] == passing and not report['gaps'] else -1)
@@ -181,13 +181,13 @@ def main(action):
         # MBT initializes once per trace. Refuse accidental fixture reuse.
         ROOT.mkdir(parents=True, exist_ok=True)
         base = fixture.repo(SOURCE)
-        LOCAL = d.local_directory(SOURCE, 'work/tiny.md')
+        LOCAL = d.local_directory(SOURCE, '.p2p/work/tiny/contract.md')
         (ROOT / 'base').write_text(base)
         if CASE == 'contested-dirty-file':
             (SOURCE / 'dirty').write_text('untouched\n')
         print('initialized')
         return
-    LOCAL = d.local_directory(SOURCE, 'work/tiny.md')
+    LOCAL = d.local_directory(SOURCE, '.p2p/work/tiny/contract.md')
     before = state()
     detail = {}
     if action == 'Start':

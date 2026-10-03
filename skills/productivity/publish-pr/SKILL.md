@@ -133,6 +133,21 @@ Readiness remains a separate assessment against the actual target and all gates.
 
 ## Prepare an exact preview
 
+Before presenting a preview for approval, check actual write access from this
+session with `python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root>
+publication-access .p2p/work/<slug>/contract.md --workspace <retained workspace>`.
+This disposable probe creates no commit or branch and removes its temporary
+files. Resolve the actual Git directory and common directory; the controller's
+`runtime/workspace/.git` points to the sibling `runtime/repository.git`, so
+granting access to the worktree alone is insufficient. Check the worktree, Git
+metadata/object/ref directories, and local publication records. Record the
+resolved paths and successful probe in the preview. A denied probe is `BLOCKED`
+before asking for publication authority; name every required writable location.
+Approval does not change sandbox permissions. Recheck access on resume and
+immediately before each publication effect. Never use an escalated GitHub
+command to bypass local filesystem restrictions, silently relocate an existing candidate,
+or request publication approval again merely to resolve missing write access.
+
 Inspect the remote, default and proposed target branches, current target tip,
 existing local and remote refs, open and closed pull requests, pull-request
 template, and applicable repository conventions. Resolve the approved target
@@ -198,9 +213,11 @@ needed, title, complete body, and the effects requiring authorization. The
 default outcome is `DRAFT`; inspection and preview create no commit, branch,
 push, pull request, comment, label, reviewer request, or other external change.
 
-State in the preview that publication uses the isolated candidate workspace
-under `~/.p2p/executions/<repo-id>/<slug>/runtime/workspace` and leaves the
-operator's checkout, branch, index, and files unchanged. Do not include a local
+State in the preview that publication uses the retained isolated candidate
+workspace at `<execution-root>/<repo-id>/<slug>/runtime/workspace` (default
+execution root `~/.p2p/executions`) and record its actual Git directory. Resolve
+the retained location through the protocol; `P2P_EXECUTION_ROOT` selects new
+work only. State that publication leaves the operator's checkout, branch, index, and files unchanged. Do not include a local
 reconciliation plan or require a clean checkout; unrelated or staged work in
 the operator's checkout does not block isolated publication.
 

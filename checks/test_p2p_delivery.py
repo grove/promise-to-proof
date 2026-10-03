@@ -876,7 +876,7 @@ Pending actions: none.
         self.assertEqual(before, (d.local_directory(self.root, '.p2p/work/tiny/contract.md') / 'delivery.json').read_bytes())
         self.assertEqual(self.cli('resume')[0], 0)
         self.assertEqual(len(self.fake.calls), 5)
-        proof = d.local_directory(self.root, '.p2p/work/tiny/contract.md') / state['reports']['proof']['path']
+        proof = self.runtime() / state['reports']['proof']['path']
         proof.write_text('{}')
         code, value = self.cli('resume')
         self.assertEqual(code,1)
@@ -906,6 +906,57 @@ Pending actions: none.
         self.assertEqual(source_index, d.fs.git(self.root, 'ls-files', '--stage', '-z'))
         self.assertEqual(local, (self.root / '.p2p/work/tiny').resolve())
         self.assertFalse((self.root / '.p2p/tmp/deliver-issue').exists())
+
+    def test_execution_access_denied_stops_before_implementation(self):
+        before = d.fs.snapshot(self.root)
+        with patch.object(d.fs.tempfile, 'TemporaryFile', side_effect=PermissionError('session denied writes')):
+            code, value = self.cli()
+        self.assertEqual(code, 1)
+        self.assertIn('write access required for', value['blocker'])
+        self.assertEqual(self.fake.calls, [])
+        self.assertEqual(d.fs.snapshot(self.root), before)
+        self.assertFalse((self.root / '.p2p/work/tiny/execution-location.json').exists())
+
+    def test_resume_checks_narrower_session_before_any_dispatch_or_record_change(self):
+        self.assertEqual(self.cli('run', '--max-dispatches', '0')[0], 1)
+        state_path = d.local_directory(self.root, '.p2p/work/tiny/contract.md') / 'delivery.json'
+        before = state_path.read_bytes()
+        git_dir = self.runtime() / 'repository.git'
+        real_probe = d.fs.tempfile.TemporaryFile
+
+        def denied(*args, **kwargs):
+            if Path(kwargs['dir']) == git_dir:
+                raise PermissionError('resumed session only permits workspace writes')
+            return real_probe(*args, **kwargs)
+
+        with patch.object(d.fs.tempfile, 'TemporaryFile', side_effect=denied):
+            code, value = self.cli('resume')
+        self.assertEqual(code, 1)
+        self.assertIn(str(git_dir), value['blocker'])
+        self.assertEqual(self.fake.calls, [])
+        self.assertEqual(state_path.read_bytes(), before)
+
+    def test_configured_execution_location_survives_cleanup_and_environment_change(self):
+        execution_root = Path(self.temp.name).resolve() / 'configured-executions'
+        original_tree = d.fs.snapshot(self.root)
+        with patch.dict(os.environ, {'P2P_EXECUTION_ROOT': str(execution_root)}):
+            code, value = self.cli()
+            self.assertEqual(code, 0, value)
+            retained = self.runtime()
+            self.assertIn(execution_root, retained.parents)
+        with patch.dict(os.environ, {'P2P_EXECUTION_ROOT': str(execution_root.parent / 'changed-root')}):
+            self.assertEqual(self.runtime(), retained)
+            code, value = self.cli('cleanup')
+            self.assertEqual(code, 0, value)
+            final = json.loads((self.root / '.p2p/work/tiny/artifacts/delivery.json').read_text())
+            self.assertEqual(final['cleanup'], 'source checkout unchanged')
+            self.assertEqual(self.runtime(), retained)
+            self.assertEqual(self.cli('status')[0], 0)
+        self.assertTrue((retained / 'workspace/.git').is_file())
+        self.assertTrue((retained / 'repository.git/HEAD').is_file())
+        self.assertTrue((self.root / '.p2p/work/tiny/execution-location.json').is_file())
+        self.assertFalse((execution_root.parent / 'changed-root').exists())
+        self.assertEqual(d.fs.snapshot(self.root), original_tree)
 
     def test_runtime_writes_ignore_checkout_ignore_rules(self):
         (self.root / '.gitignore').write_text(

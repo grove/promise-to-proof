@@ -382,6 +382,25 @@ class FilesystemTests(unittest.TestCase):
                                         cwd=directory, capture_output=True, text=True)
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertIn("capture", result.stdout)
+                if source.name == "deliver-issue":
+                    for name in ("p2p_delivery_measurements.py", "verify_acceptance_bundle.py"):
+                        self.assertTrue((installed / "scripts" / name).is_file())
+                        self.assertFalse((installed / "scripts" / name).is_symlink())
+                    result = subprocess.run(["python3", str(installed / "scripts/p2p_delivery.py"), "--help"],
+                                            cwd=directory, capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertIn("cleanup", result.stdout)
+                    # Exercise the installed cleanup entrypoint without any development checks/ directory.
+                    root = Path(directory) / "standalone-source"
+                    root.mkdir()
+                    p2p.git(root, "init", "-q")
+                    prepare(root)
+                    result = subprocess.run(["python3", str(installed / "scripts/p2p_delivery.py"),
+                                             "--repo", str(root), "cleanup", ".p2p/work/example/contract.md"],
+                                            cwd=directory, capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 1, result.stderr)
+                    self.assertEqual(json.loads(result.stdout)["status"], "BLOCKED")
+                    self.assertNotIn("ModuleNotFoundError", result.stderr)
 
 
 if __name__ == "__main__":

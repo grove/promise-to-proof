@@ -184,6 +184,30 @@ evidence, retain a description, safe durable reference, SHA-256 checksum, and
 access limitations. Without a safe durable copy, mark evidence unavailable.
 A checksum or inaccessible old temporary path alone is insufficient.
 
+Execution storage uses an absolute, persistent directory outside the source
+checkout. The default execution root is `~/.p2p/executions`; `P2P_EXECUTION_ROOT`
+may choose another root for new work. All `~/.p2p/executions/<repo-id>/<slug>/`
+paths below refer to the resolved root when configured. Resolve it with
+`python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> execution-path <contract>`.
+Before implementation, run `execution-access <contract>` with the same helper;
+it probes actual write/read access and retains the absolute location in ignored
+`.p2p/work/<slug>/execution-location.json`. Existing default executions and
+retained locations take precedence over new configuration. Never relocate an
+existing candidate merely because configuration or sandbox access changed.
+Conflicting roots require reconciliation; do not overwrite either. Preserve
+this receipt with recovery records, including after cleanup.
+
+Before requesting publication approval, run `publication-access <contract>
+--workspace <retained workspace>` with the helper. Probe from the actual
+publication session, including the worktree, resolved Git directory and common
+directory, objects, refs, and local records. `runtime/workspace/.git` points to
+`runtime/repository.git`; worktree access alone does not permit a commit.
+Record the checked paths in the preview and recheck on resume and before each publication effect.
+A missing permission blocks the preview approval handoff. A user's publication
+grant does not change the sandbox's writable roots. A later session must repeat
+the checks because the delivery worker's permissions establish no publication
+access for that session.
+
 The outer `deliver-issue` workflow keeps its invocation record, fixed review
 snapshot, reports, candidate payload, and scratch under
 `~/.p2p/executions/<repo-id>/<slug>/orchestration/` while active or unresolved.

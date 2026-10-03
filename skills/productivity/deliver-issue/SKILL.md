@@ -100,12 +100,19 @@ destination. A plan change still invalidates routing and requires reconciliation
 2. Check that this host can invoke the installed stage skills in separate
    contexts and run independent, read-only review and proof contexts against a
    fixed candidate. Check access to durable contract records and the external
-   execution directory at `~/.p2p/executions/<repo-id>/<slug>/`, including the
-   candidate and its comparison base across those contexts. Select that
+   retained execution directory (default `~/.p2p/executions/<repo-id>/<slug>/`),
+   including the candidate and its comparison base across those contexts. Select that
    report/snapshot destination and verify actual write and read access
    **before implementation**, including a harmless disposable probe when
-   permissions are uncertain. Actually launch a harmless separate read-only
-   stage context and capture its distinct session ID before implementation;
+   permissions are uncertain. Run `python3 <skill-dir>/scripts/p2p_filesystem.py
+   --repo <root> execution-access .p2p/work/<slug>/contract.md` to check and retain
+   the location. For new work, `P2P_EXECUTION_ROOT` may select an absolute,
+   persistent writable directory outside the source checkout. Reuse existing
+   locations; configuration never relocates an active candidate. Explain that
+   publication needs write access to both `runtime/workspace` and the separate
+   `runtime/repository.git`, plus the local records. Recheck those actual
+   directories before handing off a publication preview. Actually launch a
+   harmless separate read-only stage context and capture its distinct session ID before implementation;
    finding the host executable or reading its help is not an isolation check.
    If any required capability is absent, return `BLOCKED` naming it before
    dependent work. Never simulate independent review
@@ -166,8 +173,8 @@ destination. A plan change still invalidates routing and requires reconciliation
 Keep the canonical contract and compact final records under
 `.p2p/work/<slug>/`. Put active execution state, agreement snapshots, candidate
 payloads, stage reports, invocation records, and scratch under
-`~/.p2p/executions/<repo-id>/<slug>/`; resolve `<repo-id>` from the repository
-directory name and the first 16 hex characters of SHA-256 over the absolute
+`<execution-root>/<repo-id>/<slug>/` (default root `~/.p2p/executions`); resolve
+`<repo-id>` from the repository directory name and the first 16 hex characters of SHA-256 over the absolute
 Git common directory. Store outer workflow artifacts under
 `orchestration/` there and controller runtime under `runtime/`. New candidate
 checkouts and Git objects stay outside the source checkout. Existing active

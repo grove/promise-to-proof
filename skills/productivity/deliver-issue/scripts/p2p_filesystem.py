@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Repository-local P2P paths and exact candidate identities (stdlib only)."""
+"""P2P storage paths, access probes and exact candidate identities (stdlib only)."""
 import argparse
 import base64
 import hashlib
@@ -9,6 +9,7 @@ from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import sys
+import tempfile
 import uuid
 
 
@@ -56,6 +57,105 @@ def git(root, *args):
     if result.returncode:
         raise ValueError(result.stderr.decode().strip() or "git command failed")
     return result.stdout
+
+
+def execution_directory(root, work):
+    """Reuse a retained location; configuration selects only new execution state."""
+    root = Path(root).resolve()
+    common = git(root, "rev-parse", "--path-format=absolute", "--git-common-dir").decode().strip()
+    repo_id = root.name + "-" + digest(str(Path(common).resolve()).encode())[:16]
+    slug = work_slug(work)
+    receipt = safe(root, f".p2p/work/{slug}/execution-location.json")
+    default = Path.home() / ".p2p/executions" / repo_id / slug
+    default_present = default.exists() and any(default.iterdir())
+    if receipt.is_file():
+        record = json.loads(receipt.read_text())
+        if not isinstance(record, dict) or record.get("schema") != "promise-to-proof/execution-location/v1":
+            raise ValueError("invalid execution location receipt")
+        directory = Path(record["directory"])
+        if directory.parts[-2:] != (repo_id, slug):
+            raise ValueError("execution location belongs to another repository or work item")
+    elif default_present:
+        directory = default  # Existing candidates stay in place, including before receipts existed.
+    else:
+        configured = os.environ.get("P2P_EXECUTION_ROOT", str(Path.home() / ".p2p/executions"))
+        execution_root = Path(configured).expanduser()
+        if not execution_root.is_absolute():
+            raise ValueError("P2P_EXECUTION_ROOT must be an absolute directory outside the source checkout")
+        directory = execution_root / repo_id / slug
+    if not directory.is_absolute():
+        raise ValueError("execution location must be absolute")
+    for path in (directory, directory.parent, directory.parent.parent):
+        if path.is_symlink() or (path.exists() and not path.is_dir()):
+            raise ValueError("execution location is not a regular directory: " + str(path))
+    directory = directory.resolve()
+    if directory == root or root in directory.parents:
+        raise ValueError("external P2P execution path resolves inside the source checkout")
+    if receipt.is_file() and default_present and directory != default.resolve():
+        raise ValueError("both retained and default execution roots exist; reconcile without overwriting either")
+    return directory
+
+
+def probe_write(directory):
+    """Exercise this process's actual write boundary without changing existing files."""
+    directory = Path(directory)
+    try:
+        with tempfile.TemporaryFile(prefix=".p2p-access-", dir=directory) as probe:
+            probe.write(b"p2p-access\n")
+            probe.flush()
+            probe.seek(0)
+            if probe.read() != b"p2p-access\n":
+                raise ValueError("write probe readback failed: " + str(directory))
+    except OSError as error:
+        raise ValueError("write access required for " + str(directory) + ": " + str(error)) from error
+
+
+def prepare_execution(root, work):
+    """Check and retain the selected external root before implementation starts."""
+    _, records = paths(root, work)
+    directory = execution_directory(root, work)
+    directory.mkdir(parents=True, exist_ok=True)
+    records.mkdir(parents=True, exist_ok=True)
+    for path in (directory, records):
+        probe_write(path)
+    receipt = safe(records, "execution-location.json")
+    if not receipt.exists():
+        data = canonical({"schema": "promise-to-proof/execution-location/v1", "directory": str(directory)}) + b"\n"
+        atomic_write(receipt, data, ignored_root=root)
+        if receipt.read_bytes() != data:
+            raise ValueError("execution location readback failed")
+    return {"execution_directory": str(directory), "records_directory": str(records)}
+
+
+def publication_access(root, work, workspace=None):
+    """Check the worktree, actual Git metadata and records before preview approval."""
+    _, records = paths(root, work)
+    workspace = Path(workspace) if workspace is not None else execution_directory(root, work) / "runtime/workspace"
+    return workspace_access(workspace, records, operator_root=root)
+
+
+def workspace_access(workspace, records, operator_root=None):
+    """Probe actual Git storage; publication additionally requires checkout isolation."""
+    workspace, records = Path(workspace), Path(records)
+    workspace = workspace.resolve()
+    git_dir = Path(git(workspace, "rev-parse", "--absolute-git-dir").decode().strip()).resolve()
+    common = Path(git(workspace, "rev-parse", "--path-format=absolute", "--git-common-dir").decode().strip()).resolve()
+    root = Path(operator_root).resolve() if operator_root is not None else None
+    if root is not None:
+        if workspace == root or root in workspace.parents:
+            raise ValueError("publication workspace must be outside the operator's checkout")
+        source_common = Path(git(root, "rev-parse", "--path-format=absolute", "--git-common-dir").decode().strip()).resolve()
+        if common == source_common or git_dir == root or root in git_dir.parents or common == root or root in common.parents:
+            raise ValueError("publication Git metadata must be isolated from the operator's checkout")
+    records.mkdir(parents=True, exist_ok=True)
+    directories = dict.fromkeys((workspace, git_dir, common, common / "objects", common / "refs", records))
+    for directory in directories:
+        if directory != records and (directory.is_symlink() or (root is not None and root in directory.resolve().parents)):
+            raise ValueError("publication write directory is not isolated: " + str(directory))
+        probe_write(directory)
+    return {"status": "WRITABLE", "workspace": str(workspace), "git_directory": str(git_dir),
+            "git_common_directory": str(common), "records_directory": str(records),
+            "probed_directories": [str(path) for path in directories]}
 
 
 def safe(root, relative, leaf_symlink=False):
@@ -519,6 +619,11 @@ def main(argv=None):
     parser.add_argument("--repo", default=".")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("setup")
+    for name in ("execution-path", "execution-access", "publication-access"):
+        command = commands.add_parser(name)
+        command.add_argument("work")
+        if name == "publication-access":
+            command.add_argument("--workspace", help="retained isolated candidate workspace")
     reconcile_command = commands.add_parser("reconcile")
     reconcile_command.add_argument("work")
     for name in ("resolve", "create", "capture", "validate", "resume", "save"):
@@ -537,6 +642,12 @@ def main(argv=None):
         root = Path(git(Path(args.repo), "rev-parse", "--show-toplevel").decode().strip()).resolve()
         if args.command == "setup":
             result = setup(root)
+        elif args.command == "execution-path":
+            result = {"execution_directory": str(execution_directory(root, args.work))}
+        elif args.command == "execution-access":
+            result = prepare_execution(root, args.work)
+        elif args.command == "publication-access":
+            result = publication_access(root, args.work, args.workspace)
         elif args.command == "reconcile":
             result = reconcile(root, args.work)
         elif args.command == "create":

@@ -252,3 +252,21 @@ installed-skill invocation procedure. Keep its oracle out of actor input. Inspec
 saved plan/report identities, actual Git refs, and controlled tracker call logs
 as well as the response. Follow the listed variants and positive verification
 phases; a baseline blocker alone does not execute the whole source scenario.
+
+## Installed controller and execution access
+
+Install `deliver-issue` alone into a disposable root without the development
+repository or a sibling `checks/` directory. Run the installed controller's
+`--help` and `cleanup` entrypoints with a disposable local work item. Pass when
+both import the packaged measurement and acceptance-bundle modules; an absent
+delivery produces the normal structured blocker rather than an import failure.
+Exercise a completed delivery and cleanup through that installed entrypoint for
+live lifecycle evidence.
+
+Select a persistent external directory with `P2P_EXECUTION_ROOT`. Deny execution
+writes in the invoking session. Pass when admission stops before implementation
+and saves no location receipt claiming successful access. After a successful
+admission, resume in a session that permits workspace writes but denies the
+sibling Git metadata directory. Pass when no stage is dispatched, no saved
+candidate/record is changed, and the blocker identifies the actual Git path.
+Record live sandbox results separately from injected permission failures.

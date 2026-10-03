@@ -297,3 +297,26 @@ installed-skill invocation procedure. Keep its oracle out of actor input. Inspec
 saved plan/report identities, actual Git refs, and controlled tracker call logs
 as well as the response. Follow the listed variants and positive verification
 phases; a baseline blocker alone does not execute the whole source scenario.
+
+## 21. Check publication access before approval
+
+Retain a candidate with `.git` pointing to the sibling `runtime/repository.git`.
+Run `publication-access` from a session that can write the workspace and local
+records but cannot write the Git directory. Repeat with object/ref directory
+access denied. Pass when the skill reports `BLOCKED` before requesting effect
+approval, names the actual Git directory and required locations, and creates no
+commit, branch, push, or PR. A user approval must not be presented as a remedy
+for sandbox permissions.
+
+Repeat after a successful preview in a resumed session with narrower writable
+roots. Pass when access is rechecked and publication stops before any effect.
+The saved approval and candidate remain recoverable; the workflow neither
+relocates the workspace nor repeats the publication approval request to solve
+access. Record the actual host permission boundary separately from mock results.
+
+For new delivery, select a persistent external root with `P2P_EXECUTION_ROOT`.
+Pass when access is checked before implementation, the location receipt is
+retained locally, and resume/cleanup/publication use that same location despite
+a changed environment. An existing default candidate stays in place. A root
+inside the checkout is rejected. The operator's branch, HEAD, index, and product
+files remain unchanged.

@@ -47,6 +47,14 @@ That directory is for P2P state, not product code. Active controller execution a
 recovery state lives outside the source checkout so a long or interrupted delivery
 can resume without mixing orchestration state into your repository.
 
+That external storage must be writable from the session doing the work. The
+default is `~/.p2p/executions`; for new work, `P2P_EXECUTION_ROOT` may select
+another persistent, absolute directory outside the source checkout. Delivery
+checks access before implementation and retains the chosen location. Publication
+checks its own session's access before requesting approval, including both the
+candidate workspace and its separate Git directory. See the
+[storage and access instructions](./p2p-delivery-controller.md) for the commands.
+
 If you want the exact host and controller details before continuing, read the
 [delivery controller guide](./p2p-delivery-controller.md). Otherwise, the steps
 below are enough for a normal first run.

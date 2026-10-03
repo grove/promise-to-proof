@@ -4,7 +4,6 @@ import argparse
 import base64
 import datetime
 import fcntl
-import importlib.util
 import json
 import math
 import os
@@ -19,13 +18,9 @@ import time
 import uuid
 
 import p2p_filesystem as fs
-sys.path.insert(0, str(Path(__file__).resolve().parents[4] / 'checks'))
 from p2p_delivery_measurements import build as delivery_measurement
 
-CHECKER = Path(__file__).resolve().parents[4] / 'checks/verify_acceptance_bundle.py'
-spec = importlib.util.spec_from_file_location('acceptance_bundle', CHECKER)
-bundle = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(bundle)
+import verify_acceptance_bundle as bundle
 STAGES = {'implementation': 'implement-contract', 'review': 'review-implementation',
           'proof': 'prove', 'repair': 'repair-gaps'}
 POLICY = 'macos-codex-local-v1'
@@ -131,20 +126,7 @@ def execution_runtime(root, work):
 
 def execution_directory(root, work):
     """Return the stable user-local directory for one repository work item."""
-    common = fs.git(root, 'rev-parse', '--path-format=absolute', '--git-common-dir').decode().strip()
-    repo_id = Path(root).name + '-' + fs.digest(str(Path(common).resolve()).encode())[:16]
-    external_root = Path.home() / '.p2p' / 'executions'
-    external = external_root / repo_id / fs.work_slug(work)
-    for path in (Path.home() / '.p2p', external_root, external_root / repo_id, external):
-        if path.is_symlink():
-            raise ValueError('external P2P execution path contains a symlink: ' + str(path))
-    try:
-        external.resolve().relative_to(Path(root).resolve())
-    except ValueError:
-        pass
-    else:
-        raise ValueError('external P2P execution path resolves inside the source checkout')
-    return external
+    return fs.execution_directory(root, work)
 
 
 def agreement_root(root, work):
@@ -2018,6 +2000,7 @@ def create(root, args, invocation_started_epoch=None):
     committed = fs.snapshot(root, head)
     old, new = ({e['path']: e for e in entries} for entries in (committed, current))
     dirty = {p for p in old.keys() | new.keys() if old.get(p) != new.get(p)}
+    fs.prepare_execution(root, args.work)
     inputs = agreement_bindings(root, args.work)
     localize_agreement(root, args.work, inputs)
     agreement_paths = sorted({args.work, *imported_issue_sources(root, args.work)})
@@ -2113,6 +2096,7 @@ def create(root, args, invocation_started_epoch=None):
     fs.git(workspace, 'config', '--local', 'core.bare', 'false')
     fs.git(workspace, 'update-ref', '--no-deref', 'HEAD', starting)
     fs.git(workspace, 'read-tree', starting)
+    fs.workspace_access(workspace, local)
     # Git metadata is outside every worker writable root; never shared with source.
     deadline_started_epoch = time.time()
     state = {'schema': 'promise-to-proof/delivery/v1', 'policy': POLICY, 'invocation_id': str(uuid.uuid4()),
@@ -2376,6 +2360,8 @@ def main(argv=None):
                 output.update(status='RUNNING', blocker=None)
             print(json.dumps(output, indent=2))
             return 0 if output['status'] == 'REVIEWED_AND_PROVEN' else 1
+        if args.action in ('run', 'resume') and state_path.exists():
+            fs.workspace_access(execution_runtime(root, args.work) / 'workspace', local)
         lock_path = local.parent / (local.name + '.lock')
         require_repo_local_ignored(root, lock_path)
         require_repo_local_ignored(root, lock_path.parent)

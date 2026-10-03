@@ -3,8 +3,40 @@
 The controller runs one established `.p2p/work/<slug>/contract.md` agreement on macOS with
 Python 3.11 or newer, Git, and an authenticated Codex CLI. Install the
 `implement-contract`, `review-implementation`, `prove`, and `repair-gaps` skills
-in `~/.agents/skills/` or `$CODEX_HOME/skills/`. It inherits the configured OpenAI
-model and reasoning preference. Other model providers are unsupported.
+in `~/.agents/skills/` or `$CODEX_HOME/skills/`. The controller packages its
+measurement and acceptance-bundle modules in its own `scripts/` directory;
+it does not require this development repository after installation. It inherits
+the configured OpenAI model and reasoning preference. Other model providers are unsupported.
+
+The execution root defaults to `~/.p2p/executions`. For new work, set
+`P2P_EXECUTION_ROOT` to an absolute, persistent directory outside the source
+checkout that the current session can write. For example:
+
+```sh
+export P2P_EXECUTION_ROOT=/absolute/writable/p2p-executions
+python3 skills/productivity/deliver-issue/scripts/p2p_filesystem.py --repo /path/to/source execution-access .p2p/work/example/contract.md
+```
+
+The helper probes write/read access and saves the selected location in ignored
+`.p2p/work/example/execution-location.json`. Resume and cleanup reuse that
+location even if the environment changes. Existing default executions stay
+where they are; changing configuration does not migrate a candidate. The
+controller checks access before implementation and when resuming delivery.
+Paths under `~/.p2p/executions` below use the retained root when configured.
+
+Before publication approval, run the following in the publication session:
+
+```sh
+python3 skills/productivity/publish-pr/scripts/p2p_filesystem.py --repo /path/to/source publication-access .p2p/work/example/contract.md --workspace /retained/execution/runtime/workspace
+```
+
+The worktree and its actual Git directory must both be writable. The controller
+uses a `.git` pointer to the sibling `runtime/repository.git`, whose index,
+objects, and refs are required for commit creation. Local publication records
+also need write access. If access is denied, resolve it before requesting effect
+approval; approving publication cannot change sandbox permissions. Verification
+workers still receive only their scoped writable scratch/workspace, so these
+publication checks do not broaden stage access.
 
 Run from this repository, replacing the work item, source repository, and full
 comparison-base SHA. For unsliced work, add `--destination BRANCH` when the
