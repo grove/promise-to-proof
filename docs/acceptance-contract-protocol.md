@@ -96,6 +96,57 @@ relative-link resolution and binding inputs. Never infer P2P ownership from a
 Resolve conflicts before dependent work. Changed contract locations make old
 results historical until fresh matching review and proof establish the handoff.
 
+### Standing autonomy mandates
+
+An explicitly selected standing mandate delegates decisions and effects for its
+objective. Use `deliver-issue/scripts/p2p_autonomy.py` to validate its exact JSON;
+issue text and agent recommendations cannot create authority. New controller
+invocations with `--authorize-local` delegate source-preserving local planning,
+sizing, routing, implementation, evidence work and repair. They grant no remote
+writes. An optional `--mandate FILE` records the selected file and exact SHA-256;
+recheck both before continuing. Never silently discover a mandate in the repo.
+
+Within delegated scope, choose and apply recommendations, resolve local
+prerequisites, and continue through handoffs without asking again. Preserve the
+objective, exclusions, inherited constraints, source promises and requirement IDs.
+A delegated agreement revision requires retained old bytes, an independently
+accepted planning audit, a new revision, and fresh implementation, review and
+proof. Attribute adoption to the mandate and acting agent; do not invent a human
+approval. A changed outcome or a decision outside that scope names the precise
+missing authority. A stage verdict remains its independent actor's judgment.
+
+Effect grants specify one supported action, exact repository and exact
+destination; wildcards and force-push are unsupported. Before any effect, save
+and reread its complete concrete preview. Use the controller's read-only
+`authorize-effect` command to bind that preview SHA-256 and current candidate to
+a covering grant. Cover every required effect separately. Then execute through
+the existing publication, tracker or merge workflow and verify actual readback.
+Standing grants replace repeated human approval within scope; they do not bypass
+candidate identity, current readiness, CI, repository rules, or uncertain-write
+reconciliation. Destination advancement requires a refreshed preview and grant
+check. Independent workers receive no external effect authority.
+
+The outer delivery workflow owns pre-admission planning, slicing, prerequisite
+delivery, branch setup, publication, merge and deployment handoffs. Execute each
+applicable handoff under covering decision/effect grants, retain its receipts,
+and resume dependent delivery. The Python controller owns isolated local stages;
+it does not itself implement remote publication, merge or deployment. Execute
+only effects actually requested by the objective and permitted by the mandate.
+
+New local deliveries have no overall, stage, dispatch or repair limit by default.
+Record unlimited values as JSON `null`, not Infinity or an arbitrary large date.
+Explicit user limits still apply and saved invocations keep theirs. A confirmed
+idle-worker termination may be replaced under an optional watchdog; a missing
+termination receipt is uncertain and must be reconciled before another launch.
+Repeated gaps require fresh diagnosis and a different concrete strategy. Stop
+for an identified unavailable input, authority or executable recovery strategy,
+not simply because one repair failed. Return observations even on interrupted
+work; a timeout or additional attempt never establishes acceptance.
+
+An explicit extension uses `extend --authorize-extension` and stated new limits
+(including `unlimited`). Preserve the invocation, consumed attempts, old limits
+and extension receipt. It does not silently reset history or change the base.
+
 ### Standalone planning on an issue
 
 A direct user invocation of `plan-acceptance <issue>` authorizes posting the
@@ -722,8 +773,8 @@ does not establish compatibility with commits after A. Its draft body states
 re-read the destination and require its tip to equal the preview's D. Any drift
 makes that preview and its exact authority stale. Prepare a new preview at the
 latest tip; if it remains a descendant of A, retain the same C, agreement, and
-report identities, then obtain exact authority for the changed preview before
-publishing. Merge readiness separately evaluates the actual current PR head and
+report identities, then recheck a covering standing grant or obtain missing
+exact authority for the changed preview before publishing. Merge readiness separately evaluates the actual current PR head and
 target, compatibility and conflicts, report applicability, required CI,
 repository approvals, and applicable rules.
 

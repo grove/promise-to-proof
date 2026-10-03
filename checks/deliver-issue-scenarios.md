@@ -270,3 +270,14 @@ admission, resume in a session that permits workspace writes but denies the
 sibling Git metadata directory. Pass when no stage is dispatched, no saved
 candidate/record is changed, and the blocker identifies the actual Git path.
 Record live sandbox results separately from injected permission failures.
+
+## Autonomous continuation policy
+
+New controller invocations use unlimited duration, dispatches and repairs unless
+an explicit user limit applies. Historical exhaustion cases select their finite
+profile explicitly (for example `--max-repairs 1`). Regression coverage in
+`test_p2p_delivery.py` exercises multiple repair cycles with fresh diagnosis and
+both verifiers, audited delegated replanning, authority-preserving extensions,
+exact standing effect grants, and confirmed idle-worker replacement. Mandate
+validation and JSON null limits are covered by `test_p2p_autonomy.py`. None of
+these fixture checks is evidence of a live provider's isolation or verdict.

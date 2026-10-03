@@ -4,6 +4,17 @@ description: Plan a spec, ticket, or conversation as a versioned acceptance cont
 disable-model-invocation: true
 ---
 
+## Delegated continuation
+
+When an enclosing workflow delegates planning through a selected standing
+mandate, resolve in-scope questions and apply source-preserving recommendations
+without asking again. Preserve promises, exclusions, constraints, links and IDs.
+Adoption requires a new revision when material, retained prior bytes, independent
+audit, and recorded mandate attribution. In controller planning sessions return
+the proposed text in the requested schema; the controller owns storage/adoption.
+A product change outside the mandate still names the missing decision authority.
+
+
 Turn source promises into a candidate-independent acceptance contract. This skill
 plans acceptance. It does not implement or verify. A direct issue invocation
 also publishes a planning handoff under the protocol's standalone planning rules.

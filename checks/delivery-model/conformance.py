@@ -35,7 +35,7 @@ MUTATIONS = {
     'late-receipt-guard-removed': ('late-stage-result',
         "if end.get('attempt_id') != attempt['id'] or end.get('inputs') != attempt['inputs']:", 'if False:'),
     'repair-bound-removed': ('repair-restart-exhaustion',
-        "if self.state['repair_used']:", 'if False:'),
+        "if allowed is not None and used >= allowed:", 'if False:'),
     'authority-guard-removed': ('unauthorized-before-dispatch',
         'if not args.authorize_local:', 'if False:'),
 }

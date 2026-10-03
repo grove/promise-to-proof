@@ -4,6 +4,18 @@ description: Repair named implementation or evidence gaps from a NOT PROVEN proo
 disable-model-invocation: true
 ---
 
+## Delegated continuation
+
+In an enclosing autonomous delivery, apply a covering in-scope recovery
+recommendation and continue to both independent verifiers without asking again.
+For a read-only diagnosis dispatch, inspect mechanisms and return the controller's
+requested diagnosis schema; make no edits and do not claim REPAIRED. Choose a
+concrete different method after repeated gaps, including evidence or local
+prerequisite work. Name an exact unavailable input only when recovery cannot act.
+Evidence-only recovery must leave product bytes unchanged. Planning decisions
+return to the delegated planner/auditor; repair cannot weaken the agreement.
+
+
 `/repair-gaps` is the repair step after `/prove`. It consumes the source
 contract, the proof result, the matching candidate, and specific unresolved
 requirement IDs. It repairs only those gaps and never replaces fresh proof.

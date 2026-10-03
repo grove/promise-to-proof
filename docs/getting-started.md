@@ -265,10 +265,13 @@ whether the implementation is faithful to the agreement, stays in scope, and is
 engineering-sound. Proof asks whether credible evidence actually establishes every
 material promised outcome.
 
-The controller also bounds the work. The current default delivery budget is 90
-minutes overall, 30 minutes per stage, eight dispatches, and at most one automatic
-repair/recheck cycle unless an explicit applicable bound says otherwise. A timeout
-or exhausted allowance is a blocker, not a passing result.
+The controller continues autonomously through scoped repairs and rechecks, with
+unlimited duration and attempts by default. Repeated gaps trigger fresh diagnosis
+and a different approach. Explicit limits remain available. A standing mandate
+can also delegate planning and exact publication or merge effects, so the outer
+workflow can apply its recommendations without repeated approval. Independent
+review and proof still must establish the complete agreed outcome. See
+[controller options and mandates](p2p-delivery-controller.md#standing-mandates).
 
 ### What you should expect afterward
 

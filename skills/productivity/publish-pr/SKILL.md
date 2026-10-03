@@ -3,6 +3,17 @@ name: publish-pr
 description: Use after one exact candidate has matching full REVIEWED and PROVEN reports to prepare a GitHub draft PR preview; commit, push, and PR creation require explicit exact authorization.
 ---
 
+## Delegated continuation
+
+A covering standing mandate may authorize publication without another human
+approval. Build and reread the complete preview first, hash its exact UTF-8
+bytes, then run the delivery controller's `authorize-effect` for every required
+commit, push and PR effect. Use exact repository and destinations. Refresh and
+recheck after drift; perform existing candidate/readiness/readback checks.
+The instructions below requiring explicit approval apply when no covering
+standing grant exists. This workflow does not itself grant merge authority.
+
+
 Publish one exact verified candidate as one draft pull request. This skill turns
 recoverable candidate content into a remote review subject; it does not change
 the implementation, establish acceptance, assess merge readiness, approve, or
@@ -223,8 +234,8 @@ the operator's checkout does not block isolated publication.
 
 ## Require exact publication authority
 
-For initial publication, publish only after the user explicitly authorizes the
-complete preview. The grant must bind the candidate and agreement identities, report references,
+For initial publication, publish after a covering standing mandate check or
+explicit user authorization of the complete preview. The grant must bind the candidate and agreement identities, report references,
 destination, target branch and observed tip, head branch, commit inputs, title,
 body, and these effects as applicable:
 

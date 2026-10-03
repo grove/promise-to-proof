@@ -4,6 +4,16 @@ description: Divide a parent work item into complete local child work items with
 disable-model-invocation: true
 ---
 
+## Delegated continuation
+
+A selected standing mandate can delegate sizing, routing and source-preserving
+allocation decisions. Within that scope, choose and apply the justified strategy,
+retain the recommendation and decision rationale, and attribute approval to the
+mandate. Continue child planning/prerequisite delivery without asking again.
+Tracker writes and branch setup require their separate exact effect grants;
+coverage, source reconciliation and actual assembled-parent proof still apply.
+
+
 Split large work into the fewest useful implementation tickets while preserving
 the agreement. Read the [acceptance contract protocol](references/acceptance-contract-protocol.md)
 before planning. This skill owns decomposition and local child creation;

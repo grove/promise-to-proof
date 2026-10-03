@@ -4,6 +4,14 @@ description: Create exactly one originating GitHub issue from a local specificat
 disable-model-invocation: true
 ---
 
+## Delegated continuation
+
+When invoked by delivery with a selected standing mandate, apply delegated
+source-preserving planning/sizing decisions without repeated approval. External
+issue creation, edits and relationships require exact covering effect grants
+and saved previews/readback. A recommendation alone supplies no authority.
+
+
 Create one durable source issue from an agreed specification. This skill does not
 author an acceptance contract, split work, or create child tickets. Use
 `plan-acceptance` to turn the resulting issue and source spec into a versioned
@@ -112,7 +120,8 @@ acceptance planning, implementation readiness, or approval to split the work.
 End with `Next steps:` and a numbered list (`1.`, `2.`, ...) of applicable
 actions in order, so each can be referenced by number. For `PUBLISHED`, give
 `/plan-acceptance <issue URL>` and identify the linked specification. For
-`DRAFT`, ask the user to approve the exact publication preview. For `PARTIAL`,
+`DRAFT`, check covering standing effect grants and publish autonomously, or ask
+for the exact missing publication authority. For `PARTIAL`,
 give `gh issue view <issue number> --comments` to confirm the remote issue
 before any retry, then verify its title, body, labels, state, and source link.
 For `BLOCKED`, name the exact missing source, decision, or permission. If `gh`

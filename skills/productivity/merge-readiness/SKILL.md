@@ -4,6 +4,17 @@ description: Check an existing pull request's proof, CI, and repository review g
 disable-model-invocation: true
 ---
 
+## Delegated continuation
+
+A covering standing mandate permits the outer delivery workflow to invoke this
+assessment autonomously. After READY and confirmed synchronization, it may execute
+a separately granted merge effect for the exact saved head/base preview, after
+checking `authorize-effect` and rereading all current gates. Do not ask again for
+an effect already covered. This assessment's own workers remain read-only; the
+outer workflow owns merge and its readback. Without a merge grant, request that
+specific authority as described below.
+
+
 Check one existing pull request at a human's request, near the merge decision.
 Report its current readiness; do not merge it. Read the [acceptance contract
 protocol](references/acceptance-contract-protocol.md) and the repository's review
@@ -160,8 +171,10 @@ show the proposed entry, and state that the PR description remains unchanged.
 
 End with `Next steps:` and a numbered list (`1.`, `2.`, ...) of applicable
 actions in order, so each can be referenced by number. Resolve any pending
-description update first. For `READY` after synchronization, ask for
-separate human merge authorization for this exact PR head; after authorization,
+description update first. For `READY` after synchronization, check a covering
+standing merge grant for this exact head/base preview, or request missing merge
+authority. Under a covering grant, let the outer workflow execute and verify the
+configured merge action. After authorization,
 name the repository's configured merge command (for example,
 `gh pr merge <PR URL>` only when direct GitHub CLI merge is the configured
 path) or the exact merge-queue action. For `BLOCKED` or `UNKNOWN`, give the

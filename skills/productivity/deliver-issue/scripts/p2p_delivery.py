@@ -18,6 +18,7 @@ import time
 import uuid
 
 import p2p_filesystem as fs
+import p2p_autonomy as autonomy
 from p2p_delivery_measurements import build as delivery_measurement
 
 import verify_acceptance_bundle as bundle
@@ -29,6 +30,14 @@ RETAINED_ARTIFACTS = {'archive.md': 'Historical recovery map.',
                       'planning-handoff.md': 'Approval and contract provenance.'}
 FINAL_RECORDS = {'candidate.json', 'delivery.json', 'review.md', 'proof.md'}
 SUPERSEDED_RECORDS = {'candidate.json', 'implementation.md', 'review.md', 'proof.md', 'repair.md'}
+
+
+class ContinuationRequired(ValueError):
+    """The outer workflow can carry out a delegated planning/routing handoff."""
+
+
+class WorkerRestartRequired(Exception):
+    """A terminated idle worker has been retained and can be replaced safely."""
 
 
 def now():
@@ -269,31 +278,45 @@ def record_generation(delivery, candidate, stage):
     workspace = delivery.workspace
     repository = delivery.runtime / 'repository.git'
     generation_ref = f'refs/p2p/{fs.work_slug(delivery.work)}/generation-{sequence:06d}'
-    if subprocess.run(['git', '-C', str(repository), 'show-ref', '--verify', '--quiet', generation_ref]).returncode == 0:
-        raise ValueError('local generation ref exists outside recovery state: ' + generation_ref)
+    existing_ref = subprocess.run(['git', '-C', str(repository), 'show-ref', '--verify', '--quiet', generation_ref]).returncode == 0
     path = f'runtime/generations/{sequence:06d}.json'
     target = fs.safe(delivery.runtime, path.removeprefix('runtime/'))
     require_repo_local_ignored(delivery.root, target)
-    if target.exists():
-        raise ValueError('local generation record exists outside recovery state: ' + path)
-    manifest = fs.snapshot(workspace, exclude=delivery.state.get('agreement_paths', ()))
-    tree = git_generation_tree(workspace, manifest)
-    parent = generations[-1]['commit'] if generations else state['local_git_base']['local_commit']
-    commit = subprocess.run(['git', '-C', str(workspace), '-c', 'user.name=Promise-to-Proof',
-                             '-c', 'user.email=p2p@localhost', 'commit-tree', tree, '-p', parent,
-                             '-m', f'P2P {delivery.work} generation {sequence}'],
-                            capture_output=True, text=True)
-    if commit.returncode:
-        raise ValueError('local Git generation commit failed: ' + commit.stderr.strip())
-    commit = commit.stdout.strip()
-    fs.git(repository, 'update-ref', generation_ref, commit)
-    previous_key = generations[-1]['candidate_key'] if generations else None
+    intent_path = target.with_suffix('.pending.json')
     source_attempt = next(({'attempt_id': attempt['id'], 'report_sha256': attempt.get('report_sha256'),
                             'inputs': attempt['inputs']}
                            for attempt in reversed(state['attempts'])
-                           if attempt['stage'] == stage and attempt['status'] == 'complete'), None)
+                           if attempt['stage'] == stage and attempt['status'] in ('complete', 'retired')), None)
     if stage != 'admission' and source_attempt is None:
         raise ValueError('candidate generation has no completed stage attempt: ' + stage)
+    manifest = fs.snapshot(workspace, exclude=delivery.state.get('agreement_paths', ()))
+    tree = git_generation_tree(workspace, manifest)
+    parent = generations[-1]['commit'] if generations else state['local_git_base']['local_commit']
+    intent = encoded({'stage': stage, 'candidate': candidate, 'parent': parent,
+                      'tree': tree, 'source_attempt': source_attempt, 'contract_sha256': state['contract']['sha256']})
+    if intent_path.exists():
+        if intent_path.read_bytes() != intent:
+            raise ValueError('conflicting pending candidate generation: ' + path)
+    elif existing_ref or target.exists():
+        raise ValueError('local generation exists outside recovery state: ' + path)
+    else:
+        intent_path.parent.mkdir(parents=True, exist_ok=True)
+        fs.atomic_write(intent_path, intent, ignored_root=delivery.root)
+    if existing_ref:
+        commit = fs.git(repository, 'rev-parse', generation_ref).decode().strip()
+        if (fs.git(repository, 'rev-parse', commit + '^{tree}').decode().strip() != tree or
+                fs.git(repository, 'rev-parse', commit + '^').decode().strip() != parent):
+            raise ValueError('pending generation ref has unexpected content or parent')
+    else:
+        commit = subprocess.run(['git', '-C', str(workspace), '-c', 'user.name=Promise-to-Proof',
+                                 '-c', 'user.email=p2p@localhost', 'commit-tree', tree, '-p', parent,
+                                 '-m', f'P2P {delivery.work} generation {sequence}'],
+                                capture_output=True, text=True)
+        if commit.returncode:
+            raise ValueError('local Git generation commit failed: ' + commit.stderr.strip())
+        commit = commit.stdout.strip()
+        fs.git(repository, 'update-ref', generation_ref, commit)
+    previous_key = generations[-1]['candidate_key'] if generations else None
     record = {'schema': 'promise-to-proof/local-generation/v1', 'sequence': sequence,
               'stage': stage, 'work_item': delivery.work,
               'repository_id': state['local_git_base']['repository_id'],
@@ -305,6 +328,8 @@ def record_generation(delivery, candidate, stage):
               'changes': candidate['changes'], 'tree': tree, 'commit': commit,
               'ref': generation_ref}
     data = encoded(record)
+    if target.exists() and target.read_bytes() != data:
+        raise ValueError('conflicting pending generation record: ' + path)
     target.parent.mkdir(parents=True, exist_ok=True)
     fs.atomic_write(target, data, ignored_root=delivery.root)
     if target.read_bytes() != data:
@@ -332,12 +357,16 @@ def materialize(root, manifest, ignored_root=None):
 
 def contract(root, work):
     item, _ = delivery_paths(root, work)
-    text = item.read_text()
-    revision = re.findall(r'^Contract revision: (v[1-9][0-9]*)$', text, re.M)
-    heading = re.findall(r'^# Acceptance contract: (.+)$', text, re.M)
+    return parse_contract(item.read_bytes())
+
+
+def parse_contract(data):
+    text = data.decode('utf-8')
+    revision = re.findall(r'^Contract revision: (v[1-9][0-9]*)\r?$', text, re.M)
+    heading = re.findall(r'^# Acceptance contract: ([^\r\n]+)\r?$', text, re.M)
     if len(revision) != 1 or len(heading) != 1:
         raise ValueError('established contract heading/revision is missing or ambiguous')
-    result = dict(source=heading[0], revision=revision[0], content=text, sha256=fs.digest(item.read_bytes()))
+    result = dict(source=heading[0], revision=revision[0], content=text, sha256=fs.digest(data))
     issues = []
     _, _, _, requirements = bundle._validate_contract(result, issues)
     if issues:
@@ -459,6 +488,13 @@ def github_create_comment(repository, issue, body):
 
 def publish_issue_record(delivery, delivered_commit, pull_request, authorized_sha256):
     preview = issue_record_preview(delivery, delivered_commit, pull_request)
+    if authorized_sha256 is None:
+        mandate = delivery.state.get('autonomy')
+        if not mandate:
+            raise ValueError('publication requires exact preview authority or a standing issue-comment grant')
+        autonomy.authorize(mandate, 'issue-comment', preview['repository'],
+                           f'https://github.com/{preview["repository"]}/issues/{preview["issue"]}')
+        authorized_sha256 = preview['sha256']
     if authorized_sha256 != preview['sha256']:
         raise ValueError('publication authorization does not match preview SHA-256 ' + preview['sha256'])
     issue = github_issue(preview['repository'], preview['issue'])
@@ -524,7 +560,7 @@ def resolve_github_record(root, repository, issue_number):
             fs.digest(contract['text'].encode()) != contract.get('sha256') or
             not re.fullmatch(r'v[1-9][0-9]*', contract.get('revision', ''))):
         raise ValueError('durable GitHub record contract text or digest is invalid')
-    source_names = re.findall(r'^# Acceptance contract: (.+)$', contract['text'], re.M)
+    source_names = re.findall(r'^# Acceptance contract: ([^\r\n]+)\r?$', contract['text'], re.M)
     if len(source_names) != 1:
         raise ValueError('durable GitHub record contract heading is invalid')
     issues = []
@@ -586,13 +622,17 @@ def resolve_github_record(root, repository, issue_number):
 def skills():
     result = {}
     for stage, name in STAGES.items():
-        options = [Path.home() / '.agents/skills' / name / 'SKILL.md',
-                   Path(os.environ.get('CODEX_HOME', str(Path.home() / '.codex'))) / 'skills' / name / 'SKILL.md']
-        found = next((path.resolve() for path in options if path.is_file()), None)
-        if found is None:
-            raise ValueError('installed skill unavailable: ' + name)
-        result[stage] = {'path': str(found), 'sha256': fs.digest(found.read_bytes())}
+        result[stage] = installed_skill(name)
     return result
+
+
+def installed_skill(name):
+    options = [Path.home() / '.agents/skills' / name / 'SKILL.md',
+               Path(os.environ.get('CODEX_HOME', str(Path.home() / '.codex'))) / 'skills' / name / 'SKILL.md']
+    found = next((path.resolve() for path in options if path.is_file()), None)
+    if found is None:
+        raise ValueError('installed skill unavailable: ' + name)
+    return {'path': str(found), 'sha256': fs.digest(found.read_bytes())}
 
 
 def upstream_destination(root):
@@ -857,7 +897,7 @@ def command(executable, scratch, schema=None):
     return args + ['-']
 
 
-def launch(args, prompt, event_path, error_path, deadline):
+def launch(args, prompt, event_path, error_path, deadline, idle_seconds=None):
     """Only transport seam. Tests replace it; the CLI has no fake-host switch."""
     started_epoch = time.time()
     started = time.monotonic()
@@ -874,12 +914,18 @@ def launch(args, prompt, event_path, error_path, deadline):
             remaining = None if stop is None else max(0, stop - time.monotonic())
             try:
                 timeout = HEARTBEAT_SECONDS if remaining is None else min(HEARTBEAT_SECONDS, remaining)
+                if idle_seconds is not None:
+                    timeout = min(timeout, max(0.01, idle_seconds))
                 process.communicate(payload, timeout=timeout)
                 break
             except subprocess.TimeoutExpired:
                 payload = None  # communicate resumes the original input after a timeout.
+                activity = max(os.fstat(events.fileno()).st_mtime, os.fstat(errors.fileno()).st_mtime)
+                if idle_seconds is not None and time.time() - activity >= idle_seconds:
+                    outcome = 'stalled'
+                    interrupted = True
+                    break
                 if stop is None or time.monotonic() < stop:
-                    activity = max(os.fstat(events.fileno()).st_mtime, os.fstat(errors.fileno()).st_mtime)
                     print(f'[{event_path.parent.name}] running {time.monotonic() - started:.0f}s; '
                           f'last log activity {max(0, time.time() - activity):.0f}s ago '
                           '(activity is not verified progress)', file=sys.stderr, flush=True)
@@ -887,7 +933,8 @@ def launch(args, prompt, event_path, error_path, deadline):
                 interrupted = True
                 break
         if interrupted:
-            outcome = 'interrupted'
+            if outcome != 'stalled':
+                outcome = 'interrupted'
             import signal
             try:
                 os.killpg(process.pid, signal.SIGTERM)
@@ -1131,6 +1178,8 @@ class Delivery:
         for key, value in admission.items():
             if self.state.get(key) != value:
                 raise ValueError('persisted admission changed: ' + key)
+        if self.state.get('autonomy'):
+            autonomy.current(self.state['autonomy'])
         admitted_route = self.state['routing']
         selection = admitted_route.get('selection')
         explicit = (admitted_route['target_ref']
@@ -1278,10 +1327,11 @@ class Delivery:
                     record.get('invocation_id') != self.state['invocation_id'] or
                     record.get('comparison_base') != self.state['comparison_base'] or
                     record.get('base_tree') != base['tree'] or
-                    record.get('contract_sha256') != self.state['contract']['sha256'] or
+                    record.get('contract_sha256') not in ({self.state['contract']['sha256']} |
+                        {entry['old_sha256'] for entry in self.state.get('agreement_history', [])}) or
                     record.get('parent_commit') != parent or
                     record.get('previous_candidate_key') != previous_key or
-                    record.get('stage') not in ('admission', 'implementation', 'repair') or
+                    record.get('stage') not in ('admission', 'implementation', 'repair', 'planning-audit') or
                     (sequence == 1) != (record.get('stage') == 'admission')):
                 raise ValueError('local Git generation mapping changed: ' + path)
             source_attempt = record.get('source_attempt')
@@ -1294,12 +1344,19 @@ class Delivery:
                 prior = generations[sequence - 2]
                 expected_input = (attempt or {}).get('inputs', {}).get('local_git_generation', {})
                 if (attempt is None or attempt.get('stage') != record['stage'] or
-                        attempt.get('status') != 'complete' or
+                        attempt.get('status') not in ('complete', 'retired') or
                         attempt.get('report_sha256') != source_attempt.get('report_sha256') or
                         source_attempt.get('inputs') != attempt.get('inputs') or
                         expected_input.get('commit') != prior.get('commit') or
                         record.get('previous_candidate_key') != prior.get('candidate_key')):
                     raise ValueError('local Git generation does not map to its completed stage attempt')
+                if attempt['status'] == 'retired':
+                    folder = self.runtime / 'attempts' / attempt['id']
+                    end = json.loads((folder / 'exit.json').read_bytes())
+                    if (end.get('attempt_id') != attempt['id'] or end.get('inputs') != attempt['inputs'] or
+                            end.get('outcome') not in ('stalled', 'interrupted') or
+                            end.get('event_sha256') != fs.digest((folder / 'events.jsonl').read_bytes())):
+                        raise ValueError('retired worker generation has no confirmed exit receipt')
             try:
                 commit = fs.full_commit(repository, record['commit'])
                 tree = fs.git(repository, 'rev-parse', commit + '^{tree}').decode().strip()
@@ -1349,8 +1406,10 @@ class Delivery:
         if limits.get('stage_seconds') == 0:
             raise ValueError('stage elapsed-time limit exhausted before ' + stage)
         if stage == 'repair':
-            if self.state['repair_used']:
-                raise ValueError('one automatic repair already consumed')
+            used = sum(a['stage'] == 'repair' for a in self.state['attempts'])
+            allowed = limits.get('repairs', 1)  # Existing admissions retain their one-repair policy.
+            if allowed is not None and used >= allowed:
+                raise ValueError('automatic repair limit exhausted')
             self.state['repair_used'] = True
         attempt = {'id': str(uuid.uuid4()), 'stage': stage, 'inputs': inputs,
                    'status': 'reserved', 'started': now(), 'started_epoch': time.time(),
@@ -1433,7 +1492,9 @@ class Delivery:
         try:
             require_repo_local_ignored(self.root, folder / 'events.jsonl')
             require_repo_local_ignored(self.root, folder / 'stderr.txt')
-            result = launch(args, prompt, folder / 'events.jsonl', folder / 'stderr.txt', attempt['deadline'])
+            options = ([self.state['limits']['worker_idle_seconds']]
+                       if self.state['limits'].get('worker_idle_seconds') is not None else [])
+            result = launch(args, prompt, folder / 'events.jsonl', folder / 'stderr.txt', attempt['deadline'], *options)
             result.update(attempt_id=attempt['id'], inputs=inputs,
                           event_sha256=fs.digest((folder / 'events.jsonl').read_bytes()))
             local_save(self.root, self.work, f'attempts/{attempt["id"]}/exit.json', encoded(result))
@@ -1443,6 +1504,9 @@ class Delivery:
             # No retry: a saved reservation with no exit receipt is intentionally uncertain.
             print(f'{stage} stopped [{attempt["id"]}]; completion receipt unavailable', file=sys.stderr, flush=True)
             raise
+        if result['outcome'] == 'stalled' and self.state.get('autonomy'):
+            self.reconcile_worker()
+            raise WorkerRestartRequired()
         return attempt, self.receipt(attempt)
 
     def preflight(self):
@@ -1522,8 +1586,15 @@ assert results['scratch'] == 'ok'
             result['routing'] = self.state['routing']
         return result
 
-    def stage(self, name):
-        self.current()
+    def stage(self, name, reconcile=False):
+        mandate = self.state.get('autonomy')
+        if name == 'implementation' and not reconcile and mandate and 'implementation' not in mandate['policy']['decisions']:
+            raise ValueError('implementation decision outside the standing mandate')
+        if reconcile:
+            self.timed_source_stable()
+            self.verify_generation_chain()
+        else:
+            self.current()
         inputs = self.stage_inputs(self.state['candidate'])
         prior = self.state.get('reports', {})
         skill_stage = self.state.get('repair_skill', 'repair') if name == 'repair' else name
@@ -1562,6 +1633,17 @@ assert results['scratch'] == 'ok'
                   'assertion, result, and environment in the report; do not dump entire logs or workspaces. '
                   'Never fabricate results. '
                   f'Previous reports for repair only: {json.dumps(prior) if name == "repair" else "none"}. ')
+        if self.state.get('autonomy'):
+            prompt += ('Standing local decision mandate: ' + json.dumps(self.state['autonomy']['policy']) +
+                       '. Apply authorized recommendations and resolve recoverable local gaps yourself. '
+                       'Do not ask for another time bound or permission already delegated. External effects '
+                       'remain disabled in this worker; the outer workflow owns granted publication effects. ')
+        if name == 'repair':
+            prompt += ('Recovery strategy: ' + json.dumps(self.state.get('recovery_history', [])[-1:]) +
+                       '. Use the named new approach; preserve prior evidence and include any real local '
+                       'prerequisite or integration work needed for these requirements. Evidence-only recovery '
+                       'must preserve all product bytes. Do not substitute same-context fixtures for an '
+                       'independent workflow observation. ')
         if name in ('review', 'proof'):
             prompt += ('Candidate and Git metadata are protected outside writable scratch. Run checks against '
                        'the fixed workspace; place outputs and PYTHONPYCACHEPREFIX/TMPDIR in scratch. '
@@ -1699,6 +1781,11 @@ assert results['scratch'] == 'ok'
             'review_sha256': fs.digest(review_bytes),
             'proof_sha256': fs.digest(proof_bytes),
             'completed_at': self.state['completed_at'],
+            'autonomy': self.state.get('autonomy'),
+            'limits': self.state['limits'],
+            'recovery_count': len(self.state.get('recovery_history', [])),
+            'agreement_history': self.state.get('agreement_history', []),
+            'limit_extensions': self.state.get('limit_extensions', []),
             'cleanup': cleanup or self.state.get('cleanup', 'awaiting source checkout verification'),
             'routing': route_record(self.state['routing']),
             'destination_observation': self.state.get('destination_observation'),
@@ -1761,6 +1848,8 @@ assert results['scratch'] == 'ok'
                 record.get('review_sha256') != fs.digest(self.state.get('final_review', '').encode()) or
                 record.get('proof_sha256') != fs.digest(self.state.get('final_proof', '').encode())):
             raise ValueError('durable completed delivery unavailable: final records differ from local invocation identity')
+        if record.get('autonomy') != self.state.get('autonomy') or record.get('agreement_history', []) != self.state.get('agreement_history', []):
+            raise ValueError('durable completion mandate or planning receipts differ from local invocation')
         if record.get('github_record') != self.state.get('github_record'):
             raise ValueError('durable completed delivery unavailable: GitHub record receipt differs from local state')
         values = {name: fs.safe(self.directory, name).read_bytes()
@@ -1926,17 +2015,207 @@ assert results['scratch'] == 'ok'
         self.remove_superseded_artifacts()
         self.remove_local_execution_state()
 
+    def extend(self, args):
+        if not args.authorize_extension:
+            raise ValueError('extension requires explicit --authorize-extension authority')
+        self.timed_source_stable()
+        changes = {key: autonomy.limit(getattr(args, name), integer=key in ('dispatches', 'repairs'))
+                   for name, key in (('max_dispatches', 'dispatches'), ('max_seconds', 'elapsed_seconds'),
+                       ('max_stage_seconds', 'stage_seconds'), ('max_repairs', 'repairs'))
+                   if getattr(args, name) is not None}
+        if not changes:
+            raise ValueError('extension needs at least one explicit limit or unlimited')
+        admission = json.loads((self.runtime / 'admission.json').read_bytes())
+        limits = self.state['limits'] | changes
+        deadline = self.state['deadline']
+        if 'elapsed_seconds' in changes:
+            deadline = None if changes['elapsed_seconds'] is None else time.time() + changes['elapsed_seconds']
+        amended = admission | {'limits': limits, 'deadline': deadline}
+        if args.mandate:
+            amended['autonomy'] = autonomy.load(args.mandate)
+        elif not amended.get('autonomy'):
+            amended['autonomy'] = autonomy.local(f'Continue the agreed local delivery in {self.work}, preserving its outcome and binding sources.')
+            amended['autonomy']['policy']['approval_source'] = 'Explicit extension of the previously authorized local delivery.'
+        record = {'previous_limits': self.state['limits'], 'limits': limits,
+                  'previous_deadline': self.state['deadline'], 'deadline': deadline,
+                  'approved_at': now(), 'approval_source': 'Explicit extend --authorize-extension invocation',
+                  'attempt_count': len(self.state['attempts'])}
+        # Save the amendment first; startup reconciles either exact old or amended admission.
+        local_save(self.root, self.work, 'runtime/limit-extension.json', encoded({
+            'old_admission': admission, 'new_admission': amended, 'record': record}))
+        self.reconcile_extension()
+
+    def reconcile_extension(self):
+        path = self.runtime / 'limit-extension.json'
+        if not path.exists():
+            return
+        extension = json.loads(path.read_bytes())
+        if extension.get('complete'):
+            return
+        old, new = extension['old_admission'], extension['new_admission']
+        if new != old | {k: new[k] for k in ('limits', 'deadline', 'autonomy') if k in new}:
+            raise ValueError('limit extension changed unrelated admission fields')
+        admitted = json.loads((self.runtime / 'admission.json').read_bytes())
+        if admitted not in (old, new) or any(self.state.get(k) not in (old.get(k), new.get(k)) for k in old):
+            raise ValueError('conflicting limit-extension admission')
+        if new.get('autonomy'):
+            autonomy.current(new['autonomy'])
+        self.state.update(new)
+        history = self.state.setdefault('limit_extensions', [])
+        if extension['record'] not in history:
+            history.append(extension['record'])
+        self.save()
+        local_save(self.root, self.work, 'runtime/admission.json', encoded(new))
+        local_save(self.root, self.work, 'runtime/limit-extension.json', encoded(extension | {'complete': True}))
+
+    def handoff(self, action, reason):
+        decision = 'planning' if action == 'plan-acceptance' else 'routing'
+        mandate = self.state.get('autonomy')
+        delegated = bool(mandate and decision in mandate['policy']['decisions'])
+        self.state['continuation'] = {'action': action, 'work_item': self.work,
+                                      'reason': reason, 'delegated': delegated,
+                                      'mandate': mandate, 'candidate': identity(self.state['candidate'])}
+        self.save()
+        if delegated:
+            if action == 'plan-acceptance':
+                self.replan(reason)
+                return
+            raise ContinuationRequired('execute delegated ' + action + ' handoff, then resume delivery')
+        raise ValueError('decision outside the standing mandate: ' + action + '; ' + reason)
+
+    def diagnose(self, findings, history):
+        """A fresh read-only actor chooses an executable strategy after failed progress."""
+        self.current()
+        inputs = self.stage_inputs(self.state['candidate'])
+        properties = {key: {'type': 'string'} for key in
+                      ('status', 'input_identity_json', 'action', 'approach', 'reason',
+                       'missing_input', 'expected_result')}
+        properties['status']['enum'] = ['ACTIONABLE', 'BLOCKED']
+        properties['action']['enum'] = ['implementation', 'evidence', 'prerequisite', 'plan-acceptance', 'none']
+        schema = {'type': 'object', 'properties': properties,
+                  'required': list(properties), 'additionalProperties': False}
+        prompt = (f'Read {self.state["skills"]["repair"]["path"]} and its references. '
+                  'Diagnose these delivery gaps in a fresh read-only context. '
+                  f'Fixed candidate workspace: {self.workspace}; contract: {self.work}. '
+                  f'Exact input_identity_json: {json.dumps(inputs)}. '
+                  f'Findings: {json.dumps(findings)}. Prior approaches: {json.dumps(history)}. '
+                  'Inspect actual mechanisms and available local inputs. Choose a concrete different approach '
+                  'that the implementation/evidence worker can execute, including local prerequisite work. '
+                  'Repeated findings require a different method, not another copy of the previous attempt. '
+                  'Do not weaken requirements, fabricate evidence, edit any inputs, or make external effects. '
+                  'Use plan-acceptance for a necessary contract reconciliation. BLOCKED requires an exact '
+                  'unavailable input or authority and its expected result; mere difficulty, elapsed time, or '
+                  'a previous failed attempt is not a blocker. ACTIONABLE requires action, approach, and '
+                  'reason, with missing_input and expected_result empty. Return the required JSON.')
+        attempt, host = self.dispatch('diagnosis', inputs, prompt, schema=schema)
+        self.current()
+        report = json.loads(host['message'])
+        if (not isinstance(report, dict) or set(report) != set(properties) or
+                any(not isinstance(v, str) for v in report.values()) or
+                json.loads(report['input_identity_json']) != inputs or
+                report['status'] not in properties['status']['enum'] or
+                report['action'] not in properties['action']['enum'] or not report['reason'].strip()):
+            raise ValueError('invalid or stale recovery diagnosis')
+        if report['status'] == 'BLOCKED':
+            if not report['missing_input'].strip() or not report['expected_result'].strip():
+                raise ValueError('blocked diagnosis must name the unavailable input and expected result')
+        elif (report['action'] == 'none' or not report['approach'].strip() or
+              report['missing_input'] or report['expected_result']):
+            raise ValueError('recovery diagnosis has no executable approach')
+        data = host['message'].encode()
+        path = f'attempts/{attempt["id"]}/report.json'
+        stored = self.runtime / path
+        if stored.exists() and stored.read_bytes() != data:
+            raise ValueError('conflicting recovery diagnosis result')
+        local_save(self.root, self.work, path, data)
+        attempt.update(status='complete', report=path, report_sha256=fs.digest(data))
+        self.state['last_diagnosis'] = {'attempt_id': attempt['id'], 'report': report}
+        self.save()
+        if report['status'] == 'BLOCKED':
+            raise ValueError('recovery needs ' + report['missing_input'] + '; expected: ' + report['expected_result'])
+        return report
+
+    def finish_recovery(self, entry, report):
+        generation = self.state['local_git_generations'][-1]
+        if (generation.get('source_attempt') or {}).get('attempt_id') != self.state['reports']['repair']['attempt_id']:
+            self.capture('repair')
+        if entry['action'] == 'evidence' and candidate_key(self.state['candidate']) != entry['candidate_before']:
+            raise ValueError('evidence-only recovery changed product content')
+        entry.update(status='complete', candidate_after=candidate_key(self.state['candidate']),
+                     result=report['status'], completed_at=now())
+        # Preserve all attempt reports; both current verifier records become historical.
+        self.state['reports'] = {k: v for k, v in self.state['reports'].items() if k not in ('review', 'proof')}
+        self.save()
+
+    def recover(self, findings, proof=None, force_diagnosis=False):
+        allowed = self.state['limits'].get('repairs', 1)
+        used = sum(a['stage'] == 'repair' for a in self.state['attempts'])
+        if allowed is not None and used >= allowed:
+            raise ValueError('automatic repair limit exhausted; review/proof gaps remain')
+        fingerprint = fs.digest(fs.canonical(findings))
+        history = self.state.setdefault('recovery_history', [])
+        previous = [entry for entry in history if entry['status'] in ('complete', 'worker-replaced') and
+                    (entry['fingerprint'] == fingerprint or
+                     entry.get('candidate_after') == entry['candidate_before'] == candidate_key(self.state['candidate']))]
+        plan = {'action': 'implementation', 'approach': 'Correct the named implementation and evidence gaps.'}
+        if force_diagnosis or previous:
+            plan = self.diagnose(findings, previous)
+            if plan['action'] == 'plan-acceptance':
+                self.handoff('plan-acceptance', plan['reason'])
+                return {'status': 'REPLANNED'}
+            if any(entry['approach'] == plan['approach'] and entry['action'] == plan['action'] for entry in previous):
+                raise ValueError('recovery diagnosis found no new executable strategy: ' + plan['reason'])
+        policy = self.state.get('autonomy')
+        decision = 'evidence' if plan['action'] == 'evidence' else 'repair'
+        if policy and decision not in policy['policy']['decisions']:
+            raise ValueError('recovery decision outside the standing mandate: ' + decision)
+        entry = {'fingerprint': fingerprint, 'findings': findings, 'action': plan['action'],
+                 'approach': plan['approach'], 'candidate_before': candidate_key(self.state['candidate']),
+                 'status': 'reserved', 'started_at': now(), 'dispatch_offset': len(self.state['attempts'])}
+        history.append(entry)
+        self.state['repair_skill'] = 'repair' if proof and proof['status'] != 'PROVEN' else 'implementation'
+        self.save()
+        report = self.stage('repair')
+        self.finish_recovery(entry, report)
+        return report
+
     def run(self):
+        self.reconcile_extension()
+        self.reconcile_agreement()
+        self.reconcile_worker()
+        # Mutating workers can return before the controller saves their new generation.
+        # Validate their exact recorded receipt, never launch them a second time.
+        last = self.state['attempts'][-1] if self.state['attempts'] else None
+        history = self.state.get('recovery_history', [])
+        if last and last['stage'] in ('implementation', 'repair') and last['status'] != 'retired':
+            name = last['stage']
+            if last['status'] in ('reserved', 'failed'):
+                report = self.stage(name, reconcile=True)
+            else:
+                self.timed_source_stable()
+                report = self.read_report(name)
+            generation = self.state['local_git_generations'][-1]
+            if (generation.get('source_attempt') or {}).get('attempt_id') != last['id']:
+                self.capture(name)
+            if name == 'implementation' and report['status'] == 'IMPLEMENTED':
+                self.state['implementation_complete'] = True
+            if name == 'repair' and history and history[-1]['status'] == 'reserved':
+                self.finish_recovery(history[-1], report)
+            self.save()
         self.current()
         self.preflight()
-        if not self.state.get('implementation_complete'):
-            result = self.stage('implementation')
-            self.capture('implementation')
-            if result['status'] != 'IMPLEMENTED':
-                raise ValueError('implementation incomplete: ' + '; '.join(result['gaps']))
-            self.state['implementation_complete'] = True
-            self.save()
         while True:
+            while not self.state.get('implementation_complete'):
+                if 'implementation' in self.state.get('reports', {}):
+                    report = self.read_report('implementation')
+                else:
+                    report = self.stage('implementation')
+                    self.capture('implementation')
+                if report['status'] != 'IMPLEMENTED':
+                    report = self.recover({'implementation': report['gaps']}, force_diagnosis=True)
+                if report['status'] in ('IMPLEMENTED', 'REPAIRED'):
+                    self.state['implementation_complete'] = True
+                self.save()
             if 'review' not in self.state.get('reports', {}):
                 self.stage('review')
             review = self.read_report('review')
@@ -1946,9 +2225,20 @@ assert results['scratch'] == 'ok'
                     self.save()
                     review = self.stage('review')
                 if review['status'] == 'BLOCKED':
-                    raise ValueError('review BLOCKED: missing input/command: ' + review['missing_input'] +
-                                     '; expected result: ' + review['expected_result'])
+                    if not self.state.get('autonomy'):
+                        raise ValueError('review BLOCKED: missing input/command: ' + review['missing_input'] +
+                                         '; expected result: ' + review['expected_result'])
+                    self.recover({'review': review['gaps'], 'missing_input': review['missing_input'],
+                                  'expected_result': review['expected_result']}, force_diagnosis=True)
+                    continue
             if any(item['handoff'] == 'plan-acceptance' for item in review.get('findings', [])):
+                if self.state.get('autonomy'):
+                    reason = json.dumps(review['findings'])
+                    if any(entry.get('reason') == reason for entry in self.state.get('agreement_history', [])):
+                        self.recover({'planning': review['findings']}, force_diagnosis=True)
+                    else:
+                        self.handoff('plan-acceptance', reason)
+                    continue
                 raise ValueError('review requires plan-acceptance before automatic repair')
             if 'proof' not in self.state.get('reports', {}):
                 self.stage('proof')
@@ -1956,17 +2246,198 @@ assert results['scratch'] == 'ok'
             if review['status'] == 'REVIEWED' and proof['status'] == 'PROVEN' and not review['gaps'] and not proof['gaps']:
                 self.complete()
                 return
-            if self.state['repair_used']:
-                raise ValueError('one automatic repair exhausted; review/proof gaps remain')
-            # Review findings belong to implement-contract; proof gaps to repair-gaps.
-            self.state['repair_skill'] = 'repair' if proof['status'] != 'PROVEN' else 'implementation'
-            self.save()
-            result = self.stage('repair')
-            self.capture('repair')
-            self.state['reports'] = {k:v for k,v in self.state['reports'].items() if k not in ('review', 'proof')}
-            self.save()
-            if result['status'] not in ('REPAIRED', 'IMPLEMENTED'):
-                raise ValueError('automatic repair incomplete: ' + '; '.join(result['gaps']))
+            self.recover({'review': review.get('findings', []), 'review_gaps': review['gaps'],
+                          'proof_gaps': proof['gaps'], 'unproven': [row['id'] for row in proof['requirements']
+                                                               if row['verdict'] != 'proven']}, proof)
+
+    def reconcile_worker(self):
+        """Only a confirmed terminated worker can be replaced; uncertain launches stay blocked."""
+        if not self.state.get('autonomy'):
+            return
+        pending = [a for a in self.state['attempts'] if a['status'] in ('reserved', 'failed')]
+        if not pending:
+            return
+        attempt = pending[-1]
+        path = self.runtime / 'attempts' / attempt['id'] / 'exit.json'
+        if not path.is_file():
+            return  # receipt() will report uncertainty; never launch a duplicate worker.
+        end = json.loads(path.read_bytes())
+        events = path.parent / 'events.jsonl'
+        if (end.get('attempt_id') != attempt['id'] or end.get('inputs') != attempt['inputs'] or
+                end.get('event_sha256') != fs.digest(events.read_bytes())):
+            raise ValueError('conflicting terminated-worker receipt')
+        extended = any(attempt in self.state['attempts'][:entry['attempt_count']]
+                       for entry in self.state.get('limit_extensions', []))
+        if end.get('outcome') != 'stalled' and not (extended and end.get('outcome') == 'interrupted'):
+            return  # Explicit deadlines, cancellation, and invalid reports are not idle watchdogs.
+        self.timed_source_stable()
+        attempt.update(status='retired', outcome=end['outcome'], finished=end['finished'],
+                       elapsed_seconds=end['elapsed_seconds'], exit_code=end['exit_code'])
+        if attempt['stage'] in ('implementation', 'repair'):
+            self.capture(attempt['stage'])
+            self.state['reports'] = {k: v for k, v in self.state['reports'].items() if k not in ('review', 'proof')}
+            for entry in self.state.get('recovery_history', [])[-1:]:
+                if entry['status'] == 'reserved':
+                    entry.update(status='worker-replaced', candidate_after=candidate_key(self.state['candidate']))
+        self.state.setdefault('worker_recovery', []).append({'attempt_id': attempt['id'],
+                                                            'stage': attempt['stage'], 'reason': 'confirmed worker termination; idle watchdog or authorized limit extension'})
+        self.save()
+
+    def planning_actor(self, stage, skill, inputs, prompt, fields):
+        schema = {'type': 'object', 'properties': fields, 'required': list(fields), 'additionalProperties': False}
+        prompt += (' Standing local mandate: ' + json.dumps(self.state['autonomy']['policy']) +
+                   '. Return exactly the required JSON. Exact input_identity_json must encode ' + json.dumps(inputs) +
+                   '. Candidate, contract, source and Git metadata are read-only. Only scratch checks are permitted. '
+                   'No external effects. The controller saves your exact response and owns adoption.')
+        attempt, host = self.dispatch(stage, inputs, f'Read {skill["path"]} and its references. ' + prompt, schema=schema)
+        self.current()
+        report = json.loads(host['message'])
+        if (not isinstance(report, dict) or set(report) != set(fields) or
+                json.loads(report.get('input_identity_json', '{}')) != inputs):
+            raise ValueError('invalid or stale ' + stage + ' result')
+        for name, field in fields.items():
+            if (field['type'] == 'string' and not isinstance(report[name], str) or
+                    field['type'] == 'boolean' and not isinstance(report[name], bool) or
+                    'enum' in field and report[name] not in field['enum']):
+                raise ValueError('invalid ' + stage + ' field: ' + name)
+        data = host['message'].encode()
+        path = f'attempts/{attempt["id"]}/report.json'
+        stored = self.runtime / path
+        if stored.exists() and stored.read_bytes() != data:
+            raise ValueError('conflicting planning result: ' + attempt['id'])
+        local_save(self.root, self.work, path, data)
+        attempt.update(status='complete', report=path, report_sha256=fs.digest(data))
+        self.save()
+        return report, attempt
+
+    def replan(self, reason):
+        self.current()
+        if fs.contract_origin(self.root, fs.work_slug(self.work)):
+            raise ContinuationRequired('delegated plan-acceptance requires reconciliation of the retained legacy contract origin before adoption')
+        planner, auditor = installed_skill('plan-acceptance'), installed_skill('audit-acceptance')
+        inputs = self.stage_inputs(self.state['candidate'])
+        fields = {name: {'type': 'string'} for name in ('input_identity_json', 'contract', 'reason')}
+        proposal, planning = self.planning_actor('planning', planner, inputs,
+            f'Reconcile {self.work} in {self.workspace} with its binding sources. Finding: {reason}. '
+            'Standing mandate delegates acceptance planning while preserving the agreed outcome. '
+            'Return the full proposed contract text in contract. Preserve the intended outcome, all binding '
+            'links, every existing requirement ID and promise, exclusions and inherited constraints. '
+            'Use the next contract revision and document the correction. Do not weaken or remove a requirement '
+            'to make proof pass. You propose text; you do not approve or mutate it.', fields)
+        data = proposal['contract'].encode('utf-8')
+        new_contract, requirements = parse_contract(data)
+        old = self.state['contract']
+        binding_lines = lambda text: [line for line in fs.document_lines(text)
+                                     if re.match(r'^(Source:|Parent:|Parent contract:|Intended outcome:)', line)]
+        if (new_contract['source'] != old['source'] or new_contract['revision'] != 'v' + str(int(old['revision'][1:]) + 1) or
+                not set(self.state['requirements']) <= set(requirements) or
+                binding_lines(new_contract['content']) != binding_lines(old['content'])):
+            raise ValueError('planning proposal changed the outcome, binding links, requirement IDs or revision sequence')
+        proposal_path = local_save(self.root, self.work, f'runtime/planning/{planning["id"]}/contract.md', data)
+        audit_inputs = inputs | {'proposed_contract_sha256': new_contract['sha256']}
+        fields = {name: {'type': 'boolean'} for name in
+                  ('preserves_outcome', 'preserves_constraints', 'source_reconciled', 'requirements_complete')}
+        fields.update(input_identity_json={'type': 'string'}, reason={'type': 'string'})
+        audit, auditing = self.planning_actor('planning-audit', auditor, audit_inputs,
+            f'Independently audit the proposed contract at {proposal_path} against the existing contract '
+            f'{self.workspace / self.work}, its full binding sources and this finding: {reason}. '
+            'Check that all old promises and constraints survive, source promises are covered, and the new '
+            'seams can establish the complete outcome. Return honest booleans for each named condition and '
+            'a substantive reason. Standing authority permits source-preserving planning; the audit must '
+            'reject a product change, weakened acceptance, or an unexplained scope expansion.', fields)
+        if not audit['reason'].strip() or not all(audit[name] for name in fields if fields[name]['type'] == 'boolean'):
+            raise ValueError('independent planning audit rejected autonomous adoption: ' + audit['reason'])
+        admission_path = self.runtime / 'admission.json'
+        admission = json.loads(admission_path.read_bytes())
+        targets = []
+        for target in dict.fromkeys((fs.safe(self.root, self.work), self.item, self.workspace / self.work)):
+            before = target.read_bytes()
+            if fs.digest(before) != old['sha256']:
+                raise ValueError('agreement changed before delegated adoption')
+            targets.append({'path': str(target), 'before': base64.b64encode(before).decode(),
+                            'after': base64.b64encode(data).decode()})
+        transition = {'status': 'pending', 'old_admission': admission,
+                      'new_admission': admission | {'contract': new_contract, 'requirements': requirements},
+                      'targets': targets, 'planner': planning['id'], 'audit': auditing['id'], 'reason': reason,
+                      'approval_source': self.state['autonomy']['policy']['approval_source']}
+        local_save(self.root, self.work, 'runtime/agreement-transition.json', encoded(transition))
+        self.reconcile_agreement()
+
+    def reconcile_agreement(self):
+        path = self.runtime / 'agreement-transition.json'
+        if not path.exists():
+            return
+        transition = json.loads(path.read_bytes())
+        if transition['status'] == 'complete':
+            return
+        old, new = transition['old_admission'], transition['new_admission']
+        if new != old | {'contract': new['contract'], 'requirements': new['requirements']}:
+            raise ValueError('agreement transition changed unrelated admission authority')
+        expected_targets = {str(p) for p in (fs.safe(self.root, self.work), self.item, self.workspace / self.work)}
+        if {t['path'] for t in transition['targets']} != expected_targets:
+            raise ValueError('agreement transition has unexpected destinations')
+        if transition['approval_source'] != self.state['autonomy']['policy']['approval_source']:
+            raise ValueError('agreement transition approval source changed')
+        autonomy.current(self.state['autonomy'])
+        if 'planning' not in self.state['autonomy']['policy']['decisions']:
+            raise ValueError('agreement adoption outside the standing mandate')
+        admission_path = self.runtime / 'admission.json'
+        admitted = json.loads(admission_path.read_bytes())
+        if admitted not in (transition['old_admission'], transition['new_admission']):
+            raise ValueError('conflicting agreement-transition admission')
+        # Reconcile only exact old/new bytes; preserve concurrent human changes.
+        for target in transition['targets']:
+            before, after = (base64.b64decode(target[name], validate=True) for name in ('before', 'after'))
+            proposed, requirements = parse_contract(after)
+            if fs.digest(before) != old['contract']['sha256'] or proposed != new['contract'] or requirements != new['requirements']:
+                raise ValueError('agreement transition bytes do not match admission')
+            actual = Path(target['path']).read_bytes()
+            if actual not in (before, after):
+                raise ValueError('agreement changed during delegated adoption: ' + target['path'])
+        for name in ('planner', 'audit'):
+            attempt = next(a for a in self.state['attempts'] if a['id'] == transition[name])
+            host = self.receipt(attempt)
+            data = (self.runtime / attempt['report']).read_bytes()
+            if fs.digest(data) != attempt['report_sha256'] or host['message'].encode() != data:
+                raise ValueError('delegated planning receipt changed or lost')
+            report = json.loads(data)
+            if name == 'planner' and report.get('contract') != new['contract']['content']:
+                raise ValueError('planning receipt differs from proposed agreement')
+            if name == 'audit' and (not all(report.get(k) is True for k in
+                    ('preserves_outcome', 'preserves_constraints', 'source_reconciled', 'requirements_complete')) or
+                    json.loads(report['input_identity_json']).get('proposed_contract_sha256') != new['contract']['sha256']):
+                raise ValueError('agreement transition lacks passing independent audit')
+        for target in transition['targets']:
+            before, after = (base64.b64decode(target[name], validate=True) for name in ('before', 'after'))
+            destination = Path(target['path'])
+            archive = destination.parent / 'history' / fs.digest(before) / destination.name
+            archive.parent.mkdir(parents=True, exist_ok=True)
+            if archive.exists() and archive.read_bytes() != before:
+                raise ValueError('conflicting contract history')
+            fs.atomic_write(archive, before, ignored_root=self.root)
+            fs.atomic_write(destination, after, ignored_root=self.root)
+        self.state.update(transition['new_admission'])
+        local_save(self.root, self.work, 'runtime/admission.json', encoded(transition['new_admission']))
+        self.state['reports'] = {}
+        self.state['implementation_complete'] = False
+        self.state.pop('continuation', None)
+        history = self.state.setdefault('agreement_history', [])
+        adoption = {
+            'old_sha256': transition['old_admission']['contract']['sha256'],
+            'new_sha256': transition['new_admission']['contract']['sha256'],
+            'planner': transition['planner'], 'audit': transition['audit'],
+            'reason': transition['reason'],
+            'planner_report_sha256': next(a['report_sha256'] for a in self.state['attempts'] if a['id'] == transition['planner']),
+            'audit_report_sha256': attempt['report_sha256'], 'audit_report': report,
+            'audit_session_id': attempt['session_id'],
+            'approval_source': transition['approval_source']}
+        if adoption not in history:
+            history.append(adoption)
+        if self.state['candidate']['work_item_sha256'] != transition['new_admission']['contract']['sha256']:
+            self.capture('planning-audit')
+        self.save()
+        transition['status'] = 'complete'
+        local_save(self.root, self.work, 'runtime/agreement-transition.json', encoded(transition))
 
 
 def create(root, args, invocation_started_epoch=None):
@@ -1975,6 +2446,10 @@ def create(root, args, invocation_started_epoch=None):
         raise ValueError('local agent-stage authority missing; run requires --authorize-local')
     if args.hard_cost_cap is not None:
         raise ValueError('unsupported capability: no enforceable hard monetary cap')
+    mandate = autonomy.load(args.mandate) if getattr(args, 'mandate', None) else autonomy.local(
+        f'Deliver the complete agreed outcome in {args.work}, preserving its sources and exclusions.')
+    if 'implementation' not in mandate['policy']['decisions']:
+        raise ValueError('standing mandate does not delegate implementation')
     if platform.system() != 'Darwin':
         raise ValueError('unsupported host: Codex CLI on macOS required')
     executable = shutil.which('codex')
@@ -2112,23 +2587,26 @@ def create(root, args, invocation_started_epoch=None):
              'previous_records': previous_records,
              'destination_observation': destination_observation(root, decision, base),
              'authority': {'local_stages': True, 'external_effects': False},
+             'autonomy': mandate,
              'limits': {'dispatches': args.max_dispatches, 'elapsed_seconds': args.max_seconds,
-                        'stage_seconds': args.max_stage_seconds},
+                        'stage_seconds': args.max_stage_seconds,
+                        'repairs': getattr(args, 'max_repairs', None),
+                        'worker_idle_seconds': getattr(args, 'worker_idle_seconds', None)},
              'deadline': None if args.max_seconds is None else deadline_started_epoch + args.max_seconds,
              'deadline_started_epoch': deadline_started_epoch, 'started_epoch': invocation_started_epoch or time.time(),
              'started_at': datetime.datetime.fromtimestamp(invocation_started_epoch or time.time(),
                                                               datetime.timezone.utc).isoformat(),
              'ended_at': None, 'resume_count': 0,
-             'created': now(), 'repair_used': False, 'attempts': [], 'reports': {},
+             'created': now(), 'repair_used': False, 'recovery_history': [], 'attempts': [], 'reports': {},
              'host': {'name': 'Codex CLI on macOS', 'executable': executable,
                       'version': version,
                       'hard_monetary_cap': 'unsupported', 'cost': 'unknown',
                       'enforced': ['scratch-only verification writes', 'network denied', 'approval escalation disabled',
-                                   'isolated configuration', 'dispatch admission', 'one repair reservation'],
+                                   'isolated configuration', 'dispatch admission', 'durable recovery reservations'],
                       'elapsed_limit': 'admission and process termination; provider billing may continue',
                       'trust': 'controller and OS trusted; no arbitrary same-user tamper resistance'}}
     delivery = Delivery(root, args.work, state)
-    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host')}))
+    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host')}))
     delivery.save()
     delivery.capture('admission')
     delivery.save()
@@ -2185,6 +2663,9 @@ def result(delivery):
     return {'status': status, 'blocker': blocker} | {key: state[key] for key in (
         'invocation_id', 'work_item', 'comparison_base', 'limits', 'repair_used', 'host')} | {
         'routing': state.get('routing'),
+        'autonomy': state.get('autonomy'),
+        'continuation': state.get('continuation'),
+        'recovery_history': state.get('recovery_history', []),
         'destination_observation': state.get('destination_observation'),
         'completion_scope': ('Acceptance is for the exact candidate against the frozen comparison base; compatibility with the current destination is not established.'
                              if state['status'] == 'REVIEWED_AND_PROVEN' else None),
@@ -2225,6 +2706,8 @@ def completed_result(root, work, directory):
             raise ValueError('durable completion record identity changed or lost')
         item, _ = delivery_paths(root, work)
         agreement, _ = contract(root, work)
+        if record.get('autonomy'):
+            autonomy.current(record['autonomy'])
         if record.get('contract') != {key: agreement[key] for key in ('source', 'revision', 'sha256')}:
             raise ValueError('durable completion record contract identity changed or lost')
         if issue_source(root, work, agreement['content']) and not record.get('github_record'):
@@ -2306,12 +2789,28 @@ def main(argv=None):
             child.add_argument('--destination', help='explicit workflow destination for unsliced work')
             child.add_argument('--authorize-local', action='store_true')
             child.add_argument('--exclude-dirty', action='append', default=[])
-            child.add_argument('--max-dispatches', type=int, default=8, help='dispatch limit (default: 8)')
-            child.add_argument('--max-seconds', type=float, default=5400,
-                               help='elapsed seconds from admission (default: 5400, 90 minutes)')
-            child.add_argument('--max-stage-seconds', type=float, default=1800,
-                               help='seconds per stage, capped by the overall deadline (default: 1800, 30 minutes)')
+            child.add_argument('--mandate', help='explicitly selected standing autonomy mandate JSON')
+            child.add_argument('--max-dispatches', default=None, help='optional dispatch limit; default unlimited')
+            child.add_argument('--max-seconds', default=None,
+                               help='optional overall elapsed seconds; default unlimited')
+            child.add_argument('--max-stage-seconds', default=None,
+                               help='optional seconds per stage; default unlimited')
+            child.add_argument('--max-repairs', default=None, help='optional repair limit; default unlimited')
+            child.add_argument('--worker-idle-seconds', default=None,
+                               help='optional idle-worker watchdog; replaces a confirmed terminated worker, not the delivery')
             child.add_argument('--hard-cost-cap', type=float)
+    extension = commands.add_parser('extend', help='explicitly amend limits without losing the invocation or attempt history')
+    extension.add_argument('work')
+    extension.add_argument('--authorize-extension', action='store_true')
+    extension.add_argument('--mandate')
+    for flag in ('--max-dispatches', '--max-seconds', '--max-stage-seconds', '--max-repairs'):
+        extension.add_argument(flag)
+    effect = commands.add_parser('authorize-effect', help='check a standing grant for an exact effect preview; performs no effect')
+    effect.add_argument('work')
+    effect.add_argument('--action', dest='effect_action', required=True, choices=sorted(autonomy.EFFECTS))
+    effect.add_argument('--repository', required=True)
+    effect.add_argument('--destination', required=True)
+    effect.add_argument('--preview-sha256', required=True)
     preview = commands.add_parser('github-record-preview')
     preview.add_argument('work')
     preview.add_argument('--delivered-commit', required=True)
@@ -2320,7 +2819,7 @@ def main(argv=None):
     publish.add_argument('work')
     publish.add_argument('--delivered-commit', required=True)
     publish.add_argument('--pull-request')
-    publish.add_argument('--authorize-comment-sha256', required=True)
+    publish.add_argument('--authorize-comment-sha256')
     github_status = commands.add_parser('github-status')
     github_status.add_argument('--repository', required=True)
     github_status.add_argument('--issue', required=True, type=int)
@@ -2328,6 +2827,9 @@ def main(argv=None):
     delivery = None
     lock = None
     try:
+        if args.action == 'run':
+            for name in ('max_dispatches', 'max_seconds', 'max_stage_seconds', 'max_repairs', 'worker_idle_seconds'):
+                setattr(args, name, autonomy.limit(getattr(args, name), integer=name in ('max_dispatches', 'max_repairs')))
         root = Path(fs.git(Path(args.repo), 'rev-parse', '--show-toplevel').decode().strip()).resolve()
         if args.action == 'github-status':
             output = resolve_github_record(root, args.repository, args.issue)
@@ -2336,6 +2838,43 @@ def main(argv=None):
         item, directory = delivery_paths(root, args.work)
         local = local_directory(root, args.work)
         state_path = local / 'delivery.json'
+        if args.action == 'authorize-effect':
+            if not re.fullmatch(r'[0-9a-f]{64}', args.preview_sha256):
+                raise ValueError('effect authorization needs the SHA-256 of the exact saved preview')
+            if state_path.is_file():
+                delivery = Delivery(root, args.work, json.loads(state_path.read_text()))
+                delivery.read_only = True
+                delivery.current()
+                effect_state = delivery.state
+            else:
+                completed_result(root, args.work, directory)
+                effect_state = json.loads((directory / 'delivery.json').read_bytes())
+            mandate = effect_state.get('autonomy')
+            if not mandate:
+                raise ValueError('no standing effect mandate was admitted')
+            grant = autonomy.authorize(mandate, args.effect_action, args.repository, args.destination)
+            repositories = {str(root)}
+            for remote in fs.git(root, 'remote').decode().splitlines():
+                url = fs.git(root, 'remote', 'get-url', remote).decode().strip()
+                match = re.fullmatch(r'(?:https://github.com/|git@github.com:)([^/]+/[^/]+?)(?:\.git)?', url)
+                if match:
+                    repositories.add(match[1])
+            if args.repository not in repositories:
+                raise ValueError('effect repository does not match this delivery repository')
+            if args.effect_action in ('commit', 'push', 'pr-create', 'pr-update', 'pr-ready', 'merge', 'deploy'):
+                if effect_state['status'] != 'REVIEWED_AND_PROVEN':
+                    raise ValueError('effect requires current full REVIEWED and PROVEN results')
+                if delivery:
+                    for name, verdict in (('review', 'REVIEWED'), ('proof', 'PROVEN')):
+                        report = delivery.read_report(name)
+                        if (report['status'] != verdict or report['gaps'] or report.get('findings') or
+                                json.loads(report['input_identity_json']) != delivery.stage_inputs(effect_state['candidate'])):
+                            raise ValueError('effect requires current full ' + verdict + ' result')
+            print(json.dumps({'status': 'AUTHORIZED', 'effect': grant, 'preview_sha256': args.preview_sha256,
+                              'mandate_sha256': mandate['sha256'], 'approval_source': mandate['policy']['approval_source'],
+                              'candidate': identity(effect_state['candidate']) if delivery else effect_state['candidate_key'],
+                              'conditions': 'Existing publication, merge-readiness, deployment and readback requirements still apply; this command performs no effect.'}, indent=2))
+            return 0
         if args.action == 'status':
             if not state_path.exists():
                 output = completed_without_local_runtime(root, args.work, directory,
@@ -2394,20 +2933,30 @@ def main(argv=None):
             delivery = Delivery(root, args.work, json.loads(state_path.read_text()))
             if args.action == 'run':
                 requested = {'dispatches': args.max_dispatches, 'elapsed_seconds': args.max_seconds,
-                             'stage_seconds': args.max_stage_seconds}
+                             'stage_seconds': args.max_stage_seconds, 'repairs': args.max_repairs,
+                             'worker_idle_seconds': args.worker_idle_seconds}
+                if 'autonomy' not in delivery.state:
+                    requested.pop('repairs')
+                    requested.pop('worker_idle_seconds')
                 requested_destination = explicit_destination(root, args.destination)[0] if args.destination else None
                 if (not args.authorize_local or args.hard_cost_cap is not None or
-                    requested != delivery.state['limits'] or args.comparison_base != delivery.state['comparison_base'] or
+                    requested != delivery.state['limits'] or
+                    (args.mandate and autonomy.load(args.mandate) != delivery.state.get('autonomy')) or
+                    args.comparison_base != delivery.state['comparison_base'] or
                     sorted(args.exclude_dirty) != delivery.state['excluded_dirty'] or
                     (requested_destination and requested_destination != delivery.state['routing']['destination'])):
                     raise ValueError('run cannot change persisted authority, scope, base or limits; use resume')
         elif args.action == 'resume':
             raise ValueError('missing delivery invocation; no effects can be reconciled')
         elif args.action == 'run':
-            if args.max_dispatches < 0 or any(not math.isfinite(value) or value < 0
-                                            for value in (args.max_seconds, args.max_stage_seconds)):
-                raise ValueError('resource limits must be finite and nonnegative')
             delivery = create(root, args, invocation_started_epoch)
+        if args.action == 'extend':
+            if delivery is None:
+                raise ValueError('missing delivery invocation; nothing to extend')
+            delivery.extend(args)
+            print(json.dumps({'status': 'EXTENDED', 'limits': delivery.state['limits'],
+                              'deadline': delivery.state['deadline'], 'resume': result(delivery)['resume']}, indent=2))
+            return 0
         if args.action == 'resume':
             delivery.state['resume_count'] = delivery.state.get('resume_count', 0) + 1
             delivery.state['ended_at'] = None
@@ -2415,15 +2964,20 @@ def main(argv=None):
         if args.action == 'cleanup':
             delivery.cleanup()
         elif args.action == 'resume' or delivery.state['status'] != 'REVIEWED_AND_PROVEN':
-            delivery.run()
+            while True:
+                try:
+                    delivery.run()
+                    break
+                except WorkerRestartRequired:
+                    continue
         print(json.dumps(result(delivery), indent=2))
         return 0
     except (ValueError, OSError, KeyError, TypeError, UnicodeError, subprocess.SubprocessError) as error:
         message = str(error)
         if delivery:
-            if args.action in ('github-record-preview', 'github-record-publish'):
+            if args.action in ('github-record-preview', 'github-record-publish', 'authorize-effect'):
                 output = result(delivery)
-                output.update(blocker=message, github_record_status='BLOCKED')
+                output.update(blocker=message, **{('effect_status' if args.action == 'authorize-effect' else 'github_record_status'): 'BLOCKED'})
                 print(json.dumps(output, indent=2))
                 return 1
             if args.action == 'cleanup' and delivery.state.get('status') == 'REVIEWED_AND_PROVEN':
@@ -2432,7 +2986,7 @@ def main(argv=None):
                 print(json.dumps(output, indent=2))
                 return 1
             if args.action != 'status':
-                delivery.state.update(status='BLOCKED', blocker=message,
+                delivery.state.update(status='HANDOFF' if isinstance(error, ContinuationRequired) else 'BLOCKED', blocker=message,
                                       ended_at=delivery.state.get('ended_at') or now())
                 delivery.state.setdefault('ended_epoch', time.time())
             if args.action != 'status':
@@ -2441,7 +2995,7 @@ def main(argv=None):
                 except (ValueError, OSError) as storage:
                     message += '; unable to persist blocker: ' + str(storage)
             output = result(delivery)
-            output.update(status='BLOCKED', blocker=message)
+            output.update(status=delivery.state['status'] if isinstance(error, ContinuationRequired) else 'BLOCKED', blocker=message)
         else:
             work = getattr(args, 'work', None)
             output = {'status': 'BLOCKED', 'blocker': message, 'work_item': work,

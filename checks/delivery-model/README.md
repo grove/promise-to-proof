@@ -1,5 +1,11 @@
 # Delivery completion model
 
+This model exercises the explicitly bounded `--max-repairs 1` policy profile.
+The default controller policy now permits unlimited recovery, with independent
+diagnosis after repeated gaps. This finite model does not claim exhaustive
+coverage of an unbounded run; Python regression checks cover multiple repairs,
+standing mandates, worker replacement and audited replanning.
+
 This bounded FizzBee model checks one local `work/` item's completion rules at
 repository revision `41bebc726a8cc71c1d2f22d822ade006f4e78121`. It models the
 protocol, not execution of Markdown instructions by an agent. A passing run
