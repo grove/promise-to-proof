@@ -50,6 +50,9 @@ elapsed time and last activity at least every minute. The controller's optional
 `--worker-idle-seconds` terminates an idle worker's process group and replaces it
 only after a durable confirmed exit receipt. Retain partial candidate generations
 and old attempts. Missing termination evidence must be reconciled before launch.
+Keep user-facing heartbeats to one concise update with the current stage, last
+verified progress and next milestone. Retain detailed logs in the invocation
+record; repeat findings in chat only when they change.
 Repeated findings trigger fresh independent diagnosis and a different executable
 implementation, evidence or prerequisite strategy. Do not repeat an unchanged
 failed approach indefinitely, weaken requirements, or fabricate proof.
