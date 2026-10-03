@@ -199,7 +199,7 @@ def localize_agreement(root, work, bindings):
     if origin is not None:
         for relative in (origin['path'], f".p2p/work/{fs.work_slug(work)}/contract-origin.json"):
             source = fs.safe(root, relative)
-            target = fs.safe(agreement_root, relative)
+            target = fs.safe(agreement_directory, relative)
             if not source.is_file():
                 raise ValueError('legacy contract origin input is missing: ' + relative)
             require_repo_local_ignored(root, target)
