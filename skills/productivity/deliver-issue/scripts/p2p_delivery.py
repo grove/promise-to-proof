@@ -2777,6 +2777,9 @@ def completed_without_local_runtime(root, work, directory, missing_record):
 
 
 def main(argv=None):
+    if sys.version_info < (3, 11):
+        print('Python 3.11 or newer is required by the delivery controller.', file=sys.stderr)
+        return 2
     invocation_started_epoch = time.time()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo', default='.')

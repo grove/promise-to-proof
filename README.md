@@ -345,6 +345,7 @@ documentation so individual skill installs keep the rules they depend on.
 Run the repository's Python checks with:
 
 ```bash
+python3 -c 'import sys; assert sys.version_info >= (3, 11), f"Python 3.11+ required; found {sys.version.split()[0]}"' &&
 python3 -m unittest discover -s checks -p 'test_*.py'
 ```
 

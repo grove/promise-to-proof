@@ -13,6 +13,8 @@ acting. Its contract, identity, evidence, and authority rules govern every step.
 Use the installed `plan-acceptance`, `implement-contract`,
 `review-implementation`, `prove`, and, when needed, `repair-gaps` skills for
 their respective judgments. This skill owns their handoffs, not their verdicts.
+The delivery controller requires Python 3.11 or newer; verify `python3 --version`
+before invoking its scripts.
 
 Use the bundled `scripts/p2p_filesystem.py` helper for local storage and
 identity checks. Run `--help` for arguments. `resolve` locates the work item,

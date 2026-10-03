@@ -38,8 +38,13 @@ truth for the same rule.
 Run the repository's default deterministic checks after functional changes:
 
 ```bash
+python3 -c 'import sys; assert sys.version_info >= (3, 11), f"Python 3.11+ required; found {sys.version.split()[0]}"' &&
 python3 -m unittest discover -s checks -p 'test_*.py'
 ```
+
+The controller uses `tomllib`, which is included in Python starting with 3.11.
+Keep the version check when running the suite so an older `python3` fails before
+the controller tests start.
 
 For delivery-controller or filesystem changes, the focused checks are:
 

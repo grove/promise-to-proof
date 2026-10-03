@@ -238,6 +238,14 @@ class FakeTransport:
         return {'exit_code':0,'outcome':'finished','finished':d.now(),'elapsed_seconds':0.01}
 
 
+class RuntimeRequirementTests(unittest.TestCase):
+    def test_controller_rejects_python_before_311_clearly(self):
+        stderr = io.StringIO()
+        with patch.object(d.sys, 'version_info', (3, 10)), contextlib.redirect_stderr(stderr):
+            self.assertEqual(d.main([]), 2)
+        self.assertIn('Python 3.11 or newer is required', stderr.getvalue())
+
+
 class DeliveryTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
