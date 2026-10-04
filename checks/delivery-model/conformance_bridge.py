@@ -35,7 +35,8 @@ def state():
 def child():
     """Inject replies and boundary interruptions, then invoke the real CLI main."""
     settings = read(ROOT / 'command.json')
-    fake = fixture.FakeTransport('exhausted' if CASE in ('repair-restart-exhaustion', 'blocked-failure') else 'success')
+    fake = fixture.FakeTransport('multi-repair' if CASE == 'repair-restart-exhaustion' else
+                                 'exhausted' if CASE == 'blocked-failure' else 'success')
     if CASE == 'successful-repair' and not (state() or {}).get('repair_used'):
         fake.mode = 'exhausted'
     if CASE == 'uncertain-launch-restart':
@@ -80,11 +81,11 @@ def command(action='resume', **settings):
     args = [sys.executable, str(Path(__file__).resolve()), 'child', '--repo', str(SOURCE), action,
             '.p2p/work/tiny/contract.md']
     if action == 'run':
-        args += ['--comparison-base', (ROOT / 'base').read_text(), '--destination', 'delivery-target']
+        args += ['--max-repairs', '1', '--comparison-base', (ROOT / 'base').read_text(), '--destination', 'delivery-target']
         if CASE != 'unauthorized-before-dispatch':
             args += ['--authorize-local']
         if CASE == 'repair-restart-exhaustion':
-            args += ['--max-dispatches', '9']
+            args += ['--max-dispatches', '12']
     return args
 
 
@@ -183,13 +184,13 @@ def main(action):
         # MBT initializes once per trace. Refuse accidental fixture reuse.
         ROOT.mkdir(parents=True, exist_ok=True)
         base = fixture.repo(SOURCE)
-        LOCAL = d.local_directory(SOURCE, 'work/tiny.md')
+        LOCAL = d.local_directory(SOURCE, '.p2p/work/tiny/contract.md')
         (ROOT / 'base').write_text(base)
         if CASE == 'contested-dirty-file':
             (SOURCE / 'dirty').write_text('untouched\n')
         print('initialized')
         return
-    LOCAL = d.local_directory(SOURCE, 'work/tiny.md')
+    LOCAL = d.local_directory(SOURCE, '.p2p/work/tiny/contract.md')
     before = state()
     detail = {}
     if action == 'Start':

@@ -134,7 +134,7 @@ class FakeTransport:
         self.output_path = output_path
         self.on_stage = None
 
-    def __call__(self, args, prompt, event_path, error_path, deadline):
+    def __call__(self, args, prompt, event_path, error_path, deadline, idle_seconds=None):
         attempt = json.loads((event_path.parent / 'launch.json').read_text())
         inputs = attempt['inputs']
         stage = 'preflight' if 'probe_sha256' in inputs else attempt['stage']
@@ -153,11 +153,34 @@ class FakeTransport:
             observation.update(scratch='ok', network='denied')
             output = 'P2P_BOUNDARY=' + json.dumps(observation)
             report = 'FIXTURE host preflight, not live evidence'
+        elif stage == 'diagnosis':
+            blocked = self.mode in ('blocked', 'exhausted')
+            report = json.dumps({'status': 'BLOCKED' if blocked else 'ACTIONABLE',
+                'input_identity_json': json.dumps(inputs),
+                'action': 'none' if blocked else ('evidence' if self.mode == 'evidence' else 'implementation'),
+                'approach': '' if blocked else 'Inspect the actual local seam and replace the failed approach.',
+                'reason': 'Fixture independent diagnosis.',
+                'missing_input': 'configured command `python3 greet.py`' if blocked else '',
+                'expected_result': 'exit zero and print `hello\\n`' if blocked else ''})
+            output = 'FIXTURE diagnosis'
+        elif stage == 'planning':
+            proposed = CONTRACT.replace('Contract revision: v1', 'Contract revision: v2')
+            if self.mode == 'planning-weaken':
+                proposed = proposed.replace('R1', 'R2')
+            report = json.dumps({'input_identity_json': json.dumps(inputs), 'contract': proposed,
+                                 'reason': 'Fixture source-preserving reconciliation.'})
+            output = 'FIXTURE planning'
+        elif stage == 'planning-audit':
+            report = json.dumps({'input_identity_json': json.dumps(inputs),
+                **{key: self.mode != 'planning-reject' for key in ('preserves_outcome', 'preserves_constraints',
+                    'source_reconciled', 'requirements_complete')}, 'reason': 'Fixture independent audit.'})
+            output = 'FIXTURE planning audit'
         else:
             if stage in ('implementation','repair'):
                 (workspace / self.output_path).write_text("print('hello')\n" + ("# repaired fixture\n" if stage == 'repair' else ''))
             status = {'implementation':'IMPLEMENTED','repair':'REPAIRED','review':'REVIEWED','proof':'PROVEN'}[stage]
             gap = self.mode in ('repair','exhausted') and stage == 'proof' and (self.mode == 'exhausted' or self.calls.count('proof') == 1)
+            gap |= self.mode in ('multi-repair', 'evidence') and stage == 'proof' and self.calls.count('proof') <= 2
             if gap:
                 status = 'NOT PROVEN'
             row = {'id':'R1','verdict':'proven' if stage == 'proof' else 'reviewed',
@@ -178,7 +201,7 @@ class FakeTransport:
                 if self.mode == 'blocked':
                     report.update(status='BLOCKED', missing_input='configured command `python3 greet.py`',
                                   expected_result='exit zero and print `hello\\n`')
-                if self.mode == 'review-plan-handoff':
+                if self.mode in ('review-plan-handoff', 'planning-reject', 'planning-weaken') and self.calls.count('review') == 1:
                     report.update(status='CHANGES NEEDED', findings=[{
                         'id':'F1','source':'R2','axis':'Contract fidelity','location':'.p2p/work/tiny/contract.md',
                         'evidence':'The fixture requires a contract decision.',
@@ -213,6 +236,14 @@ class FakeTransport:
         event_path.write_text(''.join(json.dumps(e)+'\n' for e in events))
         error_path.write_text('FIXTURE TRANSPORT\n')
         return {'exit_code':0,'outcome':'finished','finished':d.now(),'elapsed_seconds':0.01}
+
+
+class RuntimeRequirementTests(unittest.TestCase):
+    def test_controller_rejects_python_before_311_clearly(self):
+        stderr = io.StringIO()
+        with patch.object(d.sys, 'version_info', (3, 10)), contextlib.redirect_stderr(stderr):
+            self.assertEqual(d.main([]), 2)
+        self.assertIn('Python 3.11 or newer is required', stderr.getvalue())
 
 
 class DeliveryTests(unittest.TestCase):
@@ -990,6 +1021,57 @@ Pending actions: none.
         self.assertEqual(source_index, d.fs.git(self.root, 'ls-files', '--stage', '-z'))
         self.assertEqual(local, (self.root / '.p2p/work/tiny').resolve())
         self.assertFalse((self.root / '.p2p/tmp/deliver-issue').exists())
+
+    def test_execution_access_denied_stops_before_implementation(self):
+        before = d.fs.snapshot(self.root)
+        with patch.object(d.fs.tempfile, 'TemporaryFile', side_effect=PermissionError('session denied writes')):
+            code, value = self.cli()
+        self.assertEqual(code, 1)
+        self.assertIn('write access required for', value['blocker'])
+        self.assertEqual(self.fake.calls, [])
+        self.assertEqual(d.fs.snapshot(self.root), before)
+        self.assertFalse((self.root / '.p2p/work/tiny/execution-location.json').exists())
+
+    def test_resume_checks_narrower_session_before_any_dispatch_or_record_change(self):
+        self.assertEqual(self.cli('run', '--max-dispatches', '0')[0], 1)
+        state_path = d.local_directory(self.root, '.p2p/work/tiny/contract.md') / 'delivery.json'
+        before = state_path.read_bytes()
+        git_dir = self.runtime() / 'repository.git'
+        real_probe = d.fs.tempfile.TemporaryFile
+
+        def denied(*args, **kwargs):
+            if Path(kwargs['dir']) == git_dir:
+                raise PermissionError('resumed session only permits workspace writes')
+            return real_probe(*args, **kwargs)
+
+        with patch.object(d.fs.tempfile, 'TemporaryFile', side_effect=denied):
+            code, value = self.cli('resume')
+        self.assertEqual(code, 1)
+        self.assertIn(str(git_dir), value['blocker'])
+        self.assertEqual(self.fake.calls, [])
+        self.assertEqual(state_path.read_bytes(), before)
+
+    def test_configured_execution_location_survives_cleanup_and_environment_change(self):
+        execution_root = Path(self.temp.name).resolve() / 'configured-executions'
+        original_tree = d.fs.snapshot(self.root)
+        with patch.dict(os.environ, {'P2P_EXECUTION_ROOT': str(execution_root)}):
+            code, value = self.cli()
+            self.assertEqual(code, 0, value)
+            retained = self.runtime()
+            self.assertIn(execution_root, retained.parents)
+        with patch.dict(os.environ, {'P2P_EXECUTION_ROOT': str(execution_root.parent / 'changed-root')}):
+            self.assertEqual(self.runtime(), retained)
+            code, value = self.cli('cleanup')
+            self.assertEqual(code, 0, value)
+            final = json.loads((self.root / '.p2p/work/tiny/artifacts/delivery.json').read_text())
+            self.assertEqual(final['cleanup'], 'source checkout unchanged')
+            self.assertEqual(self.runtime(), retained)
+            self.assertEqual(self.cli('status')[0], 0)
+        self.assertTrue((retained / 'workspace/.git').is_file())
+        self.assertTrue((retained / 'repository.git/HEAD').is_file())
+        self.assertTrue((self.root / '.p2p/work/tiny/execution-location.json').is_file())
+        self.assertFalse((execution_root.parent / 'changed-root').exists())
+        self.assertEqual(d.fs.snapshot(self.root), original_tree)
 
     def test_runtime_writes_ignore_checkout_ignore_rules(self):
         (self.root / '.gitignore').write_text(
@@ -1893,9 +1975,9 @@ Pending actions: none.
 
     def test_repair_refreshes_both_and_exhaustion_persists(self):
         self.fake.mode='exhausted'
-        code,value=self.cli()
+        code,value=self.cli('run','--max-repairs','1')
         self.assertEqual(code,1,value)
-        self.assertIn('repair exhausted',value['blocker'])
+        self.assertIn('repair limit exhausted',value['blocker'])
         self.assertEqual(self.fake.calls.count('repair'),1)
         self.assertEqual(self.fake.calls.count('review'),2)
         self.assertEqual(self.fake.calls.count('proof'),2)
@@ -1950,24 +2032,131 @@ Pending actions: none.
         self.fake.mode='blocked'
         code,value=self.cli()
         self.assertEqual(code,1,value)
-        self.assertIn('review BLOCKED',value['blocker'])
-        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review'])
+        self.assertIn('recovery needs',value['blocker'])
+        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review','diagnosis'])
         report=(d.local_directory(self.root, '.p2p/work/tiny/contract.md') / 'review.md').read_text()
         self.assertIn('configured command `python3 greet.py`',report)
         self.assertIn('exit zero and print `hello\\n`',report)
         code,value=self.cli('resume')
         self.assertEqual(code,1,value)
-        self.assertIn('review BLOCKED',value['blocker'])
-        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review','review'])
+        self.assertIn('recovery needs',value['blocker'])
+        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review','diagnosis','review','diagnosis'])
         self.assertNotIn('proof',self.fake.calls)
         self.assertNotIn('repair',self.fake.calls)
 
-    def test_plan_acceptance_handoff_stops_before_proof_and_repair(self):
+    def test_delegated_planning_is_audited_adopted_and_reimplemented(self):
         self.fake.mode='review-plan-handoff'
         code,value=self.cli()
+        self.assertEqual(code,0,value)
+        self.assertEqual(self.fake.calls.count('implementation'),2)
+        self.assertEqual(self.fake.calls.count('planning-audit'),1)
+        self.assertEqual(self.state()['contract']['revision'],'v2')
+        self.assertEqual(len(self.state()['agreement_history']),1)
+        self.assertTrue(list((self.root / '.p2p/work/tiny/history').glob('*/contract.md')))
+
+    def test_planning_rejects_weakened_ids_and_independent_audit_refusal(self):
+        self.fake.mode='planning-weaken'
+        code,value=self.cli()
         self.assertEqual(code,1,value)
-        self.assertIn('requires plan-acceptance',value['blocker'])
-        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review'])
+        self.assertIn('requirement IDs',value['blocker'])
+        self.assertEqual(self.state()['contract']['revision'],'v1')
+
+    def test_planning_audit_refusal_preserves_agreement(self):
+        self.fake.mode='planning-reject'
+        code,value=self.cli()
+        self.assertEqual(code,1,value)
+        self.assertIn('independent planning audit rejected',value['blocker'])
+        self.assertEqual((self.root / '.p2p/work/tiny/contract.md').read_text(),CONTRACT)
+
+    def test_multiple_repairs_use_fresh_diagnosis_and_both_verifiers(self):
+        self.fake.mode='multi-repair'
+        code,value=self.cli()
+        self.assertEqual(code,0,value)
+        self.assertEqual(self.fake.calls.count('repair'),2)
+        self.assertEqual(self.fake.calls.count('diagnosis'),1)
+        self.assertEqual(self.fake.calls.count('review'),3)
+        self.assertEqual(self.fake.calls.count('proof'),3)
+        self.assertEqual(len(self.state()['recovery_history']),2)
+
+    def test_explicit_extension_preserves_invocation_and_attempt_budget(self):
+        code,value=self.cli('run','--max-dispatches','0')
+        self.assertEqual(code,1,value)
+        original=self.state()['invocation_id']
+        code,value=self.cli('extend','--authorize-extension','--max-dispatches','infinite',
+                            '--max-seconds','unlimited','--max-stage-seconds','null','--max-repairs','inf')
+        self.assertEqual(code,0,value)
+        self.assertEqual(self.state()['invocation_id'],original)
+        self.assertEqual(len(self.state()['limit_extensions']),1)
+        code,value=self.cli('resume')
+        self.assertEqual(code,0,value)
+        self.assertEqual(value['invocation_id'],original)
+        self.assertEqual(len(value['attempts']),5)
+
+    def test_extension_requires_explicit_authority(self):
+        self.cli('run','--max-dispatches','0')
+        before=self.state()['limits']
+        code,value=self.cli('extend','--max-dispatches','unlimited')
+        self.assertEqual(code,1,value)
+        self.assertIn('explicit --authorize-extension',value['blocker'])
+        self.assertEqual(self.state()['limits'],before)
+
+    def test_standing_effect_check_is_read_only_scoped_and_rechecks_mandate(self):
+        policy=d.autonomy.local('Deliver and commit locally')['policy']
+        policy['effects']=[{'action':'commit','repository':str(self.root),'destination':'feature/tiny'}]
+        mandate=Path(self.temp.name)/'mandate.json'
+        mandate.write_text(json.dumps(policy))
+        code,value=self.cli('run','--mandate',str(mandate))
+        self.assertEqual(code,0,value)
+        state_path=d.local_directory(self.root,'.p2p/work/tiny/contract.md')/'delivery.json'
+        before=state_path.read_bytes()
+        args=['--repository',str(self.root),'--destination','feature/tiny','--preview-sha256','a'*64]
+        code,value=self.cli('authorize-effect','--action','commit',*args)
+        self.assertEqual(code,0,value)
+        self.assertEqual(value['status'],'AUTHORIZED')
+        self.assertEqual(state_path.read_bytes(),before)
+        code,value=self.cli('authorize-effect','--action','push',*args)
+        self.assertEqual(code,1,value)
+        self.assertIn('outside the standing mandate',value['blocker'])
+        self.assertEqual(state_path.read_bytes(),before)
+        mandate.write_text(mandate.read_text()+'\n')
+        code,value=self.cli('resume')
+        self.assertEqual(code,1,value)
+        self.assertIn('mandate changed',value['blocker'])
+
+    def test_confirmed_stalled_worker_is_replaced_without_duplicate_uncertain_launch(self):
+        original=self.fake
+        def stalled(*args):
+            result=original(*args)
+            if original.calls.count('implementation') == 1 and original.calls[-1] == 'implementation':
+                result.update(exit_code=-15,outcome='stalled')
+            return result
+        with patch.object(d,'launch',stalled):
+            code,value=self.cli('run','--worker-idle-seconds','30')
+        self.assertEqual(code,0,value)
+        self.assertEqual(self.fake.calls.count('implementation'),2)
+        self.assertEqual(sum(a['status']=='retired' for a in self.state()['attempts']),1)
+        self.assertEqual(len(self.state()['worker_recovery']),1)
+
+    def test_repeated_findings_stop_when_diagnosis_has_no_new_strategy(self):
+        self.fake.mode='multi-repair'
+        original=self.fake
+        def persistent(*args):
+            result=original(*args)
+            if original.calls[-1]=='proof':
+                path=args[2]
+                events=[json.loads(line) for line in path.read_text().splitlines()]
+                message=next(e['item'] for e in events if e.get('item',{}).get('type')=='agent_message')
+                report=json.loads(message['text'])
+                report.update(status='NOT PROVEN',gaps=['fixture gap'])
+                message['text']=json.dumps(report)
+                path.write_text(''.join(json.dumps(e)+'\n' for e in events))
+            return result
+        with patch.object(d,'launch',persistent):
+            code,value=self.cli()
+        self.assertEqual(code,1,value)
+        self.assertIn('no new executable strategy',value['blocker'])
+        self.assertEqual(self.fake.calls.count('repair'),2)
+        self.assertEqual(self.fake.calls.count('diagnosis'),2)
 
     def test_review_prompt_requires_substantive_observations(self):
         code,value=self.cli()
@@ -1989,7 +2178,7 @@ Pending actions: none.
             self.assertIn(expected,value['blocker'])
             self.assertEqual(self.fake.calls,[])
         state=self.state()
-        self.assertEqual(state['limits']['dispatches'],8)
+        self.assertIsNone(state['limits']['dispatches'])
         self.assertEqual(state['host']['cost'],'unknown')
 
     def test_persisted_scope_cannot_widen(self):
@@ -2003,12 +2192,12 @@ Pending actions: none.
         self.assertIn('persisted admission changed: limits',value['blocker'])
         self.assertEqual(self.fake.calls,[])
 
-    def test_finite_defaults_progress_and_read_only_status(self):
+    def test_unlimited_defaults_progress_and_read_only_status(self):
         progress=io.StringIO()
         with contextlib.redirect_stderr(progress):
             code,value=self.cli()
         self.assertEqual(code,0,value)
-        self.assertEqual(value['limits'],{'dispatches':8,'elapsed_seconds':5400,'stage_seconds':1800})
+        self.assertEqual(value['limits'],dict.fromkeys(('dispatches','elapsed_seconds','stage_seconds','repairs','worker_idle_seconds')))
         self.assertIn('implementation started',progress.getvalue())
         self.assertIn('proof finished',progress.getvalue())
         self.assertEqual(value['progress']['stage'],'proof')
@@ -2066,10 +2255,10 @@ Pending actions: none.
         self.assertEqual(len(self.fake.calls),calls)
 
     def test_invalid_stage_limits_never_admit(self):
-        for limit in ('-1','nan','inf'):
-            code,value=self.cli('run','--max-stage-seconds',limit)
+        for limit in ('-1','nan','-inf'):
+            code,value=self.cli('run','--max-stage-seconds='+limit)
             self.assertEqual(code,1,value)
-            self.assertIn('finite and nonnegative',value['blocker'])
+            self.assertIn('nonnegative numbers or unlimited',value['blocker'])
             self.assertFalse((d.local_directory(self.root, '.p2p/work/tiny/contract.md') / 'delivery.json').exists())
 
     def test_zero_stage_limit_never_dispatches(self):

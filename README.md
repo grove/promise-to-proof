@@ -294,9 +294,11 @@ scope of those checks.
 ## Project status
 
 P2P currently has an executable local delivery controller, durable acceptance
-handoffs, independent review/proof stages, bounded repair and resume behavior,
+handoffs, independent review/proof stages, autonomous recovery and durable resume,
 compact completion records, deterministic artifact checks, and a bounded FizzBee
-delivery model with conformance tests.
+delivery model with conformance tests. New deliveries continue without time or
+attempt limits by default; explicit limits and standing decision/effect mandates
+are described in the [controller guide](./docs/p2p-delivery-controller.md#standing-mandates).
 
 The current production controller path is macOS + Codex CLI. Work on broader host
 portability is tracked separately so new adapters can preserve the same
@@ -349,6 +351,7 @@ documentation so individual skill installs keep the rules they depend on.
 Run the repository's Python checks with:
 
 ```bash
+python3 -c 'import sys; assert sys.version_info >= (3, 11), f"Python 3.11+ required; found {sys.version.split()[0]}"' &&
 python3 -m unittest discover -s checks -p 'test_*.py'
 ```
 

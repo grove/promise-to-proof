@@ -13,6 +13,8 @@ acting. Its contract, identity, evidence, and authority rules govern every step.
 Use the installed `plan-acceptance`, `implement-contract`,
 `review-implementation`, `prove`, and, when needed, `repair-gaps` skills for
 their respective judgments. This skill owns their handoffs, not their verdicts.
+The delivery controller requires Python 3.11 or newer; verify `python3 --version`
+before invoking its scripts.
 
 Use the bundled `scripts/p2p_filesystem.py` helper for local storage and
 identity checks. Run `--help` for arguments. `resolve` locates the work item,
@@ -24,32 +26,43 @@ For unrelated dirty work, capture in the isolated authorized-scope checkout
 specified below and retain its payload only in the external P2P execution directory while the
 delivery is active or unresolved.
 
-## Bound the delivery
+## Continue under standing authority
 
-Before the first stage dispatch, record the invocation, start time, deadline,
-stage allowance, dispatch count, and repair usage in the external P2P execution
-directory. For a new invocation, default to 90 minutes overall, 30 minutes per
-stage, and eight dispatches, including preflight and failed stages. Allow at
-most one automatic repair/recheck cycle. State these limits before starting;
-use explicit user limits when supplied. Pass each stage its remaining allowance
-and reserve time to return its observations. The Python controller accepts
-`--max-seconds`, `--max-stage-seconds`, and `--max-dispatches` for these limits.
+Before dispatch, record the invocation, start time, limits, dispatch count,
+mandate and recovery history in the external execution directory. New runs
+with `--authorize-local` delegate source-preserving local decisions and default
+to unlimited overall duration, stage duration, dispatches and repair cycles.
+Represent unlimited as JSON `null`; accept `unlimited`, `infinite`, `inf` or
+`null` CLI values. Optional `--max-seconds`, `--max-stage-seconds`,
+`--max-dispatches` and `--max-repairs` enforce explicit user limits.
 
-Use the host's timeout or cancellation mechanism when available. While waiting,
-check elapsed time at least every 30 seconds and report the current stage,
-elapsed time, and last observed activity at least every minute. Activity is not
-evidence of useful progress. If the host cannot enforce termination, state that
-limitation. At the deadline, request cancellation, retain partial work and host
-records, and return `BLOCKED` naming the unfinished stage and any uncertain
-worker termination. A timeout never establishes a passing verdict.
+Use `--mandate FILE` for an explicitly selected standing mandate. Follow the
+protocol's Standing autonomy mandates rules. Resolve in-scope recommendations
+and handoffs without conferring with the user again. Before admission, invoke
+planning, slicing and prerequisite delivery as needed. After matching full
+review and proof, continue to requested publication, readiness, merge or deploy
+steps when exact effect grants cover them; save concrete previews and check
+each grant with `authorize-effect`. Otherwise return the exact missing grant.
+Remote effects remain outside isolated stage workers.
 
-Resume retains the saved invocation, deadline, dispatch count, and consumed
-repair allowance. Opening another conversation or repeating the command does
-not reset them. Preserve legacy recorded limits, including absent limits.
-After exhaustion, return the remaining findings and recovery action; do not
-automatically start or recommend a fresh invocation to obtain another allowance.
-Further work needs an explicit extension or follow-up request with a new bound
-and retained history. The Python controller cannot widen an existing admission.
+Keep health observations separate from completion limits. Report current stage,
+elapsed time and last activity at least every minute. The controller's optional
+`--worker-idle-seconds` terminates an idle worker's process group and replaces it
+only after a durable confirmed exit receipt. Retain partial candidate generations
+and old attempts. Missing termination evidence must be reconciled before launch.
+Keep user-facing heartbeats to one concise update with the current stage, last
+verified progress and next milestone. Retain detailed logs in the invocation
+record; repeat findings in chat only when they change.
+Repeated findings trigger fresh independent diagnosis and a different executable
+implementation, evidence or prerequisite strategy. Do not repeat an unchanged
+failed approach indefinitely, weaken requirements, or fabricate proof.
+
+Resume retains saved limits and attempts. Existing finite runs keep their
+bounds; a request to extend them authorizes `extend --authorize-extension` with
+the requested new limits, then `resume`. Unlimited is supported; do not impose
+a replacement deadline or require a fresh invocation merely to represent it.
+Retain the extension receipt and prior admission. Explicit deadlines terminate
+workers and preserve observations; they never establish passing verdicts.
 
 ## Resolve the delivery destination
 
@@ -100,12 +113,19 @@ destination. A plan change still invalidates routing and requires reconciliation
 2. Check that this host can invoke the installed stage skills in separate
    contexts and run independent, read-only review and proof contexts against a
    fixed candidate. Check access to durable contract records and the external
-   execution directory at `~/.p2p/executions/<repo-id>/<slug>/`, including the
-   candidate and its comparison base across those contexts. Select that
+   retained execution directory (default `~/.p2p/executions/<repo-id>/<slug>/`),
+   including the candidate and its comparison base across those contexts. Select that
    report/snapshot destination and verify actual write and read access
    **before implementation**, including a harmless disposable probe when
-   permissions are uncertain. Actually launch a harmless separate read-only
-   stage context and capture its distinct session ID before implementation;
+   permissions are uncertain. Run `python3 <skill-dir>/scripts/p2p_filesystem.py
+   --repo <root> execution-access .p2p/work/<slug>/contract.md` to check and retain
+   the location. For new work, `P2P_EXECUTION_ROOT` may select an absolute,
+   persistent writable directory outside the source checkout. Reuse existing
+   locations; configuration never relocates an active candidate. Explain that
+   publication needs write access to both `runtime/workspace` and the separate
+   `runtime/repository.git`, plus the local records. Recheck those actual
+   directories before handing off a publication preview. Actually launch a
+   harmless separate read-only stage context and capture its distinct session ID before implementation;
    finding the host executable or reading its help is not an isolation check.
    If any required capability is absent, return `BLOCKED` naming it before
    dependent work. Never simulate independent review
@@ -151,7 +171,8 @@ destination. A plan change still invalidates routing and requires reconciliation
    `plan-acceptance` with the source and applicable parent material. Reconcile every material promise and
    exclusion. Ask the developer about unresolved outcomes before dependent
    work. When approval is required, present the exact proposed contract and
-   wait for the developer's approval; an audit or issue label cannot approve it.
+   adopt under delegated planning authority after independent audit, or obtain the
+   developer's approval when planning is outside the mandate. An audit or issue label alone grants no authority.
    This nested planning invocation stays local; it does not inherit the remote
    write authority of a direct user invocation of `plan-acceptance <issue>`.
 5. Save and reread the imported approved contract or the planner's returned
@@ -166,8 +187,8 @@ destination. A plan change still invalidates routing and requires reconciliation
 Keep the canonical contract and compact final records under
 `.p2p/work/<slug>/`. Put active execution state, agreement snapshots, candidate
 payloads, stage reports, invocation records, and scratch under
-`~/.p2p/executions/<repo-id>/<slug>/`; resolve `<repo-id>` from the repository
-directory name and the first 16 hex characters of SHA-256 over the absolute
+`<execution-root>/<repo-id>/<slug>/` (default root `~/.p2p/executions`); resolve
+`<repo-id>` from the repository directory name and the first 16 hex characters of SHA-256 over the absolute
 Git common directory. Store outer workflow artifacts under
 `orchestration/` there and controller runtime under `runtime/`. New candidate
 checkouts and Git objects stay outside the source checkout. Existing active
@@ -276,9 +297,10 @@ its checks.
    gaps in a matching `NOT PROVEN` report to `repair-gaps`. A changed promise or
    consequential seam goes back to `plan-acceptance` with its required decision
    and approval. After a correction, recapture the candidate and rerun **both**
-   full review and proof on it. Allow at most one automatic repair and recheck
-   cycle per invocation; retain all reports and return a specific blocker if
-   findings or gaps remain. Never weaken the agreement or checks to get green.
+   full review and proof on it. Continue repair/recheck cycles under the saved
+   limits. Repeated gaps require fresh diagnosis and a different executable
+   approach. Retain all attempts; stop only for an identified unavailable input,
+   missing authority, exhausted explicit limit, or no new executable strategy. Never weaken the agreement or checks to get green.
 10. Resume from the same `.p2p/work/<slug>/contract.md` path by reading its linked inputs and
     external invocation state, candidate, reports, and evidence. Recheck
     binding parent/spec hashes and comparison base, and compare the entire
@@ -302,13 +324,14 @@ issue, contract location/revision/text identity, candidate and comparison base,
 report/evidence references, actual checks and results, and any partial or
 uncertain effects. A local delivery request authorizes scoped local work and
 safe checks, not tracker edits, triage-label changes, commits, pushes, PRs,
-merges, deployment, or destructive actions. Each external effect needs its own
-authority and verified readback. Leave publication and merge readiness to their
+merges, deployment, or destructive actions. A selected standing mandate can
+cover requested effects. Each external effect needs covering authority and verified readback. Leave publication and merge readiness to their
 existing skills.
 
 End with `Next steps:` and a numbered list (`1.`, `2.`, ...) of only applicable
-actions. For matching full reports, state that local delivery needs no further
-action; publication remains optional and separately authorized. For `BLOCKED`,
+actions. For matching full reports, continue applicable steps requested by the
+objective under covering standing grants. Local-only delivery needs no further
+action; publication requires its covering authority. For `BLOCKED`,
 name the one missing decision, capability, artifact, or check and how to resume
 with the same work-item path after resolving it. Do not ask the developer to
 choose a stage command or reconstruct artifact arguments.

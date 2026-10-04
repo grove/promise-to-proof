@@ -127,6 +127,15 @@ itself under the protocol's evidence rules. Check product content outside
 the smallest complete repair needed and name the affected requirement IDs for
 `/repair-gaps`.
 
+Before a long suite, verify its setup in the exact disposable workspace that will
+run it: interpreter path and version, required imports, working directory, clean
+`.p2p/` state, and candidate identity. A check from the source checkout does not
+establish the nested runner's environment. Save this preflight with the command
+and environment. Run the full suite once on a clean copy of the final frozen
+candidate; use focused checks to guide repairs before that run. If setup invalidates
+an attempt, correct the setup and rerun once. Do not launch duplicate full-suite
+attempts in parallel or treat setup failures as candidate evidence.
+
 ### 6. Report
 
 Save and reread `.p2p/work/<slug>/proof.md` and safe retained evidence in

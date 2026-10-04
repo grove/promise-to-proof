@@ -3,8 +3,40 @@
 The controller runs one established `.p2p/work/<slug>/contract.md` agreement on macOS with
 Python 3.11 or newer, Git, and an authenticated Codex CLI. Install the
 `implement-contract`, `review-implementation`, `prove`, and `repair-gaps` skills
-in `~/.agents/skills/` or `$CODEX_HOME/skills/`. It inherits the configured OpenAI
-model and reasoning preference. Other model providers are unsupported.
+in `~/.agents/skills/` or `$CODEX_HOME/skills/`. The controller packages its
+autonomy, measurement and acceptance-bundle modules in its own `scripts/` directory;
+it does not require this development repository after installation. It inherits
+the configured OpenAI model and reasoning preference. Other model providers are unsupported.
+
+The execution root defaults to `~/.p2p/executions`. For new work, set
+`P2P_EXECUTION_ROOT` to an absolute, persistent directory outside the source
+checkout that the current session can write. For example:
+
+```sh
+export P2P_EXECUTION_ROOT=/absolute/writable/p2p-executions
+python3 skills/productivity/deliver-issue/scripts/p2p_filesystem.py --repo /path/to/source execution-access .p2p/work/example/contract.md
+```
+
+The helper probes write/read access and saves the selected location in ignored
+`.p2p/work/example/execution-location.json`. Resume and cleanup reuse that
+location even if the environment changes. Existing default executions stay
+where they are; changing configuration does not migrate a candidate. The
+controller checks access before implementation and when resuming delivery.
+Paths under `~/.p2p/executions` below use the retained root when configured.
+
+Before publication approval, run the following in the publication session:
+
+```sh
+python3 skills/productivity/publish-pr/scripts/p2p_filesystem.py --repo /path/to/source publication-access .p2p/work/example/contract.md --workspace /retained/execution/runtime/workspace
+```
+
+The worktree and its actual Git directory must both be writable. The controller
+uses a `.git` pointer to the sibling `runtime/repository.git`, whose index,
+objects, and refs are required for commit creation. Local publication records
+also need write access. If access is denied, resolve it before requesting effect
+approval; approving publication cannot change sandbox permissions. Verification
+workers still receive only their scoped writable scratch/workspace, so these
+publication checks do not broaden stage access.
 
 Run from this repository, replacing the work item, source repository, and full
 comparison-base SHA. For unsliced work, add `--destination BRANCH` when the
@@ -14,7 +46,8 @@ workflow has an explicit destination.
 python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source run .p2p/work/example/contract.md --comparison-base FULL_SHA --authorize-local
 ```
 
-`--authorize-local` grants scoped local agent stages and safe checks. The
+`--authorize-local` grants scoped local stages, safe checks and source-preserving
+local planning/recovery decisions; it grants no remote writes. The
 Python controller keeps its isolated Git workspace and execution records under
 `~/.p2p/executions/<repo-id>/<slug>/runtime/`, with temporary agreement copies
 in the sibling `agreement/` directory. The outer `deliver-issue`
@@ -100,20 +133,83 @@ bytes for those paths in its workspace, and rejects implementation changes to
 them. It preserves original source bytes, executable modes, and symlink targets.
 Partially staged paths must be resolved before admission.
 
-New invocations default to eight dispatches, 5,400 seconds (90 minutes) overall,
-and 1,800 seconds (30 minutes) per stage. Override these defaults with
-`--max-dispatches N`, `--max-seconds SECONDS`, and `--max-stage-seconds SECONDS`
-when the task needs a different allowance.
-Limits must be finite and nonnegative; zero stops before dispatch. The two live
-preflight sessions count as dispatches, as do failed or interrupted stages.
-An ordinary delivery needs five dispatches; one repair and both fresh verifiers
-need three more. Each stage stops at the earlier of its own deadline and the
-overall deadline. These are execution guardrails, not promised completion times.
-The overall deadline starts at admission after workspace setup; local setup,
-identity checks, and record persistence are not subject to process termination.
-Resume cannot widen the recorded limits or change the comparison base, scope,
-or authority. Existing admissions keep their saved limits, including legacy
-invocations with no deadline. New defaults do not retrofit a running process.
+New invocations default to unlimited overall duration, stage duration, dispatches
+and repairs. State uses JSON `null` and no synthetic deadline. Optional
+`--max-dispatches N`, `--max-seconds SECONDS`, `--max-stage-seconds SECONDS`
+and `--max-repairs N` impose explicit nonnegative limits; `unlimited`, `infinite`,
+`inf` and `null` mean no limit. Zero stops at the corresponding boundary.
+Failed stages and preflights count as dispatches. Both independent verifiers run
+again after each recovery. Repeated gaps invoke a fresh read-only diagnosis;
+the next repair must use a different executable approach. Confirmed unavailable
+inputs or missing authority remain concrete blockers.
+
+`--worker-idle-seconds SECONDS` optionally detects idle event/error logs, stops
+the process group, saves its exit receipt and replaces that worker. Partial
+candidate generations and retired attempts remain recoverable. Activity alone
+is not proof of useful progress. No watchdog is imposed by default. A reserved
+launch without a confirmed exit stays uncertain and is never blindly duplicated.
+
+Saved invocations keep their original limits. To apply an explicitly requested
+extension without resetting history:
+
+```sh
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source extend .p2p/work/example/contract.md --authorize-extension --max-seconds unlimited --max-stage-seconds unlimited --max-dispatches unlimited --max-repairs unlimited
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source resume .p2p/work/example/contract.md
+```
+
+An extension retains old limits, elapsed observations, consumed attempts and the
+same base. `--mandate FILE` on extension can explicitly adopt standing authority.
+Legacy local-only invocations acquire the source-preserving local mandate on
+explicit extension; no remote effects are granted. A finite elapsed extension
+supplies a new remaining interval from extension time;
+dispatch/repair limits remain total counts, not additional allowances.
+
+### Standing mandates
+
+`--authorize-local` delegates source-preserving local planning, sizing, routing,
+implementation, evidence and repair. It grants no remote effects. For selected
+standing authority, pass `--mandate /absolute/path/mandate.json` at admission:
+
+```json
+{
+  "schema": "promise-to-proof/autonomy/v1",
+  "objective": "Deliver the agreed feature and open its draft PR",
+  "constraints": ["Preserve the source promises and exclusions"],
+  "decisions": ["planning", "sizing", "routing", "implementation", "evidence", "repair"],
+  "effects": [
+    {"action": "commit", "repository": "OWNER/REPO", "destination": "feature/example"},
+    {"action": "push", "repository": "OWNER/REPO", "destination": "feature/example"},
+    {"action": "pr-create", "repository": "OWNER/REPO", "destination": "main"}
+  ],
+  "approval_source": "User instruction granting these actions and destinations"
+}
+```
+
+Select the file through actual user authority; its `approval_source` is attribution,
+not a self-issued grant. The controller records exact bytes/hash and refuses a
+changed file. Only granted decision types may be applied. Source-preserving
+replanning runs separate planner/auditor sessions, retains the prior revision,
+then reruns implementation and both verifiers. Requirement IDs and binding links
+cannot be removed. Existing product changes cannot be approved by changing prose.
+
+Before effects, save/reread the complete preview and check each grant:
+
+```sh
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source authorize-effect .p2p/work/example/contract.md --action push --repository OWNER/REPO --destination feature/example --preview-sha256 FULL_PREVIEW_SHA256
+```
+
+This command is read-only and returns the exact preview hash, candidate and
+covering mandate. Product publication effects require current full matching
+review and proof. Scope checks do not replace publication/readiness/readback
+conditions. Exact destinations are branch names for commit/push/branch-create,
+target branches for pr-create, exact issue/PR URLs for edits/comments/readiness/
+merge, the repository URL for issue-create, and a named environment for deploy.
+No wildcard or force-push grant is accepted. The outer workflow executes these
+steps; the Python controller runs local stages and the compact issue-comment
+publisher. A covering `issue-comment` grant permits `github-record-publish`
+without another `--authorize-comment-sha256` approval; the exact preview is still
+created and checked immediately before writing.
+
 `--hard-cost-cap` always returns `BLOCKED` before dispatch because this host cannot
 enforce a monetary ceiling. Recorded token usage is an observation; cost is unknown.
 An elapsed-time deadline can terminate the local process, but provider work or
