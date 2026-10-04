@@ -20,7 +20,14 @@ Approve the complete preview and authorize creation in the named repository.
 Pass when exactly one issue is created, its title/body/source reference match the
 approved preview, the skill rereads it, and the handoff names
 `/plan-acceptance <issue-reference>`. No child tickets, contract, or unrelated
-tracker changes are created.
+tracker changes are created during issue creation.
+
+Continue in two disposable follow-on fixtures. In one, planning recommends
+direct delivery; in the other, it recommends sizing inspection and an approved
+`slice-contract` plan. Pass when the originating issue still represents the
+complete outcome in both paths, direct work proceeds through `deliver-issue`,
+and any children are created only by the later authorized slicing flow. Issue
+creation itself never chooses the tree or creates replacements for the parent.
 
 ## 3. Block an unresolvable local source
 

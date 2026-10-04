@@ -72,17 +72,65 @@ for a clear outcome can instead be assigned as necessary work.
 
 ## Choose and account for the slices
 
-Inspect relevant implementation, interfaces, tests, and history. Reuse existing
-behavior and assigned tickets. Choose coherent outcomes practical to implement
-and review in a fresh session, without fixed ticket counts or size estimates.
-If separate tickets add no useful boundary, return `NO SPLIT`.
+Start with the whole work item as one leaf. Inspect the source, exact agreement,
+active decomposition, relevant implementation and public seams, tests and proof
+paths, constraints, prerequisites, and relevant delivery history. Stop when more
+inspection is unlikely to change a boundary. Record the inspected context that
+grounds the result; do not infer scope from issue status or counts.
+
+Assess whether the complete outcome is manageable in one implementation,
+independent review, and proof cycle. Weigh coherence, uncertainty, prerequisites,
+compatibility, recoverability, verification, and the cost of another complete
+delivery cycle. File, requirement, test, line, word, time, token, story-point,
+component, and child counts are observations only, never thresholds. Keep
+ordinary fields, API, failure handling, checks, and docs together when they
+complete one coherent outcome.
+
+When source evidence describes staged compatibility, name the proposed
+intermediate state, its compatibility invariant, the transition risk it removes,
+and the proof each delivery unit can establish. Compare that with the merged
+delivery's risk and extra review/proof cycle before retaining a boundary or
+choosing `NO SPLIT`.
+
+Before retaining a proposed boundary, test plausible merges as one delivery
+cycle, including non-adjacent groups. Ask whether a merged group remains
+coherent, manageable, independently reviewable and provable, compatible, and
+recoverable. Merge it when those properties hold. Retain a boundary only when
+it solves a named material delivery problem and earns the extra cycle. Choose
+the fewest units that materially improve reliable delivery; keep difficult but
+indivisible work whole.
 
 Each normal slice delivers an observable outcome through its real production
 path once its prerequisites exist. Include the state, authorization, persistence,
-compatibility, and failure behavior that outcome needs. Split by outcomes, not
-files, requirements, layers, tests, or available agents. Keep ordinary evidence
-development with its behavior. Preparatory refactors need an evidenced dependency
-on the promised change. Exclude speculative platforms and unrelated cleanup.
+compatibility, failure behavior, checks, and documentation that outcome needs.
+Split by outcomes, not files, requirements, layers, tests, or available agents.
+Preparatory refactors need an evidenced dependency on the promised change.
+Exclude speculative platforms and unrelated cleanup.
+
+Before creating children, finish the merge/split analysis and bidirectional
+allocation. Save a concise `## Sizing rationale` in the parent's
+`.p2p/work/<slug>/slicing.md`, outside the exact byte range of any approved
+delivery-plan section. Bind it to the current contract path, revision, and exact
+SHA-256. State whole-versus-split reasoning, leaf manageability, strongest
+rejected merges, inspected evidence, assumptions, and the route/next action.
+This is an outcome summary, not a score or chain of thought. Preserve an active
+approved-plan section byte-for-byte when adding the rationale. Read the saved
+rationale back and verify its identity before child creation.
+
+For `NO SPLIT`, retain the direct-delivery reason and exact contract identity
+in this rationale. Create no children and no new approved delivery plan. After
+reading the rationale back, update `.p2p/work/<slug>/delivery-shape.md` under
+the local history rules: bind it to the exact contract and input identities,
+record `Direct delivery`, the exact `NO SPLIT` result, its rationale, and the
+next action. This current result supersedes an earlier `Sizing inspection` for
+the same identities. Read it back and verify the hashes before handing off; if
+the record cannot be safely updated, stop with a storage blocker. From a
+standalone call, the next step is `/deliver-issue <saved contract>`; it consumes
+the identity-bound result and reaches existing #60 admission. Reuse an
+unchanged identity-bound `NO SPLIT` result; a disagreement requires new or
+previously omitted evidence. A nested sizing call returns to its invoking
+delivery flow, never recursively invokes `deliver-issue`, and does not re-size
+unrelated siblings.
 
 Produce one coverage map in both directions:
 
@@ -251,7 +299,8 @@ actions in order, so each can be referenced by number. For `PUBLISHED`, give
 `/plan-acceptance .p2p/work/<parent>-<slice>/contract.md`; if none is ready, name the exact
 prerequisite outcome and its reference. For `NO SPLIT`, give
 `/plan-acceptance <source>` if no saved contract exists; with an approved,
-saved contract and no blocking gaps, give `/implement-contract <saved contract>`.
+saved contract and no blocking gaps, give `/deliver-issue <saved contract>` so the saved `NO SPLIT` result is
+reused and existing #60 admission runs before implementation.
 Otherwise name the pending approval or gap. For `DRAFT`, ask for approval of
 the exact breakdown or, after approval, give `/slice-contract <parent reference>;
 publish the approved breakdown to <configured destination>`. For `PARTIAL` or

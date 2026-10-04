@@ -98,7 +98,7 @@ class PilotTests(unittest.TestCase):
             self.assertTrue((root / 'episodes' / episode['id'] / 'finished.json').exists())
 
     def test_copied_controllers_repair_order_and_exhaustion(self):
-        from test_p2p_delivery import FakeTransport, repo
+        from test_p2p_delivery import CONTRACT, FakeTransport, repo
 
         class BaselineTransport:
             def __init__(self, mode):
@@ -142,6 +142,16 @@ class PilotTests(unittest.TestCase):
                     with self.subTest(strategy=strategy, mode=mode):
                         root = Path(temp) / (strategy + '-' + mode)
                         base = repo(root)
+                        # CONTROLLER_BASE predates ignored repo-local P2P state and expects these records trackable.
+                        (root / '.gitignore').write_text('')
+                        (root / 'work/tiny.md').write_text(CONTRACT.replace('../../../spec.txt', '../spec.txt'))
+                        subprocess.run(['git', '-C', str(root), 'add', '--', '.gitignore', 'work/tiny.md'], check=True)
+                        subprocess.run(['git', '-C', str(root), '-c', 'user.name=Fixture',
+                                        '-c', 'user.email=fixture@localhost', 'commit', '-qm',
+                                        'Add legacy contract fixture'], check=True)
+                        base = subprocess.check_output(['git', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip()
+                        subprocess.run(['git', '-C', str(root), 'update-ref', 'refs/heads/delivery-target', base],
+                                       check=True)
                         fake = BaselineTransport(mode)
                         args = ['--repo', str(root), 'run', 'work/tiny.md', '--comparison-base', base,
                                 '--authorize-local', '--max-dispatches', '8', '--max-seconds', '1800']

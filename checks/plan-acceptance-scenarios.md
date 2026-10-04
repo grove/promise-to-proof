@@ -261,14 +261,66 @@ exposing the affected decision or retrieval gap. It must not silently narrow
 inherited constraints, invent parent text from its digest, or treat a slice
 marker as authority to revise the agreement.
 
+## 22. Recommend direct delivery for one bounded outcome
+
+Use a small, coherent request with a clear observable result and existing public
+seam. Hide the expected route from the planner.
+
+Pass when the planner recommends `Direct delivery`, grounds it in the inspected
+outcome and delivery/review/proof path, saves and rereads
+`.p2p/work/<slug>/delivery-shape.md`, binds the exact contract and source hashes,
+and gives `/deliver-issue <contract>` as the one next action. It adds no approval,
+readiness, or admission state.
+
+## 23. Recommend sizing inspection for broad work
+
+Use one accepted outcome spanning distinct stateful mechanisms with materially
+different compatibility or proof paths.
+
+Pass when planning recommends `Sizing inspection` and `/slice-contract
+<contract>`, citing the actual mechanisms and boundary uncertainty. It does not
+choose a child count, change the contract, or treat ordinary difficulty and
+multiple rows as the reason.
+
+## 24. Inspect an uncertain boundary
+
+Use a settled contract where the available evidence does not yet show whether
+two contributions share one reliable implementation and proof cycle. Supply the
+repository context but withhold the expected result.
+
+Pass when planning identifies the concrete uncertainty and routes to
+`/slice-contract`; deeper inspection then returns either `NO SPLIT` or the
+fewest justified outcomes. It does not invent a fixed ticket count or resolve
+an unrelated product decision through slicing.
+
+## 25. Keep approval as the immediate next action
+
+Use a direct or sizing recommendation whose exact contract still needs human
+approval.
+
+Pass when `delivery-shape.md` records the advisory route but names approval of
+the exact contract as its sole immediate next action. The later delivery or
+slicing route stays conditional; no implementation or external effect begins.
+
+## 26. Keep nested planning inside delivery
+
+Invoke `deliver-issue` on a source that has no saved contract. Repeat with a
+clearly direct outcome and with a broad outcome.
+
+Pass when the direct recommendation continues within the same delivery and
+reaches existing #60 admission. The broad recommendation stops before
+implementation with one `/slice-contract <contract>` handoff and no recursive
+`deliver-issue` call. Both runs retain exact agreement and shape identities.
+
 ## Local work-item planning
 
 Start with project-authored `work/foo-bar.md` containing stable acceptance
 bullets and verification notes, with no tracker configured. Pass when planning
 saves the generated contract under `.p2p/work/foo-bar/contract.md`, preserves
-IDs and promises, leaves the source bytes unchanged, and creates no root `work/`
-contract. Repeat from `specs/foo-bar.md` and verify the same behavior. An
-unrelated existing `.p2p` contract must not be overwritten. No Git or tracker
+IDs and promises, and saves `.p2p/work/foo-bar/delivery-shape.md` bound to the
+exact source and contract identities with the advisory route and rationale. The
+source bytes remain unchanged, and no root `work/` contract is created.
+Repeat from `specs/foo-bar.md` and verify the same behavior. An unrelated existing `.p2p` contract must not be overwritten. No Git or tracker
 write is authorized by local file creation.
 
 ## Standalone issue planning handoff

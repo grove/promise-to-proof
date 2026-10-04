@@ -78,7 +78,8 @@ def child():
 
 def command(action='resume', **settings):
     write(ROOT / 'command.json', settings)
-    args = [sys.executable, str(Path(__file__).resolve()), 'child', '--repo', str(SOURCE), action, '.p2p/work/tiny/contract.md']
+    args = [sys.executable, str(Path(__file__).resolve()), 'child', '--repo', str(SOURCE), action,
+            '.p2p/work/tiny/contract.md']
     if action == 'run':
         args += ['--max-repairs', '1', '--comparison-base', (ROOT / 'base').read_text(), '--destination', 'delivery-target']
         if CASE != 'unauthorized-before-dispatch':
@@ -102,12 +103,13 @@ def invoke(action='resume', **settings):
 def corrupt():
     saved = state()
     attempt = saved['attempts'][-1]
-    folder = d.execution_runtime(SOURCE, '.p2p/work/tiny/contract.md') / 'attempts' / attempt['id']
+    runtime = d.execution_runtime(SOURCE, '.p2p/work/tiny/contract.md')
+    folder = runtime / 'attempts' / attempt['id']
     if CASE == 'candidate-mutated-during-verification':
-        (d.execution_runtime(SOURCE, '.p2p/work/tiny/contract.md') / 'workspace/greet.py').write_text("print('mutated after launch')\n")
+        (runtime / 'workspace/greet.py').write_text("print('mutated after launch')\n")
     elif CASE == 'incomplete-archive':
         # Remove the saved comparison-base identity used by current recovery checks.
-        (d.execution_runtime(SOURCE, '.p2p/work/tiny/contract.md') / 'base-tree-key').unlink()
+        (runtime / 'base-tree-key').unlink()
     elif CASE == 'late-stage-result':
         value = read(folder / 'exit.json')
         value['attempt_id'] = 'late-result-from-another-launch'

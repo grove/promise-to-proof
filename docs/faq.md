@@ -47,13 +47,20 @@ does not gain an extra publication or approval step.
 
 ### When is `slice-contract` useful, and what does `NO SPLIT` mean?
 
-Use it when one parent contract contains several coherent outcomes that people
-can implement and review separately. It creates the fewest useful local child work items,
-maps their contributions to parent promises, and can mirror an approved plan
-to a tracker when requested.
-It needs a saved parent contract before a complete decomposition. `NO SPLIT`
-means separate tickets add no useful boundary, so the parent can follow the
-direct implementation, review, and proof path.
+After `plan-acceptance` establishes the outcome, P2P recommends direct delivery
+when it is manageable as one bounded implementation, independent review, and
+proof cycle, or sizing inspection when the work is broad or a real boundary is
+uncertain. You do not need to choose the tree first.
+
+`slice-contract` inspects the saved agreement and relevant implementation and
+proof context, then keeps the fewest useful local child work items. Each retained
+boundary must solve a material delivery problem; counts and diff size are not
+thresholds. It maps contributions to parent promises and can mirror an approved
+plan to a tracker when requested.
+
+`NO SPLIT` means separate tickets add no useful boundary. P2P records the reason
+and exact contract identity under `.p2p/`, then continues through `/deliver-issue`
+and its existing #60 admission. Direct sizing itself never admits implementation.
 
 ### What are `R1` and `S1`?
 
