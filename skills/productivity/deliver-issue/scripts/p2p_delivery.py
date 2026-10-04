@@ -102,9 +102,14 @@ def local_directory(root, work):
                                           or (legacy / 'artifacts/delivery.json').is_file()
                                           or (legacy_orchestration.is_dir() and not legacy_orchestration.is_symlink()
                                               and any(legacy_orchestration.iterdir())))
-    if legacy_present and not repo_local.exists():
+    repo_local_present = repo_local.exists() and (any((repo_local / name).exists() for name in ('delivery.json', 'runtime'))
+                                                   or (repo_local / 'artifacts/delivery.json').is_file()
+                                                   or ((repo_local / 'orchestration').is_dir()
+                                                       and not (repo_local / 'orchestration').is_symlink()
+                                                       and any((repo_local / 'orchestration').iterdir())))
+    if legacy_present and not repo_local_present:
         local = legacy
-    elif legacy_present and repo_local.exists():
+    elif legacy_present and repo_local_present:
         raise ValueError('both repo-local and legacy P2P state exist; reconcile without overwriting either')
     else:
         local = repo_local
@@ -217,7 +222,7 @@ def localize_agreement(root, work, bindings):
     if origin is not None:
         for relative in (origin['path'], f".p2p/work/{fs.work_slug(work)}/contract-origin.json"):
             source = fs.safe(root, relative)
-            target = fs.safe(agreement_root, relative)
+            target = fs.safe(agreement_directory, relative)
             if not source.is_file():
                 raise ValueError('legacy contract origin input is missing: ' + relative)
             require_repo_local_ignored(root, target)
@@ -728,14 +733,30 @@ def routing(root, work, destination=None, require_tip=True):
         if parents and work not in rows:
             raise ValueError('child missing from approved routing; hand off to slice-contract ' + parent)
         target = rows[work] if parents else final
-        ref = 'refs/heads/' + target
+        local_ref = f'refs/heads/{target}'
+        ref = local_ref
+        remote = target.partition('/')[0]
+        if '/' in target and remote in fs.git(root, 'remote').decode().splitlines():
+            remote_ref = f'refs/remotes/{target}'
+            def exists(candidate):
+                return subprocess.run(['git', '-C', str(root), 'show-ref', '--verify', '--quiet', candidate],
+                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
+            local_exists, remote_exists = exists(local_ref), exists(remote_ref)
+            qualified = bool(destination and destination.startswith(('refs/heads/', 'refs/remotes/')))
+            if local_exists and remote_exists and not qualified:
+                raise ValueError('ambiguous approved destination: ' + target +
+                                 ' exists as both local and remote-tracking refs; pass a fully qualified destination')
+            if remote_exists or not local_exists:
+                ref = remote_ref
         route = {'path': str(path.relative_to(root)), 'parent': parent, 'revision': revision,
                  'sha256': fs.digest(sections[0]), 'text': text, 'approval_source': approval,
                  'destination': target, 'target_ref': ref, 'selection': 'approved-plan'}
         if destination:
-            requested, _ = explicit_destination(root, destination)
+            requested, requested_ref = explicit_destination(root, destination)
             if requested != target:
                 raise ValueError('workflow destination conflicts with approved delivery plan: ' + target)
+            if destination.startswith('refs/'):
+                ref = route['target_ref'] = requested_ref
     # An explicit local ref is required for local delivery. Skills inspect remote
     # state and perform any authorized setup before admitting this controller.
     try:
@@ -789,16 +810,39 @@ def destination_observation(root, route, base):
             'observed_tip': tip, 'relation': relation, 'observed_at': observed}
 
 
-def routing_records(root, decision):
-    """Transfer plan/history outside candidate identity, using existing file records."""
-    if decision is None or decision.get('path') is None:
-        return []
-    path = fs.safe(root, decision['path'])
-    selected = {path}
-    selected.update(path.parent.glob('history/**/slicing.md'))
-    approval = path.parent / 'planning-handoff.md'
-    if approval.is_file():
-        selected.add(approval)
+def validate_sidecar_plan(root, decision, work):
+    """Reject current sidecar plan identities that differ from the active route."""
+    _, directory = fs.paths(root, work)
+    for name in ('slicing.md', 'delivery-shape.md'):
+        sidecar = directory / name
+        if not sidecar.is_file():
+            continue
+        for line in fs.document_lines(sidecar.read_text()):
+            if re.search(r'plan.*section.*SHA-256', line, re.IGNORECASE):
+                hashes = re.findall(r'SHA-256\s+`?([0-9a-f]{64})', line)
+                if hashes != [decision.get('sha256')]:
+                    raise ValueError('current sidecar plan-section digest differs from active route; '
+                                     'reconcile ' + str(sidecar.relative_to(root)))
+
+
+def routing_records(root, decision, work):
+    """Transfer approved routing and current work-item sizing evidence."""
+    validate_sidecar_plan(root, decision, work)
+    _, work_directory = fs.paths(root, work)
+    path = fs.safe(root, decision['path']) if decision and decision.get('path') else None
+    selected = set()
+    if path:
+        selected.add(path)
+        selected.update(path.parent.glob('history/**/slicing.md'))
+        approval = path.parent / 'planning-handoff.md'
+        if approval.is_file():
+            selected.add(approval)
+    for name in ('slicing.md', 'delivery-shape.md'):
+        sidecar = fs.safe(root, str(work_directory.relative_to(root) / name))
+        if sidecar.is_file():
+            selected.add(sidecar)
+    selected.update(work_directory.glob('history/**/slicing.md'))
+    selected.update(work_directory.glob('history/**/delivery-shape.md'))
     # Local Markdown references can carry approval and captured parent evidence.
     pending = list(selected)
     while pending:
@@ -807,7 +851,11 @@ def routing_records(root, decision):
         if file.suffix != '.md':
             continue
         # History retains the original bytes, including original relative links.
-        origin = path.parent if path.parent / 'history' in file.parents else file.parent
+        origin = file.parent
+        for owner in (work_directory, path.parent if path else None):
+            if owner is not None and owner / 'history' in file.parents:
+                origin = owner
+                break
         text = file.read_text()
         targets = re.findall(r'\[[^\]]*\]\(([^)]+)\)', text)
         # Older approvals name bare local Markdown receipts. Keep their bytes and
@@ -1155,10 +1203,12 @@ class Delivery:
                     if selection == 'explicit' or (selection is None and not admitted_route.get('path'))
                     else None)
         active_route = routing(self.root, self.work, explicit, require_tip=False)
+        validate_sidecar_plan(self.root, active_route, self.work)
+        validate_sidecar_plan(self.workspace, admitted_route, self.work)
         if route_identity(active_route) != route_identity(admitted_route):
             raise ValueError('approved delivery plan or destination changed; reconcile routing before resume')
         if admitted_route.get('path') and route_identity(
-                routing(self.workspace, self.work, require_tip=False)) != route_identity(admitted_route):
+                routing(self.workspace, self.work, admitted_route['target_ref'], require_tip=False)) != route_identity(admitted_route):
             raise ValueError('transferred approved delivery plan changed')
         for record in self.state.get('routing_records', []):
             if self.state['routing'].get('path') and record['path'] == self.state['routing']['path']:
@@ -1205,7 +1255,7 @@ class Delivery:
         if agreement_bindings(self.root, self.work) != self.state['binding_inputs']:
             raise ValueError('binding inputs changed')
         source_item, _ = fs.paths(self.root, self.work)
-        if fs.digest(source_item.read_bytes()) != self.state['contract']['sha256']:
+        if source_item.is_file() and fs.digest(source_item.read_bytes()) != self.state['contract']['sha256']:
             raise ValueError('work item changed')
         if fs.digest(self.item.read_bytes()) != self.state['contract']['sha256']:
             raise ValueError('work item changed')
@@ -1538,6 +1588,10 @@ assert results['scratch'] == 'ok'
                                                ('sequence', 'candidate_key', 'tree', 'commit', 'record_sha256')}
         if self.state.get('routing') is not None:
             result['routing'] = self.state['routing']
+        if self.state.get('routing_records'):
+            result['routing_records'] = [
+                {key: record[key] for key in ('path', 'sha256')}
+                for record in self.state['routing_records']]
         return result
 
     def stage(self, name):
@@ -1566,7 +1620,8 @@ assert results['scratch'] == 'ok'
                   'must not replace this base or trigger a verifier restart. Whole contract, full scope. '
                   f'Approved delivery routing (separate from product identity): {json.dumps(self.state.get("routing"))}. '
                   f'Latest destination observation (informational only): {json.dumps(self.state.get("destination_observation"))}. '
-                  'Read transferred plan/history and verify prerequisite outcomes in the actual candidate. '
+                  'Read the transferred approved plan, current sizing/shape records, and linked history; verify '
+                  'their identities and prerequisite outcomes in the actual candidate. '
                   'The enclosing controller owns durable reports; return your full report in the required JSON '
                   'schema and it will save and reread it. Never mutate the source checkout, controller records, '
                   'agreement or binding inputs, or source/delivered Git metadata. Local stages and safe scratch '
@@ -2010,7 +2065,7 @@ def create(root, args, invocation_started_epoch=None):
     if base != decision['target_tip']:
         raise ValueError('destination ' + decision['destination'] + ' is currently at ' + decision['target_tip'] +
                          '; requested comparison base ' + base + ' is stale; start a new delivery with --comparison-base ' + decision['target_tip'])
-    records = routing_records(root, decision)
+    records = routing_records(root, decision, args.work)
     installed = skills()
     fs.check_index(root)
     current = fs.snapshot(root)

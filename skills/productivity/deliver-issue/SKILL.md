@@ -184,6 +184,39 @@ It retains `planning-handoff.md` and `archive.md` with hashed reasons when
 present, enforces the generated-record footprint, and blocks on unclassified
 or staged extras. `.p2p/` is excluded from the product candidate.
 
+## Consume delivery-shape routing
+
+Read `.p2p/work/<slug>/delivery-shape.md` when present and verify that its
+contract and binding-input hashes still match. For an accepted work item with a
+missing or stale assessment, return to `plan-acceptance` to assess the same
+agreement and save the current record before continuing; reconcile an actual
+contract change through the normal approval rules. Do not invent another sizing
+or readiness heuristic in delivery.
+
+Before choosing the route, also read the saved `slicing.md` result. When its
+`NO SPLIT` and sizing rationale bind to the exact current contract and input
+identities, that later result supersedes an earlier `Sizing inspection` in
+`delivery-shape.md`. Reconcile the sidecar under its history rules to
+`Direct delivery`, with the exact `NO SPLIT` result and rationale, then read it
+back. On unchanged inputs, reuse that result without another sizing handoff. If
+the sidecar cannot be safely updated, stop with a storage blocker. A changed
+contract or binding input makes both recommendations stale and requires a fresh
+assessment.
+
+A current `Sizing inspection` with no later identity-matching `NO SPLIT` stops
+implementation and hands off to `/slice-contract <contract>`. If planning ran
+inside this delivery, a `Direct delivery` result continues in the same
+invocation; an inspection result stops there and never recursively invokes
+`deliver-issue`. A current `NO SPLIT` result reuses its direct-delivery reason
+and identity unless new evidence materially changes the boundary.
+
+A current direct recommendation proceeds through the existing #60 admission
+controller. It is not `ADMITTED`: the controller's one admission result decides
+whether implementation may start. Preserve its destination, comparison-base,
+workspace, environment, and verifier checks. A rejected admission launches no
+implementation. Sizing consumes this admission outcome and does not duplicate
+its checks.
+
 ## Build and capture
 
 6. Invoke `implement-contract` for the whole saved agreement in the isolated

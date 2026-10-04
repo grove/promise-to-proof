@@ -14,11 +14,17 @@ Run `/setup-promise-to-proof` in a new project. It creates `.p2p/work/` and
 projects may use them for their own files. Generated contracts and all `.p2p/**`
 state stay out of project Git history. Tracker configuration is optional.
 
-For one coherent delivery, run `/plan-acceptance <source>`; it saves the
-contract under `.p2p/work/<slug>/contract.md`. A source file may be in `specs/`,
-`work/`, or another project path. Then run `/deliver-issue .p2p/work/<slug>/contract.md`.
-An agreed outcome can go directly into a standalone work item without a spec.
-For large work, plan the parent contract and then divide it into local children.
+For a new change, run `/plan-acceptance <source>`; it saves the contract under
+`.p2p/work/<slug>/contract.md`. A source file may be in `specs/`, `work/`, or
+another project path. Follow the saved delivery-shape recommendation instead of
+choosing a route in advance. An agreed outcome can also go directly into a
+standalone work item without a spec.
+After acceptance planning, P2P recommends either direct delivery or sizing
+inspection; you do not need to choose first. A direct recommendation proceeds
+through `/deliver-issue`, which applies the existing #60 admission before
+implementation. For broad or materially uncertain boundaries, run
+`/slice-contract`; `NO SPLIT` means the parent remains one delivery unit and
+continues through the direct path.
 
 ```text
 Local work item → deliver-issue → optional separately authorized publish-pr
@@ -225,9 +231,11 @@ Promoting advice to a binding rule is a separate human-authorized change through
 the source's owning workflow. If a later candidate is evaluated retrospectively,
 it needs its own proof and evaluation; an old report stays historical.
 
-## Divide large work
+## Inspect delivery boundaries when recommended
 
-Plan the parent acceptance contract, then request a split:
+You do not need to choose direct delivery or slicing before planning. When
+`plan-acceptance` recommends sizing inspection, run `/slice-contract` on the
+saved parent contract:
 
 ```text
 /plan-acceptance .p2p/work/retry-safe-uploads/contract.md
@@ -239,8 +247,10 @@ The default result is ignored child contracts such as
 `.p2p/work/retry-safe-uploads-browser/contract.md`.
 The parent lists children and contributions. Each child links to the parent
 and states a complete outcome, inherited constraints, and prerequisites.
-Slicing creates no extra specifications by default. `NO SPLIT` means the parent
-can use the direct delivery path.
+Slicing creates no extra specifications by default. `NO SPLIT` records the
+contract identity and direct-delivery reason in `.p2p/work/<slug>/slicing.md`;
+continue with `/deliver-issue` and its existing #60 admission. No child contract
+is created for that result.
 
 Resolve consequential outcome or dependency decisions before dependent work.
 Run `/plan-acceptance` on each child to complete its contract in place, then

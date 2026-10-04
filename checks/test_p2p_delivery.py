@@ -117,7 +117,7 @@ def p2p_repo(path, work='work/p2p-self-delivery.md'):
     d.fs.git(path, 'update-ref', 'refs/heads/delivery-target', base)
     (path / 'spec.txt').write_text('A CLI prints hello followed by a newline and exits zero.\n')
     (path / 'work').mkdir(exist_ok=True)
-    (path / work).write_text(CONTRACT)
+    (path / work).write_text(CONTRACT.replace('../../../spec.txt', '../spec.txt'))
     return base
 
 
@@ -406,12 +406,13 @@ class DeliveryTests(unittest.TestCase):
 
     def test_symlinked_local_storage_roots_block_reads_and_writes(self):
         local = d.local_directory(self.root, '.p2p/work/tiny/contract.md')
-        local.mkdir(parents=True)
+        self.assertTrue(local.is_dir())
         outside = Path(self.temp.name) / 'outside'
         outside.mkdir()
         for name in ('agreement', 'artifacts'):
             (local / name).symlink_to(outside, target_is_directory=True)
-            with self.assertRaisesRegex(ValueError, 'repo-local P2P ' + name):
+            expected = 'P2P agreement path is not a directory' if name == 'agreement' else 'repo-local P2P artifacts'
+            with self.assertRaisesRegex(ValueError, expected):
                 d.delivery_paths(self.root, '.p2p/work/tiny/contract.md')
             (local / name).unlink()
 
@@ -429,6 +430,10 @@ class DeliveryTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn('unambiguous configured upstream', value['blocker'])
         self.assertEqual(self.fake.calls, [])
+        self.assertEqual(self.fake.messages, [])
+        local = d.local_directory(self.root, '.p2p/work/tiny/contract.md')
+        self.assertFalse((local / 'delivery.json').exists())
+        self.assertFalse((self.runtime() / 'attempts').exists())
 
         d.fs.git(self.root, 'config', '--unset-all', f'branch.{branch}.remote')
         d.fs.git(self.root, 'config', '--add', f'branch.{branch}.remote', 'origin')
@@ -641,8 +646,9 @@ class DeliveryTests(unittest.TestCase):
     def planned_child(self, choice='grouped'):
         d.fs.git(self.root, 'branch', 'trunk', self.base)
         d.fs.git(self.root, 'branch', 'epic/tiny', self.base)
-        (self.root / 'work/parent.md').write_text(CONTRACT.replace('tiny', 'parent'))
-        (self.root / '.p2p/work/tiny/contract.md').write_text(CONTRACT + '\nParent: [Parent](parent.md)\n')
+        (self.root / 'work/parent.md').write_text(
+            CONTRACT.replace('tiny', 'parent').replace('../../../spec.txt', '../spec.txt'))
+        (self.root / '.p2p/work/tiny/contract.md').write_text(CONTRACT + '\nParent: [Parent](../../../work/parent.md)\n')
         text = f'''# Slicing
 
 ## Approved delivery plan
@@ -656,7 +662,7 @@ Default choice: {choice}
 
 | Child | Choice | Destination | Reason | State |
 |---|---|---|---|---|
-| work/tiny.md | default | {'epic/tiny' if choice == 'grouped' else 'trunk'} | Complete acceptable fixture outcome. | remaining |
+| .p2p/work/tiny/contract.md | default | {'epic/tiny' if choice == 'grouped' else 'trunk'} | Complete acceptable fixture outcome. | remaining |
 
 Parent completion: Run combined greeting.
 Pending actions: none.
@@ -665,8 +671,74 @@ Pending actions: none.
         d.fs.save(self.root, 'work/parent.md', 'slicing.md', text.encode())
         return self.root / '.p2p/work/parent/slicing.md'
 
+    def test_child_routing_resolves_approved_remote_tracking_destination(self):
+        path = self.planned_child(choice='independent')
+        d.fs.git(self.root, 'remote', 'add', 'origin', 'https://example.invalid/repo.git')
+        d.fs.git(self.root, 'update-ref', 'refs/remotes/origin/main', self.base)
+        old = path.read_text()
+        new = (old.replace('Final destination: trunk', 'Final destination: origin/main')
+                  .replace('Integration branch: epic/tiny', 'Integration branch: none')
+                  .replace('Integration start: ' + self.base, 'Integration start: none')
+                  .replace('| .p2p/work/tiny/contract.md | default | trunk |', '| .p2p/work/tiny/contract.md | default | origin/main |'))
+        self.assertNotEqual(old, new)
+        d.fs.save(self.root, 'work/parent.md', 'slicing.md', new.encode())
+        code, value = self.cli()
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['routing']['destination'], 'origin/main')
+        self.assertEqual(value['routing']['target_ref'], 'refs/remotes/origin/main')
+        self.assertEqual(value['routing']['target_tip'], self.base)
+        self.assertEqual(value['destination_observation']['relation'], 'unchanged')
+
+    def test_child_routing_rejects_ambiguous_local_and_remote_destination(self):
+        path = self.planned_child(choice='independent')
+        d.fs.git(self.root, 'remote', 'add', 'origin', 'https://example.invalid/repo.git')
+        d.fs.git(self.root, 'branch', 'origin/main', self.base)
+        d.fs.git(self.root, 'update-ref', 'refs/remotes/origin/main', self.base)
+        old = path.read_text()
+        new = (old.replace('Final destination: trunk', 'Final destination: origin/main')
+                  .replace('| .p2p/work/tiny/contract.md | default | trunk |',
+                           '| .p2p/work/tiny/contract.md | default | origin/main |'))
+        d.fs.save(self.root, 'work/parent.md', 'slicing.md', new.encode())
+        with self.assertRaisesRegex(ValueError, 'ambiguous approved destination'):
+            d.routing(self.root, '.p2p/work/tiny/contract.md')
+
+        local = d.routing(self.root, '.p2p/work/tiny/contract.md', 'refs/heads/origin/main')
+        remote = d.routing(self.root, '.p2p/work/tiny/contract.md', 'refs/remotes/origin/main')
+        self.assertEqual(local['target_ref'], 'refs/heads/origin/main')
+        self.assertEqual(remote['target_ref'], 'refs/remotes/origin/main')
+
+    def test_current_sidecar_rejects_wrong_plan_section_before_reuse(self):
+        self.planned_child()
+        work = '.p2p/work/tiny/contract.md'
+        route = d.routing(self.root, work)
+        for name in ('slicing.md', 'delivery-shape.md'):
+            sidecar = self.root / '.p2p/work/tiny' / name
+            sidecar.write_text('Approved parent-plan contribution: S1 section SHA-256 ' + '0' * 64 + '\n')
+            with self.assertRaisesRegex(ValueError, 'sidecar plan-section digest differs'):
+                d.routing_records(self.root, route, work)
+            sidecar.write_text(sidecar.read_text().replace('0' * 64, route['sha256']))
+            records = d.routing_records(self.root, route, work)
+            self.assertIn(str(sidecar.relative_to(self.root)), [r['path'] for r in records])
+        d.fs.save(self.root, work, 'delivery-shape.md', b'Approved plan section SHA-256 ' + b'0' * 64 + b'\n')
+        with self.assertRaisesRegex(ValueError, 'sidecar plan-section digest differs'):
+            d.validate_sidecar_plan(self.root, route, work)
+        d.fs.save(self.root, work, 'delivery-shape.md', ('Approved plan section SHA-256 ' + route['sha256'] + '\n').encode())
+        self.assertTrue(d.routing_records(self.root, route, work))
+
     def test_child_routing_transfers_plan_and_binds_stage_inputs(self):
         path = self.planned_child()
+        child_dir = self.root / '.p2p/work/tiny'
+        evidence = child_dir / 'artifacts/sizing-evidence.md'
+        evidence.parent.mkdir(parents=True)
+        evidence.write_text('Sizing evidence retained with the current result.\n')
+        old_sizing = b'# Previous sizing result\n'
+        d.fs.save(self.root, '.p2p/work/tiny/contract.md', 'slicing.md', old_sizing)
+        sizing = b'# Current sizing result\n\nEvidence: [inspection](artifacts/sizing-evidence.md)\n'
+        d.fs.save(self.root, '.p2p/work/tiny/contract.md', 'slicing.md', sizing)
+        old_shape = b'# Previous delivery shape\n'
+        d.fs.save(self.root, '.p2p/work/tiny/contract.md', 'delivery-shape.md', old_shape)
+        shape = b'# Current delivery shape\n\nSizing: [current result](slicing.md)\n'
+        d.fs.save(self.root, '.p2p/work/tiny/contract.md', 'delivery-shape.md', shape)
         d.fs.save(self.root, 'work/parent.md', 'approval.md', b'User: approve routing v1.\n')
         path.write_text(path.read_text().replace('retained fixture request.', '[retained fixture request](approval.md).'))
         old = path.read_bytes()
@@ -677,6 +749,13 @@ Pending actions: none.
         self.assertEqual(value['routing']['destination'], 'epic/tiny')
         workspace = self.runtime() / 'workspace'
         self.assertEqual((workspace / path.relative_to(self.root)).read_bytes(), path.read_bytes())
+        self.assertEqual((workspace / '.p2p/work/tiny/slicing.md').read_bytes(), sizing)
+        self.assertEqual((workspace / '.p2p/work/tiny/delivery-shape.md').read_bytes(), shape)
+        self.assertEqual((workspace / '.p2p/work/tiny/artifacts/sizing-evidence.md').read_bytes(),
+                         evidence.read_bytes())
+        for name, previous in (('slicing.md', old_sizing), ('delivery-shape.md', old_shape)):
+            history = '.p2p/work/tiny/history/' + d.fs.digest(previous) + '/' + name
+            self.assertEqual((workspace / history).read_bytes(), previous)
         history = '.p2p/work/parent/history/' + d.fs.digest(old) + '/slicing.md'
         self.assertEqual((workspace / history).read_bytes(), old)
         (workspace / history).write_bytes(b'changed historical routing')
@@ -687,6 +766,10 @@ Pending actions: none.
         self.assertFalse(any(e['path'].startswith('.p2p/') for e in state['candidate']['changes']))
         for stage in ('implementation', 'review', 'proof'):
             self.assertEqual(state['reports'][stage]['inputs']['routing'], state['routing'])
+            self.assertIn({'path': '.p2p/work/tiny/slicing.md', 'sha256': d.fs.digest(sizing)},
+                          state['reports'][stage]['inputs']['routing_records'])
+            self.assertIn({'path': '.p2p/work/tiny/delivery-shape.md', 'sha256': d.fs.digest(shape)},
+                          state['reports'][stage]['inputs']['routing_records'])
         # A saved proposal changes neither the active decision nor candidate bytes.
         d.fs.save(self.root, 'work/parent.md', 'slicing.md', old + b'## Proposed delivery plan\nAnother proposal.\n')
         self.assertEqual(self.cli('resume')[0], 0)
@@ -742,6 +825,7 @@ Pending actions: none.
         recovered_local.parent.mkdir(parents=True, exist_ok=True)
         shutil.copytree(local, recovered_local)
         recovered_runtime = d.execution_runtime(recovered, '.p2p/work/tiny/contract.md')
+        shutil.copytree(self.runtime(), recovered_runtime)
         recovered_workspace = recovered_runtime / 'workspace'
         (recovered_workspace / '.git').write_text('gitdir: ' + str(recovered_runtime / 'repository.git') + '\n')
         self.assertIn('dispatch-count limit', cli(recovered, 'run')['blocker'])
@@ -876,7 +960,7 @@ Pending actions: none.
         self.assertEqual(before, (d.local_directory(self.root, '.p2p/work/tiny/contract.md') / 'delivery.json').read_bytes())
         self.assertEqual(self.cli('resume')[0], 0)
         self.assertEqual(len(self.fake.calls), 5)
-        proof = d.local_directory(self.root, '.p2p/work/tiny/contract.md') / state['reports']['proof']['path']
+        proof = self.runtime() / state['reports']['proof']['path']
         proof.write_text('{}')
         code, value = self.cli('resume')
         self.assertEqual(code,1)
@@ -917,6 +1001,8 @@ Pending actions: none.
         self.assertFalse((self.root / '.p2p/work/tiny/runtime/admission.json').exists())
 
     def test_work_item_lock_must_remain_ignored(self):
+        contract = self.root / '.p2p/work/tiny/contract.md'
+        original = contract.read_bytes()
         (self.root / '.gitignore').write_text(
             '/.p2p/\n!/.p2p/\n!/.p2p/work/\n/.p2p/work/*\n!/.p2p/work/tiny.lock\n')
         self.assertEqual(d.fs.git(self.root, 'check-ignore', '--no-index', '.p2p/work/probe')
@@ -924,8 +1010,10 @@ Pending actions: none.
         code, value = self.cli('run', '--max-dispatches', '0')
         self.assertEqual(code, 1)
         self.assertIn('repo-local artifact path is not ignored: .p2p/work/tiny.lock', value['blocker'])
+        self.assertEqual(contract.read_bytes(), original)
         self.assertFalse((self.root / '.p2p/work/tiny.lock').exists())
-        self.assertFalse((self.root / '.p2p/work').exists())
+        self.assertFalse((d.local_directory(self.root, '.p2p/work/tiny/contract.md') / 'delivery.json').exists())
+        self.assertFalse(self.runtime().exists())
         self.assertEqual(self.fake.calls, [])
 
     def test_atomic_write_checks_its_temporary_sibling_ignore_rule(self):
@@ -971,7 +1059,7 @@ Pending actions: none.
         (legacy / 'delivery.json').write_text('{"legacy":true}\n')
         self.assertEqual(d.local_directory(self.root, '.p2p/work/tiny/contract.md'), legacy)
         self.assertEqual(d.delivery_paths(self.root, '.p2p/work/tiny/contract.md')[1], legacy / 'artifacts')
-        local.mkdir(parents=True)
+        (local / 'delivery.json').write_text('{"repo_local":true}\n')
         with self.assertRaisesRegex(ValueError, 'both repo-local and legacy'):
             d.local_directory(self.root, '.p2p/work/tiny/contract.md')
         shutil.rmtree(local)
@@ -988,7 +1076,9 @@ Pending actions: none.
         self.assertFalse((legacy / 'delivery.json').exists())
         self.assertFalse((legacy / 'runtime').exists())
         self.assertEqual(d.local_directory(self.root, '.p2p/work/tiny/contract.md'), legacy)
-        local.mkdir(parents=True)
+        repo_local_invocation = local / 'orchestration/invocation.json'
+        repo_local_invocation.parent.mkdir(parents=True)
+        repo_local_invocation.write_text('{"status":"RUNNING"}\n')
         with self.assertRaisesRegex(ValueError, 'both repo-local and legacy'):
             d.local_directory(self.root, '.p2p/work/tiny/contract.md')
 
@@ -1066,7 +1156,8 @@ Pending actions: none.
         base_files = {entry['path']: entry for entry in base_snapshot}
         self.assertFalse(any(path == '.p2p' or path.startswith('.p2p/') for path in base_files))
         for index, generation in enumerate(generations):
-            record = json.loads((local / generation['record_path']).read_bytes())
+            record_path = generation['record_path'].removeprefix('runtime/')
+            record = json.loads((self.runtime() / record_path).read_bytes())
             self.assertEqual(record['commit'], generation['commit'])
             reconstructed = d.fs.snapshot(repository, record['commit'])
             self.assertEqual(d.fs.snapshot_key(reconstructed), record['candidate_key'])
@@ -1632,13 +1723,15 @@ Pending actions: none.
 
     def test_repeated_deliveries_retain_only_final_record_growth(self):
         self.complete_and_cleanup()
+        apply_candidate(self.root, self.runtime() / 'workspace')
         d.fs.git(self.root, 'add', '-A')
         d.fs.git(self.root, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost',
                  'commit', '-qm', 'Apply first candidate')
         self.base = d.fs.full_commit(self.root, 'HEAD')
         d.fs.git(self.root, 'update-ref', 'refs/heads/delivery-target', self.base)
         next_work = 'work/tiny-next.md'
-        (self.root / next_work).write_text(CONTRACT.replace('Acceptance contract: tiny', 'Acceptance contract: tiny next'))
+        (self.root / next_work).write_text(CONTRACT.replace('Acceptance contract: tiny', 'Acceptance contract: tiny next')
+                                          .replace('../../../spec.txt', '../spec.txt'))
         self.fake.output_path = 'second.py'
         code, value = self.cli_item(next_work)
         self.assertEqual(code, 0, value)
@@ -1713,6 +1806,8 @@ Pending actions: none.
         self.assertEqual(self.fake.calls,[])
 
     def test_codex_version_timeout_leaves_no_delivery_state(self):
+        contract = self.root / '.p2p/work/tiny/contract.md'
+        original = contract.read_bytes()
         run = d.subprocess.run
         def timeout_version(args, *positional, **options):
             if len(args) == 2 and args[0].endswith('/codex') and args[1] == '--version':
@@ -1722,7 +1817,10 @@ Pending actions: none.
             code, value = self.cli()
         self.assertEqual(code, 1)
         self.assertIn('version probe failed or timed out', value['blocker'])
-        self.assertFalse((self.root / '.p2p/work/tiny').exists())
+        local = d.local_directory(self.root, '.p2p/work/tiny/contract.md')
+        self.assertEqual(contract.read_bytes(), original)
+        self.assertFalse((local / 'delivery.json').exists())
+        self.assertFalse(self.runtime().exists())
 
     def test_repeated_run_cannot_replace_frozen_base_after_target_moves(self):
         code, value = self.cli('run', '--max-dispatches', '0')
@@ -1752,6 +1850,7 @@ Pending actions: none.
         subprocess.run(['git', 'clone', '-q', str(self.root), str(integrated)], check=True)
         d.fs.git(integrated, 'checkout', '-q', '-B', 'delivery-target', newer)
         (integrated / 'work').mkdir(exist_ok=True)
+        (integrated / '.p2p/work/tiny').mkdir(parents=True, exist_ok=True)
         (integrated / '.p2p/work/tiny/contract.md').write_bytes((self.root / '.p2p/work/tiny/contract.md').read_bytes())
         output = io.StringIO()
         args = ['--repo', str(integrated), 'run', '.p2p/work/tiny/contract.md', '--comparison-base', newer,
@@ -2137,6 +2236,9 @@ Pending actions: none.
         metadata=self.runtime() / 'repository.git'
         subprocess.run(['git','clone','-q',str(metadata),str(restored)],check=True,capture_output=True)
         d.materialize(restored,d.fs.snapshot(self.runtime() / 'workspace'))
+        restored_contract = restored / '.p2p/work/tiny/contract.md'
+        restored_contract.parent.mkdir(parents=True, exist_ok=True)
+        restored_contract.write_bytes((self.runtime() / 'workspace/.p2p/work/tiny/contract.md').read_bytes())
         self.assertEqual(d.fs.full_commit(restored, self.base), self.base)
         self.assertEqual(d.fs.snapshot_key(d.fs.snapshot(restored, self.base)), (self.runtime() / 'base-tree-key').read_text().strip())
         d.fs.save(restored,'.p2p/work/tiny/contract.md','candidate.json',d.encoded(state['candidate']))
@@ -2358,12 +2460,13 @@ class ConformanceBridgeTests(unittest.TestCase):
             source = trace / 'source'
             with patch.dict(os.environ, {'HOME': str(home)}):
                 local = d.local_directory(source, '.p2p/work/tiny/contract.md')
+                runtime = d.execution_runtime(source, '.p2p/work/tiny/contract.md')
             saved = json.loads((local / 'delivery.json').read_text())
             self.assertIn('key', saved['candidate'])
             self.assertIn('changes', saved['candidate'])
             self.assertNotIn('manifest', saved['candidate'])
-            self.assertTrue((d.execution_runtime(source, '.p2p/work/tiny/contract.md') / 'workspace/.git').is_file())
-            self.assertTrue(all((d.execution_runtime(source, '.p2p/work/tiny/contract.md') / report['path']).is_file()
+            self.assertTrue((runtime / 'workspace/.git').is_file())
+            self.assertTrue(all((runtime / report['path']).is_file()
                                 for report in saved['reports'].values()))
             actions = [json.loads(line) for line in (trace / 'actions.jsonl').read_text().splitlines()]
             self.assertIn('--destination', actions[0]['controller']['command'])

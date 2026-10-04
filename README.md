@@ -154,13 +154,19 @@ of the work actually requires them.
 
 | I have… | Start here |
 |---|---|
-| A small local change or agreed outcome | `/plan-acceptance` → `/deliver-issue` |
-| A GitHub issue | `/plan-acceptance <issue>` → `/deliver-issue <issue>` |
-| A project specification | `/plan-acceptance <path>` → direct delivery |
-| Work that is too large for one coherent delivery | Plan the parent → `/slice-contract` |
+| An agreed outcome | `/plan-acceptance` → P2P recommends the next route |
+| A GitHub issue | `/plan-acceptance <issue>` → follow the saved P2P recommendation |
+| A project specification | `/plan-acceptance <path>` → direct delivery or sizing inspection |
+| A sizing inspection recommended after planning | Plan the parent → `/slice-contract` |
 | A proven candidate that should become a draft PR | `/publish-pr` |
 | An existing PR near the merge decision | `/merge-readiness` |
 | A failed PR workflow | `/fix-pr` |
+
+You do not need to choose direct delivery or slicing in advance. After
+`plan-acceptance` establishes the outcome, it recommends direct delivery for a
+manageable unit or `/slice-contract` when sizing needs inspection. `NO SPLIT` is
+a normal result. Direct delivery still passes through `/deliver-issue` and its
+#60 admission before implementation.
 
 The [HOW-TO](./docs/how-to.md) covers these task-oriented paths in more detail.
 

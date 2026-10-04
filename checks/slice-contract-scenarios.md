@@ -52,7 +52,7 @@ Invoke slicing with its saved contract, then separately with only the small sour
 Pass when the result is `NO SPLIT` and a direct delivery handoff. No new parent,
 child, or integration issues appear. No contract is manufactured merely to justify
 that decision. With only the source, the next step is `/plan-acceptance`; with a
-saved, approved contract and no blocking gaps, it is `/implement-contract`.
+saved, approved contract and no blocking gaps, use `/deliver-issue <saved contract>` so existing #60 admission runs before implementation.
 
 ## T2. Require an established parent agreement
 
@@ -197,6 +197,13 @@ Rerun unchanged and verify no duplicate children. Transfer the files by an
 authorized commit to a fresh checkout and discover the plan from the parent path.
 No staging or committing occurs merely because slicing saved local files.
 
+Repeat from project-authored `work/foo-bar.md` and `specs/foo-bar.md`: run
+plan-acceptance to save `.p2p/work/foo-bar/contract.md` and its
+`delivery-shape.md`, then slice locally with an approved breakdown. Pass when
+`delivery-shape.md` and `.p2p/work/foo-bar/slicing.md` bind their exact contract
+and source identities; both source files remain byte-for-byte unchanged, and
+no root `work/` contract or source edit is created.
+
 ## T14. Reconcile reruns and existing tickets
 
 Publish once, repeat unchanged, then reorder the display without changing outcomes.
@@ -316,6 +323,139 @@ blocker for S1 or S3, and does not create blocker edges from sequence alone. All
 original parent text remains unchanged outside the managed section, and readback
 confirms the saved links and sequence. Repeat unchanged in a fresh session; it
 reuses the same section and tickets with zero writes.
+
+## T24. Resolve an uncertain initial route after inspection
+
+Start from a settled parent contract whose implementation context leaves one
+material boundary uncertain. Supply relevant public interfaces, state/recovery
+paths, checks, constraints, and history; do not provide an expected child count.
+
+Pass when slicing inspects enough context to decide whether one delivery cycle
+remains manageable, then returns `NO SPLIT` or a justified decomposition. It
+names the uncertainty and evidence, tests plausible merges, and does not use a
+size proxy or reopen a settled product outcome.
+
+## T27. Merge artificial micro-tickets
+
+Propose separate field, API, test, and documentation tickets for one coherent
+observable outcome.
+
+Pass when the first complete proposal keeps their required work together, maps
+all promises and shared constraints, and explains why another delivery cycle
+would not improve implementation, review, or proof.
+
+## T28. Detect a hidden multi-mechanism outcome
+
+Use a short issue whose acceptance rows expose distinct state and recovery
+mechanisms with materially different compatibility and proof paths.
+
+Pass when slicing identifies those mechanisms from inspected evidence and
+creates only the boundaries needed for manageable complete cycles. It does not
+use the short description as evidence that the work is small or choose a
+preselected number of children.
+
+## T29. Preserve justified existing boundaries
+
+Supply a complete decomposition whose leaves already have separable outcomes,
+real prerequisites, and independent proof paths.
+
+Pass when slicing preserves the useful boundaries instead of minimizing child
+count for its own sake, and records the benefit each extra cycle provides. Before
+any child file or tracker ticket is created, the bidirectional allocation and
+sizing rationale must be complete, saved, read back, and identity-checked; the
+child directory and tracker call log are empty until that gate passes. Create
+children only afterward, then verify their mapped parent contributions.
+
+## T30. Reject misleading size proxies
+
+Compare a many-file mechanical change with a small concurrency/state change.
+Keep their expected outcomes out of the request.
+
+Pass when the mechanical change can remain one coherent delivery and the
+stateful change may split only when its real implementation/review/proof boundary
+requires it. File, test, requirement, or diff counts never decide the result.
+
+## T31. Test non-adjacent merges
+
+Present plausible leaves in an order where two non-adjacent groups share one
+production path and proof setup.
+
+Pass when slicing explicitly merge-tests those groups as one implementation,
+review, and proof cycle and merges them if coherence, compatibility, and
+recovery remain intact. It does not test adjacent pairs only.
+
+## T32. Retain a necessary small migration stage
+
+Supply a small compatibility step with an observable transition condition that
+would be violated if it merged into either neighboring outcome.
+
+Pass when the step remains only because inspected compatibility evidence shows
+that merging breaks the transition invariant. Its small size is not a reason to
+remove a useful boundary.
+
+## T33. Reuse identity-bound NO SPLIT without a loop
+
+Run sizing to `NO SPLIT`, then invoke a fresh delivery session with unchanged
+contract and binding inputs. Repeat with new concrete evidence that could change
+the boundary.
+
+Pass when unchanged inputs reuse the saved direct reason and exact contract
+identity without returning to slicing. No child contract or tracker-ticket
+set and no new approved delivery-plan section is created; existing plan bytes
+remain unchanged, and the saved rationale stays outside the approved-plan
+byte range. The read-back `delivery-shape.md` binds the same inputs, records
+`Direct delivery` and this exact `NO SPLIT` result, and supersedes the earlier
+`Sizing inspection`; a fresh `/deliver-issue` consumes it and reaches #60
+admission without another slice call. A changed recommendation cites new or
+previously omitted evidence, updates the rationale outside the approved-plan
+byte range and the route record, and names one next action. No generic “too
+large” disagreement creates a direct-to-slice-to-direct loop.
+
+## T34. Keep difficult but indivisible work whole
+
+Supply one coherent outcome with a difficult algorithm, but no separable
+outcomes, compatibility stages, recovery boundary, or independent proof path.
+Include evidence that the algorithm's difficulty raises implementation effort
+without creating a useful delivery boundary.
+
+Pass when slicing records the difficulty as context and keeps the outcome as
+one leaf. It creates no child or extra delivery cycle solely because the
+algorithm is hard.
+
+## T45. Resolve a routing disagreement without looping
+
+Start with identity-bound `NO SPLIT`, then supply genuinely new, retrievable
+evidence that disputes its direct route. Ask the delivery flow to reconsider.
+
+Pass when slicing cites that evidence and returns either a justified split or
+`NO SPLIT` with the disagreement and concrete blocker/decision recorded. It
+does not launch another delivery or repeat sizing without changed evidence.
+
+## T46. Preserve route and slicing records
+
+Seed a parent with an approved plan section, identity-bound `delivery-shape.md`
+and `slicing.md`, a human-authored note in each record, and prior versions in
+history. Produce a current `NO SPLIT` from inspected evidence, then exercise the
+fresh delivery handoff with the same contract and binding inputs. Inspect the
+local readbacks and a controlled tracker/effect log.
+
+Pass when contract, parent, issue, spec, and plan identities remain exact;
+history retains each replaced byte sequence; human notes survive; the current
+route and rationale agree; and the approved plan's bytes are unchanged. The
+effect log contains no issue, label, relationship, branch, commit, push, PR,
+merge, or deployment write.
+
+## T47. Prove the assembled parent separately
+
+Start with independently reviewed and proven child candidates, then assemble
+them with required integration work into one parent candidate. Verify the
+assembled candidate and its cross-child behavior against the parent contract.
+
+Pass only when parent review and proof name the same exact assembled candidate
+and final comparison base, inspect all promised contributions and interactions,
+and use parent-level evidence. Child proofs remain bound to their child
+candidates and are not summed into a parent verdict. No local route or proof
+handoff creates a remote effect.
 
 ## Epic delivery strategy scenarios
 

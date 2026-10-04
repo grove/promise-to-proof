@@ -83,6 +83,44 @@ It defines the spec envelope, revision rules, evidence terms, and handoffs.
    leave the approved contract unchanged and surface the proposed change as an
    open question.
 
+## Assess and retain delivery shape
+
+After the promised outcome and acceptance rows are clear, ask whether the complete
+work item can reasonably be implemented, independently reviewed, and proven as
+one bounded delivery. Recommend one advisory route:
+
+- `Direct delivery` when the outcome is clearly coherent and manageable in one
+  delivery cycle.
+- `Sizing inspection` when the outcome is clearly broad, or boundary uncertainty
+  materially affects reliable implementation, independent review, or proof.
+- `Deferred` only while an unresolved product outcome prevents the agreement
+  from being established. Resolve that outcome through acceptance planning; do
+  not use slicing to decide it.
+
+Do not trigger sizing from multiple acceptance rows, ordinary implementation
+uncertainty, unfamiliarity, a difficult algorithm, missing historical
+measurements, or file, line, word, test, time, token, story-point, component, or
+child counts. These may be recorded as observations, never as thresholds.
+
+Save and read back `.p2p/work/<slug>/delivery-shape.md` under the existing local
+P2P storage and history rules. Bind it to the exact canonical contract path,
+revision, and SHA-256 plus every applicable source, specification, parent, and
+approved-plan identity. Include the route, a concise evidence-based reason,
+inspected context with retrievable paths/revisions, assumptions, the applicable
+slicing result (`none`, exact `NO SPLIT`, or the approved plan identity), one
+earliest next action, and outstanding gates. Keep rationale concise; do not
+store hidden reasoning. Recompute hashes after readback. A contract or binding
+input change makes the recommendation stale and requires a fresh assessment;
+preserve prior records.
+
+Use exactly one immediate next action: resolve an open outcome, obtain required
+approval, resolve a material evidence gap or prerequisite, repair storage, run
+`/deliver-issue <contract>` for direct delivery, or run
+`/slice-contract <contract>` for sizing inspection. When a gate is pending,
+record the recommended later route separately but make that gate the sole next
+action. Direct delivery is advisory only: it changes neither the agreement nor
+readiness/admission state and authorizes no external effect.
+
 ## Audit and hand off
 
 Account for every source promise and justify every added invariant by the outcome
@@ -158,10 +196,12 @@ Advisory learnings: <active IDs considered and why used or inapplicable; None if
 
 ## Implementation handoff
 
-Hand off to an explicitly authorized /implement-contract invocation.
-Implement the smallest complete solution inside the spec envelope.
-Preserve requirement IDs and promised outcomes.
-Capture the resulting candidate for separate /review-implementation and /prove phases.
+For `Direct delivery`, hand off through `/deliver-issue`; its existing #60
+admission must pass before it invokes implementation. For `Sizing inspection`,
+hand off to `/slice-contract` before implementation. Implement the smallest
+complete solution inside the spec envelope, preserve requirement IDs and
+promised outcomes, and capture the candidate for separate
+/review-implementation and /prove phases.
 
 ## Proof handoff
 
@@ -170,11 +210,11 @@ Record actual evidence and verdicts in a separate proof report.
 ```
 
 After the contract, end with `Next steps:` and a numbered list (`1.`, `2.`, ...)
-of applicable actions in order, so each can be referenced by number. When the
-contract is saved, approved, and has no blocking gaps, give
-`/deliver-issue <issue>` for a published issue handoff, otherwise
-`/implement-contract <canonical contract reference>`; the optional audit is
-`/audit-acceptance <proposed contract> against <source>`. If saving or approval
-is pending, name the exact destination or proposal needing approval. If a row
-is `gap`, state its missing seam, oracle, or evidence input and do not direct
-the user to implementation until it is resolved. Do not invoke the next skill.
+of applicable actions in order, so each can be referenced by number. The sole
+immediate action follows the saved delivery-shape record: `/deliver-issue
+<contract>` for `Direct delivery`, or `/slice-contract <contract>` for
+`Sizing inspection`. If approval, an open outcome, evidence gap, storage failure,
+or prerequisite is pending, name that gate as the sole next action and keep the
+route conditional. The optional audit is `/audit-acceptance <proposed
+contract> against <source>`. Never bypass direct routing or #60 admission by
+handing straight to `/implement-contract`. Do not invoke the next skill.
