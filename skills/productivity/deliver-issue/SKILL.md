@@ -318,7 +318,12 @@ its checks.
 
 Return `REVIEWED` and `PROVEN` only when the full saved reports match the current
 exact agreement and one unchanged recoverable candidate and their evidence is
-retrievable. Otherwise return `BLOCKED` with the precise decision, capability,
+retrievable. Learning candidates in stage reports are observational side material:
+they never affect these verdicts, repair limits, or acceptance. When matching final
+review and proof exist and one or more saved stage reports contain learning
+candidates, surface `/retrospect <contract>` as an optional follow-up after the
+primary delivery result. Do not invoke it automatically, do not make it a delivery
+or publication gate, and do not promote candidate wording into project advice. Otherwise return `BLOCKED` with the precise decision, capability,
 identity, storage, check, or evidence gap and the completed work so far. Include
 issue, contract location/revision/text identity, candidate and comparison base,
 report/evidence references, actual checks and results, and any partial or
