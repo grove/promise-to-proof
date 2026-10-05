@@ -62,6 +62,132 @@ Repository standards, security constraints, compatibility guarantees, and
 applicable parent contracts remain binding even when the ticket does not restate
 them. Satisfying them does not constitute product scope expansion.
 
+## Pragmatic assurance
+
+Establish sufficient assurance with the least work necessary. Be strict about
+promised outcomes, material defects, evidence credibility, exact identity and
+authority; be flexible about the amount of work used to establish them. This is
+the default for planning, audit, implementation, review, proof and repair, not a
+lower-assurance mode or permission to override a binding check.
+
+Stop when all accepted obligations have credible evidence, the applicable
+material risks have been addressed, and no material finding or decision-blocking
+unknown remains. Finish the required handoff and requested authorized effects;
+do not start another investigation or polishing cycle merely because more work
+is possible. Unlimited execution budgets are not a requirement to keep searching.
+New evidence of a real defect still requires attention; elapsed time never turns
+an unresolved defect or missing evidence into success.
+
+### Material blockers, not preferences
+
+A blocker identifies the accepted obligation or binding constraint at risk,
+inspected evidence or the precise missing fact, a concrete consequence, and the
+smallest effective correction or smallest useful check. A conditional risk needs
+a realistic trigger and evidence that it applies to this candidate. A necessary
+unknown may block without a demonstrated bug; explain which acceptance or safety
+conclusion depends on it. Do not require a reproduced exploit to flag a credible
+security or data-integrity risk.
+
+Missing promised behavior, meaningful regressions, materially unreliable tests,
+identity failures, unavailable required evidence and missing authority remain
+blockers. Naming preferences, speculative refactors, hypothetical consumers,
+redundant evidence requests and extra robustness outside the agreed outcome do
+not. Optional suggestions do not trigger implementation, repair, or another
+verification cycle. Record useful suggestions separately, without making them
+prerequisites for completion. Do not manufacture a finding to justify a review.
+
+Never drop, weaken, or relabel an accepted obligation as optional to get green.
+Explicit verification requirements and repository standards remain binding,
+even when a lighter check would otherwise be sufficient. Materiality determines
+whether an additional concern warrants blocking; it is not a license to ignore
+an explicit requirement. A genuine agreement change uses the existing planning
+and approval rules. The owning independent stage must reconcile a disputed or
+obsolete finding and issue its own verdict; the controller or implementer must
+not edit a failing report into a passing one.
+
+### Minimum sufficient evidence
+
+One credible evidence path can be sufficient for a requirement. The verifier may
+independently inspect and run existing tests with an independent expected result;
+it need not author a duplicate test suite to be independent. The author's claim
+that tests passed is not an observation. Several obligations may share a strong
+check when its assertions actually establish each outcome. Add another method,
+edge case, or sensitivity experiment only for a material risk or an unresolved
+evidence gap, not to meet an invented count or coverage threshold.
+
+Select checks for the changed behavior and its important seams. Concurrency,
+persistence, authorization, migrations and recovery may need deeper checking;
+the list is not a universal checklist. Direct inspection of the exact candidate
+can establish a non-runtime obligation, but text matching cannot establish live
+runtime behavior. Preserve meaningful regression guards. Required integration
+checks still exercise the assembled outcome; historical child success alone is
+not evidence that the combined workflow works.
+
+### Small contracts and repairs
+
+Planning captures the smallest clear set of independently checkable promises
+that preserves the complete requested outcome and binding constraints. Do not
+turn rationale, illustrative examples, or optional implementation suggestions
+into additional acceptance obligations unless the source makes them normative.
+Do not duplicate one promise as many requirements merely because it has several
+examples. Preserve explicit failure behavior, invariants and exclusions. Do not
+re-plan an active contract merely to make it shorter.
+
+Repair the named material gaps completely, without adding optional cleanup.
+Reconcile repeated findings against the latest evidence instead of mechanically
+repeating the same repair. Keep the original contract, candidate history and
+completed work. Use the focused re-verification rules below after a correction;
+do not create another workflow state, checklist or evidence store for this policy.
+
+## Focused re-verification after a repair
+
+Full scope means complete obligation coverage, not mandatory repetition of every
+previous check. Both independent stages still issue fresh, full-scope reports
+for the exact changed candidate before delivery can succeed. Never relabel an old
+verdict or evidence receipt with a new candidate identity. The controller's
+existing requirement for matching current `REVIEWED` and `PROVEN` reports remains.
+
+Within the same delivery, a fresh verifier may focus new checks on a localized
+repair and affected interactions when it can independently establish that the
+remaining observations still apply. Use the following conditions, not file-count
+or elapsed-time thresholds:
+
+- Recover the exact earlier and current candidates, the earlier stage's own
+  observations, and their evidence. Require unchanged contract, binding inputs,
+  approved routing and comparison base. Prior observations must be retrievable
+  and credible; missing history is not successful verification.
+- Inspect the complete candidate delta, including tests, generated inputs,
+  dependencies, configuration, modes, symlinks, additions and deletions. Account
+  for callers, shared state, build inputs and the verification environment. A
+  small diff or an unchanged filename is not an applicability argument.
+- Independently justify why each retained observation's assumptions and outcome
+  are unaffected. Run fresh checks for every repaired gap and every affected
+  requirement, seam and integration risk. Changes to a test or its oracle also
+  require fresh checking of the behavior it is supposed to establish.
+- Account for every obligation in the new report. Distinguish freshly observed
+  results from retained observations, name the original candidate/evidence, and
+  record the current delta analysis that establishes applicability. Keep this
+  compact in the existing report, not a new record type. Do not claim a command
+  ran on the new candidate when it ran only on the earlier one.
+
+When applicability cannot be established, do fresh checking for the affected
+scope, with full checking when the uncertainty cannot be bounded. Changed
+agreements, bases or unverifiable environments do not qualify for this narrow
+same-delivery path. Mandatory final-candidate checks must still run. A final
+report cannot pass while any required outcome remains unknown.
+
+Use history only when the existing authorized handoff makes it available. Do
+not expand a verifier's sandbox or expose another verifier's results to obtain
+reuse. Neither verifier receives the current other verifier's conclusion before
+forming its own judgment. Without safely available history, perform fresh
+verification; this policy adds no automatic cross-run cache or stage-skipping
+mechanism. Existing evidence and bundle validators keep their exact-identity
+checks. An earlier Evidence Record stays bound to its original context; it is not
+a current-candidate receipt. When an existing validator cannot represent a
+supported applicability claim, rerun the check rather than bypassing validation.
+Resume, storage readback, publication and effect authority retain their existing
+checks.
+
 ## Durable contract handoff
 
 Keep one canonical generated acceptance contract in `.p2p/work/<slug>/contract.md`.
@@ -353,8 +479,10 @@ A product candidate A can be followed by commit B that excludes `.p2p/` records.
 Review and proof remain bound to A. To reuse them for B, compare the complete
 tracked tree outside `.p2p/`, check relevant uncommitted content, and recheck the
 exact work item, every binding input, and the requested comparison base. A
-product or agreement difference invalidates reuse. A base change requires fresh
-review and prevents claiming a matching pair under the old base. Do not replace
+product or agreement difference invalidates reuse of those verdicts. Fresh
+verifiers may assess supporting observations only under the focused
+re-verification rules above. A base change requires fresh review and prevents
+claiming a matching pair under the old base. Do not replace
 a report's candidate identity with `HEAD` merely because artifacts were committed.
 If Git metadata affects the build, also establish execution-input equivalence
 under the publication rules below.
@@ -728,7 +856,9 @@ silently weakens a promise or declares acceptance.
 Any changed candidate requires fresh proof against all requirements before
 acceptance. Prior proof describes only its original candidate. This includes CI
 repairs that change product behavior, acceptance evidence, or relevant tests.
-A green CI repair does not refresh proof automatically.
+A green CI repair does not refresh proof automatically. Fresh proof means
+a fresh full-scope judgment; the focused re-verification rules determine which
+observations need to be repeated.
 
 ## Deterministic bundle inspection
 

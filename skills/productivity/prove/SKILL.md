@@ -11,7 +11,11 @@ candidate. Use `/repair-gaps` for scoped repairs, then run `/prove` again.
 examines contract fidelity, scope, and engineering quality. Neither replaces proof.
 
 Before verification, read the [acceptance contract protocol](references/acceptance-contract-protocol.md).
-It defines the spec envelope, identities, evidence, and verdicts.
+It defines the spec envelope, identities, evidence, and verdicts. Apply its
+[pragmatic assurance](references/acceptance-contract-protocol.md#pragmatic-assurance)
+and [focused re-verification](references/acceptance-contract-protocol.md#focused-re-verification-after-a-repair)
+rules: complete coverage and fresh current-candidate judgments do not require
+exhaustive or duplicate checking.
 
 Optional [evidence-record v1](../../../docs/evidence-record-v1.md) records may be cited
 by evidence ID and computed SHA-256 digest, and their deterministic Markdown
@@ -25,9 +29,10 @@ self-run command observations directly in `proof.md`.
 
 - `PROVEN`: every material requirement has credible evidence, no contract
   discrepancy remains, and the candidate stayed fixed during verification.
-- `NOT PROVEN`: any requirement lacks evidence, a counterexample remains, the
-  contract is incomplete or ambiguous, required verification is unavailable,
-  or candidate identity is uncertain.
+- `NOT PROVEN`: an accepted requirement lacks credible evidence, a material
+  counterexample or contract discrepancy remains, required verification is
+  unavailable, or candidate identity is uncertain. Optional suggestions and
+  non-blocking limitations do not by themselves prevent `PROVEN`.
 - A concrete violation is `disproven`; unavailable or inconclusive evidence is
   `not proven`, not `disproven`.
 
@@ -111,11 +116,15 @@ agreed public seam. If a seam or oracle needs a consequential change, report the
 decision as a gap rather than silently replacing it. A passing suite or checked
 GitHub criterion does not cover a promise whose result is never asserted.
 
-### 4. Hunt counterexamples
+### 4. Check material counterexamples
 
-Check realistic boundaries: empty/one/many, state transitions, retries, restart,
-authorization, concurrency, and the final workflow outcome. When useful, run a
-controlled sensitivity check only in a disposable copy; discard it afterward.
+Select realistic failure cases for the actual change and its important seams.
+Empty/one/many, state transitions, retries, restart, authorization and concurrency
+are examples to consider when applicable, not a checklist to run for every task.
+Use a sensitivity experiment only when it resolves a material uncertainty, in a
+disposable copy tied to the candidate. Stop investigating when the requirements
+have credible evidence and no material counterexample or necessary unknown remains.
+Do not keep searching for hypothetical improvements after that point.
 
 ### 5. Verify without mutation
 
@@ -127,14 +136,22 @@ itself under the protocol's evidence rules. Check product content outside
 the smallest complete repair needed and name the affected requirement IDs for
 `/repair-gaps`.
 
-Before a long suite, verify its setup in the exact disposable workspace that will
-run it: interpreter path and version, required imports, working directory, clean
-`.p2p/` state, and candidate identity. A check from the source checkout does not
-establish the nested runner's environment. Save this preflight with the command
-and environment. Run the full suite once on a clean copy of the final frozen
-candidate; use focused checks to guide repairs before that run. If setup invalidates
-an attempt, correct the setup and rerun once. Do not launch duplicate full-suite
-attempts in parallel or treat setup failures as candidate evidence.
+Run a full suite when the accepted contract or repository standards require it,
+or when a material regression risk cannot be covered credibly by focused checks.
+Otherwise use the smallest sufficient checks. Do not skip a binding check because
+the change looks small. Before a needed long suite, verify setup in its exact
+disposable workspace: interpreter, imports, working directory and candidate
+identity. Reuse still-current setup facts rather than repeating unrelated probes.
+A source-checkout check does not establish the nested runner's environment.
+Record the actual command, environment and result; setup failures are not evidence
+about candidate behavior. Correct a failed setup before retrying. Do not launch
+duplicate full-suite attempts in parallel.
+
+After a localized repair, apply the protocol's focused re-verification conditions
+before retaining any earlier observation. Independently inspect the complete delta
+and run the affected checks; otherwise verify freshly. Always issue a new report
+covering every requirement on the exact current candidate. Keep optional
+suggestions separate from unresolved acceptance gaps and repairs needed.
 
 ### 6. Report
 

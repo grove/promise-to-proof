@@ -8,6 +8,9 @@ Review an implementation against the agreement. `/critique` reviews proposals;
 `/prove` verifies acceptance. Before acting, read the
 [acceptance contract protocol](references/acceptance-contract-protocol.md)
 for agreement ownership, the spec envelope, identities, and durable handoffs.
+Apply its [pragmatic assurance](references/acceptance-contract-protocol.md#pragmatic-assurance)
+and [focused re-verification](references/acceptance-contract-protocol.md#focused-re-verification-after-a-repair)
+rules. The goal is a trustworthy delivery, not an exhaustive search for improvements.
 
 Invocation authorizes inspection, safe isolated diagnostics, and saving the
 review report and evidence under `.p2p/work/<slug>/`. Do not
@@ -109,6 +112,15 @@ Keep unrelated pre-existing issues separate. An existing defect that prevents a
 promised outcome remains relevant outside the diff. Use no finding quota, numeric
 quality score, or mandatory redesign. Sound code can receive a short clean review.
 
+Return `REVIEWED` with optional suggestions when coverage is complete and no
+material finding or decision-blocking unknown remains. Do not turn optional
+suggestions into `CHANGES NEEDED` or repair prerequisites. Before adding a check,
+identify the material risk or missing fact it would resolve. Stop once those
+questions are answered; do not require polish or a second exhaustive proof.
+The reviewer, not the implementer or controller, owns reconciliation of a prior
+finding that is disproven or no longer applicable. Retain the old observation
+and explain the changed conclusion instead of silently rewriting its verdict.
+
 ## Investigate without repairing
 
 Start from the source, contract, candidate, and constraints. The author's report
@@ -165,7 +177,11 @@ Save and reread `.p2p/work/<slug>/review.md` and retained evidence, preserving
 prior runs under the protocol's history rule. In a read-only stage context,
 return exact report text for the enclosing workflow to save and reread.
 Validate work-item and binding parent/spec hashes and the comparison-base SHA
-against `candidate.json`; product changes outside `.p2p/` invalidate reuse.
+against `candidate.json`; product changes outside `.p2p/` invalidate verdict
+reuse. A fresh review may retain supporting observations only after the protocol's
+focused re-verification checks, including independent complete-delta inspection.
+Keep full obligation coverage and a fresh report even when new diagnostics are
+limited to the repair and its affected interactions.
 Saving reports under ignored `.p2p/` keeps the original candidate identity;
 those records stay out of Git history.
 Follow the protocol's report storage and transfer rules. Preserve the report,
