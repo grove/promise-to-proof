@@ -1029,6 +1029,7 @@ def report_schema(stage):
     def obj(properties):
         return {'type': 'object', 'properties': properties, 'required': list(properties), 'additionalProperties': False}
     evidence = obj({'assertion': string, 'observation': string, 'artifact': string})
+    learning = obj({'scope': string, 'lesson': string, 'evidence': string, 'uncertainty': string})
     status = {'type': 'string'}
     if stage == 'review':
         status['enum'] = ['REVIEWED', 'CHANGES NEEDED', 'BLOCKED']
@@ -1047,13 +1048,34 @@ def report_schema(stage):
     if stage != 'review':
         properties['details'] = string
     properties.update(requirements={'type': 'array', 'items': row},
-                      gaps={'type': 'array', 'items': string})
+                      gaps={'type': 'array', 'items': string},
+                      learning_candidates={'type': 'array', 'items': learning, 'maxItems': 5})
     if stage == 'review':
         properties.update(coverage=string, checks={'type': 'array', 'items': check},
                           limitations={'type': 'array', 'items': string},
                           findings={'type': 'array', 'items': finding},
                           missing_input=string, expected_result=string)
     return obj(properties)
+
+
+def learning_candidates_markdown(report):
+    lines = ['## Learning candidates', '']
+    candidates = report.get('learning_candidates', [])
+    if not candidates:
+        lines.append('None.')
+    else:
+        for index, item in enumerate(candidates, 1):
+            lines.extend([
+                f"### L{index}: {item['scope']}",
+                '',
+                item['lesson'],
+                '',
+                '- Evidence: ' + item['evidence'],
+                '- Uncertainty: ' + item['uncertainty'],
+                '- Status: candidate only; retrospective validation required.',
+                '',
+            ])
+    return '\n'.join(lines).rstrip()
 
 
 def report_markdown(report):
@@ -1077,6 +1099,7 @@ def report_markdown(report):
     lines.extend('- ' + item for item in report['gaps'])
     if not report['gaps']:
         lines.append('None.')
+    lines.extend(['', learning_candidates_markdown(report)])
     return '\n'.join(lines).rstrip() + '\n'
 
 
@@ -1132,7 +1155,7 @@ def review_markdown(report, work, contract, candidate, base_manifest, destinatio
     lines.extend('- ' + item for item in report['gaps'])
     if not report['gaps']:
         lines.append('None.')
-    lines.extend(['', '## Handoff', ''])
+    lines.extend(['', learning_candidates_markdown(report), '', '## Handoff', ''])
     if report['status'] == 'BLOCKED':
         lines.extend([f"Missing input or command: {report['missing_input']}",
                       f"Expected result: {report['expected_result']}"])
@@ -1652,6 +1675,12 @@ assert results['scratch'] == 'ok'
         inputs = self.stage_inputs(self.state['candidate'])
         prior = self.state.get('reports', {})
         skill_stage = self.state.get('repair_skill', 'repair') if name == 'repair' else name
+        learning_format = ('learning_candidates is an array of at most five candidate lessons and is usually empty. '
+                           'Include only durable, non-obvious, reusable delivery knowledge whose loss could cause '
+                           'future mistakes or substantial rediscovery. Each item has nonblank scope, lesson, evidence, '
+                           'and uncertainty. A learning candidate is advisory evidence only: it must not change the '
+                           'contract, stage verdict, scope, repair allowance, or authority, and it is not accepted '
+                           'project advice until retrospect validates it and a human explicitly accepts it. ')
         report_format = ('Review rows contain only id and observation. Include nonblank coverage; checks with '
                          'command, result (passed, failed, observed, or unavailable), and observation; and '
                          'limitations. Each finding has id, source (requirement ID or binding source), primary '
@@ -1682,7 +1711,7 @@ assert results['scratch'] == 'ok'
                   'Use fresh independent observations, do not trust previous judgments. '
                   f'Exact input_identity_json must encode this object: {json.dumps(inputs)}. '
                   f'Every requirement must occur exactly once: {self.state["requirements"]}. '
-                  f'{report_format}Status uses normal skill vocabulary. '
+                  f'{report_format}{learning_format}Status uses normal skill vocabulary. '
                   f'{"The controller renders review text from structured fields. Do not add free-text details or other top-level fields." if name == "review" else "details contains the full human report."} '
                   'Keep generated fixtures and verbose debug output in scratch. Return the relevant command, '
                   'assertion, result, and environment in the report; do not dump entire logs or workspaces. '
@@ -1714,13 +1743,20 @@ assert results['scratch'] == 'ok'
             self.current()
         raw_report = host['message'].encode('utf-8')
         report = json.loads(raw_report)
-        expected_fields = {'status', 'input_identity_json', 'requirements', 'gaps'}
+        expected_fields = {'status', 'input_identity_json', 'requirements', 'gaps', 'learning_candidates'}
         if name == 'review':
             expected_fields.update({'findings', 'coverage', 'checks', 'limitations', 'missing_input', 'expected_result'})
         else:
             expected_fields.add('details')
         if not isinstance(report, dict) or set(report) != expected_fields:
             raise ValueError('stage report contains unsupported or missing fields: ' + attempt['id'])
+        learning_fields = {'scope', 'lesson', 'evidence', 'uncertainty'}
+        candidates = report.get('learning_candidates')
+        if (not isinstance(candidates, list) or len(candidates) > 5 or
+                any(not isinstance(item, dict) or set(item) != learning_fields or
+                    any(not isinstance(item[key], str) or not item[key].strip() for key in learning_fields)
+                    for item in candidates)):
+            raise ValueError('stage report learning candidates are incomplete')
         if name == 'review' and report['status'] not in ('REVIEWED', 'CHANGES NEEDED', 'BLOCKED'):
             raise ValueError('review report has unsupported status')
         if json.loads(report['input_identity_json']) != inputs:
@@ -1779,7 +1815,8 @@ assert results['scratch'] == 'ok'
                                    fs.snapshot(self.workspace, self.state['comparison_base']),
                                    attempt['destination_observation'], self.verification_environment(),
                                    attempt['session_id'])
-                   if name == 'review' else report['details']).encode()
+                   if name == 'review' else
+                   report['details'].rstrip() + '\n\n' + learning_candidates_markdown(report) + '\n').encode()
         local_save(self.root, self.work, f'attempts/{attempt["id"]}/report.md', summary)
         local_save(self.root, self.work, name + '.md', summary)
         attempt.update(status='complete', report=path, report_sha256=fs.digest(raw_report))
@@ -1808,7 +1845,8 @@ assert results['scratch'] == 'ok'
             if not isinstance(summary, str):
                 raise ValueError('legacy review report details are invalid')
         else:
-            summary = report_markdown(report) if name == 'review' else report['details']
+            summary = (report_markdown(report) if name == 'review' else
+                       report['details'].rstrip() + '\n\n' + learning_candidates_markdown(report) + '\n')
         if (self.local / (name + '.md')).read_bytes() != summary.encode():
             raise ValueError('canonical report content changed or lost: ' + name)
         if name == 'review' and 'coverage' not in report:
