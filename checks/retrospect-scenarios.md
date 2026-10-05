@@ -141,3 +141,24 @@ Pass when the first run retrieves matching identities and evidence and rereads
 its saved report from another session. The report automatically uses `.p2p/work/<slug>/retrospective.md`; no
 manual destination or separate local-save approval is needed. A copy
 check or a symlink alone does not prove installer behavior or agent compliance.
+
+## Delivery learning candidates remain untrusted until retrospective validation
+
+Create a delivery whose implementation or repair report contains a non-empty
+`Learning candidates` section, then complete matching independent review and
+proof for the exact candidate.
+
+Check both cases:
+
+1. **Later evidence contradicts the candidate.** The retrospective must treat the
+   candidate as a lead only, cite the later evidence, and reject or rewrite the
+   proposed lesson. It must not copy the candidate into the advisory register.
+2. **Later evidence supports the candidate.** The retrospective may use the
+   candidate to form an evidence-backed suggestion, but the suggestion starts
+   `pending`. No register entry exists until the developer explicitly accepts
+   exact final wording.
+
+In both cases, confirm that the presence or absence of a learning candidate did
+not affect the delivery's REVIEWED/PROVEN verdicts, repair allowance, contract,
+or publication authority.
+
