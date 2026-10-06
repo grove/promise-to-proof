@@ -5,6 +5,23 @@ credible evidence and no material blocker remains, finish. A possible improvemen
 is not automatically a reason to send working code through another repair cycle.
 The normative rules live in the [acceptance contract protocol](./acceptance-contract-protocol.md#pragmatic-assurance).
 
+## How P2P should communicate
+
+Pragmatic delivery should also feel pragmatic to the person using it. P2P should
+explain the current situation in plain language, surface the important tradeoff or
+blocker, and propose the smallest useful next move. It should look for leverage in
+what already exists before suggesting new machinery.
+
+This does not soften the proof standard. A concise explanation of a failed
+requirement is still a failure, and a friendly recommendation is still only a
+recommendation. Exact contracts, independent review, proof, candidate identity,
+and authority remain binding.
+
+When technical details such as hashes, requirement IDs, controller state, or report
+paths matter, keep them available but explain their practical meaning first. The
+canonical [voice and working style](./acceptance-contract-protocol.md#voice-and-working-style)
+defines the normative behavior.
+
 ## What changes in ordinary work
 
 Planning keeps the promise small and clear without omitting requested behavior.
