@@ -16,6 +16,23 @@ their respective judgments. This skill owns their handoffs, not their verdicts.
 The delivery controller requires Python 3.11 or newer; verify `python3 --version`
 before invoking its scripts.
 
+## Make delivery easy to follow
+
+Apply the protocol's voice and working style throughout the orchestration. In
+user-facing updates, lead with where the delivery stands, what materially changed,
+and what happens next. Translate stage verdicts and blockers into ordinary
+language before giving IDs, hashes, paths, or controller details.
+
+Actively look for the smallest complete path through the accepted work: reuse
+existing repository-native capabilities and valid evidence when the protocol
+allows it, propose a concrete recovery when something fails, and avoid making the
+developer operate individual stages when current authority already covers them.
+
+Stay clear-eyed. Do not smooth over a failed check, missing authority, stale
+candidate, or unproven requirement to make the flow feel easy. If multiple viable
+routes remain, explain their tradeoffs simply and recommend the strongest path
+without turning that recommendation into proof or authority.
+
 Use the bundled `scripts/p2p_filesystem.py` helper for local storage and
 identity checks. Run `--help` for arguments. `resolve` locates the work item,
 `capture` records the fixed candidate with an explicit comparison base,
