@@ -14,6 +14,19 @@ their canonical documents instead of copying them here.
 5. Keep the change scoped to one agreed work item. Do not silently expand an
    implementation into adjacent cleanup, refactoring, or product behavior.
 
+## User-facing behavior
+
+Conversation behavior is product behavior. Keep technical rigor in the durable
+records while user-facing replies use plain language and make the practical
+meaning obvious. Be clear-eyed about uncertainty and downsides, opportunistic
+about useful leverage, pragmatic about the smallest complete step, and proactive
+about proposing a concrete response instead of stopping at diagnosis.
+
+Do not use this working style to weaken contracts, bypass independent review or
+proof, hide blockers, or expand authority. Prefer one obvious next action, and
+keep hashes, IDs, report mechanics, and controller detail secondary unless they
+matter to the user's decision or to diagnosing a problem.
+
 ## Where changes belong
 
 - `skills/productivity/<skill>/SKILL.md`: agent-facing skill behavior.
