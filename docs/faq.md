@@ -146,9 +146,11 @@ transcripts, reports, and invocation state stay in its sibling
 `orchestration/` directory. After review and proof succeed, explicit cleanup
 verifies that the source checkout is unchanged and retains the candidate for
 publication. Compact candidate, delivery, review, and proof records remain
-under ignored `.p2p/work/<slug>/`. They do not travel with product commits. If review
+under ignored `.p2p/work/<slug>/`. Their compact portable checkpoint travels
+through Git or an explicitly selected issue; raw workspaces and logs stay local.
+See [move work between computers](./p2p-checkpoints.md). If review
 and proof examined commit A, a later commit B recording other authorized
-artifacts does not change their subject to B. Reuse requires identical content outside `.p2p/`,
+artifacts does not change their subject to B. Reuse requires identical product content outside `.p2p/` and `p2p-state/`,
 unchanged agreements, and the same comparison base. Git-dependent builds also
 need execution-input equivalence.
 
@@ -166,7 +168,8 @@ checksum, and access limitations. Unavailable evidence stays unavailable.
 
 Keep exploratory runs and generated fixtures in scratch. P2P files already
 present in legacy Git history can be recovered from those existing commits;
-current P2P records stay local and ignored. Restore required evidence before reuse. See
+raw current P2P records stay local and ignored; portable checkpoints are the
+small Git/issue preservation exception. Restore required evidence before reuse. See
 [Reduce retained work data](./how-to.md#reduce-retained-work-data).
 
 ## Review, proof, and repair

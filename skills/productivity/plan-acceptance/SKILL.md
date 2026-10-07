@@ -151,6 +151,15 @@ this context cannot write, return the exact text to the enclosing workflow to
 save and reread, and report storage pending until it confirms retrieval.
 Saving local files does not authorize staging, commits, or tracker publication.
 
+Refresh the portable checkpoint after saving the proposal, approval receipt or
+approved revision and before handing off: `python3 <skill-dir>/scripts/p2p_filesystem.py
+--repo <root> checkpoint .p2p/work/<slug>/contract.md`. The default
+`p2p-state/<slug>.json` is suitable for Git; an explicitly selected issue is the
+alternative under the protocol's portable checkpoint rules. Preserve exact
+approval-bound history and binding inputs. Report its path, bytes and
+`LOCAL_ONLY`/`COMMITTED`/`PORTABLE` preservation status separately from approval.
+Never call local files disposable without verified shared readback.
+
 For a direct user invocation on an issue, publish and verify the shared planning
 handoff under the protocol's standalone planning rules. A local-only or draft-only
 request suppresses that write. An invocation inside delivery stays local under

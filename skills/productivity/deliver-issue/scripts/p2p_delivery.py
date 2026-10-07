@@ -534,6 +534,7 @@ def publish_issue_record(delivery, delivered_commit, pull_request, authorized_sh
                                        'delivered_commit': delivered_commit, 'pull_request': pull_request,
                                        'body_sha256': preview['sha256'], 'verified_at': now()}
     delivery.save()
+    delivery.checkpoint()
     return delivery.state['github_record']
 
 
@@ -1182,6 +1183,225 @@ def proof_markdown(report, work, contract, candidate, environment, session_id):
     return '\n'.join(lines).rstrip() + '\n'
 
 
+def export_checkpoint(root, work, delivery=None, destination=None):
+    """Retain stage facts and exact reports, without prompts or command transcripts."""
+    if delivery is None:
+        local = local_directory(root, work)
+        lock_path = local.parent / (local.name + '.lock')
+        require_repo_local_ignored(root, lock_path)
+        with lock_path.open('a') as lock:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                raise ValueError('stop the controller before exporting a portable checkpoint')
+            delivery = Delivery(root, work, json.loads((local / 'delivery.json').read_bytes()))
+            delivery.read_only = True
+            delivery.current()
+            for name in delivery.state['reports']:
+                delivery.read_report(name)
+            return export_checkpoint(root, work, delivery=delivery, destination=destination)
+    if any(a['status'] not in ('complete', 'retired') for a in delivery.state['attempts']):
+        raise ValueError('uncertain dispatch prevents a portable checkpoint; reconcile its completion first')
+    state = json.loads(json.dumps(delivery.state))
+    state.pop('checkpoint', None)
+    state.pop('controller_timing', None)
+    state['host']['executable'] = 'codex'
+    if state.get('restored_host'):
+        state['restored_host']['executable'] = 'codex'
+    for name, skill in state['skills'].items():
+        skill['path'] = 'skill:' + STAGES[name]
+    files = []
+    def retain(scope, relative, path):
+        if path.is_symlink() or not path.is_file():
+            raise ValueError('missing or unsafe checkpoint input: ' + str(path))
+        files.append((scope, relative, path.read_bytes()))
+    for attempt in state['attempts']:
+        original = next(a for a in delivery.state['attempts'] if a['id'] == attempt['id'])
+        attempt.setdefault('verification_environment', delivery.verification_environment())
+        folder = delivery.runtime / 'attempts' / attempt['id']
+        end = json.loads((folder / 'exit.json').read_bytes())
+        if original['status'] == 'retired':
+            if end.get('outcome') not in ('stalled', 'interrupted'):
+                raise ValueError('retired stage lacks a confirmed termination receipt')
+            existing = folder / 'portable-receipt.json'
+            if existing.exists():
+                receipt = json.loads(existing.read_bytes())
+                if fs.digest(existing.read_bytes()) != original.get('portable_receipt_sha256') or receipt['exit'] != end:
+                    raise ValueError('portable termination receipt changed')
+            else:
+                if fs.digest((folder / 'events.jsonl').read_bytes()) != end.get('event_sha256'):
+                    raise ValueError('termination receipt event hash mismatch')
+                receipt = {'attempt_id': attempt['id'], 'exit': end, 'host': None}
+        else:
+            host = delivery.receipt(original)
+            executions = []
+            for item in host['executions']:
+                executions.append({key: item[key] for key in ('id', 'type', 'command', 'exit_code', 'status') if key in item} |
+                                  {'output_sha256': item.get('output_sha256') or fs.digest(item.get('aggregated_output', '').encode())})
+            receipt = {'attempt_id': attempt['id'], 'exit': end, 'host': host | {'executions': executions}}
+        data = encoded(receipt)
+        attempt['portable_receipt_sha256'] = fs.digest(data)
+        attempt['scratch'] = 'local-scratch'
+        files.append(('runtime', f'attempts/{attempt["id"]}/portable-receipt.json', data))
+        retain('runtime', f'attempts/{attempt["id"]}/exit.json', folder / 'exit.json')
+        if attempt.get('report'):
+            retain('runtime', attempt['report'], fs.safe(delivery.runtime, attempt['report']))
+    for generation in state['local_git_generations']:
+        relative = generation['record_path'].removeprefix('runtime/')
+        retain('runtime', relative, fs.safe(delivery.runtime, relative))
+    retain('runtime', 'base-tree-key', delivery.runtime / 'base-tree-key')
+    for prefix in ('previous-records', 'superseded-records'):
+        for path in (delivery.runtime / prefix).rglob('*'):
+            if path.is_file():
+                retain('runtime', str(path.relative_to(delivery.runtime)), path)
+    for name in ('implementation.md', 'repair.md', 'review.md', 'proof.md'):
+        path = delivery.local / name
+        if path.exists():
+            retain('local', name, path)
+    for relative in [work, *(row['path'] for row in state['binding_inputs'])]:
+        retain('agreement', relative, fs.safe(agreement_root(root, work), relative))
+    origin = fs.contract_origin(root, fs.work_slug(work))
+    if origin:
+        for relative in (f'.p2p/work/{fs.work_slug(work)}/contract-origin.json',
+                         f'.p2p/work/{fs.work_slug(work)}/contract.md'):
+            retain('agreement', relative, fs.safe(agreement_root(root, work), relative))
+    for row in state.get('routing_records', []):
+        retain('project', row['path'], fs.safe(root, row['path']))
+        # The exact bytes are already in the project checkpoint's reference closure.
+        state_row = next(r for r in state['routing_records'] if r['path'] == row['path'])
+        state_row.pop('content_base64', None)
+    mandate = state.get('autonomy')
+    if mandate and mandate.get('path'):
+        retain('local', 'mandate.json', Path(mandate['path']))
+        mandate['path'] = '@checkpoint/mandate.json'
+    for old in state.get('agreement_history', []):
+        relative = f'.p2p/work/{fs.work_slug(work)}/history/{old["old_sha256"]}/contract.md'
+        retain('project', relative, fs.safe(root, relative))
+    candidate_commit = state['local_git_generations'][-1]['commit']
+    # Transfer native Git objects locally; the operator must still authorize and
+    # publish a reachable work branch before this checkpoint becomes portable.
+    fs.git(root, 'fetch', '--no-tags', str(delivery.runtime / 'repository.git'), candidate_commit)
+    return fs.checkpoint(root, work, destination, execution=state,
+                         candidate_commit=candidate_commit, extra_files=files)
+
+
+def restore_checkpoint(root, checkpoint, contents, checkpoint_data):
+    """Rehost a completed boundary; never reuse the old machine's sandbox preflight."""
+    state = json.loads(json.dumps(checkpoint['execution']))
+    checkpoint_sha256 = fs.digest(checkpoint_data)
+    work = checkpoint['work_item']
+    if (state.get('schema') != 'promise-to-proof/delivery/v1' or state.get('work_item') != work or
+            state.get('policy') != POLICY or state.get('authority') != {'local_stages': True, 'external_effects': False} or
+            any(a.get('status') not in ('complete', 'retired') for a in state['attempts']) or
+            state['local_git_generations'][-1]['commit'] != checkpoint['candidate_commit']):
+        raise ValueError('invalid or uncertain portable controller boundary')
+    installed = skills()
+    if {name: skill['sha256'] for name, skill in installed.items()} != {name: skill['sha256'] for name, skill in state['skills'].items()}:
+        raise ValueError('installed stage skills differ from the checkpoint; reconcile before resume')
+    if platform.system() != 'Darwin' or not shutil.which('codex'):
+        raise ValueError('portable delivery restore requires the supported macOS Codex host')
+    fs.check_index(root)
+    if fs.snapshot_key(fs.snapshot(root)) != state['source_tree_key']:
+        raise ValueError('receiving source checkout differs from the checkpoint admission; preserve local work')
+    candidate = fs.snapshot(root, checkpoint['candidate_commit'])
+    if (fs.snapshot_key(candidate) != state['candidate']['key'] or
+            fs.tree_changes(fs.snapshot(root, state['comparison_base'], exclude=state.get('agreement_paths', ())), candidate) != state['candidate']['changes']):
+        raise ValueError('portable candidate commit differs from its exact snapshot identity')
+    local = fs.safe(root, f'.p2p/work/{fs.work_slug(work)}')
+    runtime = fs.execution_directory(root, work) / 'runtime'
+    if (runtime.exists() or (local / 'delivery.json').exists() or
+            (local / 'runtime').exists()):
+        raise ValueError('existing execution conflicts with checkpoint restore; preserve and reconcile it')
+    targets = {}
+    for scope, relative, data in contents:
+        base = {'project': root, 'local': local, 'runtime': runtime,
+                'agreement': runtime.parent / 'agreement'}[scope]
+        target = fs.safe(base, relative)
+        if target in targets and targets[target] != data:
+            raise ValueError('conflicting checkpoint file destinations')
+        if target.exists() and (not target.is_file() or target.read_bytes() != data):
+            raise ValueError('checkpoint conflicts with local file: ' + str(target))
+        targets[target] = data
+    checkpoint_path, _ = fs.checkpoint_path(root, work, checkpoint['destination'])
+    if checkpoint_path.exists() and fs.digest(checkpoint_path.read_bytes()) != checkpoint_sha256:
+        raise ValueError('selected checkpoint conflicts with the restore source')
+    state['skills'] = installed
+    state['host']['executable'] = shutil.which('codex')
+    version = subprocess.run([state['host']['executable'], '--version'], capture_output=True, text=True,
+                             timeout=10, check=True).stdout.strip()
+    state['restored_host'] = state['host'] | {'version': version}
+    state['source_head'] = fs.full_commit(root, 'HEAD')
+    state['source_index_sha256'] = fs.digest(fs.git(root, 'ls-files', '--stage', '-z'))
+    state['source_product_index_sha256'] = fs.product_index_sha256(root)
+    state['checkpoint_restored_from'] = checkpoint_sha256
+    state.pop('checkpoint', None)
+    for name in ('cleanup_verified_at', 'cleanup_source_identity_sha256', 'final_records_written', 'cleanup'):
+        state.pop(name, None)
+    for attempt in state['attempts']:
+        attempt['scratch'] = str(runtime / 'scratch' / attempt['id'])
+        if attempt['stage'].startswith('preflight-'):
+            attempt['stage'] = 'prior-' + attempt['stage']
+    state['preflight_complete'] = False
+    if state.get('autonomy') and state['autonomy'].get('path'):
+        if state['autonomy']['path'] != '@checkpoint/mandate.json':
+            raise ValueError('checkpoint mandate location is not portable')
+        state['autonomy']['path'] = str(local / 'mandate.json')
+    # Routing records are exact project files. Restore their existing transfer
+    # representation without changing the hashes used by completed stage inputs.
+    for row in state.get('routing_records', []):
+        file = fs.safe(root, row['path'])
+        content = targets.get(file, file.read_bytes() if file.is_file() else None)
+        if content is None or fs.digest(content) != row['sha256']:
+            raise ValueError('checkpoint routing evidence is missing or changed')
+        row['content_base64'] = base64.b64encode(content).decode()
+    if any(scope == 'runtime' and relative == 'admission.json' for scope, relative, _ in contents):
+        raise ValueError('checkpoint must not import a machine-specific admission')
+    for file, data in targets.items():
+        file.parent.mkdir(parents=True, exist_ok=True)
+        if not file.exists():
+            ignored = not file.is_relative_to(root) or file.is_relative_to(root / '.p2p')
+            fs.atomic_write(file, data, ignored_root=root if ignored else None)
+    if not checkpoint_path.exists():
+        checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+        fs.atomic_write(checkpoint_path, checkpoint_data,
+                        ignored_root=root if checkpoint['destination']['kind'] == 'github' else None)
+    fs.prepare_execution(root, work)
+    repository = runtime / 'repository.git'
+    subprocess.run(['git', 'init', '--bare', '--quiet', str(repository)], check=True)
+    for commit in (state['comparison_base'], checkpoint['candidate_commit']):
+        fs.git(repository, 'fetch', '--no-tags', str(root), commit)
+    for row in [state['local_git_base'], *state['local_git_generations']]:
+        fs.git(repository, 'update-ref', row['ref'], row.get('commit', row.get('local_commit')))
+    workspace = runtime / 'workspace'
+    materialize(workspace, candidate, ignored_root=root)
+    materialize(workspace, [{'path': row['path'], 'type': 'file', 'mode': '100644', 'content_base64': row['content_base64']}
+                            for row in state.get('routing_records', [])], ignored_root=root)
+    for scope, relative, data in contents:
+        if scope == 'agreement':
+            file = fs.safe(workspace, relative)
+            file.parent.mkdir(parents=True, exist_ok=True)
+            fs.atomic_write(file, data)
+    (workspace / '.git').write_text('gitdir: ' + str(repository) + '\n')
+    fs.git(workspace, 'config', '--local', 'core.bare', 'false')
+    fs.git(workspace, 'update-ref', '--no-deref', 'HEAD', state['starting_commit'])
+    fs.git(workspace, 'read-tree', state['starting_commit'])
+    fs.save(workspace, work, 'candidate.json', encoded(state['candidate']))
+    delivery = Delivery(root, work, state)
+    keys = ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key',
+            'source_head', 'source_index_sha256', 'source_product_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'routing', 'routing_records',
+            'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits',
+            'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host')
+    local_save(root, work, 'runtime/admission.json', encoded({key: state[key] for key in keys}))
+    delivery.save()
+    delivery.read_only = True
+    delivery.current()
+    for name in state['reports']:
+        delivery.read_report(name)
+    return {'status': 'RESTORED', 'work_item': work, 'checkpoint_sha256': checkpoint_sha256,
+            'resume': f'python3 {Path(__file__).resolve()} --repo {root} resume {work}',
+            'next_action': 'Resume at the incomplete stage; the receiving host must pass fresh sandbox preflight.'}
+
+
 class Delivery:
     def __init__(self, root, work, state):
         self.root, self.work, self.state = root, work, state
@@ -1200,6 +1420,15 @@ class Delivery:
         local_save(self.root, self.work, 'delivery.json', encoded(self.state))
         self._record_controller_time('persistence_readback', started)
 
+    def checkpoint(self):
+        try:
+            value = export_checkpoint(self.root, self.work, delivery=self)
+        except (ValueError, OSError, KeyError, TypeError, UnicodeError) as error:
+            value = {'status': 'BLOCKED', 'blocker': str(error)}
+        self.state['checkpoint'] = value
+        local_save(self.root, self.work, 'delivery.json', encoded(self.state))
+        return value
+
     def _record_controller_time(self, name, started):
         timings = self.state.setdefault('controller_timing', {})
         timings[name] = timings.get(name, 0) + time.monotonic() - started
@@ -1215,7 +1444,7 @@ class Delivery:
                 raise ValueError('retained superseded artifact changed or lost: ' + name)
 
     def verification_environment(self):
-        host = self.state['host']
+        host = self.state.get('restored_host') or self.state['host']
         return f"{host['name']} {host['version']}; policy {self.state['policy']}; enforced: {', '.join(host['enforced'])}"
 
     def source_stable(self):
@@ -1258,11 +1487,14 @@ class Delivery:
             raise ValueError('isolated Git metadata pointer changed')
         head = fs.full_commit(self.root, 'HEAD')
         index = fs.digest(fs.git(self.root, 'ls-files', '--stage', '-z'))
-        if head != self.state['source_head'] or index != self.state['source_index_sha256']:
+        metadata_only = (self.state.get('source_product_index_sha256') == fs.product_index_sha256(self.root) and
+                         fs.snapshot_key(fs.snapshot(self.root, head)) == self.state['source_tree_key'] and
+                         fs.snapshot_key(current) == self.state['source_tree_key'])
+        if (head != self.state['source_head'] or index != self.state['source_index_sha256']) and not metadata_only:
             committed_candidate = (candidate_applied and
                                    fs.snapshot_key(fs.snapshot(self.root, head)) == applied_key)
             staged_product = subprocess.run(['git', '-C', str(self.root), 'diff', '--cached', '--quiet',
-                                             '--', ':(exclude).p2p']).returncode
+                                             '--', ':(exclude).p2p', ':(exclude)p2p-state']).returncode
             if not committed_candidate or staged_product:
                 raise ValueError('source HEAD or index changed since admission')
         if fs.full_commit(self.workspace, self.state['comparison_base']) != self.state['comparison_base']:
@@ -1403,9 +1635,18 @@ class Delivery:
                 if attempt['status'] == 'retired':
                     folder = self.runtime / 'attempts' / attempt['id']
                     end = json.loads((folder / 'exit.json').read_bytes())
+                    portable = folder / 'portable-receipt.json'
+                    if portable.exists():
+                        data = portable.read_bytes()
+                        receipt = json.loads(data)
+                        if fs.digest(data) != attempt.get('portable_receipt_sha256') or receipt.get('exit') != end:
+                            raise ValueError('portable worker termination receipt changed')
+                        event_sha256 = end.get('event_sha256')
+                    else:
+                        event_sha256 = fs.digest((folder / 'events.jsonl').read_bytes())
                     if (end.get('attempt_id') != attempt['id'] or end.get('inputs') != attempt['inputs'] or
                             end.get('outcome') not in ('stalled', 'interrupted') or
-                            end.get('event_sha256') != fs.digest((folder / 'events.jsonl').read_bytes())):
+                            end.get('event_sha256') != event_sha256):
                         raise ValueError('retired worker generation has no confirmed exit receipt')
             try:
                 commit = fs.full_commit(repository, record['commit'])
@@ -1481,8 +1722,18 @@ class Delivery:
         end = json.loads(path.read_text())
         if end.get('attempt_id') != attempt['id'] or end.get('inputs') != attempt['inputs']:
             raise ValueError('late or conflicting host receipt: ' + attempt['id'])
-        if end.get('event_sha256') != fs.digest((folder / 'events.jsonl').read_bytes()):
-            raise ValueError('host event content changed: ' + attempt['id'])
+        portable = folder / 'portable-receipt.json'
+        if portable.exists():
+            data = portable.read_bytes()
+            record = json.loads(data)
+            if (fs.digest(data) != attempt.get('portable_receipt_sha256') or
+                    record.get('exit') != end or record.get('attempt_id') != attempt['id']):
+                raise ValueError('portable host receipt changed: ' + attempt['id'])
+            host = record['host']
+        else:
+            if end.get('event_sha256') != fs.digest((folder / 'events.jsonl').read_bytes()):
+                raise ValueError('host event content changed: ' + attempt['id'])
+            host = None
         attempt.update({k: end[k] for k in ('exit_code', 'outcome', 'finished', 'elapsed_seconds')})
         attempt['launch_started'] = end.get('launch_started')
         attempt['launch_finished'] = end.get('launch_finished')
@@ -1492,7 +1743,7 @@ class Delivery:
                 self.save()
             raise ValueError(f'{attempt["stage"]} elapsed-time limit exhausted; host interrupted: {attempt["id"]}')
         try:
-            host = host_events(folder / 'events.jsonl')
+            host = host if host is not None else host_events(folder / 'events.jsonl')
         except ValueError:
             attempt['status'] = 'failed'
             if not self.read_only:
@@ -1775,6 +2026,7 @@ assert results['scratch'] == 'ok'
             raise ValueError('conflicting duplicate stage result: ' + attempt['id'])
         local_save(self.root, self.work, path, raw_report)
         attempt['destination_observation'] = self.state.get('destination_observation')
+        attempt['verification_environment'] = self.verification_environment()
         summary = (review_markdown(report, self.work, self.state['contract'], self.state['candidate'],
                                    fs.snapshot(self.workspace, self.state['comparison_base']),
                                    attempt['destination_observation'], self.verification_environment(),
@@ -1786,6 +2038,8 @@ assert results['scratch'] == 'ok'
         self.state.setdefault('reports', {})[name] = {'path': path, 'sha256': attempt['report_sha256'],
                                                      'attempt_id': attempt['id'], 'inputs': inputs}
         self.save()
+        if name in ('review', 'proof'):
+            self.checkpoint()
         return report
 
     def read_report(self, name):
@@ -1801,7 +2055,8 @@ assert results['scratch'] == 'ok'
         if name == 'review' and 'coverage' in report:
             summary = review_markdown(report, self.work, self.state['contract'], self.state['candidate'],
                                       fs.snapshot(self.workspace, self.state['comparison_base']),
-                                      attempt.get('destination_observation'), self.verification_environment(),
+                                      attempt.get('destination_observation'),
+                                      attempt.get('verification_environment', self.verification_environment()),
                                       attempt.get('session_id'))
         elif name == 'review' and 'details' in report:
             summary = report['details']
@@ -1982,9 +2237,11 @@ assert results['scratch'] == 'ok'
                 evidence.append({'id': eid, 'result': 'passed', 'assertion': item['assertion'],
                                  'observation': item['observation'], 'artifact': text(item['artifact'])})
             verdicts.append({'id': row['id'], 'verdict': row['verdict'], 'evidence': ids})
+        proof_attempt = next(a for a in self.state['attempts'] if a['id'] == self.state['reports']['proof']['attempt_id'])
+        proof_environment = proof_attempt.get('verification_environment', self.verification_environment())
         normalized_proof = {'contract': contract_identity, 'candidate_key': key, 'status': 'PROVEN',
                             'stability': {'contract': 'unchanged', 'candidate': 'unchanged'},
-                            'verification_context': json.dumps(self.state['host']), 'verdicts': verdicts,
+                            'verification_context': proof_environment, 'verdicts': verdicts,
                             'evidence': evidence, 'details': text(proof['details'])}
         value = {'schema': bundle.SCHEMA, 'claim': 'REVIEWED_AND_PROVEN', 'contract': self.state['contract'],
                  'candidate': {'key': key, 'manifest': manifest, 'comparison_base': 'git:' + candidate['comparison_base']},
@@ -2002,9 +2259,7 @@ assert results['scratch'] == 'ok'
                           ended_at=None,
                           final_review=review['details'],
                           final_proof=proof_markdown(proof, self.work, self.state['contract'], candidate,
-                                                     self.verification_environment(),
-                                                     next(a for a in self.state['attempts']
-                                                          if a['id'] == self.state['reports']['proof']['attempt_id'])['session_id']))
+                                                     proof_environment, proof_attempt['session_id']))
         self.save()
         if not already_complete:
             self.state.update(status='REVIEWED_AND_PROVEN', completed_at=now())
@@ -2015,6 +2270,7 @@ assert results['scratch'] == 'ok'
                                   blocker='terminal measurement finalization failed: ' + str(error),
                                   completed_at=None, ended_at=now(), ended_epoch=time.time())
                 raise
+        self.checkpoint()
 
     def verify_github_readback(self):
         receipt = self.state.get('github_record')
@@ -2067,6 +2323,8 @@ assert results['scratch'] == 'ok'
         self.state['final_records_written'] = True
         self.save()
         self.verify_final_readback('source checkout changed during cleanup finalization')
+        if self.checkpoint()['status'] == 'BLOCKED':
+            raise ValueError('portable checkpoint unavailable; retain execution receipts before cleanup')
         self.remove_superseded_artifacts()
         self.remove_local_execution_state()
 
@@ -2271,6 +2529,7 @@ assert results['scratch'] == 'ok'
                 if report['status'] in ('IMPLEMENTED', 'REPAIRED'):
                     self.state['implementation_complete'] = True
                 self.save()
+                self.checkpoint()
             if 'review' not in self.state.get('reports', {}):
                 self.stage('review')
             review = self.read_report('review')
@@ -2635,6 +2894,7 @@ def create(root, args, invocation_started_epoch=None):
              'agreement_paths': agreement_paths,
              'source_tree_key': fs.snapshot_key(current), 'source_head': head,
              'source_index_sha256': fs.digest(fs.git(root, 'ls-files', '--stage', '-z')),
+             'source_product_index_sha256': fs.product_index_sha256(root),
              'excluded_dirty': sorted(excluded), 'skills': installed,
              'routing': decision, 'routing_records': records, 'starting_commit': starting,
              'base_tree_key': base_tree_key,
@@ -2661,7 +2921,7 @@ def create(root, args, invocation_started_epoch=None):
                       'elapsed_limit': 'admission and process termination; provider billing may continue',
                       'trust': 'controller and OS trusted; no arbitrary same-user tamper resistance'}}
     delivery = Delivery(root, args.work, state)
-    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host')}))
+    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'source_product_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host')}))
     delivery.save()
     delivery.capture('admission')
     delivery.save()
@@ -2719,6 +2979,7 @@ def result(delivery):
         'invocation_id', 'work_item', 'comparison_base', 'limits', 'repair_used', 'host')} | {
         'routing': state.get('routing'),
         'autonomy': state.get('autonomy'),
+        'checkpoint': state.get('checkpoint', {'status': 'LOCAL_ONLY', 'blocker': 'portable checkpoint not yet saved'}),
         'continuation': state.get('continuation'),
         'recovery_history': state.get('recovery_history', []),
         'destination_observation': state.get('destination_observation'),
@@ -3050,6 +3311,7 @@ def main(argv=None):
             if args.action != 'status':
                 try:
                     delivery.save()
+                    delivery.checkpoint()
                 except (ValueError, OSError) as storage:
                     message += '; unable to persist blocker: ' + str(storage)
             output = result(delivery)

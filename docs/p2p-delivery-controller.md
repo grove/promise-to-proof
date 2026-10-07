@@ -60,7 +60,11 @@ first 16 hex characters of SHA-256 over the absolute Git common directory.
 An existing checkout-local runtime stays in place until that delivery is
 reconciled.
 A successful controller result identifies the isolated workspace and matching
-full `REVIEWED` and `PROVEN` reports. The source checkout remains untouched.
+full `REVIEWED` and `PROVEN` reports. Product files in the source checkout remain
+untouched. The controller also writes a bounded portable checkpoint in
+`p2p-state/<slug>.json`, or the selected ignored GitHub checkpoint cache.
+Its `checkpoint` result distinguishes local preservation from remote portability.
+See [portable checkpoints](p2p-checkpoints.md) for publication and recovery.
 Run explicit cleanup without applying the candidate:
 
 ```sh
@@ -73,7 +77,9 @@ removes superseded reports and execution logs. It records hashes and reasons
 for retained planning and archive receipts, blocks on unclassified or staged
 extras, and keeps the isolated candidate workspace and Git objects under
 `~/.p2p/executions/<repo-id>/<slug>/runtime/`, outside the checkout. Cleanup does not apply, commit, publish, or merge
-code.
+code. It must save/read back the portable checkpoint before removing host
+receipts. Neither a local checkpoint nor cleanup authorizes deleting both local
+P2P roots; verify the published checkpoint and candidate commits first.
 
 ## Record an issue-backed delivery
 

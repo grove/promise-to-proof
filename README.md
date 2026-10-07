@@ -72,7 +72,7 @@ coding tools. The production-validated direct controller path is currently narro
 | Coordinated local delivery controller | **macOS + Codex CLI** |
 | Controller prerequisites | **Python 3.11+**, Git, an authenticated Codex CLI, and the required P2P stage skills |
 | GitHub | Optional. It can be used for issue import, planning handoffs, completion records, and PR workflows, but local planning and delivery do not require it |
-| P2P project state | Generated project-local records live under ignored `.p2p/`; active controller execution and recovery state lives outside the source checkout |
+| P2P project state | Local working records stay ignored; compact portable checkpoints use `p2p-state/<slug>.json` in Git or an explicitly selected GitHub issue |
 
 If the coordinated host cannot establish fresh stage contexts, protect the fixed
 candidate and agreement during verification, or retain the required handoffs, P2P
@@ -257,15 +257,20 @@ situations that appear later in real work.
 
 For normal project use, the simple rule is:
 
-> **P2P keeps generated project-local workflow records under ignored `.p2p/`, so
-> they do not pollute your product history.**
+> **P2P keeps working data local and preserves portable handoffs in small Git
+> checkpoints or an explicitly selected GitHub issue.**
 
 Acceptance contracts and compact final records use
 `.p2p/work/<slug>/`. Temporary project-local scratch may use `.p2p/tmp/`.
 The coordinated controller keeps its active candidate workspace, invocation
 records, reports, and recovery state outside the checkout under the user-level P2P
 execution root. That lets interrupted delivery resume without mixing controller
-state into the product tree.
+state into the product tree. These directories are working storage, not the only
+preservation destination. Checkpoints retain exact agreements, approval evidence,
+routing and completed reports; code travels through Git commit references. The
+current checkpoint is capped at 256 KiB and excludes prompts, logs and workspaces.
+Publication still requires covering authority. Only verified remote readback
+establishes portability. See [move work between computers](./docs/p2p-checkpoints.md).
 
 You only need the deeper storage rules when debugging, migrating older state, or
 operating the controller directly. See the

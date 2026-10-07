@@ -327,12 +327,57 @@ PR; generated `.p2p/` records remain local and ignored.
 
 ## Durable generated records
 
+### Portable checkpoints
+
+Save a compact checkpoint at planning/approval, decomposition, completed stage,
+publication and delivery boundaries. The default shared record is
+`p2p-state/<slug>.json`, suitable for Git; an explicitly selected GitHub issue
+is the alternative. Choose one destination per item, not two synchronized stores.
+Use the filesystem helper's `checkpoint`, `checkpoint-status`,
+`checkpoint-restore`, and `checkpoint-github-*` commands. See
+[portable checkpoints](p2p-checkpoints.md) for transport and recovery.
+
+Preserve exact agreements and binding sources, approvals and their referenced
+historical versions, dependencies/routing, completed reports and necessary host
+receipts, effect receipts, limits, blocker and next action. Deduplicate text by
+SHA-256. Reference matching committed project documents and product candidates
+by full Git commit and path; never embed product trees, transcripts, prompts,
+dependency caches or ordinary logs. Referenced evidence must remain retrievable;
+missing evidence never becomes a passing claim. Checkpoints are limited to
+262144 UTF-8 bytes. Exceeding the limit blocks preservation without deleting or
+truncating required content; retain local state and report the storage problem.
+
+The checkpoint namespace is reserved for P2P records and excluded from product
+candidate identities, like `.p2p/`. Exact contract bytes remain canonical locally;
+the selected checkpoint is the authority for transferring those same bytes and
+their provenance. Do not author a competing contract or silently adopt conflicting
+copies. Git history retains checkpoint revisions; copy historical inputs only
+when an approval/report actually references them. No blanket runtime archive.
+
+Local writes do not authorize commits, pushes or issue publication. Distinguish
+`LOCAL_ONLY`, `COMMITTED`, and `PORTABLE`: portability requires readback from the
+selected shared destination and all required Git objects available there. A hash
+or unpublished local commit is not portable. Stop the old controller before
+moving work. Restore verifies every object and preflights all write conflicts
+before creating local records; it never overwrites differing product files,
+existing executions or agreements. Preserve the frozen comparison base and stage
+identities. Recheck host isolation on the receiving machine; completed contexts
+are evidence, not permission to skip a new host's preflight. An uncertain dispatch
+blocks transfer/resume until reconciled; never recreate a running agent process.
+
+Neither `.p2p/` nor `~/.p2p/` is required on a receiving machine after a verified
+checkpoint. They may be removed only after verifying the shared checkpoint and
+recoverable candidate, and after stopping any active controller. Raw local state
+must still be retained while preservation is incomplete or an effect is uncertain.
+
+### Local working records
+
 Save work-item output under `.p2p/work/<slug>/`: `implementation.md`,
 `candidate.json`, `review.md`, `proof.md`, and `evidence/`. Other stages use
 `audit.md`, `repair.md`, `publication.md`, and `retrospective.md` as applicable.
 Use descriptive kebab-case evidence names. Read back every saved artifact before
 claiming a durable handoff. These local records are excluded from project Git
-history. Writing them does not authorize tracker writes, publishing a PR,
+history; only the compact checkpoint may be committed. Writing them does not authorize tracker writes, publishing a PR,
 merging, or deploying.
 
 After a successful local delivery, cleanup reads back the four final records
@@ -407,14 +452,16 @@ switches the operator's checkout. The current records replace prior records
 without an extra history copy. The controller keeps any uncommitted prior
 record bytes in ignored local recovery until replacement has been read back.
 Versions already committed under legacy workflows remain in their existing Git
-history; current P2P records never enter project Git history. A fresh checkout
-still requires an explicit transfer of the ignored candidate workspace.
+history. Raw current P2P records never enter project Git history. A portable
+checkpoint and its referenced Git commits replace copying an ignored workspace
+for cross-computer recovery.
 
 Before replacing a report, candidate, evidence, or uncommitted agreement,
 retain its previous bytes in ignored
 `.p2p/work/<slug>/history/<sha256>/<name>`. If exact old bytes already exist in
 legacy Git history, keep that commit as an additional recovery source. Never
-add P2P records to a new project commit. Preserve uncommitted versions in
+add raw P2P records to a new project commit; compact checkpoints are the scoped
+exception. Preserve uncommitted versions in
 `history/` before replacement.
 Retain related evidence and snapshots so historical reports remain interpretable.
 Rerunning the owning stage updates verdicts and identities. A manually edited
@@ -425,7 +472,7 @@ current reports, never from an authoritative `accepted: true` flag.
 
 Some legacy P2P records were already committed before the repo-local ignore
 rule. Those old versions may be recovered from their existing commits for
-historical inspection. Do not create new commits to archive current P2P records;
+historical inspection. Do not create new commits to archive raw current P2P records;
 use explicit delivery cleanup to remove runtime data while retaining the final
 records in ignored local storage. See [Reduce retained work
 data](./how-to.md#reduce-retained-work-data).
@@ -451,7 +498,7 @@ attribution before capture; an external URL alone cannot establish its currency.
 Historical copies in `.p2p/` identify previous agreements but are not live inputs.
 The work item, binding inputs, and reports must all agree on these identities.
 
-Exclude the entire `.p2p/` directory from candidate trees and snapshots. Capture
+Exclude `.p2p/` and `p2p-state/` from product candidate trees and snapshots. Capture
 all relevant tracked, staged, unstaged, deleted, and untracked product content,
 including executable modes and symlink targets. A compact record keeps the full
 candidate key plus only changed path/mode/type/content digests relative to the
@@ -477,7 +524,7 @@ discarding the user's work.
 
 A product candidate A can be followed by commit B that excludes `.p2p/` records.
 Review and proof remain bound to A. To reuse them for B, compare the complete
-tracked tree outside `.p2p/`, check relevant uncommitted content, and recheck the
+tracked product tree outside `.p2p/` and `p2p-state/`, check relevant uncommitted content, and recheck the
 exact work item, every binding input, and the requested comparison base. A
 product or agreement difference invalidates reuse of those verdicts. Fresh
 verifiers may assess supporting observations only under the focused
@@ -491,10 +538,10 @@ Given only `.p2p/work/<slug>/contract.md`, resolve its source and parent links, 
 artifact directory, candidate, reports, and evidence. Recompute their identities
 before reuse and resume the earliest incomplete or stale stage. Missing evidence
 or recoverable candidate content is a blocked handoff, not a reason to infer
-success from chat or file existence. A fresh checkout needs the ignored work-item
-records copied from the local work root and candidate Git objects or a retained
-snapshot. An authorized transfer must include them before the previous checkout
-or temporary files are removed.
+success from chat or file existence. A fresh checkout restores the portable
+checkpoint and its referenced Git objects. Legacy work without a checkpoint
+still requires explicit transfer of ignored records and candidate content.
+Verify recovery before removing the previous checkout or temporary files.
 
 The dependency-free `scripts/p2p_filesystem.py` shipped with the skills implements
 setup, path resolution, safe creation and replacement, candidate capture,
@@ -916,10 +963,10 @@ normalization. A content-equivalent commit does not replace a report-bound
 snapshot key.
 
 When a snapshot needs a commit, create it in an isolated publication workspace
-and compare its complete Git tree outside `.p2p/` with the captured candidate.
+and compare its complete product tree outside `.p2p/` and `p2p-state/` with the captured candidate.
 Exclude all `.p2p/**` records from the publication commit. If a durable handoff
-is needed, use the separately authorized GitHub issue-record flow and verify its
-readback; PR publication does not authorize an issue write. Record the exact
+is needed, use the separately authorized compact checkpoint or GitHub issue-record
+flow and verify its readback; PR publication does not authorize an issue write. Record the exact
 snapshot-to-commit mapping. A content-equivalent commit preserves candidate-bound
 review and proof only when behaviorally relevant build and execution inputs are
 unchanged or explicitly shown equivalent. These inputs include Git metadata when

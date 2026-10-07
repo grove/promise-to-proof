@@ -304,7 +304,7 @@ its checks.
 10. Resume from the same `.p2p/work/<slug>/contract.md` path by reading its linked inputs and
     external invocation state, candidate, reports, and evidence. Recheck
     binding parent/spec hashes and comparison base, and compare the entire
-    product tree outside `.p2p/`. Local `.p2p/` record updates retain the
+    product tree outside `.p2p/` and `p2p-state/`. Local `.p2p/` record updates retain the
     original reviewed candidate identity; they do not make a new HEAD proven.
     Reread its canonical agreement,
     saved candidate and reports; validate identities and scope before reusing
@@ -315,6 +315,18 @@ its checks.
     a completed stage from a chat summary.
 
 ## Result and authority
+
+The controller saves compact portable checkpoints at completed stage boundaries.
+Report the checkpoint preservation status and size separately from acceptance.
+`LOCAL_ONLY` is not remote backup. Under covering authority, publish the selected
+Git checkpoint and its candidate work branch, or the exact GitHub checkpoint
+comment and candidate branch; verify remote readback with the filesystem helper.
+Do not copy transcripts or execution workspaces. On another computer use
+`checkpoint-restore` (or `checkpoint-github-restore`) before the existing
+controller `resume`; restore preserves the frozen base and completed stage
+identities while requiring fresh host preflight. An uncertain dispatch or missing
+required evidence/commit blocks transfer. Never delete local state until the
+selected checkpoint and all required candidate/source commits are portable.
 
 Return `REVIEWED` and `PROVEN` only when the full saved reports match the current
 exact agreement and one unchanged recoverable candidate and their evidence is

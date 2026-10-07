@@ -257,6 +257,14 @@ contracts, decisions, or prerequisites are missing.
 
 ## Report and hand off
 
+After saving the decomposition, child set, approval or routing change, refresh
+the parent's portable checkpoint with `python3 <skill-dir>/scripts/p2p_filesystem.py
+--repo <root> checkpoint .p2p/work/<parent>/contract.md`. Include the complete
+linked child/source/approval closure, not only task briefs. Follow the protocol's
+portable checkpoint rules and report preservation status and size. Publication
+and Git effects retain their existing authority boundaries. Local `.p2p/` paths
+alone are not a cross-computer handoff.
+
 Use one conclusion:
 
 | Outcome | Meaning |
