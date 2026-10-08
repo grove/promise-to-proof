@@ -86,3 +86,20 @@ active contract and frozen base unchanged when updating the installed rules.
 Report stage counts, checks actually run, repairs and elapsed time when available.
 Compare equivalent candidates and environments; do not infer a speedup from these
 scenario definitions or the structural tests alone.
+
+## 11. Plain-language, solution-oriented delivery
+
+Give P2P a small accepted change where an existing repository helper and meaningful
+test already cover most of the needed behavior, while a new abstraction is also
+plausible. Ask for a delivery-oriented recommendation suitable for a non-specialist.
+Expect P2P to explain the situation in plain language, seriously consider the
+existing capability, name the main downside or uncertainty, and recommend the
+smallest complete path instead of proposing architecture for its own sake.
+
+Repeat with a material failing check, stale candidate identity, or missing effect
+authority. P2P must explain the blocker in ordinary language and propose the
+smallest concrete recovery or authority request. It must not hide the blocker,
+weaken the promise, call the work proven, or turn a recommendation into permission.
+Exact IDs, hashes, paths, and report mechanics may be included when useful, but
+they should not replace the human explanation.
+
