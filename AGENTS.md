@@ -88,11 +88,15 @@ P2P workflow state.
 - Generated project-local P2P records stay under ignored
   `.p2p/work/<slug>/`; compact completed delivery records live under its
   `artifacts/` directory.
+- Portable checkpoints live at `p2p-state/<slug>.json` and may be committed under
+  explicit authority. GitHub issue checkpoints are an alternative destination.
+  Follow the canonical checkpoint protocol; raw local execution data stays ignored.
 - Active controller execution, candidate workspaces, reports, and recovery state
   live in the retained external execution root documented in
   `docs/p2p-delivery-controller.md`.
 - Use the existing controller `status` and `resume` paths to recover active
   work. Do not reconstruct progress from chat history or create parallel state.
+  On another computer, restore the portable checkpoint before using those paths.
 - Never commit generated `.p2p/` state.
 
 The repository and retained P2P records are the handoff between agent sessions.

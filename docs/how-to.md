@@ -463,12 +463,16 @@ review requirements still apply after proof succeeds.
 
 ## Carry work to another session or checkout
 
-Do not commit `.p2p/` records. When moving an active delivery, copy its
-`.p2p/work/<slug>/` contract and compact records plus the matching
-`~/.p2p/executions/<repo-id>/<slug>/` directory, preserving bytes and access
-limits. After successful explicit cleanup, the external runtime retains the
-candidate workspace and Git objects. Keep secrets out of snapshots and
-evidence, and delete scratch files only after durable records are read back.
+Do not commit raw `.p2p/` records. Preserve the compact
+`p2p-state/<slug>.json` checkpoint and its referenced Git commits, or use the
+explicitly selected GitHub checkpoint destination. Verify `PORTABLE` against
+the current remote before removing local state. Stop the old controller, fetch
+the checkpoint and candidate branches on the new computer, and run the installed
+filesystem helper's `checkpoint-restore` before controller resume. See
+[move work between computers](./p2p-checkpoints.md) for commands and limits.
+Legacy work without a checkpoint still requires an explicit transfer of its
+contracts, receipts and recoverable candidate; never discard uncertain execution
+state. Keep secrets out of checkpoints and evidence.
 
 In the new checkout, resume with the work-item path:
 
@@ -500,7 +504,9 @@ It verifies the source checkout stayed at admission, reads back the four final
 local records, and removes attempt logs and scratch. The candidate workspace
 and Git objects remain under `~/.p2p/executions/<repo-id>/<slug>/runtime/` for
 publication. Keep the remaining `.p2p/` records ignored; they are never
-committed to the project.
+committed to the project. The compact portable checkpoint is the scoped Git
+exception. Cleanup requires a readable checkpoint before dropping host receipts;
+removing both local P2P roots additionally requires verified remote portability.
 
 For historical inspection of P2P files already present in an older Git commit,
 recover them into a new temporary directory:

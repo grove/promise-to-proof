@@ -1,5 +1,10 @@
 # Move existing P2P state out of Git
 
+This guide applies to raw legacy records. Current compact
+`p2p-state/<slug>.json` checkpoints are intentionally trackable; do not migrate
+them out of Git. For cross-computer preservation and recovery, use
+[portable checkpoints](p2p-checkpoints.md).
+
 New active deliveries keep canonical contracts and compact records under
 `.p2p/work/<slug>/`; their execution workspace and candidate stay outside the
 checkout under `~/.p2p/executions/<repo-id>/<slug>/`. Unresolved state from the

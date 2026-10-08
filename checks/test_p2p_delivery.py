@@ -830,7 +830,10 @@ Pending actions: none.
         path.write_text(path.read_text().replace('retained fixture request.', 'retained receipt approval.md.'))
         receipt = path.parent / 'approval.md'
         original = path.read_bytes()
-        d.fs.save(self.root, 'work/parent.md', 'slicing.md', original + b'## Proposed delivery plan\nPending.\n')
+        pending = original + b'## Proposed delivery plan\nPending.\n'
+        with self.assertRaisesRegex(ValueError, 'missing checkpoint input: .*approval.md'):
+            d.fs.save(self.root, 'work/parent.md', 'slicing.md', pending)
+        self.assertEqual(path.read_bytes(), pending)
 
         def cli(root, action):
             command = [sys.executable, str(SCRIPTS / 'p2p_delivery.py'), '--repo', str(root), action, '.p2p/work/tiny/contract.md']
@@ -858,15 +861,15 @@ Pending actions: none.
         d.fs.git(recovered, 'branch', 'epic/tiny', self.base)
         recovered = recovered.resolve()
         shutil.copytree(workspace / 'work', recovered / 'work')
-        shutil.copytree(workspace / '.p2p/work/parent', recovered / '.p2p/work/parent')
-        local = d.local_directory(self.root, '.p2p/work/tiny/contract.md')
-        recovered_local = d.local_directory(recovered, '.p2p/work/tiny/contract.md')
-        recovered_local.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copytree(local, recovered_local)
+        checkpoint = (self.root / 'p2p-state/tiny.json').read_bytes()
+        saved = json.loads(checkpoint)
+        commit = saved['candidate_commit']
+        self.assertEqual(d.fs.snapshot_key(d.fs.snapshot(self.root, saved['execution']['source_recovery_commit'])),
+                         saved['execution']['source_tree_key'])
+        d.fs.git(recovered, 'fetch', '--no-tags', str(self.root), commit)
+        self.assertEqual(d.fs.restore_checkpoint(recovered, checkpoint)['status'], 'RESTORED')
         recovered_runtime = d.execution_runtime(recovered, '.p2p/work/tiny/contract.md')
-        shutil.copytree(self.runtime(), recovered_runtime)
         recovered_workspace = recovered_runtime / 'workspace'
-        (recovered_workspace / '.git').write_text('gitdir: ' + str(recovered_runtime / 'repository.git') + '\n')
         self.assertIn('dispatch-count limit', cli(recovered, 'run')['blocker'])
         self.assertEqual((recovered_workspace / '.p2p/work/parent/approval.md').read_bytes(), receipt.read_bytes())
         receipt.write_bytes(b'Changed approval.\n')

@@ -58,6 +58,14 @@ do not hide them with force-add or silently rewrite unrelated policy. Empty dire
 placeholder files. Run `python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> setup`;
 its error output identifies conflicts.
 
+Use `p2p-state/<slug>.json` as the default portable checkpoint destination;
+keep it trackable and reserve it for compact P2P metadata. Do not create empty
+checkpoint files. An explicitly selected GitHub issue is the alternative per
+work item; do not establish competing synchronized stores. Explain that local
+writes are not remote preservation, and that candidate/source commits must also
+be retrievable before portability is claimed. Neither setup nor checkpoint
+creation authorizes commits, pushes or issue comments.
+
 Create or update resolved `docs/agents/` configuration files. Add
 short pointers to them under `## Agent skills` in an existing `AGENTS.md` or
 `CLAUDE.md`; if both exist, confirm which is authoritative. If neither exists,

@@ -15,6 +15,13 @@ import uuid
 
 SLUG = r"[a-z0-9]+(?:-[a-z0-9]+)*"
 WORK = re.compile(rf"(?:work/(?P<legacy>{SLUG})\.md|\.p2p/work/(?P<active>{SLUG})/contract\.md)\Z")
+CHECKPOINT_SCHEMA = "promise-to-proof/checkpoint/v1"
+CHECKPOINT_LIMIT = 262144
+CHECKPOINT_DIRECTORY = "p2p-state"
+
+
+def product_path(path):
+    return path.split("/", 1)[0] not in (".p2p", CHECKPOINT_DIRECTORY)
 
 
 def work_slug(work):
@@ -167,6 +174,8 @@ def safe(root, relative, leaf_symlink=False):
         current = current / part
         if current.is_symlink() and not (leaf_symlink and i == len(path.parts) - 1):
             raise ValueError(f"symlink in repository path: {relative}")
+        if i < len(path.parts) - 1 and current.exists() and not current.is_dir():
+            raise ValueError(f"non-directory in repository path: {relative}")
     return current
 
 
@@ -261,7 +270,7 @@ def snapshot(root, commit=None, exclude=()):
             meta, name = record.split(b"\t", 1)
             mode, kind, oid = meta.decode().split()
             path = name.decode("utf-8")
-            if path == ".p2p" or path.startswith(".p2p/") or path in excluded:
+            if not product_path(path) or path in excluded:
                 continue
             if kind != "blob":
                 raise ValueError(f"submodules are not supported: {path}")
@@ -271,7 +280,7 @@ def snapshot(root, commit=None, exclude=()):
         sources = []
         for name in filter(None, names):
             path = name.decode("utf-8")
-            if path == ".p2p" or path.startswith(".p2p/") or path in excluded:
+            if not product_path(path) or path in excluded:
                 continue
             file = safe(root, path, leaf_symlink=True)
             if file.is_symlink():
@@ -354,6 +363,8 @@ def bindings(root, work, require_trackable=True, _follow_origin=True):
         return bool(re.fullmatch(
             rf"\.p2p/work/{re.escape(slug)}/source-(?:issue|pr-[0-9]+)\.md", relative))
     def visit(relative, from_contract_source=False):
+        if relative.split("/", 1)[0] == CHECKPOINT_DIRECTORY:
+            raise ValueError("generated artifacts cannot be binding inputs")
         p2p_path = relative == ".p2p" or relative.startswith(".p2p/")
         allowed = is_contract(relative) or is_imported_issue(relative) or (
             from_contract_source and is_imported_source(relative))
@@ -473,6 +484,8 @@ def save(root, work, name, data):
             atomic_write(archived, old, ignored_root=root)
     target.parent.mkdir(parents=True, exist_ok=True)
     atomic_write(target, data, ignored_root=root)
+    if name != "candidate.json":
+        checkpoint(root, work)
     return str(target.relative_to(root))
 
 
@@ -483,7 +496,7 @@ def full_commit(root, ref):
 def check_index(root):
     # Retain one version, including modes even when Git ignores filesystem mode changes.
     staged = {name.decode() for name in git(root, "diff", "--cached", "--name-only", "-z").split(b"\0")
-              if name and name != b".p2p" and not name.startswith(b".p2p/")}
+              if name and product_path(name.decode())}
     if not staged:
         return
     current = {entry["path"]: entry for entry in snapshot(root)}
@@ -507,6 +520,11 @@ def check_index(root):
             if expected == (actual["mode"], data):
                 continue
         raise ValueError("partially staged path needs one candidate version (content or mode): " + path)
+
+
+def product_index_sha256(root):
+    records = git(root, "ls-files", "--stage", "-z").split(b"\0")
+    return digest(b"\0".join(record for record in records if record and product_path(record.split(b"\t", 1)[1].decode())))
 
 
 def capture(root, work, base, commit=None, exclude=()):
@@ -614,11 +632,456 @@ def resolve(root, work):
             "artifacts": sorted(str(file.relative_to(root)) for file in artifact.rglob("*") if file.is_file())}
 
 
+def checkpoint_path(root, work, destination=None):
+    slug = work_slug(work)
+    shared = safe(root, f"{CHECKPOINT_DIRECTORY}/{slug}.json")
+    local = safe(root, f".p2p/work/{slug}/checkpoint.json")
+    if shared.exists() and local.exists():
+        raise ValueError("conflicting Git and GitHub checkpoints; reconcile the selected destination")
+    existing = shared if shared.exists() else local if local.exists() else None
+    if existing:
+        previous = json.loads(existing.read_bytes())
+        if previous.get("schema") != CHECKPOINT_SCHEMA or previous.get("work_item") != work:
+            raise ValueError("checkpoint path belongs to another record; preserve and reconcile it")
+        if destination is not None and destination != previous.get("destination"):
+            raise ValueError("checkpoint destination changed; reconcile the existing checkpoint first")
+        destination = previous["destination"]
+    destination = destination or {"kind": "git"}
+    if destination == {"kind": "git"}:
+        trackable(root, [shared.relative_to(root).as_posix()])
+        return shared, destination
+    if (set(destination) != {"kind", "repository", "issue"} or destination["kind"] != "github" or
+            not re.fullmatch(r"[\w.-]+/[\w.-]+", destination["repository"]) or
+            type(destination["issue"]) is not int or destination["issue"] < 1):
+        raise ValueError("invalid checkpoint destination")
+    require_ignored(root, local.relative_to(root).as_posix())
+    return local, destination
+
+
+def checkpoint_documents(root, work):
+    """Collect live agreements and referenced receipts, not every draft or log."""
+    selected = set()
+    pending = [work]
+    records = ("contract.md", "contract-origin.json", "planning-handoff.md", "delivery-shape.md", "slicing.md",
+               "slicing-approval.md", "source-publication.md", "tracker-publication.json",
+               "tracker-publication.md", "publication.md", "archive.md", "implementation.md",
+               "review.md", "proof.md", "audit.md", "repair.md", "candidate.json", "retrospective.md")
+    owners = set()
+    referenced_hashes = set()
+    inspected_hashes = set()
+    while pending:
+        relative = pending.pop()
+        if relative in selected:
+            continue
+        file = safe(root, relative)
+        if not file.is_file():
+            raise ValueError("missing checkpoint input: " + relative)
+        selected.add(relative)
+        if file.suffix == ".md":
+            referenced_hashes.update(re.findall(r"[a-f0-9]{64}", file.read_text()))
+        if WORK.fullmatch(relative):
+            owner = f".p2p/work/{work_slug(relative)}"
+            if owner not in owners:
+                owners.add(owner)
+                pending.extend(owner + "/" + name for name in records if safe(root, owner + "/" + name).exists())
+                artifacts = safe(root, owner + "/artifacts")
+                pending.extend(str(p.relative_to(root)) for p in artifacts.glob("*") if p.is_file())
+            pending.extend(row["path"] for row in bindings(root, relative))
+            pending.extend(children(root, relative))
+        if relative.startswith(".p2p/") and file.suffix == ".md":
+            origin = PurePosixPath(relative).parent
+            if "history" in origin.parts:
+                origin = PurePosixPath(*origin.parts[:origin.parts.index("history")])
+            text = file.read_text()
+            targets = re.findall(r"\[[^\]]*\]\(([^)]+)\)", text)
+            for line in document_lines(text):
+                if line.startswith("Approval source:"):
+                    plain = re.sub(r"\[[^\]]*\]\([^)]+\)|[a-zA-Z][a-zA-Z0-9+.-]*://\S+", "", line)
+                    targets.extend(re.findall(r"(?<![\w/])([.\w/-]+\.md)(?=$|[\s.,;`])", plain))
+            for target in targets:
+                if re.match(r"[a-zA-Z][a-zA-Z0-9+.-]*:", target):
+                    continue
+                target = target.split("#", 1)[0]
+                if not target:
+                    continue
+                linked = os.path.normpath(str(origin / target))
+                parts = PurePosixPath(linked).parts
+                # Captured source snapshots retain their original document links;
+                # code/README links are not workflow receipts. Binding inputs and
+                # child contracts are independently checked above.
+                if (len(parts) > 3 and parts[:2] == (".p2p", "work") and
+                        safe(root, '/'.join(parts[:3])).is_dir()):
+                    safe(root, linked)
+                    pending.append(linked)
+        # Older approval tables sometimes name historical drafts only by digest.
+        # Preserve those exact retained bytes without exporting every old draft.
+        for sha in referenced_hashes - inspected_hashes:
+            for historical in (root / '.p2p/work').glob('*/history/' + sha + '/**/*'):
+                if historical.is_file() and str(historical.relative_to(root)) not in selected:
+                    pending.append(str(historical.relative_to(root)))
+            inspected_hashes.add(sha)
+    return sorted(selected)
+
+
+def checkpoint(root, work, destination=None, execution=None, candidate_commit=None, extra_files=()):
+    """Write bounded, deduplicated metadata; never perform a Git or tracker write."""
+    root = Path(root).resolve()
+    paths(root, work)
+    target, destination = checkpoint_path(root, work, destination)
+    previous = json.loads(target.read_bytes()) if target.exists() else {}
+    # Filesystem saves may occur within a controller stage. Keep its last complete
+    # boundary until the controller explicitly replaces it, rather than inventing one.
+    if execution is None and previous.get("execution") is not None:
+        return {"status": "LOCAL_ONLY", "path": str(target.relative_to(root)),
+                "bytes": target.stat().st_size, "blocker": "controller checkpoint needs its next completed boundary"}
+    files, texts, required = [], {}, set()
+    try:
+        head = full_commit(root, "HEAD")
+    except ValueError:
+        head = None
+    committed_checkpoint = subprocess.run(["git", "-C", str(root), "show",
+                                          str(head) + ":" + str(target.relative_to(root))], capture_output=True)
+    retained_texts = json.loads(committed_checkpoint.stdout).get("texts", {}) if committed_checkpoint.returncode == 0 else {}
+    def add(scope, relative, data):
+        safe(root, relative)
+        sha = digest(data)
+        existing = next((row for row in files if row["scope"] == scope and row["path"] == relative), None)
+        if existing:
+            if existing["sha256"] != sha:
+                raise ValueError("conflicting checkpoint input: " + relative)
+            return
+        row = {"scope": scope, "path": relative, "sha256": sha}
+        retained = next((row for row in previous.get("files", []) if row["scope"] == scope and row["path"] == relative and
+                         row["sha256"] == sha and row.get("git_commit")), None)
+        if retained:
+            row.update({key: retained[key] for key in ("git_commit", "checkpoint_path") if key in retained})
+            required.add(retained["git_commit"])
+            files.append(row)
+            return
+        if destination["kind"] == "git" and sha in retained_texts and retained_texts[sha].encode() == data:
+            row.update(git_commit=head, checkpoint_path=str(target.relative_to(root)))
+            required.add(head)
+            files.append(row)
+            return
+        commit = retained["git_commit"] if retained else head
+        committed = subprocess.run(["git", "-C", str(root), "show", str(commit) + ":" + relative], capture_output=True)
+        if scope == "project" and product_path(relative) and committed.returncode == 0 and committed.stdout == data:
+            row["git_commit"] = commit
+            required.add(commit)
+        else:
+            texts[sha] = data.decode("utf-8")
+        files.append(row)
+    retained_agreement = {relative: data for scope, relative, data in extra_files if scope == "agreement"}
+    if execution is not None and not safe(root, work).is_file():
+        selected = [work, *(row["path"] for row in execution["binding_inputs"]),
+                    *(row["path"] for row in execution.get("routing_records", []))]
+    else:
+        selected = checkpoint_documents(root, work)
+    for relative in sorted(set(selected)):
+        file = safe(root, relative)
+        add("project", relative, file.read_bytes() if file.is_file() else retained_agreement[relative])
+    for scope, relative, data in extra_files:
+        add(scope, relative, data)
+    if len({(row["scope"], row["path"]) for row in files}) != len(files):
+        raise ValueError("duplicate checkpoint input")
+    candidate_record = next((safe(root, path) for path in (f".p2p/work/{work_slug(work)}/artifacts/candidate.json",
+                                                         f".p2p/work/{work_slug(work)}/candidate.json") if safe(root, path).is_file()), None)
+    if candidate_record and execution is None:
+        record = json.loads(candidate_record.read_bytes())
+        candidate_commit = candidate_commit or record.get("commit")
+        if candidate_commit and record.get("key"):
+            agreement_paths = [work, *(row["path"] for row in bindings(root, work))]
+            expected = snapshot_key(snapshot(root, candidate_commit, exclude=agreement_paths if "/artifacts/" in str(candidate_record) else ()))
+            if record["key"] != expected:
+                raise ValueError("checkpoint candidate commit differs from the saved candidate")
+    if candidate_commit:
+        if not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", candidate_commit):
+            raise ValueError("checkpoint candidate needs a full commit SHA")
+        required.add(candidate_commit)
+    if execution:
+        required.update([execution["comparison_base"], execution["local_git_base"]["local_commit"]])
+        execution["source_recovery_commit"] = None
+        for commit in (execution["source_head"], execution["starting_commit"], execution["local_git_generations"][0]["commit"]):
+            if snapshot_key(snapshot(root, commit)) == execution["source_tree_key"]:
+                required.add(commit)
+                execution["source_recovery_commit"] = commit
+                break
+    value = {"schema": CHECKPOINT_SCHEMA, "work_item": work, "destination": destination,
+             "files": sorted(files, key=lambda row: (row["scope"], row["path"])), "texts": texts,
+             "required_commits": sorted(required), "candidate_commit": candidate_commit,
+             "execution": execution}
+    data = canonical(value) + b"\n"
+    if len(data) > CHECKPOINT_LIMIT:
+        raise ValueError(f"checkpoint exceeds 256 KiB: {len(data)} bytes; retain local state and move essential large evidence to durable referenced storage")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists() and target.read_bytes() == data:
+        pass
+    else:
+        atomic_write(target, data, ignored_root=root if destination["kind"] == "github" else None)
+    if target.read_bytes() != data:
+        raise ValueError("checkpoint readback failed")
+    return {"status": "LOCAL_ONLY", "path": str(target.relative_to(root)), "sha256": digest(data), "bytes": len(data)}
+
+
+def read_checkpoint(root, data):
+    if len(data) > CHECKPOINT_LIMIT:
+        raise ValueError("checkpoint exceeds 256 KiB")
+    value = json.loads(data)
+    fields = {"schema", "work_item", "destination", "files", "texts", "required_commits", "candidate_commit", "execution"}
+    if not isinstance(value, dict) or set(value) != fields or value["schema"] != CHECKPOINT_SCHEMA:
+        raise ValueError("invalid checkpoint schema")
+    work_slug(value["work_item"])
+    if (not isinstance(value["texts"], dict) or not isinstance(value["files"], list) or
+            not isinstance(value["required_commits"], list)):
+        raise ValueError("invalid checkpoint files/texts")
+    for sha, text in value["texts"].items():
+        if not isinstance(text, str) or digest(text.encode()) != sha:
+            raise ValueError("checkpoint text hash mismatch")
+    seen, contents = set(), []
+    for row in value["files"]:
+        if (not isinstance(row, dict) or set(row) not in ({"scope", "path", "sha256"}, {"scope", "path", "sha256", "git_commit"},
+                                                       {"scope", "path", "sha256", "git_commit", "checkpoint_path"}) or
+                row["scope"] not in ("project", "runtime", "local", "agreement")):
+            raise ValueError("invalid checkpoint file")
+        safe(root, row["path"])
+        if row["scope"] == "runtime" and not re.fullmatch(
+                r"base-tree-key|generations/[0-9]{6}\.json|(?:previous-records|superseded-records)/[\w.-]+|attempts/[a-f0-9-]+/(?:report|exit|portable-receipt)\.json", row["path"]):
+            raise ValueError("unsupported checkpoint runtime path")
+        if row["scope"] == "local" and row["path"] not in ("implementation.md", "repair.md", "review.md", "proof.md", "mandate.json"):
+            raise ValueError("unsupported checkpoint local path")
+        key = (row["scope"], row["path"])
+        if key in seen or not product_path(row["path"]) and row["path"].startswith(CHECKPOINT_DIRECTORY + "/"):
+            raise ValueError("duplicate or recursive checkpoint file")
+        seen.add(key)
+        if "git_commit" in row:
+            if not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", row["git_commit"]) or row["git_commit"] not in value["required_commits"]:
+                raise ValueError("checkpoint document commit is not retained")
+            if "checkpoint_path" in row:
+                if not re.fullmatch(rf"{CHECKPOINT_DIRECTORY}/{SLUG}\.json", row["checkpoint_path"]):
+                    raise ValueError("invalid retained checkpoint path")
+                retained = json.loads(git(root, "show", row["git_commit"] + ":" + row["checkpoint_path"]))
+                if retained.get("schema") != CHECKPOINT_SCHEMA:
+                    raise ValueError("invalid retained checkpoint schema")
+                content = retained["texts"][row["sha256"]].encode()
+            else:
+                content = git(root, "show", row["git_commit"] + ":" + row["path"])
+        else:
+            content = value["texts"][row["sha256"]].encode()
+        if digest(content) != row["sha256"]:
+            raise ValueError("checkpoint file hash mismatch: " + row["path"])
+        contents.append((row["scope"], row["path"], content))
+    for commit in value["required_commits"]:
+        if not isinstance(commit, str) or not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", commit) or full_commit(root, commit) != commit:
+            raise ValueError("missing or invalid checkpoint Git commit")
+    if ("project", value["work_item"]) not in seen:
+        raise ValueError("checkpoint contract missing")
+    if value["candidate_commit"] and value["candidate_commit"] not in value["required_commits"]:
+        raise ValueError("checkpoint candidate commit missing")
+    if not value["candidate_commit"] and any(relative.endswith("/candidate.json") and json.loads(content).get("key")
+                                              for _, relative, content in contents):
+        raise ValueError("candidate payload has no recoverable Git commit; retain local execution state")
+    execution = value["execution"]
+    if execution is not None:
+        if not isinstance(execution, dict) or execution.get("work_item") != value["work_item"]:
+            raise ValueError("invalid checkpoint execution")
+        allowed = {value["work_item"], *(row["path"] for row in execution["binding_inputs"])}
+        origin_path = f'.p2p/work/{work_slug(value["work_item"])}/contract-origin.json'
+        origin_data = next((content for scope, relative, content in contents if scope == "project" and relative == origin_path), None)
+        if origin_data is not None:
+            origin = json.loads(origin_data)
+            if origin.get("schema") != "promise-to-proof/contract-origin/v1" or origin.get("sha256") != execution["contract"]["sha256"]:
+                raise ValueError("checkpoint legacy contract origin mismatch")
+            allowed.update({origin_path, origin["path"], f'.p2p/work/{work_slug(value["work_item"])}/contract.md'})
+        if any(scope == "agreement" and relative not in allowed for scope, relative, _ in contents):
+            raise ValueError("unsupported checkpoint agreement path")
+        indexed = {(scope, relative): content for scope, relative, content in contents}
+        contract = indexed[("project", value["work_item"])]
+        if digest(contract) != execution["contract"]["sha256"] or contract.decode() != execution["contract"]["content"]:
+            raise ValueError("checkpoint agreement identity mismatch")
+        for attempt in execution["attempts"]:
+            prefix = "attempts/" + attempt["id"] + "/"
+            receipt = indexed[("runtime", prefix + "portable-receipt.json")]
+            parsed = json.loads(receipt)
+            end = json.loads(indexed[("runtime", prefix + "exit.json")])
+            if (digest(receipt) != attempt["portable_receipt_sha256"] or parsed["exit"] != end or
+                    parsed["attempt_id"] != attempt["id"] or end["attempt_id"] != attempt["id"] or end["inputs"] != attempt["inputs"]):
+                raise ValueError("checkpoint stage receipt identity mismatch")
+            if attempt.get("report"):
+                report = indexed[("runtime", attempt["report"])]
+                if digest(report) != attempt["report_sha256"] or parsed["host"]["message"].encode() != report:
+                    raise ValueError("checkpoint stage report identity mismatch")
+        agreement_paths = execution.get("agreement_paths", ())
+        candidate = snapshot(root, value["candidate_commit"])
+        if (snapshot_key(candidate) != execution["candidate"]["key"] or
+                tree_changes(snapshot(root, execution["comparison_base"], exclude=agreement_paths), candidate) != execution["candidate"]["changes"]):
+            raise ValueError("checkpoint candidate identity mismatch")
+    return value, contents
+
+
+def restore_checkpoint(root, data):
+    """Validate the entire transfer before writing any local agreement or product input."""
+    root = Path(root).resolve()
+    value, contents = read_checkpoint(root, data)
+    setup(root)
+    if value["execution"]:
+        import p2p_delivery
+        return p2p_delivery.restore_checkpoint(root, value, contents, data)
+    if any(scope != "project" for scope, _, _ in contents):
+        raise ValueError("runtime files require a controller checkpoint")
+    targets = []
+    for _, relative, content in contents:
+        target = safe(root, relative)
+        if target.exists() and (not target.is_file() or target.read_bytes() != content):
+            raise ValueError("checkpoint conflicts with local file: " + relative)
+        targets.append((target, content))
+    target, _ = checkpoint_path(root, value["work_item"], value["destination"])
+    if target.exists() and target.read_bytes() != data:
+        raise ValueError("checkpoint conflicts with selected local checkpoint")
+    for file, content in targets + [(target, data)]:
+        file.parent.mkdir(parents=True, exist_ok=True)
+        if not file.exists():
+            atomic_write(file, content, ignored_root=root if file.is_relative_to(root / ".p2p") else None)
+    resolve(root, value["work_item"])
+    return {"status": "RESTORED", "work_item": value["work_item"], "checkpoint_sha256": digest(data),
+            "next_action": "Continue the saved planning/decomposition handoff; approval is never inferred from restoration."}
+
+
+def checkpoint_status(root, work, remote=None):
+    target, destination = checkpoint_path(root, work)
+    data = target.read_bytes()
+    value, contents = read_checkpoint(root, data)
+    checkpoint_current(root, value, contents)
+    result = {"status": "LOCAL_ONLY", "path": str(target.relative_to(root)), "sha256": digest(data), "bytes": len(data)}
+    if destination["kind"] != "git":
+        raise ValueError("use checkpoint-github-status for the selected GitHub destination")
+    relative = str(target.relative_to(root))
+    committed = subprocess.run(["git", "-C", str(root), "show", "HEAD:" + relative], capture_output=True)
+    if committed.returncode == 0 and committed.stdout == data:
+        result["status"] = "COMMITTED"
+    if remote:
+        refs = git(root, "ls-remote", "--heads", remote).decode().splitlines()
+        tips = [line.split("\t")[0] for line in refs]
+        for tip in tips:
+            if subprocess.run(["git", "-C", str(root), "cat-file", "-e", tip + "^{commit}"], capture_output=True).returncode:
+                git(root, "fetch", "--no-tags", remote, tip)
+        def reachable(commit):
+            return any(subprocess.run(["git", "-C", str(root), "merge-base", "--is-ancestor", commit, tip],
+                                      capture_output=True).returncode == 0 for tip in tips)
+        if not all(reachable(commit) for commit in value["required_commits"]):
+            raise ValueError("checkpoint candidate or binding commit is not available from the remote's branches")
+        if any(subprocess.run(["git", "-C", str(root), "show", tip + ":" + relative], capture_output=True).stdout == data for tip in tips):
+            result.update(status="PORTABLE", remote=remote)
+        else:
+            raise ValueError("current checkpoint bytes have not been published to this remote")
+    return result
+
+
+def checkpoint_current(root, value, contents):
+    execution = value["execution"]
+    if execution and (execution.get("source_recovery_commit") not in value["required_commits"] or
+                      snapshot_key(snapshot(root, execution["source_recovery_commit"])) != execution["source_tree_key"]):
+        raise ValueError("source admission has no recoverable Git commit; preserve and reconcile excluded local changes before transfer")
+    for scope, relative, content in contents:
+        if scope == "project":
+            file = safe(root, relative)
+            if file.is_file() and file.read_bytes() != content:
+                raise ValueError("checkpoint is stale; local input changed: " + relative)
+    local = safe(root, f'.p2p/work/{work_slug(value["work_item"])}/delivery.json')
+    if local.is_file():
+        current = json.loads(local.read_bytes())
+        boundary = value["execution"]
+        if boundary is None or any(current.get(key) != boundary.get(key) for key in
+                                  ("invocation_id", "candidate", "contract", "limits", "routing", "reports", "blocker")):
+            raise ValueError("checkpoint is stale; the local controller needs a new completed boundary")
+        if any(a["status"] not in ("complete", "retired") for a in current["attempts"]):
+            raise ValueError("uncertain dispatch prevents portability; retain local execution state")
+        import p2p_delivery
+        if p2p_delivery.controller_running(p2p_delivery.Delivery(root, value["work_item"], current)) is not False:
+            raise ValueError("stop the active controller before verifying a portable handoff")
+
+
+def checkpoint_github_body(data):
+    value = json.loads(data)
+    return (f'<!-- p2p-checkpoint:{work_slug(value["work_item"])}:{digest(data)} -->\n'
+            '```json\n' + data.decode().rstrip("\n") + '\n```\n')
+
+
+def checkpoint_github_read(repository, issue, sha=None):
+    result = subprocess.run(["gh", "api", "--paginate", "--jq", ".[]", f"repos/{repository}/issues/{issue}/comments"],
+                            capture_output=True, text=True)
+    if result.returncode:
+        raise ValueError("checkpoint GitHub read failed: " + result.stderr.strip())
+    found = []
+    for line in result.stdout.splitlines():
+        comment = json.loads(line)
+        match = re.fullmatch(r"<!-- p2p-checkpoint:([a-z0-9-]+):([a-f0-9]{64}) -->\n```json\n(.*)\n```\n?", comment.get("body", ""), re.S)
+        if not match and sha is not None and sha in comment.get("body", "") and '<!-- p2p-checkpoint:' in comment.get("body", ""):
+            raise ValueError("malformed matching GitHub checkpoint")
+        if not match or sha is not None and match[2] != sha:
+            continue
+        data = match[3].encode() + b"\n"
+        if digest(data) != match[2] or work_slug(json.loads(data)["work_item"]) != match[1]:
+            raise ValueError("GitHub checkpoint marker/hash mismatch")
+        found.append((data, comment.get("html_url")))
+    if not found:
+        raise ValueError("missing exact GitHub checkpoint SHA-256")
+    if len(found) != 1:
+        raise ValueError("ambiguous GitHub checkpoint; reconcile duplicate records")
+    return found[0]
+
+
+def checkpoint_github_publish(root, work, authorized_sha256):
+    target, destination = checkpoint_path(root, work)
+    if destination["kind"] != "github":
+        raise ValueError("work item selects Git, not a GitHub checkpoint")
+    data = target.read_bytes()
+    read_checkpoint(root, data)
+    body = checkpoint_github_body(data)
+    if authorized_sha256 != digest(body.encode()):
+        raise ValueError("publication needs authority for the exact checkpoint comment body SHA-256")
+    if len(body) > 60000:
+        raise ValueError("checkpoint exceeds the 60000-character issue-comment budget; select Git or reduce redundant metadata")
+    repository, issue = destination["repository"], destination["issue"]
+    try:
+        existing, url = checkpoint_github_read(repository, issue, digest(data))
+    except ValueError as error:
+        if "missing exact GitHub checkpoint" not in str(error):
+            raise
+        # A readback after any uncertain write is mandatory before a caller retries.
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8") as file:
+            file.write(body)
+            file.flush()
+            result = subprocess.run(["gh", "issue", "comment", str(issue), "--repo", repository, "--body-file", file.name],
+                                    capture_output=True, text=True)
+        existing, url = checkpoint_github_read(repository, issue, digest(data))
+    if existing != data:
+        raise ValueError("checkpoint GitHub readback differs; retain local state")
+    return {"status": "RECORDED", "url": url, "sha256": digest(data),
+            "next_action": "Verify candidate and binding commits with checkpoint-github-status --remote before deleting local state."}
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo", default=".")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("setup")
+    for name in ("checkpoint", "checkpoint-status", "checkpoint-restore", "checkpoint-github-preview",
+                 "checkpoint-github-publish", "checkpoint-github-status", "checkpoint-github-restore"):
+        command = commands.add_parser(name)
+        if name not in ("checkpoint-github-restore",):
+            command.add_argument("work")
+        if name == "checkpoint":
+            command.add_argument("--github", help="select OWNER/REPO as the checkpoint destination")
+            command.add_argument("--issue", type=int)
+            command.add_argument("--candidate-commit")
+        if name in ("checkpoint-status", "checkpoint-github-status"):
+            command.add_argument("--remote", help="verify published checkpoint and Git objects against this remote")
+        if name == "checkpoint-github-publish":
+            command.add_argument("--authorize-comment-sha256", required=True)
+        if name == "checkpoint-github-restore":
+            command.add_argument("--repository", required=True)
+            command.add_argument("--issue", type=int, required=True)
+            command.add_argument("--sha256", required=True)
     for name in ("execution-path", "execution-access", "publication-access"):
         command = commands.add_parser(name)
         command.add_argument("work")
@@ -637,11 +1100,65 @@ def main(argv=None):
             command.add_argument("name")
         if name in ("create", "save"):
             command.add_argument("--from", dest="source", required=True)
+        if name == "create":
+            command.add_argument("--github", help="select OWNER/REPO before the first checkpoint")
+            command.add_argument("--issue", type=int)
     args = parser.parse_args(argv)
     try:
         root = Path(git(Path(args.repo), "rev-parse", "--show-toplevel").decode().strip()).resolve()
+        if args.command in ("create", "checkpoint"):
+            if bool(args.github) != (args.issue is not None):
+                raise ValueError("select --github and --issue together")
+            destination = {"kind": "github", "repository": args.github, "issue": args.issue} if args.github else None
         if args.command == "setup":
             result = setup(root)
+        elif args.command == "checkpoint":
+            state = safe(root, f".p2p/work/{work_slug(args.work)}/delivery.json")
+            if state.is_file():
+                import p2p_delivery
+                result = p2p_delivery.export_checkpoint(root, args.work, destination=destination)
+            else:
+                result = checkpoint(root, args.work, destination, candidate_commit=args.candidate_commit)
+        elif args.command == "checkpoint-restore":
+            target, _ = checkpoint_path(root, args.work)
+            result = restore_checkpoint(root, target.read_bytes())
+        elif args.command == "checkpoint-status":
+            result = checkpoint_status(root, args.work, args.remote)
+        elif args.command == "checkpoint-github-preview":
+            target, destination = checkpoint_path(root, args.work)
+            if destination["kind"] != "github":
+                raise ValueError("select the GitHub checkpoint destination first")
+            body = checkpoint_github_body(target.read_bytes())
+            result = {"destination": destination, "body": body, "sha256": digest(body.encode())}
+        elif args.command == "checkpoint-github-publish":
+            result = checkpoint_github_publish(root, args.work, args.authorize_comment_sha256)
+        elif args.command == "checkpoint-github-restore":
+            data, url = checkpoint_github_read(args.repository, args.issue, args.sha256)
+            value = json.loads(data)
+            if value["destination"] != {"kind": "github", "repository": args.repository, "issue": args.issue}:
+                raise ValueError("GitHub checkpoint destination differs from the selected issue")
+            result = restore_checkpoint(root, data) | {"url": url}
+        elif args.command == "checkpoint-github-status":
+            target, destination = checkpoint_path(root, args.work)
+            if destination["kind"] != "github":
+                raise ValueError("work item does not select a GitHub checkpoint")
+            data = target.read_bytes()
+            value, contents = read_checkpoint(root, data)
+            checkpoint_current(root, value, contents)
+            published, url = checkpoint_github_read(destination["repository"], destination["issue"], digest(data))
+            if published != data:
+                raise ValueError("GitHub checkpoint differs from local bytes")
+            if value["required_commits"]:
+                if not args.remote:
+                    raise ValueError("candidate/source commits need --remote verification")
+                tips = [line.split("\t")[0] for line in git(root, "ls-remote", "--heads", args.remote).decode().splitlines()]
+                for tip in tips:
+                    if subprocess.run(["git", "-C", str(root), "cat-file", "-e", tip + "^{commit}"], capture_output=True).returncode:
+                        git(root, "fetch", "--no-tags", args.remote, tip)
+                if not all(any(subprocess.run(["git", "-C", str(root), "merge-base", "--is-ancestor", commit, tip], capture_output=True).returncode == 0
+                               for tip in tips) for commit in value["required_commits"]):
+                    raise ValueError("checkpoint Git objects are not published to this remote")
+            result = {"status": "PORTABLE", "url": url, "sha256": digest(data), "bytes": len(data)}
         elif args.command == "execution-path":
             result = {"execution_directory": str(execution_directory(root, args.work))}
         elif args.command == "execution-access":
@@ -652,6 +1169,7 @@ def main(argv=None):
             result = reconcile(root, args.work)
         elif args.command == "create":
             item, artifact = paths(root, args.work)
+            checkpoint_path(root, args.work, destination)
             if artifact.exists() and any(artifact.iterdir()):
                 raise ValueError("artifact directory already contains records")
             if not args.work.startswith(".p2p/"):
@@ -661,6 +1179,7 @@ def main(argv=None):
             with item.open("xb") as output:
                 output.write(data)
             result = resolve(root, args.work)
+            result["checkpoint"] = checkpoint(root, args.work, destination)
         elif args.command == "capture":
             result = capture(root, args.work, args.base, args.commit)
         elif args.command in ("validate", "resume"):

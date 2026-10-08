@@ -120,7 +120,8 @@ You can verify the core idea yourself:
 
 ```text
 product code and tests → normal repository history
-P2P generated state    → ignored .p2p/
+P2P working state     → ignored .p2p/
+Portable checkpoints  → p2p-state/<slug>.json (Git), or a selected GitHub issue
 ```
 
 ## Step 3: start with one small promise
