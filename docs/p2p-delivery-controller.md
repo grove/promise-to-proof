@@ -146,8 +146,12 @@ and `--max-repairs N` impose explicit nonnegative limits; `unlimited`, `infinite
 `inf` and `null` mean no limit. Zero stops at the corresponding boundary.
 Failed stages and preflights count as dispatches. Both independent verifiers run
 again after each recovery. Repeated gaps invoke a fresh read-only diagnosis;
-the next repair must use a different executable approach. Confirmed unavailable
-inputs or missing authority remain concrete blockers.
+the next repair must use a materially different executable approach, supported
+by a successful safe capability check in its host receipt. Different wording
+alone does not establish a new method. Diagnosis uses the latest partial repair
+gaps and the retained approach history, including on resume. Worker permissions
+and available tools must cover its proposed next step; unavailable host tools,
+inputs or missing authority remain concrete blockers for the enclosing workflow.
 
 `--worker-idle-seconds SECONDS` optionally detects idle event/error logs, stops
 the process group, saves its exit receipt and replaces that worker. Partial

@@ -2440,7 +2440,8 @@ assert results['scratch'] == 'ok'
         inputs = self.stage_inputs(self.state['candidate'])
         properties = {key: {'type': 'string'} for key in
                       ('status', 'input_identity_json', 'action', 'approach', 'reason',
-                       'missing_input', 'expected_result')}
+                       'missing_input', 'expected_result', 'capability_check')}
+        properties['strategy_changed'] = {'type': 'boolean'}
         properties['status']['enum'] = ['ACTIONABLE', 'BLOCKED']
         properties['action']['enum'] = ['implementation', 'evidence', 'prerequisite', 'plan-acceptance', 'none']
         schema = {'type': 'object', 'properties': properties,
@@ -2450,9 +2451,19 @@ assert results['scratch'] == 'ok'
                   f'Fixed candidate workspace: {self.workspace}; contract: {self.work}. '
                   f'Exact input_identity_json: {json.dumps(inputs)}. '
                   f'Findings: {json.dumps(findings)}. Prior approaches: {json.dumps(history)}. '
+                  f'Retained reports under {self.runtime}: {json.dumps(self.state.get("reports", {}))}. '
                   'Inspect actual mechanisms and available local inputs. Choose a concrete different approach '
                   'that the implementation/evidence worker can execute, including local prerequisite work. '
                   'Repeated findings require a different method, not another copy of the previous attempt. '
+                  'Judge strategy_changed by a materially different method or newly confirmed inputs/capabilities, '
+                  'not by different wording. Check the actual worker boundary: network denied, approval '
+                  'escalation disabled, MCP servers/apps/plugins disabled, and no enclosing-host tools inherited. '
+                  'Implementation/repair can write the isolated candidate, but cannot alter protected agreement '
+                  'or Git metadata. Diagnosis can write only scratch. Do not propose an unavailable host tool '
+                  'or nested model call as worker-executable. For ACTIONABLE, run a safe capability probe and '
+                  'print P2P_RECOVERY_CAPABILITY=<observation> only after it establishes the inputs/tools '
+                  'needed by the proposed next step. Put that exact output line in capability_check; the '
+                  'probe must exit zero. Explain how its observation supports the strategy in reason. '
                   'Do not weaken requirements, fabricate evidence, edit any inputs, or make external effects. '
                   'Use plan-acceptance for a necessary contract reconciliation. BLOCKED requires an exact '
                   'unavailable input or authority and its expected result; mere difficulty, elapsed time, or '
@@ -2462,7 +2473,8 @@ assert results['scratch'] == 'ok'
         self.current()
         report = json.loads(host['message'])
         if (not isinstance(report, dict) or set(report) != set(properties) or
-                any(not isinstance(v, str) for v in report.values()) or
+                any(not isinstance(report[key], bool if field['type'] == 'boolean' else str)
+                    for key, field in properties.items()) or
                 json.loads(report['input_identity_json']) != inputs or
                 report['status'] not in properties['status']['enum'] or
                 report['action'] not in properties['action']['enum'] or not report['reason'].strip()):
@@ -2484,6 +2496,12 @@ assert results['scratch'] == 'ok'
         self.save()
         if report['status'] == 'BLOCKED':
             raise ValueError('recovery needs ' + report['missing_input'] + '; expected: ' + report['expected_result'])
+        check = report['capability_check']
+        if not check.startswith('P2P_RECOVERY_CAPABILITY=') or not check.split('=', 1)[1].strip() or not any(
+                check in event.get('aggregated_output', '').splitlines() and event.get('exit_code') == 0
+                for event in host['executions']):
+            raise ValueError('recovery needs a successful host-recorded capability check for its next step: ' +
+                             report['approach'])
         return report
 
     def finish_recovery(self, entry, report):
@@ -2510,12 +2528,12 @@ assert results['scratch'] == 'ok'
                      entry.get('candidate_after') == entry['candidate_before'] == candidate_key(self.state['candidate']))]
         plan = {'action': 'implementation', 'approach': 'Correct the named implementation and evidence gaps.'}
         if force_diagnosis or previous:
-            plan = self.diagnose(findings, previous)
+            plan = self.diagnose(findings, history)
+            if previous and not plan['strategy_changed']:
+                raise ValueError('recovery diagnosis found no new executable strategy: ' + plan['reason'])
             if plan['action'] == 'plan-acceptance':
                 self.handoff('plan-acceptance', plan['reason'])
                 return {'status': 'REPLANNED'}
-            if any(entry['approach'] == plan['approach'] and entry['action'] == plan['action'] for entry in previous):
-                raise ValueError('recovery diagnosis found no new executable strategy: ' + plan['reason'])
         policy = self.state.get('autonomy')
         decision = 'evidence' if plan['action'] == 'evidence' else 'repair'
         if policy and decision not in policy['policy']['decisions']:
@@ -2523,6 +2541,8 @@ assert results['scratch'] == 'ok'
         entry = {'fingerprint': fingerprint, 'findings': findings, 'action': plan['action'],
                  'approach': plan['approach'], 'candidate_before': candidate_key(self.state['candidate']),
                  'status': 'reserved', 'started_at': now(), 'dispatch_offset': len(self.state['attempts'])}
+        if 'capability_check' in plan:
+            entry['capability_check'] = plan['capability_check']
         history.append(entry)
         self.state['repair_skill'] = 'repair' if proof and proof['status'] != 'PROVEN' else 'implementation'
         self.save()
@@ -2548,7 +2568,7 @@ assert results['scratch'] == 'ok'
             generation = self.state['local_git_generations'][-1]
             if (generation.get('source_attempt') or {}).get('attempt_id') != last['id']:
                 self.capture(name)
-            if name == 'implementation' and report['status'] == 'IMPLEMENTED':
+            if report['status'] in ('IMPLEMENTED', 'REPAIRED'):
                 self.state['implementation_complete'] = True
             if name == 'repair' and history and history[-1]['status'] == 'reserved':
                 self.finish_recovery(history[-1], report)
@@ -2557,12 +2577,14 @@ assert results['scratch'] == 'ok'
         self.preflight()
         while True:
             while not self.state.get('implementation_complete'):
-                if 'implementation' in self.state.get('reports', {}):
+                if 'repair' in self.state.get('reports', {}):
+                    report = self.read_report('repair')
+                elif 'implementation' in self.state.get('reports', {}):
                     report = self.read_report('implementation')
                 else:
                     report = self.stage('implementation')
                     self.capture('implementation')
-                if report['status'] != 'IMPLEMENTED':
+                if report['status'] not in ('IMPLEMENTED', 'REPAIRED'):
                     report = self.recover({'implementation': report['gaps']}, force_diagnosis=True)
                 if report['status'] in ('IMPLEMENTED', 'REPAIRED'):
                     self.state['implementation_complete'] = True

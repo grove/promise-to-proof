@@ -354,6 +354,15 @@ for an identified unavailable input, authority or executable recovery strategy,
 not simply because one repair failed. Return observations even on interrupted
 work; a timeout or additional attempt never establishes acceptance.
 
+Continue and resume partial implementation from the latest retained repair
+result, including its remaining gaps; do not redispatch the original gaps after
+new observations supersede them. Recovery diagnosis must assess the actual
+worker boundary and confirm the capabilities its next step needs through a
+successful safe check retained in the host receipt. Rewording a prior approach
+is not a new strategy. The independent diagnosis must judge whether the method
+has materially changed; unavailable capabilities return a concrete blocker to
+the enclosing workflow rather than another worker that cannot execute the step.
+
 An explicit extension uses `extend --authorize-extension` and stated new limits
 (including `unlimited`). Preserve the invocation, consumed attempts, old limits
 and extension receipt. It does not silently reset history or change the base.

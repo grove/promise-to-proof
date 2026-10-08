@@ -71,7 +71,11 @@ Keep user-facing heartbeats to one concise update with the current stage, last
 verified progress and next milestone. Retain detailed logs in the invocation
 record; repeat findings in chat only when they change.
 Repeated findings trigger fresh independent diagnosis and a different executable
-implementation, evidence or prerequisite strategy. Do not repeat an unchanged
+implementation, evidence or prerequisite strategy. Continue and resume from the
+latest partial repair's remaining gaps. Diagnosis must assess the actual worker
+boundary and retain a successful safe capability check for its proposed next
+step; rewording an approach is not a materially different strategy. An unavailable
+host capability returns a concrete blocker to the enclosing workflow. Do not repeat an unchanged
 failed approach indefinitely, weaken requirements, or fabricate proof.
 
 Resume retains saved limits and attempts. Existing finite runs keep their

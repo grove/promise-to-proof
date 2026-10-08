@@ -158,11 +158,16 @@ class FakeTransport:
             report = json.dumps({'status': 'BLOCKED' if blocked else 'ACTIONABLE',
                 'input_identity_json': json.dumps(inputs),
                 'action': 'none' if blocked else ('evidence' if self.mode == 'evidence' else 'implementation'),
-                'approach': '' if blocked else 'Inspect the actual local seam and replace the failed approach.',
+                'approach': '' if blocked else (
+                    'Inspect partial recovery step ' + str(self.calls.count('diagnosis'))
+                    if self.mode == 'partial-repair' else
+                    'Inspect the actual local seam and replace the failed approach.'),
                 'reason': 'Fixture independent diagnosis.',
+                'strategy_changed': not blocked and (self.calls.count('diagnosis') == 1 or self.mode == 'partial-repair'),
+                'capability_check': '' if blocked else 'P2P_RECOVERY_CAPABILITY=fixture local CLI available',
                 'missing_input': 'configured command `python3 greet.py`' if blocked else '',
                 'expected_result': 'exit zero and print `hello\\n`' if blocked else ''})
-            output = 'FIXTURE diagnosis'
+            output = 'P2P_RECOVERY_CAPABILITY=fixture local CLI available'
         elif stage == 'planning':
             proposed = CONTRACT.replace('Contract revision: v1', 'Contract revision: v2')
             if self.mode == 'planning-weaken':
@@ -200,6 +205,10 @@ class FakeTransport:
                     'evidence':'The implementation stage exercised greet.py and observed exact hello newline output.',
                     'uncertainty':'This is candidate advice until retrospect checks it against final review and proof.'
                 }]
+            if self.mode in ('partial-repair','partial-implementation') and stage == 'implementation':
+                report.update(status='PARTIAL', gaps=['original implementation gap'])
+            if self.mode == 'partial-repair' and stage == 'repair' and self.calls.count('repair') == 1:
+                report.update(status='PARTIAL', gaps=['remaining repair gap'])
             if stage == 'review':
                 report.update(findings=[], coverage='R1; inspected greet.py and the delivery checks.',
                               checks=[{'command':'python3 greet.py','result':'passed',
@@ -2089,6 +2098,68 @@ Pending actions: none.
         self.assertEqual(self.fake.calls.count('proof'),3)
         self.assertEqual(len(self.state()['recovery_history']),2)
 
+    def test_partial_repair_uses_latest_gaps_before_both_verifiers(self):
+        self.fake.mode='partial-repair'
+        code,value=self.cli('run','--max-dispatches','10')
+        self.assertEqual(code,0,value)
+        diagnoses=[prompt for stage,prompt in self.fake.prompts if stage=='diagnosis']
+        findings=json.loads(diagnoses[1].split('Findings: ',1)[1].split('. Prior approaches:',1)[0])
+        self.assertEqual(findings,{'implementation':['remaining repair gap']})
+        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','diagnosis','repair',
+                                         'diagnosis','repair','review','proof'])
+
+    def test_resume_partial_repair_uses_latest_gaps(self):
+        self.fake.mode='partial-repair'
+        code,value=self.cli('run','--max-dispatches','5')
+        self.assertEqual(code,1,value)
+        self.assertIn('dispatch-count limit',value['blocker'])
+        code,value=self.cli('extend','--authorize-extension','--max-dispatches','10')
+        self.assertEqual(code,0,value)
+        code,value=self.cli('resume')
+        self.assertEqual(code,0,value)
+        diagnoses=[prompt for stage,prompt in self.fake.prompts if stage=='diagnosis']
+        findings=json.loads(diagnoses[1].split('Findings: ',1)[1].split('. Prior approaches:',1)[0])
+        self.assertEqual(findings,{'implementation':['remaining repair gap']})
+        self.assertEqual(self.fake.calls.count('repair'),2)
+
+    def test_resume_completed_repair_does_not_repeat_original_implementation(self):
+        self.fake.mode='partial-implementation'
+        finish=d.Delivery.finish_recovery
+        def interrupted(delivery,entry,report):
+            finish(delivery,entry,report)
+            raise OSError('fixture interruption after saved repair')
+        with patch.object(d.Delivery,'finish_recovery',interrupted):
+            code,value=self.cli()
+        self.assertEqual(code,1,value)
+        self.assertIn('fixture interruption',value['blocker'])
+        self.assertEqual(self.state()['recovery_history'][-1]['status'],'complete')
+        code,value=self.cli('resume')
+        self.assertEqual(code,0,value)
+        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','diagnosis','repair',
+                                         'review','proof'])
+
+    def test_actionable_diagnosis_requires_successful_capability_receipt(self):
+        self.fake.mode='partial-implementation'
+        original=self.fake
+        def failed_probe(*args):
+            result=original(*args)
+            if original.calls[-1]=='diagnosis':
+                path=args[2]
+                events=[json.loads(line) for line in path.read_text().splitlines()]
+                execution=next(e['item'] for e in events if e.get('item',{}).get('type')=='command_execution')
+                execution['exit_code']=1
+                path.write_text(''.join(json.dumps(e)+'\n' for e in events))
+            return result
+        with patch.object(d,'launch',failed_probe):
+            code,value=self.cli()
+        self.assertEqual(code,1,value)
+        self.assertIn('successful host-recorded capability check',value['blocker'])
+        self.assertNotIn('repair',self.fake.calls)
+        self.assertEqual(self.state()['last_diagnosis']['report']['status'],'ACTIONABLE')
+        prompt=next(prompt for stage,prompt in self.fake.prompts if stage=='diagnosis')
+        self.assertIn('no enclosing-host tools inherited',prompt)
+        self.assertIn('MCP servers/apps/plugins disabled',prompt)
+
     def test_explicit_extension_preserves_invocation_and_attempt_budget(self):
         code,value=self.cli('run','--max-dispatches','0')
         self.assertEqual(code,1,value)
@@ -2159,6 +2230,15 @@ Pending actions: none.
                 message=next(e['item'] for e in events if e.get('item',{}).get('type')=='agent_message')
                 report=json.loads(message['text'])
                 report.update(status='NOT PROVEN',gaps=['fixture gap'])
+                message['text']=json.dumps(report)
+                path.write_text(''.join(json.dumps(e)+'\n' for e in events))
+            if original.calls[-1]=='diagnosis' and original.calls.count('diagnosis') == 2:
+                path=args[2]
+                events=[json.loads(line) for line in path.read_text().splitlines()]
+                message=next(e['item'] for e in events if e.get('item',{}).get('type')=='agent_message')
+                report=json.loads(message['text'])
+                report.update(approach='Repeat the same local seam inspection, expressed in different words.',
+                              strategy_changed=False)
                 message['text']=json.dumps(report)
                 path.write_text(''.join(json.dumps(e)+'\n' for e in events))
             return result
