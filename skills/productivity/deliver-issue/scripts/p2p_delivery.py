@@ -2917,6 +2917,8 @@ def main(argv=None):
                 match = re.fullmatch(r'(?:https://github.com/|git@github.com:)([^/]+/[^/]+?)(?:\.git)?', url)
                 if match:
                     repositories.add(match[1])
+            if Path(args.repository).is_absolute() and Path(args.repository).resolve(strict=True) == root:
+                repositories.add(args.repository)
             if args.repository not in repositories:
                 raise ValueError('effect repository does not match this delivery repository')
             if args.effect_action in ('commit', 'push', 'pr-create', 'pr-update', 'pr-ready', 'merge', 'deploy'):

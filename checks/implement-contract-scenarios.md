@@ -222,6 +222,35 @@ and the broader suite is green. In the documentation-only case, it uses the
 contract-approved command and does not manufacture a tautological test merely
 to satisfy the coverage rule.
 
+## T35. Signal a useful boundary from direct implementation inspection
+
+Invoke `/implement-contract` directly on a settled leaf. Before editing, give it
+an active parent tree, exact source and candidate context, and inspected
+behavior showing a complete separable contribution or a smaller
+compatibility/recovery/verification boundary that materially reduces delivery
+burden. Include a difficult but indivisible variant and variants where the only
+signals are failing tests, review/proof defects, size counts, or uncertainty.
+
+Pass when only the structural-evidence case returns `BLOCKED` before product
+edits with one `/slice-contract <affected-leaf-contract>` action, citing its
+candidate and retained work. Every negative-control case stays on the existing
+implementation or repair path. No case edits the tree, creates children, moves
+work, or makes external effects.
+
+## T36. Preserve partial implementation state at the re-sizing handoff
+
+Repeat T35 with a current candidate containing scoped implementation changes,
+an untracked evidence file, an implementation report, a human edit, and one
+unresolved shared-work item. Make the structural signal retrievable and
+independent of any failing test or reviewer finding.
+
+Pass when the implementation report is `PARTIAL`, identifies the exact
+candidate/worktree, base, reports, evidence, human edit, and unresolved owner,
+and names one `/slice-contract <affected-leaf-contract>` next action. The
+candidate and retained files remain byte-for-byte available; no child is
+created, no old report is rebound, and no code, branch, commit, push, issue, or
+PR effect occurs.
+
 ## Sliced child handoff
 
 Run the child phase of [slicing T20](./slice-contract-scenarios.md#t20-install-alone-and-preserve-the-two-child-delivery-chain)

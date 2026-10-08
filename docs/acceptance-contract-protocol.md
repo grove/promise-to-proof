@@ -589,6 +589,76 @@ proofs do not compose into a parent verdict. Allocate actual integration work
 to a named ticket when needed; ordinary parent-level `/prove` needs no separate
 integration ticket. Existing review and merge conditions still apply.
 
+### Adaptive re-sizing and subtree recovery
+
+These rules govern changes to an existing parent/child decomposition. Re-sizing
+changes allocation, not the accepted product outcome. A changed promise, boundary,
+or exclusion follows the normal `plan-acceptance` revision and approval rules.
+This section is the canonical meaning for the adaptive procedures used by the
+workflow skills.
+
+A current `deliver-issue` or direct `implement-contract` inspection may signal
+re-sizing only when exact, retrievable candidate, report, worktree, or acceptance
+evidence identifies a material delivery burden and explains how another boundary
+reduces it. Examples are a complete separable contribution already present or a
+compatibility, recovery, ownership, or verification boundary that materially
+improves delivery. Difficulty, elapsed time, failed tests, review or proof
+defects, repair exhaustion, diff or requirement counts, and model uncertainty
+alone are not signals; route defects through their existing repair path. Retain
+an identity-bound `NO SPLIT` result unless new or previously omitted evidence
+changes the boundary. A grounded signal stops dependent work: `deliver-issue`
+returns `BLOCKED`; `implement-contract` retains its existing `BLOCKED` or
+`PARTIAL` semantics. Preserve its exact
+agreement, candidate, base, reports, evidence, worktree, and human edits, and give
+one next action naming the affected leaf for `/slice-contract`. The signal does
+not create children or authorize moving code, work, or pull requests.
+
+Before changing a tree, inventory known implementation reports, candidates,
+evidence, worktree changes, open pull-request state, and human edits. Classify
+each affected item by retained identity as `child-attributable` (belongs only to
+that child's contribution), `parent-level shared` (serves multiple children or
+a parent-level invariant), `historical-only` (retained for prior history, not
+assigned to active work), or `unresolved` (ownership cannot yet be established).
+Keep unresolved ownership explicit; if it affects the proposed boundary, stop
+that change until the ownership is resolved. Do not move, copy, discard,
+cherry-pick, rewrite, retarget, or close work or pull requests as part of saving
+a slicing decision.
+
+Change only the smallest subtree whose boundary the evidence changes. Keep its
+parent link, contribution mapping, prerequisites, and unaffected siblings intact;
+place new descendants below that leaf and map each contribution through its
+ancestors. Preserve completed work and its history. Keep reports bound to their
+original contract revision and exact candidate (and comparison base where
+applicable). Reuse an observation only when ordinary identity and scope rules
+still match. Historical reports, including parent proof, do not become evidence
+for a new child or changed candidate, and child reports or proofs do not compose
+into parent acceptance.
+
+When a leaf becomes a parent, retain the leaf's existing contribution and do not
+start competing direct implementation while descendants are active. After
+assembly, review and prove the full parent contribution, inherited constraints,
+and cross-child interactions on one exact candidate. Consider merging siblings
+only when the avoided full delivery cycle outweighs the added correction,
+implementation, review, proof, and recovery cost and the combined leaf remains
+coherent, manageable, and independently verifiable. Prefer unstarted work;
+preserve started, completed, and proven work and its history. Keep the boundary
+when merging is unsafe or uneconomical.
+
+Stop recursive fragmentation when another boundary solves no concrete problem.
+An ancestor route recovers the active tree and returns exactly one next action:
+the next ready leaf, one unresolved decision or prerequisite, one blocker, or
+parent verification. It does not alternate blindly between slicing and direct
+delivery or resize unrelated siblings. Disagreeing with a current `NO SPLIT`
+requires new or previously omitted evidence.
+
+Saving or approving a local decomposition follows its ordinary local approval
+rules and grants no tracker, branch, commit, push, pull-request, merge, or
+deployment effect. Keep adaptive contracts, slicing, and recovery state under
+ignored `.p2p/work/`; keep active execution and candidate recovery in the
+configured external execution root. Treat project-owned `specs/` and `work/`
+inputs as unchanged source: do not rewrite, move, or use them as a second P2P
+state store.
+
 ## Epic delivery plans
 
 `slice-contract` owns routing in `.p2p/work/<parent>/slicing.md`, alongside the

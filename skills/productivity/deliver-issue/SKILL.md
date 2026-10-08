@@ -271,6 +271,28 @@ its checks.
 
 ## Review, prove, and recover
 
+Before dispatching a dependent stage or resuming after retained evidence, inspect
+the active leaf, its subtree, implementation report, exact candidate/worktree,
+checks, review/proof reports, and known work allocation. Signal adaptive
+re-sizing only when concrete evidence identifies a material delivery burden
+and explains how a separable complete contribution or a smaller
+compatibility, ownership, recovery, or verification boundary reduces it.
+Inspect and cite the affected subtree and retained work. Difficulty, elapsed
+time, failed tests, review/proof defects, repair exhaustion, size/count
+proxies, or model uncertainty alone remain on the existing path; fix defects
+through the named review or proof repair workflow.
+
+When that structural signal is grounded, stop the affected dependent delivery
+work and return `BLOCKED`, including when the candidate or reports already
+contain scoped work. Retain the exact
+contract, base, candidate/worktree, reports, evidence, human edits, and known
+pull-request state; classify uncertain ownership as unresolved. State one next
+action, `/slice-contract <affected-leaf-contract>`. Do not create children,
+move or rewrite code, retarget or close pull requests, or change issue, label,
+branch, commit, push, merge, or deployment state. The slice workflow must
+preview the smallest affected subtree, preserve siblings and history, and
+obtain any required approval before changing local routing.
+
 8. Reread the saved agreement and candidate identity before dispatch. Invoke
    `review-implementation` and `prove` in separate independent read-only
    contexts, in either order, with the same exact captured contract and fixed

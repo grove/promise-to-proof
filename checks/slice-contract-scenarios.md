@@ -202,7 +202,11 @@ plan-acceptance to save `.p2p/work/foo-bar/contract.md` and its
 `delivery-shape.md`, then slice locally with an approved breakdown. Pass when
 `delivery-shape.md` and `.p2p/work/foo-bar/slicing.md` bind their exact contract
 and source identities; both source files remain byte-for-byte unchanged, and
-no root `work/` contract or source edit is created.
+no root `work/` contract or source edit is created. Repeat after an approved
+adaptive re-size. Canonical P2P contracts and slicing records stay under
+ignored `.p2p/work/`, and active execution/candidate recovery stays in the
+existing retained external root; no P2P-owned file appears in project `specs/`
+or `work/`, and both original source hashes still match.
 
 ## T14. Reconcile reruns and existing tickets
 
@@ -307,7 +311,12 @@ proof, including browser/API racing, metadata, restart, and ownership. Exercise
 [proof and repair case 15](./proof-repair-scenarios.md#15-prove-and-repair-the-correct-child-or-parent-agreement)
 for an integrated gap. Pass when every phase retrieves its exact identities and
 parent acceptance comes only from parent proof. Missing capabilities and
-unexecuted phases remain validation gaps.
+unexecuted phases remain validation gaps. Repeat with one child converted into
+a parent of active descendants and with project-authored `specs/` and `work/`
+inputs. Canonical contracts and slicing stay under ignored `.p2p/work/`, active
+execution state stays in the existing retained external root, those input bytes
+remain unchanged, and no P2P-owned artifact is written in project `specs/` or
+`work/`.
 
 ## T21. Publish child implementation order in the parent description
 
@@ -422,6 +431,95 @@ Pass when slicing records the difficulty as context and keeps the outcome as
 one leaf. It creates no child or extra delivery cycle solely because the
 algorithm is hard.
 
+## T38. Re-size only the smallest affected subtree
+
+Seed a parent with child A and an unrelated sibling B, each with exact
+contracts, mappings, prerequisites, and retained work. New delivery evidence
+inside A identifies two complete outcomes with a real recovery or verification
+boundary. Approve an exact proposal to make A the parent of A1 and A2.
+
+Pass when only A's subtree and direct parent child mapping change. A1/A2 link
+to A and map their contributions through A's requirements to the root. B's
+contract, mappings, prerequisites, reports, and worktree bytes remain exact;
+no broader tree, sibling, code, or PR change occurs.
+
+## T39. Preserve report identities through re-sizing
+
+Give A an implementation report, candidate, review, proof, and evidence with
+matching identities. Re-size A after concrete new evidence, then assess which
+observations still match each descendant's agreement and candidate.
+
+Pass when every old report remains retrievable with its original contract,
+candidate, base, and meaning. Only evidence with unchanged identity and scope is
+reused. No parent or descendant inherits acceptance from A's old proof; each
+new child receives fresh evidence, review, and proof on its own exact candidate.
+
+## T40. Inventory work and leave ownership gaps unresolved
+
+Before changing A, supply child-specific edits, a shared parent fix, an old
+candidate/report useful only as history, a human edit, known open-PR state, and
+one worktree change whose owner cannot be established.
+
+Pass when the saved inventory cites each item and classifies it as
+child-attributable, parent-level shared, historical-only, or unresolved. The
+unresolved item stays untouched and blocks only a boundary that would move or
+reassign it. No code, candidate payload, or PR is moved, copied, retargeted,
+closed, or rewritten.
+
+## T41. Merge siblings only when the saved cycle is worth avoiding
+
+Compare two unstarted/planning siblings whose complete outcomes share one
+manageable implementation and verification path. Then repeat after one sibling
+has completed and its candidate is proven, with correction and retest work
+greater than the extra cycle avoided.
+
+Pass when both previews identify the exact affected subtree and sibling records
+to retain or supersede, affected allocations and prerequisites, work and
+history to preserve, and the exact approval required for any allocation change.
+The first preview names the avoided review/proof cycle and concrete correction
+cost, and proposes a merge only if the combined leaf remains coherent,
+manageable, and independently verifiable. In both variants, no plan or
+allocation changes and no effect occurs before that exact approval. In the
+completed variant, the proven contribution, reports, and history remain stable;
+the boundary stays when merging is unsafe or uneconomical. No work is relocated
+by preview.
+
+## T42. Stop recursive fragmentation when no boundary helps
+
+After one approved re-size, inspect a current descendant with no separable
+outcome, compatibility transition, ownership boundary, or safer verification
+path. Supply no new structural evidence and include a difficult algorithm and
+large file/test counts as distractors.
+
+Pass when `slice-contract` retains that leaf or returns identity-bound
+`NO SPLIT`, names the evidence considered, and creates no descendant or
+additional delivery cycle. It does not alternate between direct delivery and
+slicing or resize an unrelated sibling.
+
+## T43. Recover one next action from the active tree
+
+Start a fresh ancestor invocation with a retained tree containing a ready leaf,
+a leaf waiting on an unsatisfied prerequisite, an unresolved allocation
+approval, and an assembled parent awaiting verification. Repeat with exactly
+one of those gates active.
+
+Pass when each result resolves the current contracts and work allocation, then
+names exactly one applicable next action: one ready leaf, one decision or
+prerequisite, one blocker, or full parent verification. It cites the relevant
+retained reference and does not dispatch children or direct parent work
+recursively.
+
+## T44. Convert a leaf to a parent without competing implementation
+
+Use an approved plan that converts A into a parent with active descendants A1
+and A2. Invoke ancestor delivery and direct implementation both before and
+after A1 completes, then assemble the complete A contribution.
+
+Pass when A's parent link and contribution remain intact, no direct A
+implementation competes with active descendants, and the active tree selects
+one next ready descendant. After assembly, full review and proof assess A and
+its interactions on one exact parent candidate; child proofs remain separate.
+
 ## T45. Resolve a routing disagreement without looping
 
 Start with identity-bound `NO SPLIT`, then supply genuinely new, retrievable
@@ -429,7 +527,9 @@ evidence that disputes its direct route. Ask the delivery flow to reconsider.
 
 Pass when slicing cites that evidence and returns either a justified split or
 `NO SPLIT` with the disagreement and concrete blocker/decision recorded. It
-does not launch another delivery or repeat sizing without changed evidence.
+does not launch another delivery or repeat sizing without changed evidence. In
+the adaptive-tree variant, it also identifies the affected leaf, preserves the
+old route rationale in history, and changes no ancestor or sibling mapping.
 
 ## T46. Preserve route and slicing records
 
@@ -443,7 +543,9 @@ Pass when contract, parent, issue, spec, and plan identities remain exact;
 history retains each replaced byte sequence; human notes survive; the current
 route and rationale agree; and the approved plan's bytes are unchanged. The
 effect log contains no issue, label, relationship, branch, commit, push, PR,
-merge, or deployment write.
+merge, or deployment write. Include candidate, implementation, review, proof,
+and evidence references in the retained-work inventory, preserving their old
+meaning and the same sibling/human-edit hashes after readback.
 
 ## T47. Prove the assembled parent separately
 
@@ -454,8 +556,22 @@ assembled candidate and its cross-child behavior against the parent contract.
 Pass only when parent review and proof name the same exact assembled candidate
 and final comparison base, inspect all promised contributions and interactions,
 and use parent-level evidence. Child proofs remain bound to their child
-candidates and are not summed into a parent verdict. No local route or proof
-handoff creates a remote effect.
+candidates and are not summed into a parent verdict. Include a leaf-to-parent
+conversion and verify that active descendants prevent competing direct parent
+implementation until assembly. No local route or proof handoff creates a
+remote effect.
+
+## T48. Keep an unapproved re-size as a preview
+
+Supply valid structural evidence and a complete proposed child allocation, but
+withhold approval for that exact allocation. Seed an approved delivery-plan
+section, its approval receipt, human notes, existing child links, and a
+separate pending strategy proposal.
+
+Pass when the exact proposal and reasons are saved as pending, the approved
+section and its bytes remain active, and no child contract, tracker item, code
+movement, branch, or pull-request action occurs. The result names approval of
+that proposal as its sole next action and preserves all human/history bytes.
 
 ## Epic delivery strategy scenarios
 

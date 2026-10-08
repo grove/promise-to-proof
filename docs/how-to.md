@@ -32,6 +32,26 @@ Local spec      → plan-acceptance → direct delivery or slice-contract
 Tracker issue   → import into .p2p/work/<slug>/contract.md → same local workflow
 ```
 
+## Re-size from delivery evidence
+
+A delivery may expose a useful boundary that was not visible during planning.
+Ask `/slice-contract` to inspect the current tree only when concrete output
+shows a separable complete contribution or a materially safer compatibility,
+ownership, recovery, or verification boundary. The report must explain how the
+boundary reduces delivery work and cite the exact candidate and retained
+evidence. Difficulty, elapsed time, failing tests, review/proof defects,
+repair exhaustion, and diff or requirement counts alone stay on the existing
+implementation or repair path; hard but indivisible work remains one leaf.
+
+Re-sizing preserves the old contract, candidate, reports, human edits, and
+history. It changes only the smallest affected subtree after the required
+allocation approval. Unaffected siblings and completed work remain stable;
+code and pull requests are not moved automatically. A leaf converted to a
+parent waits for its descendants, then receives full parent review and proof
+on one assembled candidate. Child proofs never add up to parent acceptance.
+Each delivery or ancestor handoff returns one next leaf, unresolved decision,
+prerequisite, blocker, or parent-verification action from the current tree.
+
 The coordinated path needs separate stage invocations and independent review
 and proof contexts. Use the [manual stages](#complete-a-local-work-item) if the
 host cannot provide them. Settle unclear outcomes with `interrogate` or an
