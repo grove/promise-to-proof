@@ -191,7 +191,15 @@ class FakeTransport:
             if stage == 'review': row = {'id':'R1','observation':'Fixture observes hello newline and exit zero.'}
             report = {'status':status, 'input_identity_json':json.dumps(inputs),
                       'requirements':[row],
-                      'gaps':['fixture gap'] if gap else []}
+                      'gaps':['fixture gap'] if gap else [],
+                      'learning_candidates':[]}
+            if self.mode == 'learning-candidate' and stage == 'implementation':
+                report['learning_candidates'] = [{
+                    'scope':'Python CLI output checks',
+                    'lesson':'Prefer an exact stdout assertion over exit-code-only coverage for this behavior.',
+                    'evidence':'The implementation stage exercised greet.py and observed exact hello newline output.',
+                    'uncertainty':'This is candidate advice until retrospect checks it against final review and proof.'
+                }]
             if stage == 'review':
                 report.update(findings=[], coverage='R1; inspected greet.py and the delivery checks.',
                               checks=[{'command':'python3 greet.py','result':'passed',

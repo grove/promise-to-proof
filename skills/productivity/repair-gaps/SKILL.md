@@ -78,6 +78,23 @@ complete in depth.
 None of these outcomes accepts the ticket. A new `/prove` run must evaluate the
 changed candidate against every requirement.
 
+
+## Preserve reusable delivery learning
+
+If this run reveals durable, non-obvious knowledge that is likely to help future
+delivery work, include it as a **learning candidate**. Empty output is valid and
+preferred over inventing a lesson. A candidate must state its scope, the reusable
+lesson, the concrete evidence that suggested it, and important uncertainty.
+
+When the enclosing controller requests structured JSON, put these in its
+`learning_candidates` array. Otherwise add a short `## Learning candidates`
+section to the report.
+
+Learning candidates are leads for `/retrospect`, not accepted advice. They must
+not change the contract, requirement IDs, stage verdict, scope, repair allowance,
+or authority. Do not promote them into project rules or the advisory learning
+register from this skill.
+
 ## Handoff format
 
 ```markdown
