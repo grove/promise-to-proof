@@ -230,6 +230,48 @@ launch a replacement worker or create a new invocation automatically. Exercise
 the Python transport deadline with `python3 checks/test_p2p_delivery.py`; those
 subprocess checks do not establish enforcement by a conversational host.
 
+## T34. Re-size only when delivery evidence exposes a material boundary
+
+Start with a settled approved leaf and a partially completed delivery. Supply
+the exact active tree, a candidate/worktree, implementation output, and retained
+evidence showing that one complete contribution can be delivered independently
+or that a smaller subtree materially improves compatibility, recovery, or
+verification. Include unrelated siblings and one known human edit. Keep the
+expected route out of the actor input.
+
+Pass when `/deliver-issue` inspects the affected subtree and work, cites the
+candidate and evidence, explains the material delivery burden and how the
+smallest boundary reduces it, then stops with `BLOCKED` while preserving
+the saved work. Its sole next action names `/slice-contract` and the
+affected leaf contract. The candidate, reports, evidence, human edit, sibling,
+tree, and effect log remain unchanged; it creates no child or remote effect.
+
+## T36. Stop dependent delivery and preserve its exact work
+
+Repeat T34 after an implementation has changed product files and saved a
+candidate. Seed retained review/proof output, a human edit, and an open-PR
+snapshot (do not authorize a remote query or write). Include both
+child-attributable work and unresolved parent-shared work.
+
+Pass when the workflow reports `BLOCKED`, records exact contract/base/candidate,
+workspace, report, evidence, human-edit, and known PR references, and classifies
+the work without moving it. Unresolved ownership stays explicit. It returns
+one `/slice-contract <affected-leaf-contract>` action and does not dispatch
+another dependent stage, rewrite old report meaning, create children, or change
+code, refs, PRs, or tracker state.
+
+## T37. Keep difficulty and defects on their existing paths
+
+Run separate variants with a hard but indivisible leaf, a failing check, a
+review defect, a proof gap, repair exhaustion, many changed files/requirements,
+and model uncertainty. Do not include independent outcomes or a new
+compatibility, recovery, or verification boundary.
+
+Pass when none of those observations alone changes the active tree or invokes
+adaptive slicing. The workflow continues its existing implementation or
+named repair path, records the actual defect when present, and creates no child,
+plan change, or tracker/ref/PR effect.
+
 ## D16. Direct sizing still requires #60 admission
 
 Use a settled work item with a current direct `delivery-shape.md` result. Run the

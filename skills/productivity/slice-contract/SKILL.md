@@ -151,6 +151,65 @@ Leave no promise silently unassigned or postponed. A requested scope reduction
 needs the amendment protocol. Complete allocation is a planning claim, never
 acceptance, a completion percentage, or proof that the design will work.
 
+## Re-size from concrete delivery evidence
+
+Re-size an existing tree only when a current delivery or direct implementation
+inspection identifies a material delivery burden and explains how another
+boundary reduces it. Cite the exact contract, affected leaf, candidate or
+worktree, report, and evidence. Useful signals include a complete separable
+contribution already established inside a broader leaf, or a distinct
+compatibility, recovery, ownership, or verification boundary that makes the
+smallest subtree materially safer to deliver. Inspect the whole affected
+subtree and its retained work before proposing a change.
+
+Difficulty, elapsed time, failed tests, review or proof defects, repair
+exhaustion, diff/file/requirement/test counts, and model uncertainty alone are
+not re-sizing evidence. Route defects through their existing repair workflow;
+do not use a tree change to avoid fixing them. Reuse an unchanged
+identity-bound `NO SPLIT`. A disagreement must cite new or previously omitted
+retrievable evidence and explain the changed boundary.
+
+Before changing the tree, inventory known implementation reports, candidates,
+evidence, worktree changes, open pull-request state, and human edits. Classify
+each affected item as child-attributable, parent-level shared, historical-only,
+or unresolved, citing its retained reference. Preserve unresolved ownership
+explicitly and do not move, copy, discard, cherry-pick, retarget, close, or
+rewrite the work or pull requests. If unresolved ownership affects the proposed
+boundary, stop that change and name the exact item and its unresolved ownership
+as the blocker.
+
+Change only the smallest affected subtree. Keep its parent link and qualified
+contribution mapping intact, place descendants beneath that leaf, and map each
+descendant through the leaf contract to its ancestors. Preserve unrelated
+sibling contracts, mappings, prerequisites, reports, and completed work. Keep
+the existing leaf contract as the parent contribution when converting it into a
+parent; do not start competing direct implementation of that parent while its
+descendants are active. Route the ancestor to one next ready descendant, one
+unresolved decision or prerequisite, one blocker, or parent verification as
+the active tree requires. Child reports remain bound to their original
+contracts and candidates; they never combine into parent acceptance.
+
+For a possible sibling merge, compare the concrete extra implementation,
+review, proof, correction, and recovery work with the full delivery cycle the
+merge avoids. Prefer unstarted or planning siblings. Merge only when the
+combined leaf remains coherent, manageable, independently reviewable and
+provable, and the avoided cycle outweighs the correction cost. Preserve started,
+completed, and proven work and its history; keep the boundary when a merge is
+unsafe or uneconomical.
+
+Preview the exact subtree, allocations, prerequisites, ownership inventory,
+retained and historical records, approval required, and next action before
+saving. Save local state through the existing `.p2p/work/` and history helpers,
+then read it back and verify identities. Keep adaptive contracts and slicing
+records under ignored `.p2p/work/`, and active execution/candidate recovery in
+the existing retained external execution root. Leave project-owned `specs/`
+and `work/` inputs byte-for-byte unchanged and do not create a second state
+store. Keep any approved delivery-plan section byte-for-byte until an exact
+strategy change is approved; a local plan or its approval grants no tracker,
+branch, commit, push, pull-request, merge, or deployment effect. Do not create
+children until their contracts receive the required approval through
+`/plan-acceptance`.
+
 ## Establish dependencies and parent completion
 
 For each blocker, name the prerequisite outcome or artifact and why it is needed.

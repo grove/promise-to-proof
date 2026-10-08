@@ -168,6 +168,14 @@ manageable unit or `/slice-contract` when sizing needs inspection. `NO SPLIT` is
 a normal result. Direct delivery still passes through `/deliver-issue` and its
 #60 admission before implementation.
 
+During delivery, P2P may recommend re-sizing only when inspected work shows a
+material boundary that makes one complete contribution or its verification and
+recovery safer. It preserves the candidate and reports and asks
+`/slice-contract` to preview the smallest affected subtree. Hard work, failing
+checks, review or proof defects, and file or requirement counts alone do not
+trigger a split. Unaffected siblings and completed work stay in place; an
+assembled parent still needs its own full review and proof.
+
 The [HOW-TO](./docs/how-to.md) covers these task-oriented paths in more detail.
 
 ## A few P2P terms, in plain language

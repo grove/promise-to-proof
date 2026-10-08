@@ -90,9 +90,20 @@ steps, performed before capturing the actor's starting input inventory.
 | S9 | `prepare S9`; preview, exact approval, injected faults, fresh resume | Preserve confirmed edits, reject changed preview inputs, reread after uncertainty, and produce no duplicate PR/ref effects. Use the phase procedure below. A base-only edit preserves the exact human body and marker. |
 | S10 | `prepare S10`; review plus strategy-change handoff | Integration tip differs from recorded comparison base: require fresh review against the exact current tip. Run actual review/proof first, then change only the destination and save an approved plan revision. Unchanged proof remains tied to its original candidate; a repaired/rebased candidate needs full fresh review/proof. A changed promise returns to acceptance planning. Contract hashes stay unchanged for destination-only changes. |
 | S11 | `prepare S11`; child verification, parent proof and publication/readiness | Every child function and its unchanged full check preserves the original name. Parent-owned `greet` passes an uppercased argument into capture, so the actual public workflow returns Welcome ADA for Ada. Assert the literal child outcomes independently, then run `verify --expect parent-fails`. Parent remains unproven and unpublished despite complete children; inspect the failed parent assertion and actual proof report. |
-| S12 | `prepare S12`; full parent review/proof and completion | Candidate is on `trunk`, all contributions exist, and `verify --expect parent-passes` passes. Parent review/proof must cover all requirements on that exact candidate. No empty parent PR is created. |
+| S12 | `prepare S12`; full parent review/proof and completion; repeat with the adaptive leaf-to-parent variant below | Candidate is on `trunk`, all contributions exist, and `verify --expect parent-passes` passes. The adaptive variant also confirms active descendants block competing direct parent implementation, then requires full parent review/proof on one assembled candidate. No empty parent PR is created. |
 | S13 | `prepare S13 --variant missing`, `conflicting`, and `advanced`; delivery/direct implementation/review | Missing names exact approved starting SHA and local/remote setup without effects. Conflicting branch has unrelated ancestry and is not reused/overwritten. Advanced branch requires exact-base refresh. Repeat matching branch and exact authorized setup with ref readback, incomplete child, missing actual prerequisite, and explicitly approved shared candidate. |
 | S14 | `prepare S14` then `--variant present`; slicing and implementation | The existing flag permits independent delivery to custom default `trunk`. Closed issue 101 does not satisfy capture while executable behavior raises. Supplying the actual behavior changes the prerequisite handoff. An ambiguous acceptable intermediate outcome triggers a focused product question; hierarchy and release date never substitute for the answer. |
+
+For S12's adaptive leaf-to-parent variant, start with its approved parent and
+one existing child A. Give A two approved descendants with exact contribution
+maps, active delivery status, and preserved A reports/work. Invoke ancestor
+delivery while both descendants are active and again after only one completes.
+It must return one next descendant and must not start direct A implementation.
+After the second contribution and required integration are assembled, run fresh
+parent review and proof against one exact candidate and base. Assert that both
+reports cover A's complete contribution and interactions, while the old child
+reports retain their child identities. No remote publication is part of this
+variant.
 
 Some cases need several skill invocations. Preserve each phase and state snapshot,
 including blockers. Do not claim an entire S ID was executed from a single

@@ -62,6 +62,21 @@ plan to a tracker when requested.
 and exact contract identity under `.p2p/`, then continues through `/deliver-issue`
 and its existing #60 admission. Direct sizing itself never admits implementation.
 
+### Can the tree change after delivery starts?
+
+Yes, when current delivery evidence shows a material boundary: for example, a
+complete separable contribution or a smaller subtree that makes compatibility,
+recovery, ownership, or verification materially safer. P2P inspects the active
+subtree and retained work, preserves the candidate and report identities, and
+hands the smallest affected area to `/slice-contract` for an approved local
+plan. It does not create children or move code or pull requests automatically.
+
+Difficulty, time, failed tests, review/proof defects, repair exhaustion, and
+size/count proxies alone do not trigger re-sizing. Unaffected siblings and
+completed work stay stable. If a leaf becomes a parent, verify that assembled
+parent with full review and proof; child proofs do not compose into parent
+acceptance. The active tree supplies one immediate next action.
+
 ### What are `R1` and `S1`?
 
 `R1`, `R2`, and later `R` IDs identify acceptance requirements in one contract.

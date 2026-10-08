@@ -61,6 +61,28 @@ with the candidate, not only in another checkout's working tree.
 Before editing, briefly state the outcome, scope, starting identity, contract,
 and unresolved decisions. A small correction needs only a brief plan.
 
+### Evidence-triggered re-sizing
+
+During pre-edit inspection or direct implementation, check the exact leaf and
+its active subtree for a concrete material delivery burden. Signal
+`/slice-contract <affected-leaf-contract>` only when cited candidate, worktree,
+or acceptance evidence shows a complete separable contribution or a
+compatibility, ownership, recovery, or verification boundary, and the report
+explains how the smaller boundary improves delivery. Inspect the retained work
+and affected subtree before recommending it. Difficulty, time, failed tests,
+review or proof defects, repair exhaustion, diff/file/requirement counts, and
+uncertainty alone stay on the existing implementation or repair path.
+
+When a grounded signal affects the requested work, stop dependent implementation
+before changing its tree or contract. Return `BLOCKED` if no product work was
+changed, or `PARTIAL` if safe scoped work already exists. Preserve the exact
+candidate/worktree path, reports, evidence, human edits, and base; mark any
+unknown ownership unresolved. Give one next action naming the affected leaf
+contract for `/slice-contract`. Do not create children, move code, rewrite
+contracts or reports, or make tracker, branch, commit, push, pull-request,
+merge, or deployment changes. Existing report and proof meanings stay attached
+to their original agreement and candidate.
+
 ## Implement the selected outcome
 
 Explicit invocation authorizes scoped local implementation and appropriate safe
