@@ -14,13 +14,35 @@ from unittest.mock import patch
 import run_delivery_comparison as pilot
 
 HOST = {'model': 'fixture-model', 'reasoning': 'fixture', 'version': 'fixture', 'skills': {}}
+AGREEMENT_BASE = 'eb84d66dd70ce8998cd43e951741785e8520c301'
+
+
+@contextlib.contextmanager
+def historical_agreement():
+    """Supply the pilot's exact old agreement without restoring local workflow state."""
+    relative = 'work/fixed-delivery-strategy-comparison.md'
+    path = pilot.PROJECT / relative
+    agreement = subprocess.check_output(
+        ['git', '-C', str(pilot.PROJECT), 'show', f'{AGREEMENT_BASE}:{relative}'])
+    read_bytes = Path.read_bytes
+
+    def fixture_bytes(source):
+        return agreement if source == path else read_bytes(source)
+
+    # The repository intentionally removed old work/ agreements in 5f163407.
+    # This fixture retains the original bytes, not a replacement pilot agreement.
+    with patch.object(Path, 'read_bytes', fixture_bytes):
+        yield agreement
 
 
 class PilotTests(unittest.TestCase):
     def test_preparation_order_identity_and_uncertain_repeat(self):
-        with tempfile.TemporaryDirectory() as temp, patch.object(pilot, 'configured', return_value=HOST):
+        with tempfile.TemporaryDirectory() as temp, patch.object(pilot, 'configured', return_value=HOST), \
+                historical_agreement() as agreement:
             root = Path(temp) / 'pilot'
             manifest = pilot.prepare(root)
+            self.assertEqual((root / 'evaluation/pilot-contract.md').read_bytes(), agreement)
+            self.assertEqual(manifest['pilot_contract_sha256'], pilot.d.fs.digest(agreement))
             self.assertEqual(len(manifest['episodes']), 6)
             self.assertEqual([e['strategy'] for e in manifest['episodes']],
                              ['review-first', 'proof-first', 'proof-first', 'review-first', 'review-first', 'proof-first'])
@@ -76,7 +98,8 @@ class PilotTests(unittest.TestCase):
                     pilot.validate(root, manifest)
 
     def test_blocked_episode_stops_cohort_and_post_run_configuration_drift(self):
-        with tempfile.TemporaryDirectory() as temp, patch.object(pilot, 'configured', return_value=HOST):
+        with tempfile.TemporaryDirectory() as temp, patch.object(pilot, 'configured', return_value=HOST), \
+                historical_agreement():
             root = Path(temp) / 'pilot'
             manifest = pilot.prepare(root)
             with patch.object(pilot, 'run_episode', return_value={'returncode': 1}) as run, \
@@ -98,7 +121,7 @@ class PilotTests(unittest.TestCase):
             self.assertTrue((root / 'episodes' / episode['id'] / 'finished.json').exists())
 
     def test_copied_controllers_repair_order_and_exhaustion(self):
-        from test_p2p_delivery import CONTRACT, FakeTransport, repo
+        from test_p2p_delivery import CONTRACT, FakeTransport, fixture_host, repo
 
         class BaselineTransport:
             def __init__(self, mode):
@@ -124,19 +147,23 @@ class PilotTests(unittest.TestCase):
                 event_path.write_text(''.join(json.dumps(event) + '\n' for event in events))
                 return result
 
-        with tempfile.TemporaryDirectory() as temp, patch.object(pilot, 'configured', return_value=HOST):
+        with tempfile.TemporaryDirectory() as temp, patch.object(pilot, 'configured', return_value=HOST), \
+                historical_agreement():
             destination = Path(temp) / 'pilot'
             pilot.prepare(destination)
             for strategy in pilot.STRATEGIES:
                 script = destination / 'controllers' / strategy / pilot.SCRIPT
                 spec = importlib.util.spec_from_file_location('pilot_controller', script)
                 controller = importlib.util.module_from_spec(spec)
-                sys.modules.pop('p2p_filesystem', None)
+                current_filesystem = sys.modules.pop('p2p_filesystem', None)
                 sys.path.insert(0, str(script.parent))
                 try:
                     spec.loader.exec_module(controller)
                 finally:
                     sys.path.remove(str(script.parent))
+                    sys.modules.pop('p2p_filesystem', None)
+                    if current_filesystem is not None:
+                        sys.modules['p2p_filesystem'] = current_filesystem
                 order = ['review', 'proof'] if strategy == 'review-first' else ['proof', 'review']
                 for mode in ('repair', 'exhausted'):
                     with self.subTest(strategy=strategy, mode=mode):
@@ -155,8 +182,12 @@ class PilotTests(unittest.TestCase):
                         fake = BaselineTransport(mode)
                         args = ['--repo', str(root), 'run', 'work/tiny.md', '--comparison-base', base,
                                 '--authorize-local', '--max-dispatches', '8', '--max-seconds', '1800']
-                        with patch.object(controller, 'launch', fake), \
-                                patch.object(controller.platform, 'system', return_value='Darwin'), \
+                        # This pinned controller predates installed_skill(). Its
+                        # discovery still uses the same repository-backed fixture skills.
+                        with fixture_host(), patch.object(controller, 'launch', fake), \
+                                patch.object(controller, 'skills', side_effect=lambda: {
+                                    stage: pilot.d.installed_skill(name)
+                                    for stage, name in controller.STAGES.items()}), \
                                 contextlib.redirect_stdout(io.StringIO()):
                             code = controller.main(args)
                             state = json.loads((root / '.p2p/work/tiny/delivery.json').read_text())

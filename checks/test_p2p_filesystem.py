@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Disposable Git repository checks: python3 checks/test_p2p_filesystem.py."""
 import importlib.util
+import base64
 import contextlib
 import io
 import json
@@ -11,6 +12,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location("p2p", Path(__file__).resolve().parents[1] / "skills/productivity/deliver-issue/scripts/p2p_filesystem.py")
 p2p = importlib.util.module_from_spec(spec)
@@ -218,6 +220,72 @@ def run():
 
 
 class FilesystemTests(unittest.TestCase):
+    def test_committed_snapshot_batches_blobs_without_changing_identity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "repo"
+            root.mkdir()
+            p2p.git(root, "init", "-q")
+            files = {f"file-{index:02}.bin": bytes([index]) + b"\0\nend" for index in range(24)}
+            files.update({"empty": b"", "executable": b"#!/bin/sh\necho hello\n",
+                          "line\nbreak\tø.txt": b"unusual path\n", "duplicate": b"\0\0\nend",
+                          "excluded": b"not part of this identity"})
+            for name, data in files.items():
+                (root / name).write_bytes(data)
+            (root / "executable").chmod(0o755)
+            (root / "link").symlink_to("line\nbreak\tø.txt")
+            for name in (".p2p/work/contract.md", "p2p-state/task.json"):
+                target = root / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text("excluded workflow state")
+            p2p.git(root, "add", ".")
+            p2p.git(root, "-c", "user.name=Fixture", "-c", "user.email=fixture@localhost",
+                    "commit", "-qm", "binary, executable and symlink fixture")
+            base = p2p.full_commit(root, "HEAD")
+            # The committed snapshot must not read the now different working files.
+            (root / "executable").write_bytes(b"changed since commit")
+            expected = [{"path": name, "type": "file",
+                         "mode": "100755" if name == "executable" else "100644",
+                         "content_base64": base64.b64encode(data).decode()}
+                        for name, data in files.items() if name != "excluded"]
+            expected.append({"path": "link", "type": "symlink", "mode": "120000",
+                             "target": "line\nbreak\tø.txt"})
+            expected.sort(key=lambda entry: entry["path"])
+            with patch.object(p2p.subprocess, "run", wraps=p2p.subprocess.run) as processes:
+                actual = p2p.snapshot(root, base, exclude=("excluded",))
+            self.assertEqual(actual, expected)
+            self.assertEqual(p2p.snapshot_key(actual), p2p.snapshot_key(expected))
+            self.assertEqual(processes.call_count, 2, "snapshot cost must not spawn once per file")
+
+    def test_git_blob_batch_rejects_incomplete_or_misbound_results(self):
+        oid = "a" * 40
+        header = (oid + " blob 3\n").encode()
+        valid = header + b"a\0b\n"
+        malformed = (b"", (oid + " missing\n").encode(),
+                     ("b" * 40 + " blob 3\na\0b\n").encode(),
+                     (oid + " tree 3\na\0b\n").encode(),
+                     (oid + " blob -1\n\n").encode(), header + b"a\0", valid[:-1], valid + b"extra")
+        for response in malformed:
+            with self.subTest(response=response), patch.object(p2p.subprocess, "run", return_value=
+                    subprocess.CompletedProcess([], 0, stdout=response, stderr=b"")):
+                with self.assertRaisesRegex(ValueError, "Git blob batch response"):
+                    p2p.git_blobs(Path("unused-fixture"), [oid])
+
+    def test_committed_snapshot_rereads_missing_objects(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "repo"
+            root.mkdir()
+            p2p.git(root, "init", "-q")
+            (root / "file").write_text("retained bytes")
+            p2p.git(root, "add", ".")
+            p2p.git(root, "-c", "user.name=Fixture", "-c", "user.email=fixture@localhost",
+                    "commit", "-qm", "missing object fixture")
+            base = p2p.full_commit(root, "HEAD")
+            self.assertEqual(len(p2p.snapshot(root, base)), 1)
+            oid = p2p.git(root, "rev-parse", base + ":file").decode().strip()
+            (root / ".git/objects" / oid[:2] / oid[2:]).unlink()
+            with self.assertRaisesRegex(ValueError, "Git blob batch response"):
+                p2p.snapshot(root, base)
+
     def test_setup_rejects_existing_selectively_unignored_p2p_file(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory) / "repo"

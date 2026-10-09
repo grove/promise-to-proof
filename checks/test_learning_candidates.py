@@ -42,8 +42,9 @@ class LearningCandidateTests(unittest.TestCase):
         self.assertIn("None.", delivery.learning_candidates_markdown({"learning_candidates": []}))
 
     def test_skill_boundaries_keep_retrospect_as_promoter(self):
-        retrospect = (ROOT / "skills/productivity/retrospect/SKILL.md").read_text(encoding="utf-8")
-        deliver = (ROOT / "skills/productivity/deliver-issue/SKILL.md").read_text(encoding="utf-8")
+        # Markdown line wrapping must not change these required authority rules.
+        retrospect = " ".join((ROOT / "skills/productivity/retrospect/SKILL.md").read_text(encoding="utf-8").split())
+        deliver = " ".join((ROOT / "skills/productivity/deliver-issue/SKILL.md").read_text(encoding="utf-8").split())
         self.assertIn("Treat those candidates only as attributed leads", retrospect)
         self.assertIn("only the existing explicit human disposition flow", retrospect)
         self.assertIn("Do not invoke it automatically", deliver)

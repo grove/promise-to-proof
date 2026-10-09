@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Deterministic fixture transport tests. These are NOT live host evidence."""
 import argparse
+import base64
 import contextlib
 import importlib.util
 import io
@@ -38,14 +39,43 @@ None.
 '''
 
 
+@contextlib.contextmanager
+def fixture_host():
+    """Supply version/skill discovery for offline fixtures; never launch a model."""
+    executable = Path(__file__).resolve().parent / 'fixtures/codex'
+    original_which = shutil.which
+    original_run = subprocess.run
+
+    def which(name, *args, **kwargs):
+        return str(executable) if name == 'codex' else original_which(name, *args, **kwargs)
+
+    def installed(name):
+        path = SCRIPTS.parents[1] / name / 'SKILL.md'
+        return {'path': str(path), 'sha256': d.fs.digest(path.read_bytes())}
+
+    def run(args, *positional, **kwargs):
+        if args and str(args[0]) == str(executable):
+            if list(args[1:]) != ['--version']:
+                raise AssertionError('offline fixture requires injected stage transport')
+            return subprocess.CompletedProcess(args, 0, 'FIXTURE codex 0.0.0 (not live host evidence)\n', '')
+        return original_run(args, *positional, **kwargs)
+
+    with patch.object(d.platform, 'system', lambda: 'Darwin'), \
+            patch.object(d.shutil, 'which', side_effect=which), \
+            patch.object(d.subprocess, 'run', side_effect=run), \
+            patch.object(d, 'installed_skill', side_effect=installed):
+        yield
+
+
 def repo(path):
     path.mkdir()
     subprocess.run(['git', 'init', '-q', str(path)], check=True)
+    d.fs.git(path, 'config', 'user.name', 'Fixture')
+    d.fs.git(path, 'config', 'user.email', 'fixture@localhost')
     (path / '.gitignore').write_text('/.p2p/\n')
     (path / 'spec.txt').write_text('A CLI prints hello followed by a newline and exits zero.\n')
     subprocess.run(['git', '-C', str(path), 'add', '.'], check=True)
-    subprocess.run(['git', '-C', str(path), '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost',
-                    'commit', '-qm', 'Fixture base'], check=True)
+    subprocess.run(['git', '-C', str(path), 'commit', '-qm', 'Fixture base'], check=True)
     (path / 'work').mkdir()
     (path / '.p2p/work/tiny/contract.md').parent.mkdir(parents=True)
     (path / '.p2p/work/tiny/contract.md').write_text(CONTRACT)
@@ -153,6 +183,16 @@ class FakeTransport:
             observation.update(scratch='ok', network='denied')
             output = 'P2P_BOUNDARY=' + json.dumps(observation)
             report = 'FIXTURE host preflight, not live evidence'
+            if 'task_readiness' in inputs:
+                readiness_command = 'FIXTURE python3 --version'
+                readiness_output = 'Python 3.11 fixture runtime available'
+                events.append({'type': 'item.completed', 'item': {'type': 'command_execution',
+                    'command': readiness_command, 'aggregated_output': readiness_output, 'exit_code': 0}})
+                report = json.dumps({'status': 'READY', 'input_identity_json': json.dumps(inputs),
+                    'checks': [{'kind': 'runtime', 'prerequisite': 'Python 3.11', 'requirement_id': 'R1',
+                                'command': readiness_command, 'observation': readiness_output, 'available': True}],
+                    'reason': 'Fixture runtime is available; greet.py is the product to implement, not a prerequisite.',
+                    'missing_input': '', 'expected_result': ''})
         elif stage == 'diagnosis':
             blocked = self.mode in ('blocked', 'exhausted')
             report = json.dumps({'status': 'BLOCKED' if blocked else 'ACTIONABLE',
@@ -263,13 +303,37 @@ class RuntimeRequirementTests(unittest.TestCase):
         self.assertIn('Python 3.11 or newer is required', stderr.getvalue())
 
 
+class GenerationTreeTests(unittest.TestCase):
+    def test_generation_batches_exact_blobs_without_changing_refs_or_source(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / 'source'
+            repo(root)
+            original = d.fs.snapshot(root)
+            refs = d.fs.git(root, 'for-each-ref')
+            index = (root / '.git/index').read_bytes()
+            manifest = [{'path': f'new-{i}.bin', 'type': 'file', 'mode': '100644',
+                         'content_base64': base64.b64encode(bytes([i]) + b'\0\nblob\ndone\n').decode()}
+                        for i in range(24)]
+            manifest.extend([
+                {'path': 'empty', 'type': 'file', 'mode': '100755', 'content_base64': ''},
+                {'path': 'line\nbreak\tø.txt', 'type': 'file', 'mode': '100644',
+                 'content_base64': base64.b64encode(b'exact text').decode()},
+                {'path': 'link', 'type': 'symlink', 'mode': '120000', 'target': 'line\nbreak\tø.txt'}])
+            with patch.object(d.subprocess, 'run', wraps=d.subprocess.run) as processes:
+                tree = d.git_generation_tree(root, manifest)
+            self.assertLessEqual(processes.call_count, 5, 'generation cost must not spawn once per file')
+            self.assertEqual(d.fs.snapshot(root, tree), sorted(manifest, key=lambda entry: entry['path']))
+            self.assertEqual(d.fs.git(root, 'for-each-ref'), refs)
+            self.assertEqual((root / '.git/index').read_bytes(), index)
+            self.assertEqual(d.fs.snapshot(root), original)
+            self.assertEqual(list((root / '.git/p2p-indexes').iterdir()), [])
+
+
 class DeliveryTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
-        real_home = Path.home()
         test_home = Path(self.temp.name) / 'home'
         test_home.mkdir()
-        (test_home / '.agents').symlink_to(real_home / '.agents', target_is_directory=True)
         self.home_patch = patch.dict(os.environ, {'HOME': str(test_home)})
         self.home_patch.start()
         self.root = Path(self.temp.name) / 'source'
@@ -277,11 +341,11 @@ class DeliveryTests(unittest.TestCase):
         self.fake = FakeTransport()
         self.patch = patch.object(d, 'launch', self.fake)
         self.patch.start()
-        self.host = patch.object(d.platform, 'system', lambda:'Darwin')
-        self.host.start()
+        self.host = fixture_host()
+        self.host.__enter__()
 
     def tearDown(self):
-        self.patch.stop(); self.host.stop(); self.home_patch.stop(); self.temp.cleanup()
+        self.patch.stop(); self.host.__exit__(None, None, None); self.home_patch.stop(); self.temp.cleanup()
 
     def cli(self, action='run', *extra):
         return self.cli_item('.p2p/work/tiny/contract.md', action, *extra)
@@ -845,7 +909,12 @@ Pending actions: none.
         self.assertEqual(path.read_bytes(), pending)
 
         def cli(root, action):
-            command = [sys.executable, str(SCRIPTS / 'p2p_delivery.py'), '--repo', str(root), action, '.p2p/work/tiny/contract.md']
+            # Keep a fresh interpreter and the public argument parser, while giving
+            # this offline fixture the same explicit host boundary as in-process tests.
+            bootstrap = ('import sys;sys.path.insert(0,' + repr(str(Path(__file__).parent)) +
+                         ');import test_p2p_delivery as t\nwith t.fixture_host():\n'
+                         ' t.d.launch=t.FakeTransport();sys.exit(t.d.main(sys.argv[1:]))')
+            command = [sys.executable, '-c', bootstrap, '--repo', str(root), action, '.p2p/work/tiny/contract.md']
             if action == 'run':
                 command += ['--comparison-base', self.base, '--authorize-local', '--max-dispatches', '0']
                 if not (root / '.p2p/work/parent/slicing.md').exists():
@@ -2060,7 +2129,8 @@ Pending actions: none.
         code,value=self.cli('resume')
         self.assertEqual(code,1,value)
         self.assertIn('recovery needs',value['blocker'])
-        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review','diagnosis','review','diagnosis'])
+        self.assertEqual(self.fake.calls,['preflight','preflight','implementation','review','diagnosis',
+                                         'preflight','review','diagnosis'])
         self.assertNotIn('proof',self.fake.calls)
         self.assertNotIn('repair',self.fake.calls)
 
@@ -2462,7 +2532,7 @@ Pending actions: none.
 
     def subprocess_cli(self, setup, action='run', *extra):
         # Fixture injection lives only in this test launcher, never in production CLI.
-        code = "import sys;sys.path.insert(0," + repr(str(Path(__file__).parent)) + ");import test_p2p_delivery as t;d=t.d;d.launch=t.FakeTransport();" + setup + ";sys.exit(d.main(sys.argv[1:]))"
+        code = "import sys;sys.path.insert(0," + repr(str(Path(__file__).parent)) + ");import test_p2p_delivery as t;d=t.d\nwith t.fixture_host():\n d.launch=t.FakeTransport();" + setup + ";sys.exit(d.main(sys.argv[1:]))"
         args=[sys.executable,'-c',code,'--repo',str(self.root),action,'.p2p/work/tiny/contract.md']
         if action=='run':
             args+=['--comparison-base',self.base,'--authorize-local']
@@ -2711,7 +2781,6 @@ class ConformanceBridgeTests(unittest.TestCase):
             home = Path(temporary) / 'home'
             scratch.mkdir()
             home.mkdir()
-            (home / '.agents').symlink_to(Path.home() / '.agents', target_is_directory=True)
             env = os.environ | {'P2P_REPO': str(project), 'P2P_TRACE_DIR': str(trace),
                                 'HOME': str(home),
                                 'P2P_MBT_CASE': 'successful-delivery',

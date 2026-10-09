@@ -2,6 +2,7 @@
 """Deliver one local agreement through fresh, sandboxed Codex CLI stages."""
 import argparse
 import base64
+from contextlib import contextmanager
 import datetime
 import fcntl
 import json
@@ -10,6 +11,7 @@ import os
 from pathlib import Path
 import platform
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -38,6 +40,10 @@ class ContinuationRequired(ValueError):
 
 class WorkerRestartRequired(Exception):
     """A terminated idle worker has been retained and can be replaced safely."""
+
+
+class ReportFormatError(ValueError):
+    """A completed response is malformed; it is not an unavailable capability."""
 
 
 def now():
@@ -91,7 +97,7 @@ def check_final_footprint(root, work, values):
             and path.relative_to(artifact).as_posix() not in values}
 
 
-def local_directory(root, work):
+def local_directory(root, work, *, _storage_checked=False):
     common = fs.git(root, 'rev-parse', '--path-format=absolute', '--git-common-dir').decode().strip()
     repo_id = Path(root).name + '-' + fs.digest(str(Path(common).resolve()).encode())[:16]
     root = Path(root).resolve()
@@ -117,7 +123,8 @@ def local_directory(root, work):
         raise ValueError('both repo-local and legacy P2P state exist; reconcile without overwriting either')
     else:
         local = repo_local
-        fs.setup(root)
+        if not _storage_checked:
+            fs.setup(root)
     for path in (root / '.p2p', root / '.p2p' / 'work', repo_local, home / '.p2p', local_root,
                  local_root / repo_id, legacy, legacy_orchestration, local):
         if path.is_symlink():
@@ -125,10 +132,10 @@ def local_directory(root, work):
     return local
 
 
-def execution_runtime(root, work):
+def execution_runtime(root, work, *, _local=None):
     """Keep delivery checkouts and their Git objects outside the source checkout."""
     external_directory = execution_directory(root, work)
-    local = local_directory(root, work) / 'runtime'
+    local = (_local if _local is not None else local_directory(root, work)) / 'runtime'
     external = external_directory / 'runtime'
     for path in (external_directory, external):
         if path.is_symlink():
@@ -143,8 +150,8 @@ def execution_directory(root, work):
     return fs.execution_directory(root, work)
 
 
-def agreement_root(root, work):
-    local = local_directory(root, work) / 'agreement'
+def agreement_root(root, work, *, _local=None):
+    local = (_local if _local is not None else local_directory(root, work)) / 'agreement'
     external = execution_directory(root, work) / 'agreement'
     if local.exists() and external.exists():
         raise ValueError('both checkout-local and external agreement copies exist; reconcile without overwriting either')
@@ -154,8 +161,8 @@ def agreement_root(root, work):
     return path
 
 
-def local_storage_directory(root, work, name):
-    path = local_directory(root, work) / name
+def local_storage_directory(root, work, name, *, _local=None):
+    path = (_local if _local is not None else local_directory(root, work)) / name
     if path.is_symlink() or (path.exists() and not path.is_dir()):
         raise ValueError('repo-local P2P ' + name + ' path is not a directory')
     return path
@@ -185,11 +192,14 @@ def imported_issue_sources(root, work):
 
 def delivery_paths(root, work):
     """Resolve agreements and records inside this checkout's ignored P2P root."""
-    agreement = fs.safe(agreement_root(root, work), work)
     source, _ = fs.paths(root, work)
+    # fs.paths just checked storage. Reuse that check within this synchronous
+    # resolution only; each later read/write operation validates current storage.
+    local = local_directory(root, work, _storage_checked=True)
+    agreement = fs.safe(agreement_root(root, work, _local=local), work)
     if not agreement.is_file():
         agreement = source
-    return agreement, local_storage_directory(root, work, 'artifacts')
+    return agreement, local_storage_directory(root, work, 'artifacts', _local=local)
 
 
 def localize_agreement(root, work, bindings):
@@ -234,7 +244,7 @@ def local_save(root, work, name, data):
     relative = local.relative_to(directory)
     if relative.parts[0] in ('runtime', 'attempts'):
         prefix = ('attempts',) if relative.parts[0] == 'attempts' else ()
-        external = execution_runtime(root, work)
+        external = execution_runtime(root, work, _local=directory)
         local = fs.safe(external, '/'.join((*prefix, *relative.parts[1:])))
     require_repo_local_ignored(root, local)
     local.parent.mkdir(parents=True, exist_ok=True)
@@ -252,22 +262,33 @@ def git_generation_tree(workspace, manifest):
     index = index_dir / (uuid.uuid4().hex + '.index')
     env = os.environ | {'GIT_INDEX_FILE': str(index)}
 
-    def run(*args, input=None):
+    def run(*args, input=None, stdin=None):
         result = subprocess.run(['git', '-C', str(workspace), *args], input=input,
-                                env=env, capture_output=True)
+                                stdin=stdin, env=env, capture_output=True)
         if result.returncode:
             raise ValueError(result.stderr.decode().strip() or 'local generation Git command failed')
         return result.stdout
 
     try:
         run('read-tree', '--empty')
-        entries = []
-        for item in manifest:
-            content = (base64.b64decode(item['content_base64'], validate=True)
-                       if item['type'] == 'file' else item['target'].encode())
-            oid = run('hash-object', '-w', '--stdin', input=content).decode().strip()
-            entries.append(item['mode'].encode() + b' ' + oid.encode() + b'\t' +
-                           item['path'].encode('utf-8') + b'\0')
+        # Blob-only fast-import writes exact binary bytes in one Git process. No
+        # branch, commit or reset commands are sent, so source refs stay untouched.
+        # Spool the input to avoid a second in-memory copy of the entire manifest.
+        with tempfile.TemporaryFile(dir=index_dir) as stream:
+            for mark, item in enumerate(manifest, 1):
+                content = (base64.b64decode(item['content_base64'], validate=True)
+                           if item['type'] == 'file' else item['target'].encode('utf-8'))
+                stream.write(f'blob\nmark :{mark}\ndata {len(content)}\n'.encode())
+                stream.write(content)
+                stream.write(f'\nget-mark :{mark}\n'.encode())
+            stream.write(b'done\n')
+            stream.seek(0)
+            objects = run('fast-import', '--quiet', '--done', stdin=stream).splitlines()
+        if len(objects) != len(manifest) or any(not re.fullmatch(b'[0-9a-f]{40}|[0-9a-f]{64}', oid)
+                                                for oid in objects):
+            raise ValueError('local generation Git blob identity response is incomplete or malformed')
+        entries = [item['mode'].encode() + b' ' + oid + b'\t' + item['path'].encode('utf-8') + b'\0'
+                   for item, oid in zip(manifest, objects)]
         if entries:
             run('update-index', '--add', '-z', '--index-info', input=b''.join(entries))
         return run('write-tree').decode().strip()
@@ -1784,6 +1805,15 @@ class Delivery:
         return host
 
     def dispatch(self, stage, inputs, prompt, writable=None, schema=None):
+        # Planning can stop between a saved proposal and its independent audit.
+        # Reuse that exact completed response before reconciling a later reservation.
+        if stage in ('planning', 'planning-audit'):
+            completed = next((a for a in reversed(self.state['attempts'])
+                              if a['stage'] == stage and a['inputs'] == inputs and
+                              a['status'] == 'complete'), None)
+            if completed:
+                self.check_report_rejection(completed)
+                return completed, self.receipt(completed)
         pending = [a for a in self.state['attempts'] if a['status'] in ('reserved', 'failed')]
         if pending:
             attempt = pending[-1]
@@ -1833,13 +1863,140 @@ class Delivery:
             raise WorkerRestartRequired()
         return attempt, self.receipt(attempt)
 
+    def check_report_rejection(self, attempt):
+        if attempt.get('report_validation') != 'rejected':
+            return
+        host = self.receipt(attempt)
+        data = (self.runtime / attempt['report']).read_bytes()
+        if fs.digest(data) != attempt['report_sha256'] or data != host['message'].encode():
+            raise ValueError('rejected stage report changed: ' + attempt['id'])
+        raise ValueError(attempt['stage'] + ' returned an invalid report: ' + attempt['report_error'] +
+                         '; exact response retained at ' + str(self.runtime / attempt['report']))
+
+    @contextmanager
+    def report_validation(self, attempt, host):
+        """A confirmed response can fail validation without becoming an uncertain launch."""
+        try:
+            yield
+        except (ValueError, TypeError, KeyError, AttributeError) as error:
+            data = host['message'].encode()
+            path = f'attempts/{attempt["id"]}/report.json'
+            stored = self.runtime / path
+            if stored.exists() and stored.read_bytes() != data:
+                raise ValueError('conflicting rejected stage result: ' + attempt['id']) from error
+            local_save(self.root, self.work, path, data)
+            attempt.update(status='complete', report=path, report_sha256=fs.digest(data),
+                           report_validation='rejected', report_error=str(error),
+                           report_format_error=isinstance(error, ReportFormatError))
+            self.save()
+            # Capturing preserves the returned product bytes; it does not accept the
+            # invalid report, mark implementation complete, or authorize verification.
+            if attempt['stage'] in ('implementation', 'repair'):
+                self.capture(attempt['stage'])
+                self.save()
+            if isinstance(error, ReportFormatError):
+                raise
+            raise ValueError(attempt['stage'] + ' returned an invalid report: ' + str(error) +
+                             '; exact response retained at ' + str(stored)) from error
+        else:
+            attempt['report_validation'] = 'accepted'
+
     def preflight(self):
+        # Product edits do not invalidate a successfully observed host prerequisite.
+        # Keep the inspected candidate in the attempt identity, but reuse readiness
+        # by agreement, binding inputs and the actual admitted/receiving host.
+        readiness = {'contract_sha256': self.state['contract']['sha256'],
+                     'binding_inputs': self.state['binding_inputs'],
+                     'host': self.state.get('restored_host') or self.state['host'],
+                     'policy': self.state['policy'], 'skills': self.state['skills']}
+        fields = {key: {'type': 'string'} for key in
+                  ('status', 'input_identity_json', 'reason', 'missing_input', 'expected_result')}
+        fields['status']['enum'] = ['READY', 'BLOCKED']
+        check_fields = {key: {'type': 'string'} for key in
+                        ('kind', 'prerequisite', 'requirement_id', 'command', 'observation')}
+        check_fields['kind']['enum'] = ['tool', 'input', 'runtime', 'service']
+        check_fields['available'] = {'type': 'boolean'}
+        fields['checks'] = {'type': 'array', 'maxItems': 12, 'items': {
+            'type': 'object', 'properties': check_fields, 'required': list(check_fields),
+            'additionalProperties': False}}
+        schema = {'type': 'object', 'properties': fields, 'required': list(fields),
+                  'additionalProperties': False}
+
+        def same_command(recorded, reported):
+            if not isinstance(recorded, str):
+                return False
+            if recorded == reported:
+                return True
+            # Codex may record its shell wrapper instead of the submitted command.
+            # Accept only the exact body of that wrapper, never a substring match.
+            try:
+                parts = shlex.split(recorded)
+            except (ValueError, TypeError):
+                return False
+            return (len(parts) == 3 and Path(parts[0]).name in ('sh', 'bash', 'zsh', 'dash') and
+                    parts[1] in ('-c', '-lc', '-ic', '-lic') and parts[2] == reported)
+
+        def validate_readiness(attempt, host):
+            report = json.loads(host['message'])
+            if (not isinstance(report, dict) or set(report) != set(fields) or
+                    any(not isinstance(report[key], str) for key in fields if key != 'checks') or
+                    report['status'] not in ('READY', 'BLOCKED') or not report['reason'].strip() or
+                    json.loads(report['input_identity_json']) != attempt['inputs'] or
+                    not isinstance(report['checks'], list) or len(report['checks']) > 12):
+                raise ValueError('invalid or stale task-readiness report')
+            unavailable = []
+            for check in report['checks']:
+                if (not isinstance(check, dict) or set(check) != set(check_fields) or
+                        any(not isinstance(check[key], str) or not check[key].strip()
+                            for key in check_fields if key != 'available') or
+                        type(check['available']) is not bool or
+                        check['kind'] not in check_fields['kind']['enum'] or
+                        check['requirement_id'] not in self.state['requirements']):
+                    raise ValueError('invalid task-readiness prerequisite')
+                evidence = [event for event in host['executions']
+                            if same_command(event.get('command'), check['command']) and
+                            check['observation'] in event.get('aggregated_output', '') and
+                            isinstance(event.get('exit_code'), int)]
+                if not evidence or (check['available'] and not any(event['exit_code'] == 0 for event in evidence)):
+                    raise ValueError('task readiness lacks host-recorded command evidence: ' + check['prerequisite'])
+                if not check['available']:
+                    unavailable.append(check['prerequisite'])
+            if report['status'] == 'READY':
+                if unavailable or report['missing_input'] or report['expected_result']:
+                    raise ValueError('READY task readiness contains an unmet prerequisite')
+            elif (not unavailable or report['missing_input'] not in unavailable or
+                  not report['expected_result'].strip()):
+                raise ValueError('BLOCKED task readiness needs an observed missing prerequisite and next result')
+            return report
+
         for index in range(2):
             stage = 'preflight-' + str(index + 1)
-            done = next((a for a in self.state['attempts'] if a['stage'] == stage and a['status'] == 'complete'), None)
+            done = next((a for a in reversed(self.state['attempts'])
+                         if a['stage'] == stage and a['status'] == 'complete'), None)
             if done:
-                self.receipt(done)
-                continue
+                self.check_report_rejection(done)
+                host = self.receipt(done)
+                if index == 0:
+                    continue
+                if done['inputs'].get('task_readiness') == readiness and done.get('report'):
+                    data = (self.runtime / done['report']).read_bytes()
+                    if fs.digest(data) != done['report_sha256'] or data != host['message'].encode():
+                        raise ValueError('retained task-readiness report changed')
+                    with self.report_validation(done, host):
+                        report = validate_readiness(done, host)
+                    if report['status'] == 'READY' and not self.state.get('task_readiness_invalidated'):
+                        continue
+                # A valid BLOCKED observation can be rechecked on an explicit resume
+                # after its prerequisite is supplied. Legacy boundary-only attempts
+                # likewise receive readiness once, without repeating preflight-1.
+            if index == 1 and any(a['status'] in ('reserved', 'failed') and a['stage'] != stage
+                                  for a in self.state['attempts']):
+                # Adopt the already-dispatched response before starting this new
+                # readiness check. A legacy reservation is not permission to launch
+                # a competing worker, even when its output is now available.
+                self.state['preflight_complete'] = False
+                self.save()
+                return False
             probe = self.runtime / ('probe-' + str(index) + '.py')
             git_dir = Path(fs.git(self.root, 'rev-parse', '--absolute-git-dir').decode().strip())
             protected = [git_dir / 'HEAD', git_dir / 'index', self.item, self.runtime / 'admission.json', self.runtime / 'base-tree-key', self.runtime / 'repository.git/HEAD',
@@ -1884,21 +2041,70 @@ assert results['scratch'] == 'ok'
                       'network connection expected to fail, and writes allowed scratch. Do not escalate or '
                       'change inputs. Print actual available ALL_TOOLS names if that runtime is exposed. '
                       'Return the exact probe output and observed permissions. No other effects are authorized.')
-            attempt, host = self.dispatch(stage, inputs, prompt)
-            expected_keys = {str(p) + ':' + mode for p in protected for mode in ('absolute', 'symlink', 'subprocess')} | {'network', 'scratch'}
-            observations = []
-            for event in host['executions']:
-                for line in event.get('aggregated_output', '').splitlines():
-                    if line.startswith('P2P_BOUNDARY=') and event.get('exit_code') == 0:
-                        observations.append(json.loads(line.split('=', 1)[1]))
-            if not any(set(o) == expected_keys and all(v == ('ok' if k == 'scratch' else 'denied') for k,v in o.items()) for o in observations):
-                raise ValueError('host preflight did not establish all permission boundaries: ' + attempt['id'])
-            if before != {str(p): fs.digest(p.read_bytes()) for p in protected}:
-                raise ValueError('host preflight changed protected inputs')
+            if index == 1:
+                inputs.update(task_readiness=readiness, candidate=self.stage_inputs(self.state['candidate']))
+                prompt += (
+                    f' In this same preflight context, inspect task readiness for {self.workspace / self.work} '
+                    f'and its binding sources in {self.workspace}. Exact input_identity_json: {json.dumps(inputs)}. '
+                    'Read the agreed evidence paths and check only the small set of existing prerequisites '
+                    'needed to implement and verify them: required tools/runtimes, supplied source evidence, '
+                    'fixtures, and local services or sockets. Use safe, short read-only checks from this actual '
+                    'worker boundary; network is denied, approval escalation and MCP/apps/plugins are disabled, '
+                    'candidate/agreement/Git are protected, and only scratch is writable. Host tools available '
+                    'to the enclosing workflow are not inherited. A successful version/help command does not '
+                    'establish service or socket access: safely probe the actual required access. '
+                    'Use short bounded probes; correct a malformed shell command or diagnostic query before '
+                    'classifying availability. A syntax/type error is not evidence of a missing service. '
+                    'Do not install dependencies, start services, fetch or copy evidence bundles, invoke another '
+                    'model or run acceptance/full test suites here. This is readiness, not implementation or proof. '
+                    'A product file, behavior or regression test the contract asks implementation to create is '
+                    'unfinished work, NEVER a missing prerequisite. Ordinary local setup that implementation '
+                    'can perform with available tools and inputs is also work, not a blocker. '
+                    'Return the structured report. Every check names its requirement_id, concrete prerequisite '
+                    'and kind (tool/input/runtime/service), exact command as recorded by the host, an exact '
+                    'nonempty substring of its output as observation, and whether it is available. Base availability '
+                    'on those actual observations, never an echo of a claimed capability. READY requires all '
+                    'required prerequisites available; an empty checks list is allowed when no task-specific '
+                    'prerequisite needs a check, with the reason explained. BLOCKED requires an actually unmet '
+                    'pre-existing prerequisite: missing_input must name one unavailable prerequisite exactly, '
+                    'and expected_result must say what supplying/fixing it will establish so this delivery can '
+                    'resume. Otherwise leave missing_input and expected_result empty. Do not reinterpret the '
+                    'promise or manufacture a prerequisite to demand completed product behavior before work starts.')
+            attempt, host = self.dispatch(stage, inputs, prompt, schema=schema if index == 1 else None)
+            with self.report_validation(attempt, host):
+                expected_keys = {str(p) + ':' + mode for p in protected for mode in ('absolute', 'symlink', 'subprocess')} | {'network', 'scratch'}
+                observations = []
+                for event in host['executions']:
+                    for line in event.get('aggregated_output', '').splitlines():
+                        if line.startswith('P2P_BOUNDARY=') and event.get('exit_code') == 0:
+                            observations.append(json.loads(line.split('=', 1)[1]))
+                if not any(isinstance(o, dict) and set(o) == expected_keys and
+                           all(v == ('ok' if k == 'scratch' else 'denied') for k,v in o.items()) for o in observations):
+                    raise ValueError('host preflight did not establish all permission boundaries: ' + attempt['id'])
+                if before != {str(p): fs.digest(p.read_bytes()) for p in protected}:
+                    raise ValueError('host preflight changed protected inputs')
+                if index == 1:
+                    report = validate_readiness(attempt, host)
+            if index == 1:
+                self.current()
+                data = host['message'].encode()
+                path = f'attempts/{attempt["id"]}/report.json'
+                local_save(self.root, self.work, path, data)
+                attempt.update(report=path, report_sha256=fs.digest(data))
+                self.state['task_readiness'] = {'status': report['status'], 'attempt_id': attempt['id'],
+                                                'report': path, 'report_sha256': attempt['report_sha256']}
+                self.state.pop('task_readiness_invalidated', None)
             attempt['status'] = 'complete'
             self.save()
+            if index == 1 and report['status'] == 'BLOCKED':
+                self.state['preflight_complete'] = False
+                self.save()
+                raise ValueError('task prerequisite unavailable before implementation: ' + report['missing_input'] +
+                                 '; expected: ' + report['expected_result'] +
+                                 '; supply the prerequisite and resume this delivery')
         self.state['preflight_complete'] = True
         self.save()
+        return True
 
     def stage_inputs(self, candidate):
         result = report_identity(candidate)
@@ -1913,6 +2119,62 @@ assert results['scratch'] == 'ok'
                 {key: record[key] for key in ('path', 'sha256')}
                 for record in self.state['routing_records']]
         return result
+
+    def verification_history(self, name):
+        """Offer one verifier its own checked observations, never another actor's verdict."""
+        if name not in ('review', 'proof'):
+            return None
+        current_inputs = self.stage_inputs(self.state['candidate'])
+        agreement = {key: value for key, value in current_inputs.items()
+                     if key not in ('key', 'commit', 'local_git_generation')}
+        previous = next((attempt for attempt in reversed(self.state['attempts'])
+                         if attempt['stage'] == name and attempt['status'] == 'complete'
+                         and attempt.get('report_validation') != 'rejected'
+                         and {key: value for key, value in attempt['inputs'].items()
+                              if key not in ('key', 'commit', 'local_git_generation')} == agreement), None)
+        if previous is None:
+            return None
+        unavailable = {'stage': name, 'available': False,
+                       'reason': 'Earlier observations cannot be validated; perform fresh checks.'}
+        # Portable receipts intentionally omit command output and scratch evidence.
+        # Do not turn a restored report into a cache for a different machine.
+        if ((self.runtime / 'attempts' / previous['id'] / 'portable-receipt.json').exists() or
+                previous.get('verification_environment') != self.verification_environment()):
+            return unavailable | {'reason': 'Earlier verification environment or local evidence is unavailable.'}
+        try:
+            report_path = fs.safe(self.runtime, previous['report'])
+            data = report_path.read_bytes()
+            host = self.receipt(dict(previous))
+            if (fs.digest(data) != previous['report_sha256'] or
+                    host['message'].encode('utf-8') != data or
+                    json.loads(json.loads(data)['input_identity_json']) != previous['inputs']):
+                return unavailable
+            mapping = previous['inputs'].get('local_git_generation', {})
+            generation = next((item for item in self.state['local_git_generations']
+                               if all(item.get(key) == value for key, value in mapping.items())
+                               and mapping and item['candidate_key'] == previous['inputs'].get('key')), None)
+            if generation is None:
+                return unavailable
+            latest = self.state['local_git_generations'][-1]
+            repository = self.runtime / 'repository.git'
+            before = fs.snapshot(repository, generation['commit'])
+            after = fs.snapshot(repository, latest['commit'])
+            if (fs.snapshot_key(before) != generation['candidate_key'] or
+                    fs.snapshot_key(after) != self.state['candidate']['key']):
+                return unavailable
+            events = fs.safe(self.runtime, f'attempts/{previous["id"]}/events.jsonl')
+            return {'stage': name, 'available': True, 'attempt_id': previous['id'],
+                    'report': {'path': str(report_path), 'sha256': previous['report_sha256']},
+                    'command_evidence': {'path': str(events), 'sha256': fs.digest(events.read_bytes())},
+                    'scratch': previous['scratch'], 'repository': str(repository),
+                    'previous_candidate': {'key': generation['candidate_key'], 'commit': generation['commit']},
+                    'current_candidate': {'key': latest['candidate_key'], 'commit': latest['commit']},
+                    'complete_delta': fs.tree_changes(before, after),
+                    'verification_environment': previous['verification_environment']}
+        except (OSError, ValueError, KeyError, TypeError):
+            # History is optional. Missing old evidence means new observations,
+            # not a weaker verdict or an unrelated storage-repair project.
+            return unavailable
 
     def stage(self, name, reconcile=False):
         mandate = self.state.get('autonomy')
@@ -1980,82 +2242,100 @@ assert results['scratch'] == 'ok'
                        'must preserve all product bytes. Do not substitute same-context fixtures for an '
                        'independent workflow observation. ')
         if name in ('review', 'proof'):
+            history = self.verification_history(name)
             prompt += ('Candidate and Git metadata are protected outside writable scratch. Run checks against '
                        'the fixed workspace; place outputs and PYTHONPYCACHEPREFIX/TMPDIR in scratch. '
-                       'Do not copy and edit product code to make a check pass. Inspect the full candidate. ')
+                       'Do not copy and edit product code to make a check pass. Inspect the full candidate. '
+                       'Use the smallest sufficient checks for the material questions this stage owns. '
+                       'Review is not a second exhaustive acceptance proof. Do not repeat an expensive full '
+                       'suite merely to produce a fresh report; run it when a binding requirement or an '
+                       'unbounded material regression risk needs it. '
+                       'Earlier observations from this same stage only: ' + json.dumps(history) + '. '
+                       'When available, read that report and its command evidence, inspect the complete delta '
+                       'between the exact retained Git candidates, and independently decide applicability '
+                       'under the focused re-verification protocol. Check repaired gaps, affected interactions, '
+                       'changed tests/oracles, and any changed environment afresh. For every retained observation, '
+                       'cite its original candidate/evidence and explain why it still applies in your new report. '
+                       'A missing artifact or uncertain applicability requires fresh checking of the affected '
+                       'scope. Prior verdicts never transfer. Cover every requirement, preserve mandatory '
+                       'final-candidate checks, and do not read the other verifier\'s reports. ')
         else:
             prompt += ('Implement the smallest complete change in the workspace. .p2p/tmp/ is disposable scratch; '
-                       'do not include it in product content. Preserve agreement and binding inputs. ')
+                       'do not include it in product content. Preserve agreement and binding inputs. '
+                       'Use focused checks while making a correction. Once the candidate is ready, finish '
+                       'the required repository checks; do not restart a full suite after each intermediate '
+                       'edit or repeat an unchanged passing check without a concrete reason. ')
         attempt, host = self.dispatch(name, inputs, prompt,
                                       self.workspace if name in ('implementation', 'repair') else None,
                                       report_schema(name))
         self.timed_source_stable()
         if name in ('review', 'proof'):
             self.current()
-        raw_report = host['message'].encode('utf-8')
-        report = json.loads(raw_report)
-        expected_fields = {'status', 'input_identity_json', 'requirements', 'gaps', 'learning_candidates'}
-        if name == 'review':
-            expected_fields.update({'findings', 'coverage', 'checks', 'limitations', 'missing_input', 'expected_result'})
-        else:
-            expected_fields.add('details')
-        if not isinstance(report, dict) or set(report) != expected_fields:
-            raise ValueError('stage report contains unsupported or missing fields: ' + attempt['id'])
-        learning_fields = {'scope', 'lesson', 'evidence', 'uncertainty'}
-        candidates = report.get('learning_candidates')
-        if (not isinstance(candidates, list) or len(candidates) > 5 or
-                any(not isinstance(item, dict) or set(item) != learning_fields or
-                    any(not isinstance(item[key], str) or not item[key].strip() for key in learning_fields)
-                    for item in candidates)):
-            raise ValueError('stage report learning candidates are incomplete')
-        if name == 'review' and report['status'] not in ('REVIEWED', 'CHANGES NEEDED', 'BLOCKED'):
-            raise ValueError('review report has unsupported status')
-        if json.loads(report['input_identity_json']) != inputs:
-            raise ValueError('stage returned stale or mistyped input identity: ' + attempt['id'])
-        rows = report['requirements']
-        if sorted(row['id'] for row in rows) != sorted(self.state['requirements']):
-            raise ValueError('stage omitted/duplicated full requirement coverage: ' + attempt['id'])
-        if (name != 'review' and not report['details'].strip()) or any(not row['observation'].strip() for row in rows):
-            raise ValueError('stage returned incomplete report observations: ' + attempt['id'])
-        if name == 'review':
-            if any(set(row) != {'id', 'observation'} for row in rows):
-                raise ValueError('review report rows must not contain verdicts or proof evidence')
-            if not isinstance(report['coverage'], str) or not report['coverage'].strip():
-                raise ValueError('review report coverage is incomplete')
-            findings = report.get('findings')
-            finding_fields = {'id', 'source', 'axis', 'location', 'evidence', 'consequence', 'correction', 'handoff'}
-            if not isinstance(findings, list) or any(not isinstance(item, dict) or set(item) != finding_fields or
-                    any(not isinstance(item[key], str) or not item[key].strip() for key in finding_fields) or
-                    item['axis'] not in REVIEW_AXES or item['handoff'] not in ('implement-contract', 'plan-acceptance')
-                    for item in findings):
-                raise ValueError('review report findings are incomplete')
-            if len({item['id'] for item in findings}) != len(findings):
-                raise ValueError('review report finding IDs are duplicated')
-            check_fields = {'command', 'result', 'observation'}
-            if not isinstance(report['checks'], list) or any(not isinstance(item, dict) or set(item) != check_fields or
-                    any(not isinstance(item[key], str) or not item[key].strip() for key in check_fields) or
-                    item['result'] not in ('passed', 'failed', 'observed', 'unavailable') for item in report['checks']):
-                raise ValueError('review report checks are incomplete')
-            for field in ('gaps', 'limitations'):
-                if not isinstance(report[field], list) or any(not isinstance(item, str) or not item.strip() for item in report[field]):
-                    raise ValueError('review report ' + field + ' are incomplete')
-            if report['status'] == 'REVIEWED' and (findings or report['gaps']):
-                raise ValueError('REVIEWED review report contains findings or gaps')
-            if report['status'] == 'CHANGES NEEDED' and not findings:
-                raise ValueError('CHANGES NEEDED review report has no findings')
-            if report['status'] == 'BLOCKED':
-                if any(not isinstance(report[field], str) or not report[field].strip()
-                       for field in ('missing_input', 'expected_result')):
-                    raise ValueError('BLOCKED review report must name the missing input and expected result')
-            elif report['missing_input'] or report['expected_result']:
-                raise ValueError('non-blocked review report contains blocked-only details')
-        if name == 'proof' and report['status'] == 'PROVEN':
-            if not host['executions'] or any(row['verdict'] != 'proven' or not row['evidence'] for row in rows):
-                raise ValueError('proof lacks full independently exercised evidence')
-            for row in rows:
-                for evidence in row['evidence']:
-                    if any(not evidence[k].strip() for k in ('assertion', 'observation', 'artifact')):
-                        raise ValueError('proof evidence is incomplete: ' + row['id'])
+        with self.report_validation(attempt, host):
+            raw_report = host['message'].encode('utf-8')
+            report = json.loads(raw_report)
+            expected_fields = {'status', 'input_identity_json', 'requirements', 'gaps', 'learning_candidates'}
+            if name == 'review':
+                expected_fields.update({'findings', 'coverage', 'checks', 'limitations', 'missing_input', 'expected_result'})
+            else:
+                expected_fields.add('details')
+            if not isinstance(report, dict) or set(report) != expected_fields:
+                raise ValueError('stage report contains unsupported or missing fields: ' + attempt['id'])
+            learning_fields = {'scope', 'lesson', 'evidence', 'uncertainty'}
+            candidates = report.get('learning_candidates')
+            if (not isinstance(candidates, list) or len(candidates) > 5 or
+                    any(not isinstance(item, dict) or set(item) != learning_fields or
+                        any(not isinstance(item[key], str) or not item[key].strip() for key in learning_fields)
+                        for item in candidates)):
+                raise ValueError('stage report learning candidates are incomplete')
+            if name == 'review' and report['status'] not in ('REVIEWED', 'CHANGES NEEDED', 'BLOCKED'):
+                raise ValueError('review report has unsupported status')
+            if json.loads(report['input_identity_json']) != inputs:
+                raise ValueError('stage returned stale or mistyped input identity: ' + attempt['id'])
+            rows = report['requirements']
+            if sorted(row['id'] for row in rows) != sorted(self.state['requirements']):
+                raise ValueError('stage omitted/duplicated full requirement coverage: ' + attempt['id'])
+            if (name != 'review' and not report['details'].strip()) or any(not row['observation'].strip() for row in rows):
+                raise ValueError('stage returned incomplete report observations: ' + attempt['id'])
+            if name == 'review':
+                if any(set(row) != {'id', 'observation'} for row in rows):
+                    raise ValueError('review report rows must not contain verdicts or proof evidence')
+                if not isinstance(report['coverage'], str) or not report['coverage'].strip():
+                    raise ValueError('review report coverage is incomplete')
+                findings = report.get('findings')
+                finding_fields = {'id', 'source', 'axis', 'location', 'evidence', 'consequence', 'correction', 'handoff'}
+                if not isinstance(findings, list) or any(not isinstance(item, dict) or set(item) != finding_fields or
+                        any(not isinstance(item[key], str) or not item[key].strip() for key in finding_fields) or
+                        item['axis'] not in REVIEW_AXES or item['handoff'] not in ('implement-contract', 'plan-acceptance')
+                        for item in findings):
+                    raise ValueError('review report findings are incomplete')
+                if len({item['id'] for item in findings}) != len(findings):
+                    raise ValueError('review report finding IDs are duplicated')
+                check_fields = {'command', 'result', 'observation'}
+                if not isinstance(report['checks'], list) or any(not isinstance(item, dict) or set(item) != check_fields or
+                        any(not isinstance(item[key], str) or not item[key].strip() for key in check_fields) or
+                        item['result'] not in ('passed', 'failed', 'observed', 'unavailable') for item in report['checks']):
+                    raise ValueError('review report checks are incomplete')
+                for field in ('gaps', 'limitations'):
+                    if not isinstance(report[field], list) or any(not isinstance(item, str) or not item.strip() for item in report[field]):
+                        raise ValueError('review report ' + field + ' are incomplete')
+                if report['status'] == 'REVIEWED' and (findings or report['gaps']):
+                    raise ValueError('REVIEWED review report contains findings or gaps')
+                if report['status'] == 'CHANGES NEEDED' and not findings:
+                    raise ValueError('CHANGES NEEDED review report has no findings')
+                if report['status'] == 'BLOCKED':
+                    if any(not isinstance(report[field], str) or not report[field].strip()
+                           for field in ('missing_input', 'expected_result')):
+                        raise ValueError('BLOCKED review report must name the missing input and expected result')
+                elif report['missing_input'] or report['expected_result']:
+                    raise ValueError('non-blocked review report contains blocked-only details')
+            if name == 'proof' and report['status'] == 'PROVEN':
+                if not host['executions'] or any(row['verdict'] != 'proven' or not row['evidence'] for row in rows):
+                    raise ValueError('proof lacks full independently exercised evidence')
+                for row in rows:
+                    for evidence in row['evidence']:
+                        if any(not evidence[k].strip() for k in ('assertion', 'observation', 'artifact')):
+                            raise ValueError('proof evidence is incomplete: ' + row['id'])
         path = f'attempts/{attempt["id"]}/report.json'
         stored = self.runtime / path
         if stored.exists() and stored.read_bytes() != raw_report:
@@ -2085,6 +2365,7 @@ assert results['scratch'] == 'ok'
         if fs.digest(data) != record['sha256']:
             raise ValueError('report/evidence content changed or lost: ' + name)
         attempt = next(a for a in self.state['attempts'] if a['id'] == record['attempt_id'])
+        self.check_report_rejection(attempt)
         host = self.receipt(attempt)
         if host['message'].encode('utf-8') != data:
             raise ValueError('report differs from host return: ' + name)
@@ -2435,9 +2716,36 @@ assert results['scratch'] == 'ok'
         raise ValueError('decision outside the standing mandate: ' + action + '; ' + reason)
 
     def diagnose(self, findings, history):
-        """A fresh read-only actor chooses an executable strategy after failed progress."""
+        """Retain and consume one diagnosis; correct malformed output once, never blind retry."""
         self.current()
-        inputs = self.stage_inputs(self.state['candidate'])
+        base_inputs = self.stage_inputs(self.state['candidate'])
+        readiness = self.state.get('task_readiness', {})
+        readiness = {key: readiness.get(key) for key in ('attempt_id', 'report_sha256')}
+        active = self.state.get('recovery_decision', {})
+        basis = {'inputs': base_inputs, 'findings': findings, 'history': history,
+                 'receiving_checkpoint': self.state.get('checkpoint_restored_from')}
+        if active.get('status') in ('pending', 'diagnosed', 'rejected') and 'readiness' in active:
+            original_key = fs.digest(fs.canonical(basis | {'readiness': active['readiness']}))
+            if original_key == active['context_sha256']:
+                # A newly checked readiness prerequisite does not discard a valid,
+                # unconsumed decision. A previously BLOCKED decision can be renewed.
+                readiness = active['readiness']
+        context_key = fs.digest(fs.canonical(basis | {'readiness': readiness}))
+        inputs = base_inputs | {'recovery_context_sha256': context_key}
+        last = next((attempt for attempt in reversed(self.state['attempts'])
+                     if not attempt['stage'].startswith('preflight-')), None)
+        # Older invocations did not bind findings to the diagnosis input. Adopt their
+        # exact host response only while it is still the unconsumed final attempt.
+        if (last and last['stage'] == 'diagnosis' and last['inputs'] == base_inputs and
+                not last.get('recovery_context_sha256')):
+            last['recovery_context_sha256'] = context_key
+            inputs = base_inputs
+        previous = [a for a in self.state['attempts'] if a['stage'] == 'diagnosis' and
+                    (a['inputs'].get('recovery_context_sha256') or
+                     a.get('recovery_context_sha256')) == context_key]
+        self.state['recovery_decision'] = {'context_sha256': context_key, 'findings': findings,
+                                            'readiness': readiness, 'status': 'pending'}
+        self.save()
         properties = {key: {'type': 'string'} for key in
                       ('status', 'input_identity_json', 'action', 'approach', 'reason',
                        'missing_input', 'expected_result', 'capability_check')}
@@ -2452,11 +2760,17 @@ assert results['scratch'] == 'ok'
                   f'Exact input_identity_json: {json.dumps(inputs)}. '
                   f'Findings: {json.dumps(findings)}. Prior approaches: {json.dumps(history)}. '
                   f'Retained reports under {self.runtime}: {json.dumps(self.state.get("reports", {}))}. '
+                  f'Most recent retained diagnosis: {json.dumps(self.state.get("last_diagnosis"))}. '
+                  'On a receiving host, retain the prior proposed strategy and findings but freshly check '
+                  'the specific capabilities needed here; prior host observations do not establish current '
+                  'availability. Reuse the retained investigation instead of repeating unrelated exploration. '
                   'Inspect actual mechanisms and available local inputs. Choose a concrete different approach '
                   'that the implementation/evidence worker can execute, including local prerequisite work. '
                   'Repeated findings require a different method, not another copy of the previous attempt. '
                   'Judge strategy_changed by a materially different method or newly confirmed inputs/capabilities, '
-                  'not by different wording. Check the actual worker boundary: network denied, approval '
+                  'not by different wording. Compare unresolved requirement/source/location identities and '
+                  'the entire candidate history: paraphrased findings and returning to an earlier candidate '
+                  'do not establish useful progress. Check the actual worker boundary: network denied, approval '
                   'escalation disabled, MCP servers/apps/plugins disabled, and no enclosing-host tools inherited. '
                   'Implementation/repair can write the isolated candidate, but cannot alter protected agreement '
                   'or Git metadata. Diagnosis can write only scratch. Do not propose an unavailable host tool '
@@ -2469,40 +2783,112 @@ assert results['scratch'] == 'ok'
                   'unavailable input or authority and its expected result; mere difficulty, elapsed time, or '
                   'a previous failed attempt is not a blocker. ACTIONABLE requires action, approach, and '
                   'reason, with missing_input and expected_result empty. Return the required JSON.')
-        attempt, host = self.dispatch('diagnosis', inputs, prompt, schema=schema)
-        self.current()
-        report = json.loads(host['message'])
-        if (not isinstance(report, dict) or set(report) != set(properties) or
-                any(not isinstance(report[key], bool if field['type'] == 'boolean' else str)
-                    for key, field in properties.items()) or
-                json.loads(report['input_identity_json']) != inputs or
-                report['status'] not in properties['status']['enum'] or
-                report['action'] not in properties['action']['enum'] or not report['reason'].strip()):
-            raise ValueError('invalid or stale recovery diagnosis')
-        if report['status'] == 'BLOCKED':
-            if not report['missing_input'].strip() or not report['expected_result'].strip():
-                raise ValueError('blocked diagnosis must name the unavailable input and expected result')
-        elif (report['action'] == 'none' or not report['approach'].strip() or
-              report['missing_input'] or report['expected_result']):
-            raise ValueError('recovery diagnosis has no executable approach')
-        data = host['message'].encode()
-        path = f'attempts/{attempt["id"]}/report.json'
-        stored = self.runtime / path
-        if stored.exists() and stored.read_bytes() != data:
-            raise ValueError('conflicting recovery diagnosis result')
-        local_save(self.root, self.work, path, data)
-        attempt.update(status='complete', report=path, report_sha256=fs.digest(data))
-        self.state['last_diagnosis'] = {'attempt_id': attempt['id'], 'report': report}
-        self.save()
-        if report['status'] == 'BLOCKED':
-            raise ValueError('recovery needs ' + report['missing_input'] + '; expected: ' + report['expected_result'])
-        check = report['capability_check']
-        if not check.startswith('P2P_RECOVERY_CAPABILITY=') or not check.split('=', 1)[1].strip() or not any(
-                check in event.get('aggregated_output', '').splitlines() and event.get('exit_code') == 0
-                for event in host['executions']):
-            raise ValueError('recovery needs a successful host-recorded capability check for its next step: ' +
-                             report['approach'])
-        return report
+        while True:
+            last = previous[-1] if previous else None
+            if last and last.get('report_validation') == 'rejected':
+                if not last.get('report_format_error'):
+                    self.check_report_rejection(last)
+                if sum(a.get('report_format_error', False) for a in previous) >= 2:
+                    self.state['recovery_decision']['status'] = 'rejected'
+                    self.save()
+                    raise ValueError('recovery diagnosis report is invalid after one format correction: ' +
+                                     last['report_error'] + '; retained response: ' +
+                                     str(self.runtime / last['report']))
+                correction = (' Repair the response format from the retained diagnosis at ' +
+                              str(self.runtime / last['report']) + '. Validation error: ' +
+                              last['report_error'] + '. Reuse its useful observations and the retained reports; '
+                              'do not restart implementation or repeat the full investigation. Return the '
+                              'required JSON and substantiate any ACTIONABLE capability in this host receipt.')
+                attempt, host = self.dispatch('diagnosis', inputs, prompt + correction, schema=schema)
+                previous.append(attempt)
+            elif last:
+                attempt = last
+                # A missing or conflicting receipt remains uncertain. It never earns
+                # a correction attempt merely because the controller has restarted.
+                host = self.receipt(attempt)
+            else:
+                attempt, host = self.dispatch('diagnosis', inputs, prompt, schema=schema)
+                previous.append(attempt)
+            self.current()
+            try:
+                with self.report_validation(attempt, host):
+                    try:
+                        report = json.loads(host['message'])
+                    except (ValueError, TypeError) as error:
+                        raise ReportFormatError('invalid recovery diagnosis JSON: ' + str(error)) from error
+                    if (not isinstance(report, dict) or set(report) != set(properties) or
+                            any(not isinstance(report[key], bool if field['type'] == 'boolean' else str)
+                                for key, field in properties.items()) or
+                            report['status'] not in properties['status']['enum'] or
+                            report['action'] not in properties['action']['enum'] or not report['reason'].strip()):
+                        raise ReportFormatError('invalid recovery diagnosis fields')
+                    try:
+                        reported_inputs = json.loads(report['input_identity_json'])
+                    except ValueError as error:
+                        raise ReportFormatError('invalid recovery diagnosis input identity JSON') from error
+                    if reported_inputs != attempt['inputs']:
+                        raise ValueError('stale recovery diagnosis input identity')
+                    self.state['last_diagnosis'] = {'attempt_id': attempt['id'], 'report': report,
+                                                    'context_sha256': context_key}
+                    if report['status'] == 'BLOCKED':
+                        if not report['missing_input'].strip() or not report['expected_result'].strip():
+                            raise ReportFormatError('blocked diagnosis must name the unavailable input and expected result')
+                    else:
+                        if (report['action'] == 'none' or not report['approach'].strip() or
+                                report['missing_input'] or report['expected_result']):
+                            raise ReportFormatError('recovery diagnosis has no executable approach')
+                        check = report['capability_check']
+                        observed = [event for event in host['executions']
+                                    if check in event.get('aggregated_output', '').splitlines() and
+                                    event.get('exit_code') == 0]
+                        if (not check.startswith('P2P_RECOVERY_CAPABILITY=') or
+                                not check.split('=', 1)[1].strip() or not observed):
+                            raise ValueError('recovery needs a successful host-recorded capability check for its next step: ' +
+                                             report['approach'])
+            except ReportFormatError:
+                continue
+            except ValueError:
+                if attempt.get('report_validation') == 'rejected':
+                    self.state['recovery_decision']['status'] = 'rejected'
+                    self.save()
+                raise
+            data = host['message'].encode()
+            path = f'attempts/{attempt["id"]}/report.json'
+            stored = self.runtime / path
+            if stored.exists() and stored.read_bytes() != data:
+                raise ValueError('conflicting recovery diagnosis result')
+            local_save(self.root, self.work, path, data)
+            attempt.update(status='complete', report=path, report_sha256=fs.digest(data))
+            self.state['recovery_decision'].update(status='blocked' if report['status'] == 'BLOCKED' else 'diagnosed',
+                                                   attempt_id=attempt['id'])
+            if report['status'] == 'BLOCKED':
+                self.state['task_readiness_invalidated'] = report['missing_input'] + '; expected: ' + report['expected_result']
+            self.save()
+            if report['status'] == 'BLOCKED':
+                raise ValueError('recovery needs ' + report['missing_input'] + '; expected: ' + report['expected_result'])
+            return report
+
+    def pending_diagnosis(self):
+        decision = self.state.get('recovery_decision')
+        if decision:
+            return decision['findings'] if decision['status'] in ('pending', 'diagnosed', 'rejected') else None
+        # Reconcile pre-upgrade local reservations/completions without requiring a
+        # new delivery or reconstructing workflow state from conversation text.
+        last = next((attempt for attempt in reversed(self.state['attempts'])
+                     if not attempt['stage'].startswith('preflight-')), None)
+        if not last or last['stage'] != 'diagnosis' or last['status'] == 'retired':
+            return None
+        if self.state.get('last_diagnosis', {}).get('report', {}).get('status') == 'BLOCKED':
+            return None
+        launch_path = self.runtime / 'attempts' / last['id'] / 'launch.json'
+        launch = json.loads(launch_path.read_bytes())
+        if launch.get('attempt_id') != last['id'] or launch.get('inputs') != last['inputs']:
+            raise ValueError('conflicting retained diagnosis context')
+        try:
+            findings, _ = json.JSONDecoder().raw_decode(launch['prompt'].split('Findings: ', 1)[1])
+        except (ValueError, KeyError, IndexError) as error:
+            raise ValueError('retained diagnosis is missing its exact recovery findings') from error
+        return findings
 
     def finish_recovery(self, entry, report):
         generation = self.state['local_git_generations'][-1]
@@ -2516,6 +2902,55 @@ assert results['scratch'] == 'ok'
         self.state['reports'] = {k: v for k, v in self.state['reports'].items() if k not in ('review', 'proof')}
         self.save()
 
+    def recovery_obligations(self, findings):
+        """Track unresolved promises/locations independently of a verifier's prose."""
+        known = set(self.state['requirements'])
+        keys = set()
+        for phase in ('implementation', 'planning', 'review', 'review_gaps', 'proof_gaps'):
+            values = findings.get(phase)
+            if not values:
+                continue
+            named = set()
+            for value in values:
+                if isinstance(value, dict):
+                    source = value.get('source', '')
+                    # Line offsets and finding IDs can change after a repair while
+                    # the same requirement at the same product seam remains open.
+                    location = re.sub(r':\d+(?::\d+)?(?:-\d+)?', '', value.get('location', ''))
+                    keys.add(('review', source, value.get('axis', ''), location))
+                for requirement in known:
+                    if re.search(r'(?<![\w-])' + re.escape(requirement) + r'(?![\w-])', str(value)):
+                        named.add(requirement)
+            if phase == 'implementation':
+                keys.update(('implementation', requirement) for requirement in (named or known))
+            elif phase in ('review', 'review_gaps') and not any(isinstance(value, dict) for value in values):
+                keys.update(('review-gap', requirement) for requirement in (named or known))
+            elif phase == 'planning':
+                keys.update(('planning', requirement) for requirement in (named or known))
+        unproven = set(findings.get('unproven', []))
+        if findings.get('proof_gaps') or unproven:
+            keys.update(('proof', requirement) for requirement in (unproven or known))
+        if findings.get('missing_input'):
+            keys.add(('review-prerequisite',))
+        return [list(key) for key in sorted(keys)]
+
+    def partial_recovery_progress(self, findings, history):
+        if not history or 'implementation' not in findings:
+            return False
+        previous = history[-1]
+        before = previous.get('findings', {}).get('implementation')
+        after = findings['implementation']
+        if not before or not after or previous.get('candidate_after') == previous['candidate_before']:
+            return False
+        known = set(self.state['requirements'])
+        def named(gaps):
+            rows = [{requirement for requirement in known
+                     if re.search(r'(?<![\w-])' + re.escape(requirement) + r'(?![\w-])', gap)}
+                    for gap in gaps if isinstance(gap, str)]
+            return set().union(*rows) if len(rows) == len(gaps) and all(rows) else set()
+        remaining, old = named(after), named(before)
+        return bool(remaining and remaining < old)
+
     def recover(self, findings, proof=None, force_diagnosis=False):
         allowed = self.state['limits'].get('repairs', 1)
         used = sum(a['stage'] == 'repair' for a in self.state['attempts'])
@@ -2523,26 +2958,49 @@ assert results['scratch'] == 'ok'
             raise ValueError('automatic repair limit exhausted; review/proof gaps remain')
         fingerprint = fs.digest(fs.canonical(findings))
         history = self.state.setdefault('recovery_history', [])
+        obligations = self.recovery_obligations(findings)
+        current_key = candidate_key(self.state['candidate'])
+        completed = [entry for entry in history if entry['status'] in ('complete', 'worker-replaced')]
+        cycle = any(entry['candidate_before'] == current_key for entry in completed)
         previous = [entry for entry in history if entry['status'] in ('complete', 'worker-replaced') and
                     (entry['fingerprint'] == fingerprint or
-                     entry.get('candidate_after') == entry['candidate_before'] == candidate_key(self.state['candidate']))]
+                     (obligations and entry.get('obligations', self.recovery_obligations(entry['findings'])) == obligations) or
+                     entry.get('candidate_after') == entry['candidate_before'] == current_key or cycle)]
+        if (self.partial_recovery_progress(findings, completed) and not cycle and
+                self.state.get('recovery_decision', {}).get('status') not in ('pending', 'diagnosed', 'rejected')):
+            force_diagnosis = False
         plan = {'action': 'implementation', 'approach': 'Correct the named implementation and evidence gaps.'}
         if force_diagnosis or previous:
             plan = self.diagnose(findings, history)
             if previous and not plan['strategy_changed']:
                 raise ValueError('recovery diagnosis found no new executable strategy: ' + plan['reason'])
+            method = lambda value: ' '.join(re.findall(r'\w+', value.casefold()))
+            if previous and any(entry['action'] == plan['action'] and
+                                method(entry['approach']) == method(plan['approach']) and
+                                entry.get('capability_check') == plan.get('capability_check') for entry in completed):
+                raise ValueError('recovery diagnosis repeated an exhausted strategy without new capabilities: ' +
+                                 plan['approach'])
             if plan['action'] == 'plan-acceptance':
                 self.handoff('plan-acceptance', plan['reason'])
+                self.state['recovery_decision']['status'] = 'consumed'
+                self.save()
                 return {'status': 'REPLANNED'}
         policy = self.state.get('autonomy')
         decision = 'evidence' if plan['action'] == 'evidence' else 'repair'
         if policy and decision not in policy['policy']['decisions']:
             raise ValueError('recovery decision outside the standing mandate: ' + decision)
-        entry = {'fingerprint': fingerprint, 'findings': findings, 'action': plan['action'],
-                 'approach': plan['approach'], 'candidate_before': candidate_key(self.state['candidate']),
+        # An old reserved diagnosis must finish before an upgraded readiness
+        # context can launch. Establish that readiness before any new mutator.
+        if not self.state.get('preflight_complete') and not self.preflight():
+            raise ValueError('recovery is waiting for a retained stage response before task readiness')
+        entry = {'fingerprint': fingerprint, 'findings': findings, 'obligations': obligations, 'action': plan['action'],
+                 'approach': plan['approach'], 'candidate_before': current_key,
                  'status': 'reserved', 'started_at': now(), 'dispatch_offset': len(self.state['attempts'])}
         if 'capability_check' in plan:
             entry['capability_check'] = plan['capability_check']
+            decision = self.state['recovery_decision']
+            entry['diagnosis_attempt_id'] = decision['attempt_id']
+            decision['status'] = 'consumed'
         history.append(entry)
         self.state['repair_skill'] = 'repair' if proof and proof['status'] != 'PROVEN' else 'implementation'
         self.save()
@@ -2558,6 +3016,14 @@ assert results['scratch'] == 'ok'
         # Validate their exact recorded receipt, never launch them a second time.
         last = self.state['attempts'][-1] if self.state['attempts'] else None
         history = self.state.get('recovery_history', [])
+        if last and last['stage'] != 'diagnosis' and last.get('report_validation') == 'rejected':
+            if last['stage'] in ('implementation', 'repair'):
+                generation = self.state['local_git_generations'][-1]
+                if (generation.get('source_attempt') or {}).get('attempt_id') != last['id']:
+                    self.timed_source_stable()
+                    self.capture(last['stage'])
+                    self.save()
+            self.check_report_rejection(last)
         if last and last['stage'] in ('implementation', 'repair') and last['status'] != 'retired':
             name = last['stage']
             if last['status'] in ('reserved', 'failed'):
@@ -2574,7 +3040,17 @@ assert results['scratch'] == 'ok'
                 self.finish_recovery(history[-1], report)
             self.save()
         self.current()
-        self.preflight()
+        ready = self.preflight()
+        if last and last['stage'] in ('review', 'proof') and last['status'] in ('reserved', 'failed'):
+            self.stage(last['stage'])
+            self.state['status'] = 'RUNNING'
+            self.save()
+            if not ready:
+                self.preflight()
+        pending_findings = self.pending_diagnosis()
+        if pending_findings is not None:
+            proof = self.read_report('proof') if 'proof' in self.state.get('reports', {}) else None
+            self.recover(pending_findings, proof, force_diagnosis=True)
         while True:
             while not self.state.get('implementation_complete'):
                 if 'repair' in self.state.get('reports', {}):
@@ -2594,7 +3070,9 @@ assert results['scratch'] == 'ok'
                 self.stage('review')
             review = self.read_report('review')
             if review['status'] == 'BLOCKED':
-                if self.state['status'] == 'BLOCKED':
+                if self.state['status'] == 'BLOCKED' and not any(
+                        a['stage'] in ('diagnosis', 'planning', 'planning-audit') and
+                        a['status'] in ('reserved', 'failed') for a in self.state['attempts']):
                     self.state['reports'].pop('review')
                     self.save()
                     review = self.stage('review')
@@ -2665,15 +3143,16 @@ assert results['scratch'] == 'ok'
                    'No external effects. The controller saves your exact response and owns adoption.')
         attempt, host = self.dispatch(stage, inputs, f'Read {skill["path"]} and its references. ' + prompt, schema=schema)
         self.current()
-        report = json.loads(host['message'])
-        if (not isinstance(report, dict) or set(report) != set(fields) or
-                json.loads(report.get('input_identity_json', '{}')) != inputs):
-            raise ValueError('invalid or stale ' + stage + ' result')
-        for name, field in fields.items():
-            if (field['type'] == 'string' and not isinstance(report[name], str) or
-                    field['type'] == 'boolean' and not isinstance(report[name], bool) or
-                    'enum' in field and report[name] not in field['enum']):
-                raise ValueError('invalid ' + stage + ' field: ' + name)
+        with self.report_validation(attempt, host):
+            report = json.loads(host['message'])
+            if (not isinstance(report, dict) or set(report) != set(fields) or
+                    json.loads(report.get('input_identity_json', '{}')) != inputs):
+                raise ValueError('invalid or stale ' + stage + ' result')
+            for name, field in fields.items():
+                if (field['type'] == 'string' and not isinstance(report[name], str) or
+                        field['type'] == 'boolean' and not isinstance(report[name], bool) or
+                        'enum' in field and report[name] not in field['enum']):
+                    raise ValueError('invalid ' + stage + ' field: ' + name)
         data = host['message'].encode()
         path = f'attempts/{attempt["id"]}/report.json'
         stored = self.runtime / path
@@ -2736,6 +3215,7 @@ assert results['scratch'] == 'ok'
                       'approval_source': self.state['autonomy']['policy']['approval_source']}
         local_save(self.root, self.work, 'runtime/agreement-transition.json', encoded(transition))
         self.reconcile_agreement()
+        self.preflight()
 
     def reconcile_agreement(self):
         path = self.runtime / 'agreement-transition.json'

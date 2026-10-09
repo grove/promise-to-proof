@@ -175,6 +175,11 @@ destination. A plan change still invalidates routing and requires reconciliation
    sandbox must keep candidate inputs read-only. Keep controller stage reports
    and diagnostics under the external P2P execution directory until successful cleanup;
    diagnostics may write only to controller runtime scratch.
+   Check the task's known prerequisite evidence, tools, runtimes and services in
+   that actual restricted context before implementation. Reuse the existing
+   preflight contexts for this inspection. Use small safe checks and name the
+   exact missing input and expected result when blocked. Do not run a full suite
+   to test readiness or treat the behavior being implemented as a prerequisite.
 3. Record the work-item path, repository, branch, starting commit, and existing tracked
    and untracked work. Preserve unrelated work. When ownership of overlapping
    edits is unclear, stop before changing them. Do not stash, reset, clean, or
@@ -344,6 +349,13 @@ obtain any required approval before changing local routing.
    limits. Repeated gaps require fresh diagnosis and a different executable
    approach. Retain all attempts; stop only for an identified unavailable input,
    missing authority, exhausted explicit limit, or no new executable strategy. Never weaken the agreement or checks to get green.
+   Full scope does not require repeating every earlier command. Give each
+   verifier its own compatible previous report, original command evidence,
+   exact prior candidate and complete delta when the controller retains them.
+   Apply the protocol's focused re-verification rules: the verifier decides
+   applicability, reruns affected checks, and issues a fresh report covering
+   every obligation. Missing history requires fresh checking. Do not share the
+   other verifier's conclusion or make a new candidate inherit an old verdict.
 10. Resume from the same `.p2p/work/<slug>/contract.md` path by reading its linked inputs and
     external invocation state, candidate, reports, and evidence. Recheck
     binding parent/spec hashes and comparison base, and compare the entire

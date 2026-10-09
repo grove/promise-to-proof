@@ -51,13 +51,15 @@ class WorkingStyleRules(unittest.TestCase):
                 self.assertIn(phrase, self.protocol)
 
     def test_pragmatism_preserves_rigor_and_authority(self):
+        # Protect the required wording independently of Markdown line wrapping.
+        protocol = " ".join(self.protocol.split())
         for guard in (
             "Leverage never authorizes weakening or reinterpreting an accepted promise",
             "Pragmatic does not mean careless.",
             "A recommendation is not a verdict, proof, approval, or new authority.",
         ):
             with self.subTest(guard=guard):
-                self.assertIn(guard, self.protocol)
+                self.assertIn(guard, protocol)
 
     def test_delivery_orchestrator_translates_mechanics_for_people(self):
         deliver = text("skills/productivity/deliver-issue/SKILL.md")

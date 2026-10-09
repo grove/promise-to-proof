@@ -256,7 +256,8 @@ def main(action):
 
 
 if __name__ == '__main__':
-    if sys.argv[1] == 'child':
-        child()
-    else:
-        main(sys.argv[1])
+    with fixture.fixture_host():
+        if sys.argv[1] == 'child':
+            child()
+        else:
+            main(sys.argv[1])

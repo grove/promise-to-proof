@@ -66,6 +66,34 @@ def git(root, *args):
     return result.stdout
 
 
+def git_blobs(root, object_ids):
+    """Read exact Git blobs in one process, preserving binary data and order."""
+    object_ids = tuple(dict.fromkeys(object_ids))
+    if not object_ids:
+        return {}
+    result = subprocess.run(["git", "-C", str(root), "cat-file", "--batch"],
+                            input="".join(oid + "\n" for oid in object_ids).encode("ascii"),
+                            capture_output=True)
+    if result.returncode:
+        raise ValueError(result.stderr.decode().strip() or "Git blob batch failed")
+    data, offset, blobs = result.stdout, 0, {}
+    for oid in object_ids:
+        newline = data.find(b"\n", offset)
+        header = data[offset:newline].split(b" ") if newline >= 0 else []
+        if (len(header) != 3 or header[0] != oid.encode("ascii") or
+                header[1] != b"blob" or not header[2].isdigit()):
+            raise ValueError("missing or malformed Git blob batch response: " + oid)
+        start = newline + 1
+        end = start + int(header[2])
+        if end >= len(data) or data[end:end + 1] != b"\n":
+            raise ValueError("truncated Git blob batch response: " + oid)
+        blobs[oid] = data[start:end]
+        offset = end + 1
+    if offset != len(data):
+        raise ValueError("unexpected trailing Git blob batch response")
+    return blobs
+
+
 def execution_directory(root, work):
     """Reuse a retained location; configuration selects only new execution state."""
     root = Path(root).resolve()
@@ -246,17 +274,31 @@ def setup(root):
     ignore = root / ".gitignore"
     if not ignore.is_file() or "/.p2p/" not in ignore.read_text().splitlines():
         raise ValueError("project .gitignore must contain the exact /.p2p/ rule")
-    result = subprocess.run(["git", "-C", str(root), "check-ignore", "--no-index", "--", ".p2p/work/probe"],
-                            capture_output=True)
-    if result.returncode != 0:
-        raise ValueError("repo-local .p2p state is not effectively ignored; resolve conflicting ignore rules")
-    detail = subprocess.run(["git", "-C", str(root), "check-ignore", "-v", "--no-index", "--", ".p2p/work/probe"],
-                            capture_output=True, text=True, check=True).stdout
-    if not detail.startswith(".gitignore:") and not detail.startswith(str(ignore) + ":"):
-        raise ValueError("project .gitignore rule is overridden by a higher-priority ignore source")
+    probe = ".p2p/work/probe"
+    names = [probe]
     if state.is_dir():
-        require_ignored(root, *(path.relative_to(root).as_posix() for path in state.rglob("*")
-                                if path.is_file() or path.is_symlink()))
+        names.extend(path.relative_to(root).as_posix() for path in state.rglob("*")
+                     if path.is_file() or path.is_symlink())
+    # One batch verifies both the project-owned rule and every existing record.
+    # Recheck on each call: ignore files and index entries may change mid-delivery.
+    result = subprocess.run(["git", "-C", str(root), "check-ignore", "-v", "-z", "--no-index", "--stdin"],
+                            input=b"\0".join(os.fsencode(name) for name in names) + b"\0",
+                            capture_output=True)
+    if result.returncode not in (0, 1):
+        raise ValueError("repo-local .p2p state is not effectively ignored; resolve conflicting ignore rules")
+    fields = result.stdout.split(b"\0")
+    if fields[-1] or (len(fields) - 1) % 4:
+        raise ValueError("could not verify repo-local ignore rules")
+    matches = {fields[index + 3]: (fields[index], fields[index + 2])
+               for index in range(0, len(fields) - 1, 4)}
+    for name in names:
+        match = matches.get(os.fsencode(name))
+        if match is None or match[1].startswith(b"!"):
+            if name == probe:
+                raise ValueError("repo-local .p2p state is not effectively ignored; resolve conflicting ignore rules")
+            raise ValueError("repo-local artifact path is not ignored: " + name)
+    if matches[os.fsencode(probe)][0] not in (b".gitignore", os.fsencode(ignore)):
+        raise ValueError("project .gitignore rule is overridden by a higher-priority ignore source")
     return {"storage": "repository-local", "root": ".p2p/work"}
 
 
@@ -265,7 +307,7 @@ def snapshot(root, commit=None, exclude=()):
     entries = []
     if commit:
         records = git(root, "ls-tree", "-rz", "--full-tree", commit).split(b"\0")
-        sources = []
+        objects = []
         for record in filter(None, records):
             meta, name = record.split(b"\t", 1)
             mode, kind, oid = meta.decode().split()
@@ -274,7 +316,9 @@ def snapshot(root, commit=None, exclude=()):
                 continue
             if kind != "blob":
                 raise ValueError(f"submodules are not supported: {path}")
-            sources.append((path, mode, git(root, "cat-file", "blob", oid)))
+            objects.append((path, mode, oid))
+        blobs = git_blobs(root, (oid for _, _, oid in objects))
+        sources = [(path, mode, blobs[oid]) for path, mode, oid in objects]
     else:
         names = set(git(root, "ls-files", "-z", "--cached", "--others", "--exclude-standard").split(b"\0"))
         sources = []
