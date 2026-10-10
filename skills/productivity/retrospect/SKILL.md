@@ -145,3 +145,75 @@ suggestion IDs. For a possible violation, give
 `/prove <saved contract>; candidate <exact candidate>`. If more evidence is
 needed, give its exact command and expected result. If nothing remains open,
 say no further action is needed.
+## Selected learning preservation and unfinished work (#35)
+
+The existing proven retrospective above remains the normal path. It is
+optional and must not run automatically on an uneventful delivery. Before
+cleanup of a completed delivery, finish any chosen retrospective while its
+original evidence still exists. Use `Learning preservation: none` when no
+worthwhile lesson was selected; it creates no learning or cleanup gate.
+
+For a selected useful suggestion, retain the existing retrospective's
+observations, suggestions, human disposition and register decisions. Also
+record these exact single-line fields in `retrospective.md`:
+
+```text
+Learning preservation: selected
+Delivery identity: <the saved invocation_id>
+Contract SHA-256: <saved 64-character digest>
+Candidate identity: <saved exact candidate key, or none>
+Evidence status: PROVEN
+```
+
+Name a `## Suggested learnings` section with existing pending or human-approved
+dispositions. Capture the smallest safe supporting observations as existing
+project documents or saved P2P artifacts, not raw command logs. Each supporting
+reference is a line under `## Retained evidence`:
+
+```text
+- E1: [What was observed](.p2p/work/<slug>/artifacts/safe-evidence.md) SHA-256 `<digest>` - What this demonstrates and its limitation
+```
+
+Paths are repository-relative (not relative to this report). Source files,
+digests and observations must remain accessible in the selected #82 checkpoint
+on another computer. Do not record secrets, raw transcripts, local scratch
+paths, or full workspace snapshots. Reuse the existing advisory register
+and explicit human acceptance rules; only an accepted scoped suggestion belongs
+in that register. Register acceptance never promotes advice into a rule.
+
+**Explicit terminal observation handoff:** `/retrospect` itself still requires
+matching full PROVEN proof. For an explicitly abandoned or terminally blocked
+delivery, an authorized operator can instead save a *terminal learning handoff*
+in the same `retrospective.md` location using the observation and disposition
+sections above, with `Evidence status: UNPROVEN`,
+`Terminal disposition: abandoned` or `terminally blocked`, and
+`Terminal decision source: <retrievable exact authorization>`. Never claim
+review, acceptance, successful proof, or completed delivery. Require a saved
+BLOCKED invocation and an actual explicit human terminal decision. Uncertain
+worker termination, pending repair, unapplied authority, unresolved effects
+and necessary recovery receipts remain protected: distillation is not cleanup
+authorization for unfinished work. The normal /retrospect proof prerequisite
+cannot be bypassed by relabeling this handoff.
+
+Check the selected evidence and its existing checkpoint with:
+
+```bash
+python3 <delivery-skill-dir>/scripts/p2p_learning.py --repo <root> \
+  --contract .p2p/work/<slug>/contract.md
+```
+
+After authorized Git/GitHub checkpoint publication, add `--portable
+--remote origin` to require remote readback and actual required Git objects.
+Never call a local-only digest portable. Before completed-delivery cleanup
+deletes local execution material, the existing cleanup path verifies this
+portable preservation again. A missing observation, changed input or
+unpublished checkpoint blocks deletion, retaining recovery state intact.
+An unfinished handoff must be published and independently restored if desired;
+it never enables successful-delivery cleanup.
+
+In a fresh checkout, use the existing checkpoint restore procedure, open
+`.p2p/work/<slug>/retrospective.md` and its cited safe evidence, compare hashes,
+and then consult any explicitly accepted entry in the project advisory register.
+If no lesson was selected or the candidate was rejected, there is no durable
+learning to adopt. No new stage, acceptance database or historical archive
+is created.

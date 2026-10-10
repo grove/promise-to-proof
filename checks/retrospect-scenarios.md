@@ -162,3 +162,33 @@ In both cases, confirm that the presence or absence of a learning candidate did
 not affect the delivery's REVIEWED/PROVEN verdicts, repair allowance, contract,
 or publication authority.
 
+
+## Selected learning survives cleanup (#35)
+
+In an authorized disposable repository, complete a delivery with no useful
+learning. Pass when no new model stage is run, no register entry appears, and
+existing cleanup works unchanged.
+
+Then complete one delivery containing an evidence-backed learning candidate
+and independently validate it against saved current observations and any later
+contradictory proof. Reject contradicted or unsupported advice. For accepted
+advice, retain a scoped retrospective with the exact invocation, agreement,
+candidate, disposition and one minimal nonsecret observation. Publish the
+existing #82 checkpoint with the selected observation, verify actual shared
+readback and required remote objects, perform normal cleanup and restore the
+checkpoint in a fresh checkout. Pass only when the report, original observation
+and project advisory entry can be read and independently checked there.
+
+Repeat with an unpublished checkpoint, a broken source digest, an unavailable
+report file, a deleted local-only attachment and a lost write response. Pass
+when selected-learning cleanup blocks without destroying recovery material.
+The checkpoint does not automatically publish or authorize a new remote effect.
+
+For an explicitly abandoned or terminally blocked delivery, prepare an
+authorized terminal observation handoff with `Evidence status: UNPROVEN`,
+human decision source, exact saved invocation, and safe evidence. Pass when
+it can be retained through #82 under permitted publication authority without
+granting acceptance or running the proof-only `/retrospect`. Verify that an
+unreconciled worker, effect, source amendment or ordinary recoverable blocked
+delivery cannot be cleaned through this handoff. Rejected, pending and private
+candidate material never becomes binding policy or a new raw history archive.

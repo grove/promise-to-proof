@@ -1307,6 +1307,16 @@ def checkpoint_documents(root, work):
             pending.extend([pointer["origin"], origin_plan])
         if file.suffix == ".md":
             referenced_hashes.update(re.findall(r"[a-f0-9]{64}", file.read_text()))
+        if relative.endswith("/retrospective.md") and relative.startswith(".p2p/work/"):
+            # Selected lessons keep only explicitly cited safe, hash-checked
+            # evidence files, using the existing checkpoint transport.
+            content = file.read_text()
+            if re.search(r"^Learning preservation: selected$", content, re.M):
+                for evidence_path in re.findall(
+                        r"^- E[1-9][0-9]*: \[[^\]\n]+\]\(([^)\n]+)\) SHA-256 `[a-f0-9]{64}` - ",
+                        content, re.M):
+                    safe(root, evidence_path)
+                    pending.append(evidence_path)
         if WORK.fullmatch(relative):
             owner = f".p2p/work/{work_slug(relative)}"
             if owner not in owners:
