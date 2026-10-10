@@ -12,6 +12,7 @@ from pathlib import Path
 import platform
 import subprocess
 import sys
+import tempfile
 import time
 from types import SimpleNamespace
 
@@ -119,7 +120,7 @@ def observed_defect(report, expected):
     return False
 
 
-def judgment_mismatches(review, proof, expected):
+def judgment_mismatches(review, proof, expected, previous_review=None):
     errors = []
     for stage, report in (("review", review), ("proof", proof)):
         if report.get("status") != expected[stage]:
@@ -132,6 +133,20 @@ def judgment_mismatches(review, proof, expected):
             errors.append(f"proof falsely accepted missing obligation {requirement}")
     if expected["proof"] == "PROVEN" and any(row.get("verdict") != "proven" for row in rows.values()):
         errors.append("PROVEN result contains an unproven requirement")
+    reconciled = expected.get("reconciles_review_finding")
+    if reconciled:
+        # Reconciliation is an independent, fresh full-scope judgment. The old
+        # material finding and original report stay intact; the new report must
+        # account for the obligation without inheriting the old blocker.
+        earlier = (previous_review or {}).get("findings", [])
+        covered = {row["id"] for row in review.get("requirements", [])
+                   if row.get("observation", "").strip()}
+        if not any(f.get("source") == reconciled for f in earlier):
+            errors.append("no earlier material finding to reconcile for " + reconciled)
+        if reconciled not in covered or review.get("status") != "REVIEWED":
+            errors.append("fresh review did not reconcile the corrected " + reconciled + " finding")
+        if any(f.get("source") == reconciled for f in review.get("findings", [])):
+            errors.append("corrected obligation still has a review finding: " + reconciled)
     return errors
 
 
@@ -167,8 +182,55 @@ def observable_checks(delivery, candidate, case_dir):
     return result
 
 
-def run_case(output, data, case, fixture_sha, stage_seconds):
-    case_dir = output / case["id"]
+
+
+def guard_sensitivity_checks(delivery, candidate, data, case_dir):
+    """Independent regression-guard oracle; never an instruction for reviewers.
+
+    On a disposable copy of the exact candidate product tree, deliberately
+    substitute an independently known broken implementation and rerun the
+    *existing* tests. This documents whether the supplied regression guard would
+    actually catch the defect. The workers only see the unmodified candidate.
+    """
+    observations = []
+    for probe in candidate.get("guard_probes", []):
+        source = data["implementations"][probe["implementation"]]
+        with tempfile.TemporaryDirectory(prefix="guard-oracle-", dir=case_dir) as temporary:
+            scratch = Path(temporary) / "candidate"
+            d.materialize(scratch, d.fs.snapshot(delivery.workspace))
+            replacement = {}
+            for path in probe["replace"]:
+                if path not in source:
+                    raise ValueError("missing oracle replacement: " + path)
+                evaluation_path = d.fs.safe(scratch, path)
+                if not evaluation_path.exists():
+                    raise ValueError("missing original implementation: " + path)
+                product_file(scratch, path, source[path])
+                replacement[path] = d.fs.digest(source[path].encode())
+            env = os.environ.copy()
+            env.update({"PYTHONDONTWRITEBYTECODE": "1", **probe.get("env", {})})
+            command = [sys.executable, "-B", "-m", "unittest", "discover",
+                       "-s", "tests", "-p", "test_*.py"]
+            try:
+                result = subprocess.run(command, cwd=scratch, env=env,
+                                        capture_output=True, text=True, timeout=30)
+                observed = {"exit": result.returncode,
+                            "stdout": result.stdout, "stderr": result.stderr}
+            except subprocess.TimeoutExpired as error:
+                observed = {"timeout": str(error)}
+            observations.append({
+                "id": probe["id"], "mutation": replacement, "environment": probe.get("env", {}),
+                "expected_exit": probe["expected_exit"], "observed": observed,
+                "match": observed.get("exit") == probe["expected_exit"],
+                "note": "Private, controlled fixture sensitivity, not a reviewer requirement or live-host judgment",
+            })
+    result = {"probes": observations, "passed": all(item["match"] for item in observations)}
+    write_json(case_dir / "guard-sensitivity.json", result)
+    return result
+
+def run_case(output, data, case, fixture_sha, stage_seconds, position=1):
+    # Neutral directory names do not hint at the expected verdict or defect to workers.
+    case_dir = output / f"candidate-{position:03d}"
     case_dir.mkdir()
     summary = {"fixture": case["id"], "rationale": case["rationale"],
                "manifest_sha256": fixture_sha, "kind": "live-host (Codex CLI; no fixture transport)",
@@ -183,10 +245,14 @@ def run_case(output, data, case, fixture_sha, stage_seconds):
                        installed_skills=delivery.state["skills"], host=delivery.state["host"],
                        runtime=str(delivery.runtime))
         former_key = None
+        earlier_review = None
+        previous_sha = None
+        previous_path = None
         for index, spec in enumerate(case["candidates"]):
-            entry = {"name": spec["name"], "expected": spec["expected"], "passed": False}
+            # Expected judgments and oracle answers live only in the evaluator until
+            # the independent stages finish. Do not emit them before the worker runs.
+            entry = {"name": spec["name"], "passed": False}
             summary["candidates"].append(entry)
-            write_json(case_dir / "summary.json", summary)
             before_attempts = len(delivery.state["attempts"])
             captured = capture_fixed_candidate(delivery, candidate_files(data, spec))
             entry["candidate"] = d.identity(captured)
@@ -217,19 +283,29 @@ def run_case(output, data, case, fixture_sha, stage_seconds):
                 "receipt": str(delivery.runtime / "attempts" / a["id"] / "exit.json"),
                 "events": str(delivery.runtime / "attempts" / a["id"] / "events.jsonl"),
             } for a in delivery.state["attempts"][before_attempts:]]
-            errors.extend(judgment_mismatches(review, proof, spec["expected"]))
+            errors.extend(judgment_mismatches(review, proof, spec["expected"], earlier_review))
+            if previous_path is not None and d.fs.digest(previous_path.read_bytes()) != previous_sha:
+                errors.append("a prior review was modified rather than reconciled by a fresh report")
+            earlier_review = review
+            previous_path = delivery.runtime / delivery.state["reports"]["review"]["path"]
+            previous_sha = d.fs.digest(previous_path.read_bytes())
             if d.identity(delivery.current()) != d.identity(captured):
                 errors.append("verifier mutated fixed candidate")
             if any(a["stage"] in ("implementation", "repair") for a in
                    delivery.state["attempts"][before_attempts:]):
                 errors.append("evaluation unexpectedly ran implementation or repair")
-            oracle = observable_checks(delivery, spec, case_dir / spec["name"])
+            oracle = observable_checks(delivery, spec, case_dir / f"observation-{index + 1:02d}")
+            guard = guard_sensitivity_checks(delivery, spec, data,
+                                             case_dir / f"observation-{index + 1:02d}")
             entry["oracle"] = oracle
+            entry["guard_sensitivity"] = guard
             if not oracle["passed"]:
                 errors.append("independent CLI observations or supplied green tests disagreed")
+            if not guard["passed"]:
+                errors.append("regression guard sensitivity did not match the independent fixture oracle")
             if d.identity(delivery.current()) != d.identity(captured):
                 errors.append("oracle probes mutated the fixed candidate")
-            entry.update(passed=not errors, mismatches=errors)
+            entry.update(expected=spec["expected"], passed=not errors, mismatches=errors)
             write_json(case_dir / "summary.json", summary)
         summary["passed"] = all(item["passed"] for item in summary["candidates"])
         summary["measurement"] = d.result(delivery)["measurement"]  # Existing #59 accounting.
@@ -275,17 +351,19 @@ def main(argv=None):
         execution = output / "executions"
         execution.mkdir()
         os.environ["P2P_EXECUTION_ROOT"] = str(execution)
-        for case in selected:
-            result = run_case(output, data, case, identity, args.max_stage_seconds)
-            summary["cases"].append({"fixture": case["id"], "passed": result["passed"],
-                                     "summary": str(output / case["id"] / "summary.json")})
+        for position, case in enumerate(selected, 1):
+            result = run_case(output, data, case, identity, args.max_stage_seconds, position)
+            summary["cases"].append({
+                "fixture": case["id"], "passed": result["passed"],
+                "summary": str(output / f"candidate-{position:03d}" / "summary.json"),
+            })
             write_json(output / "summary.json", summary)
         summary["passed"] = all(item["passed"] for item in summary["cases"])
         # A platform check or attempted admission alone is not live evidence.
         # Both independent stages must have real, read-back host receipts.
         receipts = []
-        for case in selected:
-            case_result = json.loads((output / case["id"] / "summary.json").read_text())
+        for item in summary["cases"]:
+            case_result = json.loads(Path(item["summary"]).read_text())
             for candidate in case_result["candidates"]:
                 attempts = candidate.get("stage_attempts", [])
                 verified = {a["stage"] for a in attempts if a.get("session_id") and
