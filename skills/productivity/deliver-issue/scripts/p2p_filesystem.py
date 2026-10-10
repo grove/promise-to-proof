@@ -495,7 +495,7 @@ def entry_source(root, request, issue_repository=None):
 
     def matches(work, contract_text, handoff):
         if kind == "issue":
-            return any(re.fullmatch(r"Source attribution:\\s*" + re.escape(identity) + r"(?:[;\\s].*)?", line.strip())
+            return any(re.fullmatch(r"Source attribution:\s*" + re.escape(identity) + r"(?:[;\s].*)?", line.strip())
                        for line in document_lines(contract_text))
         if kind == "spec":
             for line in document_lines(contract_text):
