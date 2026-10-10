@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Matched, offline cold-delivery timing. Never interpreted as live model speed.
 
-Before/after only swaps Delivery._capture with the exact issue #57 main revision
-method; all other host, skill, preflight, verification, recovery, and checkpoint
-paths use the current implementation. Source and candidate outputs are checked.
+Before/after replaces only Delivery._capture and source_stable with their
+exact pre-change versions from issue #57 main; host, skills, preflight,
+verification, recovery, and checkpoint code stays identical. Source and
+candidate outcomes are checked. No live model calls are made.
 """
 import argparse
 import ast
@@ -23,17 +24,17 @@ PROJECT = Path(__file__).resolve().parents[1]
 SOURCE = "skills/productivity/deliver-issue/scripts/p2p_delivery.py"
 
 
-def historical_capture():
+def historical_method(name):
     text = d.fs.git(PROJECT, "show", f"{BASE}:{SOURCE}").decode()
     module = ast.parse(text)
     cls = next(item for item in module.body if isinstance(item, ast.ClassDef)
                and item.name == "Delivery")
     method = next(item for item in cls.body if isinstance(item, ast.FunctionDef)
-                  and item.name == "_capture")
+                  and item.name == name)
     namespace = dict(vars(d))
     exec(compile(ast.Module(body=[method], type_ignores=[]),
                  BASE + ":" + SOURCE, "exec"), namespace)
-    return namespace["_capture"]
+    return namespace[name]
 
 
 def episode(use_historical=False):
@@ -64,7 +65,8 @@ def episode(use_historical=False):
         finally:
             stats["checkpoint_calls"] += 1
             stats["checkpoint_seconds"] += time.monotonic() - t
-    capture_fn = historical_capture() if use_historical else original_capture
+    capture_fn = historical_method("_capture") if use_historical else original_capture
+    stable_fn = historical_method("source_stable") if use_historical else original_source_stable
     def capture(self, *args, **kwargs):
         t = time.monotonic()
         try:
@@ -74,7 +76,7 @@ def episode(use_historical=False):
     def stable(self):
         t = time.monotonic()
         try:
-            return original_source_stable(self)
+            return stable_fn(self)
         finally:
             stats["source_stable_seconds"] += time.monotonic() - t
 
@@ -127,6 +129,10 @@ def compare(baseline, optimized):
               "checkpoint_seconds", "capture_seconds", "source_stable_seconds")
     before = {k: med(k, baseline) for k in fields}
     after = {k: med(k, optimized) for k in fields}
+    if after["snapshots"] >= before["snapshots"] or after["git_processes"] > before["git_processes"]:
+        raise AssertionError("first-pass optimization did not remove measured redundant work")
+    if after["checkpoint_calls"] != before["checkpoint_calls"]:
+        raise AssertionError("optimization changed durable checkpoint boundaries")
     return {"baseline": before, "optimized": after,
             "elapsed_saved_percent": (round(100 * (before["elapsed_seconds"]-after["elapsed_seconds"]) /
                                             before["elapsed_seconds"], 1)
