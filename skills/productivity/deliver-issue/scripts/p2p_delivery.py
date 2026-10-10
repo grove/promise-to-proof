@@ -1577,6 +1577,8 @@ def restore_checkpoint(root, checkpoint, contents, checkpoint_data, *,
             'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host')
     if state.get('instruction_identity'):
         keys += ('instruction_identity',)
+    if state.get('implementation_slice_version'):
+        keys += ('implementation_slice_version',)
     local_save(root, work, 'runtime/admission.json', encoded({key: state[key] for key in keys}))
     delivery.save()
     delivery.read_only = True
