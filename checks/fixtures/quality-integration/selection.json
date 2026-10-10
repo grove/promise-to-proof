@@ -1,0 +1,27 @@
+{
+  "schema": "promise-to-proof/quality-integration/v1",
+  "purpose": "Small combined acceptance-quality regression across merged #44, #41, #42 and #43. Reuses existing #72 stage fixtures and does not add a production workflow stage.",
+  "audit": [
+    {
+      "id": "clear-source",
+      "expected": "READY_FOR_APPROVAL",
+      "spec_suffix": ""
+    },
+    {
+      "id": "contradictory-source",
+      "expected": "BLOCKED",
+      "spec_suffix": "\nA username consisting exclusively of spaces and/or tabs is valid. For this input the CLI must echo the exact whitespace to stdout and exit zero.\n"
+    }
+  ],
+  "cases": [
+    "review-meaningful-tests",
+    "green-but-incomplete",
+    "unrelated-scope-expansion",
+    "review-overmocked-boundary",
+    "verification-durable-control",
+    "review-reconcile-corrected-finding"
+  ],
+  "low_risk_case": "review-meaningful-tests",
+  "optional_advice": "\nOptional improvement, not an acceptance criterion: a maintainer may rename the internal normalize helper for readability, but the existing name is fine.\n",
+  "expectations": "No audit ambiguity reaches implementation; the clear low-risk example passes without polish, material false acceptance and overblocking fail, a durable high-risk seam is addressed, and a repaired candidate gets fresh identity-bound review/proof."
+}
