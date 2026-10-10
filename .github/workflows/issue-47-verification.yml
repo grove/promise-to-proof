@@ -1,0 +1,28 @@
+name: Issue 47 offline finalization verification (temporary)
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Fetch pinned historical revisions
+        run: git fetch --no-tags origin cc27a47f5ee765cff3cf13b21c36f974cb1234ae eb84d66dd70ce8998cd43e951741785e8520c301
+      - name: Compile finalization module
+        run: python3 -m py_compile skills/productivity/deliver-issue/scripts/p2p_finalize.py
+      - name: Focused finalization regressions
+        run: python3 -m unittest discover -s checks -p 'test_p2p_finalization.py' -v
+      - name: Full deterministic regression suite
+        run: python3 -m unittest discover -s checks -p 'test_*.py'
