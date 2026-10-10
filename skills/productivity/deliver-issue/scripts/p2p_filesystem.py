@@ -518,6 +518,40 @@ def compare_review_scope(scope, before, after):
             "limitations": scope["limitations"]}
 
 
+def review_scope_status(root, work, current_repo=None, current_ref=None):
+    """Check current product bytes against one saved exact review; read-only."""
+    _, artifact = paths(root, work)
+    completed = artifact / 'delivery.json'
+    if completed.is_file():
+        record = json.loads(completed.read_bytes())
+        if record.get('schema') != 'promise-to-proof/delivery-record/v1':
+            return {'status': 'UNKNOWN', 'reason': 'unrecognized completed delivery record'}
+        scope = record.get('review_scope')
+        exclusions = record.get('agreement_paths', (work,))
+    else:
+        import p2p_delivery
+        active = p2p_delivery.local_directory(root, work) / 'delivery.json'
+        if not active.is_file():
+            return {'status': 'UNKNOWN', 'reason': 'no saved review; run independent review for this candidate'}
+        record = json.loads(active.read_bytes())
+        scope = record.get('reports', {}).get('review', {}).get('review_scope')
+        exclusions = record.get('agreement_paths', (work,))
+    if not isinstance(scope, dict):
+        return {'status': 'UNKNOWN', 'reason': 'saved review has no exact product scope; refresh review, do not infer coverage'}
+    if digest(safe(root, work).read_bytes()) != scope.get('contract_sha256'):
+        return {'status': 'UNKNOWN', 'reason': 'agreement changed since the saved review; reconcile contract first'}
+    reviewed = execution_directory(root, work) / 'runtime/workspace'
+    if not reviewed.is_dir():
+        return {'status': 'UNKNOWN', 'reason': 'the exact reviewed candidate workspace is unavailable; restore it before comparison'}
+    try:
+        before = snapshot(reviewed, exclude=exclusions)
+        after = snapshot(Path(current_repo).resolve() if current_repo else root,
+                         current_ref, exclude=exclusions)
+        return compare_review_scope(scope, before, after)
+    except (ValueError, OSError) as error:
+        return {'status': 'UNKNOWN', 'reason': 'cannot inspect exact candidate: ' + str(error)}
+
+
 def document_lines(text):
     """Read document metadata, excluding fenced examples."""
     fence = None
@@ -1502,6 +1536,10 @@ def main(argv=None):
         command.add_argument("work")
         if name == "publication-access":
             command.add_argument("--workspace", help="retained isolated candidate workspace")
+    scope_command = commands.add_parser('review-scope-status', help='compare saved reviewed product against current PR/checkout')
+    scope_command.add_argument('work')
+    scope_command.add_argument('--current-repo', help='PR head checkout; defaults to the source repository')
+    scope_command.add_argument('--current-ref', help='exact current commit SHA or ref; defaults to the checked-out product tree')
     entry_command = commands.add_parser("resolve-entry", help="read-only lookup for a single delivery request")
     entry_command.add_argument("source", help="quoted text, configured #issue, repository spec, or saved contract path")
     entry_command.add_argument("--issue-repository", help="configured GitHub OWNER/REPO for an issue number")
@@ -1586,6 +1624,8 @@ def main(argv=None):
             result = prepare_execution(root, args.work)
         elif args.command == "publication-access":
             result = publication_access(root, args.work, args.workspace)
+        elif args.command == 'review-scope-status':
+            result = review_scope_status(root, args.work, args.current_repo, args.current_ref)
         elif args.command == "resolve-entry":
             result = entry_source(root, args.source, args.issue_repository)
         elif args.command == "reconcile":
@@ -1612,6 +1652,8 @@ def main(argv=None):
         else:
             result = resolve(root, args.work)
         print(json.dumps(result, indent=2, ensure_ascii=False))
+        if args.command == 'review-scope-status' and result['status'] != 'COVERED':
+            return 1
         return 0
     except (ValueError, OSError, KeyError, TypeError, UnicodeError) as error:
         print(f"p2p: {error}", file=sys.stderr)
