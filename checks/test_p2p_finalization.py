@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Offline #47 external-effect gates and receipt recovery (not live-host proof)."""
+import contextlib
 import copy
+import io
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -287,6 +290,21 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(published.call_count, 2)  # readback/idempotence per run
         self.assertEqual(read.call_count, 4)  # no merge mutation
 
+    def test_previously_published_receipt_is_verifiable_after_grant_expires(self):
+        self.merged()
+        target = {"refs/heads/delivery-target": self.after}
+        with patch.object(final, "read_pr", return_value=self.pr), \
+             patch.object(final, "remote_branches", return_value=target), \
+             patch.object(final, "portable", return_value={"status": "PORTABLE"}), \
+             patch.object(final, "comment_receipt",
+                          return_value={"status": "RECORDED", "url": URL + "#issuecomment-1"}):
+            checked = final.finalize(
+                self.root, self.record, self.checkpoint, repository=REPO,
+                remote=self.remote, method="squash", pr_url=URL,
+                mandate=None, execute=True)
+        self.assertEqual(checked["status"], "FINALIZED")
+        self.assertEqual(checked["human_progress"]["phase"], "FULLY_FINALIZED")
+
     def test_merged_but_no_portable_checkpoint_is_partial_not_success(self):
         self.merged()
         with patch.object(final, "read_pr", return_value=self.pr), \
@@ -463,6 +481,54 @@ class IntegrationTests(unittest.TestCase):
                                  first["remote_commit"] + ":p2p-state/tiny-delivery.json"],
                                 check=True, capture_output=True)
         self.assertEqual(result.stdout, data)
+
+
+class CommandLineTests(unittest.TestCase):
+    def test_repo_relative_inputs_are_loaded_without_changing_cwd(self):
+        with tempfile.TemporaryDirectory() as folder, \
+             tempfile.TemporaryDirectory() as elsewhere:
+            root = Path(folder)
+            (root / "receipt.json").write_text('{"schema":"example"}')
+            (root / "checkpoint.json").write_bytes(b"checkpoint bytes")
+            output = io.StringIO()
+            original = os.getcwd()
+            try:
+                os.chdir(elsewhere)
+                with patch.object(final.fs, "git", return_value=str(root).encode()), \
+                     patch.object(final, "finalize",
+                                  return_value={"status": "READY_TO_RECORD"}) as called, \
+                     contextlib.redirect_stdout(output):
+                    code = final.main([
+                        "--repo", str(root), "preview", "receipt.json",
+                        "--checkpoint", "checkpoint.json",
+                        "--repository", REPO, "--remote", "origin",
+                        "--method", "direct"])
+            finally:
+                os.chdir(original)
+            self.assertEqual(code, 0)
+            self.assertEqual(json.loads(output.getvalue())["status"], "READY_TO_RECORD")
+            self.assertEqual(called.call_args.args[1], {"schema": "example"})
+            self.assertEqual(called.call_args.args[2], b"checkpoint bytes")
+
+    def test_command_line_errors_return_precise_json_blocker(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / "record.json").write_text("{}")
+            (root / "checkpoint.json").write_text("{}")
+            output = io.StringIO()
+            with patch.object(final.fs, "git", return_value=str(root).encode()), \
+                 patch.object(final, "finalize",
+                              side_effect=ValueError("missing exact merge grant")), \
+                 contextlib.redirect_stdout(output):
+                code = final.main([
+                    "--repo", str(root), "finalize", "record.json",
+                    "--checkpoint", "checkpoint.json",
+                    "--repository", REPO, "--remote", "origin",
+                    "--method", "squash"])
+            self.assertEqual(code, 1)
+            result = json.loads(output.getvalue())
+            self.assertEqual(result["status"], "BLOCKED")
+            self.assertIn("merge grant", result["blocker"])
 
 
 if __name__ == "__main__":
