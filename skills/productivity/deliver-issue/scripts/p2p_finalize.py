@@ -151,8 +151,10 @@ def check_ready(root, record, remote, repository, pr, method, readiness,
                 *, runner=subprocess.run):
     head, base, branch = pr["head"]["sha"], pr["base"]["sha"], pr["base"]["ref"]
     marker = "<!-- p2p-ready:sha256:" + fs.digest(fs.canonical(readiness)) + " -->"
-    need(isinstance(pr.get("body"), str) and pr["body"].count(marker) == 1,
-         "READY assessment has not been read back in the PR description")
+    markers = (re.findall(r"<!-- p2p-ready:sha256:[a-f0-9]{64} -->",
+                          pr.get("body", "")) if isinstance(pr.get("body"), str) else [])
+    need(markers == [marker],
+         "the exact READY assessment is not uniquely synchronized in the PR description")
     need(readiness["pr"] == pr["html_url"] and readiness["head"] == head and
          readiness["base"] == base and readiness["target"] == branch and
          readiness["merge_method"] == method,
@@ -171,8 +173,10 @@ def check_ready(root, record, remote, repository, pr, method, readiness,
     need(repository_info.get(field) is True, "merge method disabled by repository settings")
     rules = gh(f"repos/{repository}/rules/branches/{branch}", runner=runner)
     need(isinstance(rules, list) and
+         all(isinstance(rule, dict) and isinstance(rule.get("type"), str)
+             for rule in rules) and
          fs.digest(fs.canonical(rules)) == readiness["policy_sha256"],
-         "branch rules changed or cannot be read back")
+         "branch rules changed, malformed or cannot be read back")
     need(not any(isinstance(r, dict) and r.get("type") == "merge_queue" for r in rules),
          "merge queue is required; direct merge is unsupported")
     checks = [c for rule in rules if isinstance(rule, dict) and
@@ -596,9 +600,16 @@ def finalize(root, original, checkpoint, *, repository, remote, method,
         need(validated["receipt_id"] == mapping["receipt_id"],
              "delivered-code mapping changed after receipt readback")
     except (ValueError, OSError, KeyError, TypeError) as error:
-        return {"status": "PARTIAL", "phase": "RECEIPT_RECONCILIATION",
-                "mapping": mapping, "reason": str(error),
-                "next_action": "Reconcile readback of the already attempted effect before cleanup."}
+        message = str(error)
+        missing_authority = ("outside the standing mandate" in message or
+                             "missing exact" in message and "mandate" in message)
+        return {"status": "PARTIAL",
+                "phase": ("AUTHORIZATION_REQUIRED" if missing_authority
+                          else "RECEIPT_RECONCILIATION"),
+                "mapping": mapping, "reason": message,
+                "next_action": ("Provide the exact missing effect grant; the landed code is preserved."
+                                if missing_authority else
+                                "Reconcile readback of the already attempted effect before cleanup.")}
     completed = {
         "status": "FINALIZED", "receipt_verified": True,
         "candidate_mapping_verified": True, "destination_verified": True,
