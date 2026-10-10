@@ -408,7 +408,14 @@ proof or portable checkpoints. Its reported speedup is for an offline
 controller fixture, **not** a prediction of authenticated live-model delivery
 time.
 
-## Contributing
+Retained work is also used incrementally: an unchanged completed delivery can
+be verified by `resume` without starting new model stages or rewriting
+completion records. For small product edits, independently checked same-stage
+observations may inform a focused **new** review and proof; unknown reach is
+rechecked rather than silently reused. The [incremental reuse guide](./checks/incremental-reuse.md)
+explains the conditions and measurements.
+
+## Contributing## Contributing
 
 Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before starting work. This project
 uses an issue-first contribution model, and substantial pull requests should follow
