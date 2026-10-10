@@ -540,6 +540,51 @@ class CommandLineTests(unittest.TestCase):
             self.assertEqual(called.call_args.args[1], {"schema": "example"})
             self.assertEqual(called.call_args.args[2], b"checkpoint bytes")
 
+    def test_missing_remote_commit_fetch_preserves_operator_checkout_and_index(self):
+        with tempfile.TemporaryDirectory() as folder:
+            base = Path(folder)
+            source, target, remote = (base / part for part in
+                                      ("source", "target", "remote.git"))
+            source.mkdir()
+            target.mkdir()
+            for repo in (source, target):
+                subprocess.run(["git", "init", "-q", str(repo)], check=True)
+                subprocess.run(["git", "-C", str(repo), "config", "user.name",
+                                "Fixture"], check=True)
+                subprocess.run(["git", "-C", str(repo), "config", "user.email",
+                                "fixture@example.invalid"], check=True)
+            (source / "delivered.py").write_text("print('new')\n")
+            subprocess.run(["git", "-C", str(source), "add", "."], check=True)
+            subprocess.run(["git", "-C", str(source), "commit", "-qm",
+                            "Remote delivered commit"], check=True)
+            sha = subprocess.check_output(
+                ["git", "-C", str(source), "rev-parse", "HEAD"],
+                text=True).strip()
+            subprocess.run(["git", "init", "--bare", "-q", str(remote)], check=True)
+            subprocess.run(["git", "-C", str(source), "push", "-q", str(remote),
+                            "HEAD:refs/heads/main"], check=True)
+            (target / "local.txt").write_text("preserve\n")
+            subprocess.run(["git", "-C", str(target), "add", "."], check=True)
+            subprocess.run(["git", "-C", str(target), "commit", "-qm",
+                            "Separate checkout"], check=True)
+            local_head = subprocess.check_output(
+                ["git", "-C", str(target), "rev-parse", "HEAD"],
+                text=True).strip()
+            local_index = (target / ".git/index").read_bytes()
+            self.assertNotEqual(subprocess.run(
+                ["git", "-C", str(target), "cat-file", "-e", sha + "^{commit}"],
+                capture_output=True).returncode, 0)
+            self.assertEqual(final.ensure_remote_commit(
+                target, str(remote), sha, ref="refs/heads/main"), sha)
+            self.assertEqual(subprocess.check_output(
+                ["git", "-C", str(target), "rev-parse", "HEAD"],
+                text=True).strip(), local_head)
+            self.assertEqual((target / ".git/index").read_bytes(), local_index)
+            self.assertEqual((target / "local.txt").read_text(), "preserve\n")
+            self.assertFalse((target / "delivered.py").exists())
+            self.assertEqual(final.ensure_remote_commit(
+                target, str(remote), sha, ref="refs/heads/main"), sha)
+
     def test_command_line_errors_return_precise_json_blocker(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
