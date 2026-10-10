@@ -91,7 +91,7 @@ class ReadinessGates(unittest.TestCase):
     def test_ready_requires_exact_current_pair_policy_and_synchronized_body(self):
         self.assertEqual(self.check()["base"], BASE)
         self.pr["body"] = "Merge readiness: READY"
-        with self.assertRaisesRegex(ValueError, "read back"):
+        with self.assertRaisesRegex(ValueError, "synchronized"):
             self.check()
         self.sync()
         self.pr["base"]["sha"] = "f"*40
