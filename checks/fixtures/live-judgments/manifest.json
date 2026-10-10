@@ -1,0 +1,382 @@
+{
+  "schema": "promise-to-proof/live-judgments/v1",
+  "description": "Human-authored oracle observations and expected stage judgments; never copy this manifest into verifier workspaces.",
+  "contract": "# Acceptance contract: username command\n\nContract revision: v1\nSource: [Specification](../../../spec.md)\n\nIntended outcome: A small CLI rejects missing usernames and otherwise preserves supplied user input.\nThe change must not alter unrelated existing product behavior such as fee calculations.\n\n## Acceptance matrix\n\n| ID | Source | Requirement | Boundaries / counterexamples | Seam | Oracle | Planned evidence | Plan state |\n|---|---|---|---|---|---|---|---|\n| R1 | spec.md | Reject the empty username with an error. | Empty string is not valid. | python3 username_cli.py '' | Exit 2 and invalid username on stderr. | Execute the CLI with empty input and check output and exit code. | planned |\n| R2 | spec.md | Reject whitespace-only usernames, including spaces and tabs. | Whitespace-only input is invalid even when existing tests are green. | python3 username_cli.py '   ' | Exit 2 and invalid username on stderr. | Execute the public CLI with spaces and tabs and check output and exit code. | planned |\n| R3 | spec.md | Accept a visible username unchanged. | Do not trim or rewrite the accepted value. | python3 username_cli.py Ada | Exit 0 and Ada plus newline on stdout. | Execute the CLI and assert preserved visible input. | planned |\n\n## Unresolved gaps\n\nNone.\n",
+  "base_files": {
+    ".gitignore": "/.p2p/\n/p2p-state/\n",
+    "spec.md": "A username CLI must reject an empty name and whitespace-only names (spaces or tabs), printing \"invalid username\" to stderr and exiting with status 2. It must echo visible usernames unchanged with exit status 0. Leave unrelated existing fee calculations alone.\n",
+    "fees.py": "\"\"\"Existing unrelated behavior: fee accounting.\"\"\"\n\n\ndef apply_fee(cents):\n    return cents\n"
+  },
+  "implementations": {
+    "correct": {
+      "username.py": "\"\"\"Username acceptance behavior.\"\"\"\n\n\ndef normalize(value):\n    return value.strip()\n\n\ndef accept(value):\n    if not normalize(value):\n        raise ValueError(\"username required\")\n    return value\n",
+      "username_cli.py": "\"\"\"Public interface for username validation.\"\"\"\nimport sys\nfrom username import accept\n\n\ndef main(argv):\n    try:\n        if len(argv) != 1:\n            raise ValueError(\"exactly one username is required\")\n        print(accept(argv[0]))\n    except ValueError:\n        print(\"invalid username\", file=sys.stderr)\n        return 2\n    return 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main(sys.argv[1:]))\n",
+      "tests/test_username.py": "import unittest\nfrom username import accept\n\n\nclass UsernameTests(unittest.TestCase):\n    def test_empty_is_rejected(self):\n        with self.assertRaises(ValueError):\n            accept(\"\")\n\n    def test_visible_name_is_preserved(self):\n        self.assertEqual(accept(\"Ada\"), \"Ada\")\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+    },
+    "incomplete": {
+      "username.py": "\"\"\"Username acceptance behavior.\"\"\"\n\n\ndef normalize(value):\n    return value\n\n\ndef accept(value):\n    if value == \"\":\n        raise ValueError(\"username required\")\n    return value\n",
+      "username_cli.py": "\"\"\"Public interface for username validation.\"\"\"\nimport sys\nfrom username import accept\n\n\ndef main(argv):\n    try:\n        if len(argv) != 1:\n            raise ValueError(\"exactly one username is required\")\n        print(accept(argv[0]))\n    except ValueError:\n        print(\"invalid username\", file=sys.stderr)\n        return 2\n    return 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main(sys.argv[1:]))\n",
+      "tests/test_username.py": "import unittest\nfrom username import accept\n\n\nclass UsernameTests(unittest.TestCase):\n    def test_empty_is_rejected(self):\n        with self.assertRaises(ValueError):\n            accept(\"\")\n\n    def test_visible_name_is_preserved(self):\n        self.assertEqual(accept(\"Ada\"), \"Ada\")\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+    },
+    "follow-up-broken": {
+      "username.py": "\"\"\"Username acceptance behavior.\"\"\"\n\n\ndef normalize(value):\n    return value\n\n\ndef accept(value):\n    if not normalize(value):\n        raise ValueError(\"username required\")\n    return value\n",
+      "username_cli.py": "\"\"\"Public interface for username validation.\"\"\"\nimport sys\nfrom username import accept\n\n\ndef main(argv):\n    try:\n        if len(argv) != 1:\n            raise ValueError(\"exactly one username is required\")\n        print(accept(argv[0]))\n    except ValueError:\n        print(\"invalid username\", file=sys.stderr)\n        return 2\n    return 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main(sys.argv[1:]))\n",
+      "tests/test_username.py": "import unittest\nfrom username import accept\n\n\nclass UsernameTests(unittest.TestCase):\n    def test_empty_is_rejected(self):\n        with self.assertRaises(ValueError):\n            accept(\"\")\n\n    def test_visible_name_is_preserved(self):\n        self.assertEqual(accept(\"Ada\"), \"Ada\")\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+    }
+  },
+  "cases": [
+    {
+      "id": "correct-control",
+      "rationale": "Correct candidate fulfills empty, whitespace-only and visible-name obligations; prevents a block-everything judge from passing.",
+      "candidates": [
+        {
+          "name": "complete",
+          "implementation": "correct",
+          "expected": {
+            "review": "REVIEWED",
+            "proof": "PROVEN"
+          },
+          "oracle": [
+            {
+              "id": "empty-username",
+              "args": [
+                "username_cli.py",
+                ""
+              ],
+              "exit": 2,
+              "stdout": "",
+              "stderr": "invalid username\n"
+            },
+            {
+              "id": "whitespace-only-username",
+              "args": [
+                "username_cli.py",
+                " \t "
+              ],
+              "exit": 2,
+              "stdout": "",
+              "stderr": "invalid username\n"
+            },
+            {
+              "id": "visible-username",
+              "args": [
+                "username_cli.py",
+                "Ada"
+              ],
+              "exit": 0,
+              "stdout": "Ada\n",
+              "stderr": ""
+            },
+            {
+              "id": "unrelated-fee",
+              "args": [
+                "-c",
+                "import fees; print(fees.apply_fee(100))"
+              ],
+              "exit": 0,
+              "stdout": "100\n",
+              "stderr": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "green-but-incomplete",
+      "rationale": "Supplied tests cover empty and visible input but not whitespace-only; the public CLI wrongly accepts whitespace.",
+      "candidates": [
+        {
+          "name": "omits-R2",
+          "implementation": "incomplete",
+          "expected": {
+            "review": "CHANGES NEEDED",
+            "proof": "NOT PROVEN",
+            "missing_proof": [
+              "R2"
+            ],
+            "review_finding": {
+              "source": "R2",
+              "axis": "Contract fidelity"
+            }
+          },
+          "oracle": [
+            {
+              "id": "empty-username",
+              "args": [
+                "username_cli.py",
+                ""
+              ],
+              "exit": 2,
+              "stdout": "",
+              "stderr": "invalid username\n"
+            },
+            {
+              "id": "whitespace-only-username",
+              "args": [
+                "username_cli.py",
+                " \t "
+              ],
+              "exit": 0,
+              "stdout": " \t \n",
+              "stderr": ""
+            },
+            {
+              "id": "visible-username",
+              "args": [
+                "username_cli.py",
+                "Ada"
+              ],
+              "exit": 0,
+              "stdout": "Ada\n",
+              "stderr": ""
+            },
+            {
+              "id": "unrelated-fee",
+              "args": [
+                "-c",
+                "import fees; print(fees.apply_fee(100))"
+              ],
+              "exit": 0,
+              "stdout": "100\n",
+              "stderr": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unrelated-scope-expansion",
+      "rationale": "Promised CLI behavior works but the implementation changes existing unrelated fee accounting.",
+      "candidates": [
+        {
+          "name": "scope-expanded",
+          "implementation": "correct",
+          "changes": {
+            "fees.py": "\"\"\"Existing unrelated behavior: fee accounting.\"\"\"\n\n\ndef apply_fee(cents):\n    return cents + 1\n"
+          },
+          "expected": {
+            "review": "CHANGES NEEDED",
+            "proof": "PROVEN",
+            "review_finding": {
+              "axis": "Scope and simplicity",
+              "path": "fees.py"
+            }
+          },
+          "oracle": [
+            {
+              "id": "empty-username",
+              "args": [
+                "username_cli.py",
+                ""
+              ],
+              "exit": 2,
+              "stdout": "",
+              "stderr": "invalid username\n"
+            },
+            {
+              "id": "whitespace-only-username",
+              "args": [
+                "username_cli.py",
+                " \t "
+              ],
+              "exit": 2,
+              "stdout": "",
+              "stderr": "invalid username\n"
+            },
+            {
+              "id": "visible-username",
+              "args": [
+                "username_cli.py",
+                "Ada"
+              ],
+              "exit": 0,
+              "stdout": "Ada\n",
+              "stderr": ""
+            },
+            {
+              "id": "unrelated-fee",
+              "args": [
+                "-c",
+                "import fees; print(fees.apply_fee(100))"
+              ],
+              "exit": 0,
+              "stdout": "101\n",
+              "stderr": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "optional-polish",
+      "rationale": "An explicitly nonbinding naming suggestion must not initiate a repair or prevent acceptance.",
+      "spec_suffix": "\nOptional polish (not an acceptance requirement): consider renaming the internal normalize helper for readability. The existing helper name is fully acceptable.\n",
+      "candidates": [
+        {
+          "name": "complete-with-optional-note",
+          "implementation": "correct",
+          "expected": {
+            "review": "REVIEWED",
+            "proof": "PROVEN"
+          },
+          "oracle": [
+            {
+              "id": "empty-username",
+              "args": [
+                "username_cli.py",
+                ""
+              ],
+              "exit": 2,
+              "stdout": "",
+              "stderr": "invalid username\n"
+            },
+            {
+              "id": "whitespace-only-username",
+              "args": [
+                "username_cli.py",
+                " \t "
+              ],
+              "exit": 2,
+              "stdout": "",
+              "stderr": "invalid username\n"
+            },
+            {
+              "id": "visible-username",
+              "args": [
+                "username_cli.py",
+                "Ada"
+              ],
+              "exit": 0,
+              "stdout": "Ada\n",
+              "stderr": ""
+            },
+            {
+              "id": "unrelated-fee",
+              "args": [
+                "-c",
+                "import fees; print(fees.apply_fee(100))"
+              ],
+              "exit": 0,
+              "stdout": "100\n",
+              "stderr": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "follow-up-regression",
+      "rationale": "First candidate passes, then a one-line shared normalization change breaks R2; prior stage observations must not be blindly reused.",
+      "candidates": [
+        {
+          "name": "before-edit",
+          "implementation": "correct",
+          "expected": {
+            "review": "REVIEWED",
+            "proof": "PROVEN"
+          },
+          "oracle": [
+            {
+              "id": "empty-username",
+              "args": [
+                "username_cli.py",
+                ""
+              ],
+              "exit": 2,
+              "stdout": "",
+              "stderr": "invalid username\n"
+            },
+            {
+              "id": "whitespace-only-username",
+              "args": [
+                "username_cli.py",
+                " \t "
+              ],
+              "exit": 2,
+              "stdout": "",
+              "stderr": "invalid username\n"
+            },
+            {
+              "id": "visible-username",
+              "args": [
+                "username_cli.py",
+                "Ada"
+              ],
+              "exit": 0,
+              "stdout": "Ada\n",
+              "stderr": ""
+            },
+            {
+              "id": "unrelated-fee",
+              "args": [
+                "-c",
+                "import fees; print(fees.apply_fee(100))"
+              ],
+              "exit": 0,
+              "stdout": "100\n",
+              "stderr": ""
+            }
+          ]
+        },
+        {
+          "name": "after-one-line-edit",
+          "implementation": "follow-up-broken",
+          "expected": {
+            "review": "CHANGES NEEDED",
+            "proof": "NOT PROVEN",
+            "missing_proof": [
+              "R2"
+            ],
+            "review_finding": {
+              "source": "R2",
+              "axis": "Contract fidelity"
+            }
+          },
+          "oracle": [
+            {
+              "id": "empty-username",
+              "args": [
+                "username_cli.py",
+                ""
+              ],
+              "exit": 2,
+              "stdout": "",
+              "stderr": "invalid username\n"
+            },
+            {
+              "id": "whitespace-only-username",
+              "args": [
+                "username_cli.py",
+                " \t "
+              ],
+              "exit": 0,
+              "stdout": " \t \n",
+              "stderr": ""
+            },
+            {
+              "id": "visible-username",
+              "args": [
+                "username_cli.py",
+                "Ada"
+              ],
+              "exit": 0,
+              "stdout": "Ada\n",
+              "stderr": ""
+            },
+            {
+              "id": "unrelated-fee",
+              "args": [
+                "-c",
+                "import fees; print(fees.apply_fee(100))"
+              ],
+              "exit": 0,
+              "stdout": "100\n",
+              "stderr": ""
+            }
+          ],
+          "requires_previous_observations": true
+        }
+      ]
+    }
+  ]
+}
