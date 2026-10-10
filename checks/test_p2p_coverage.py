@@ -34,8 +34,12 @@ class CoverageFactsTests(unittest.TestCase):
         record = "record:E1@sha256:" + "a" * 64
         valid = self.trace(requirements=[{"id": "R1", "paths": ["app.py"],
                                           "existing": False, "evidence": ["row", record]}])
+        with self.assertRaisesRegex(ValueError, "unresolved"):
+            d.fs.validate_coverage_trace(valid, ["R1"], self.report, "review",
+                                         self.current, self.changes)
         self.assertEqual(d.fs.validate_coverage_trace(valid, ["R1"], self.report,
-                                                        "review", self.current, self.changes)["requirements"], ["R1"])
+                                                        "review", self.current, self.changes,
+                                                        {record})["requirements"], ["R1"])
 
     def test_missing_obligation_and_unaccounted_changes_fail(self):
         invalid = self.trace(requirements=[])
@@ -94,6 +98,26 @@ class CoverageFactsTests(unittest.TestCase):
         self.assertEqual(d.fs.compare_review_scope(None, self.current, self.current)["status"], "UNKNOWN")
         wrong = dict(scope, manifest_sha256="f" * 64)
         self.assertEqual(d.fs.compare_review_scope(wrong, self.current, self.current)["status"], "UNKNOWN")
+
+    def test_only_actual_retained_record_identities_can_be_referenced(self):
+        with tempfile.TemporaryDirectory() as temp:
+            workspace = Path(temp)
+            folder = workspace / ".p2p/work/tiny/evidence"
+            folder.mkdir(parents=True)
+            identity = d.fs.snapshot_key(self.current)
+            record = {"schema": "promise-to-proof/evidence-record/v1",
+                      "id": "E1", "candidate": identity,
+                      "contract": {"sha256": "b" * 64}}
+            path = folder / "E1.json"
+            path.write_text(json.dumps(record))
+            ref = "record:E1@sha256:" + d.fs.digest(d.fs.canonical(record))
+            self.assertEqual(d.fs.available_evidence_refs(
+                workspace, ".p2p/work/tiny/contract.md", identity, "b" * 64), {ref})
+            self.assertFalse(d.fs.available_evidence_refs(
+                workspace, ".p2p/work/tiny/contract.md", identity, "c" * 64))
+            path.write_text(json.dumps(dict(record, candidate="snapshot:sha256:" + "0" * 64)))
+            self.assertFalse(d.fs.available_evidence_refs(
+                workspace, ".p2p/work/tiny/contract.md", identity, "b" * 64))
 
     def test_review_scope_rejects_fabricated_file_inspection(self):
         candidate = {"key": d.fs.snapshot_key(self.current), "work_item_sha256": "1" * 64,
