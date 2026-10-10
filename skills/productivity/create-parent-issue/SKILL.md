@@ -53,6 +53,10 @@ durable source. If no immutable retrievable reference exists, prepare a draft
 but block publication; tell the user what source link is needed. Do not commit
 or push the file to make one.
 
+## Issue publication is not acceptance planning
+
+Keep GitHub issue creation optional and independent from delivery readiness. Modern coding agents may work directly from an accepted specification or contract without a parent issue. This skill must preserve exact source identity and an understandable outcome, not expand every detail into an acceptance matrix, require a decomposition, or dictate the later agent's implementation steps. `plan-acceptance` remains the owner of formal acceptance criteria. No tracker write or approval is implied by the existence of a prepared issue.
+
 ## Draft one issue
 
 Prepare exactly one issue with:
