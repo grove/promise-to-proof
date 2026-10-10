@@ -115,6 +115,26 @@ should finish without a repair. Separately inspect a candidate with untrusted
 shell input and a realistic injection trigger, for which review depth must
 increase despite green ordinary tests.
 
+## Risk-driven seam verification: issue #42
+
+On the supported live host, exercise the fixed `verification-durable-control`
+and `verification-concurrency-and-persistence-gap` fixtures. Use independent
+oracle outcomes withheld from workers. The first candidate uses a real SQLite
+unique-seat boundary with process restarts and concurrent callers; its
+full-scope review and proof should pass. The second passes in-process tests
+but loses state and lets two independent callers claim the same slot; it must
+receive material findings and unproven R2/R3 results. Retain the actual
+commands, stage risk/requirement links and current-candidate identities.
+
+Contrast with the low-risk correct username control. It should not be forced
+through persistence/concurrency/property tests or an exhaustive verifier
+checklist. After a localized repair, obtain fresh current-candidate verdicts
+and recheck affected seams; broad or uncertain consequences require broader
+checks. At merge-readiness, compare destination changes with saved risk paths
+using `target-risk-status`: an unrelated fast-forward does not trigger extra
+seam checks, a touched booking dependency does, and missing reach returns
+UNKNOWN. Always keep ordinary exact-pair CI and merge conditions separate.
+
 ## 11. Plain-language, solution-oriented delivery
 
 Give P2P a small accepted change where an existing repository helper and meaningful
