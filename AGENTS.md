@@ -86,7 +86,11 @@ checks have pinned tool and platform requirements.
 
 For real host-boundary behavior, follow `docs/p2p-delivery-controller.md` and
 run its live host check only with explicit authorization for real model calls.
-Fixture transport tests are not live host evidence.
+For model judgment regressions, run `checks/test_live_judgments.py` offline and,
+when a supported live macOS/Codex host is explicitly authorized, run
+`checks/check_p2p_judgments_host.py --output-dir NEW_DIRECTORY`. The live suite
+retains independent expected/observed judgments and fails mismatches. Its
+fixtures and mocked transport tests are never live host evidence.
 
 If a required check cannot run in the current environment, say exactly which
 check was not run and why. Never treat an unavailable check as a pass.
