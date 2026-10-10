@@ -1641,7 +1641,12 @@ class Delivery:
             raise ValueError('admission requires actual completed host and task receipts')
         # receipt() rechecks the controller-recorded event stream and exit identity.
         self.receipt(boundary)
-        self.receipt(task)
+        host = self.receipt(task)
+        data = (self.runtime / ready['report']).read_bytes()
+        if (fs.digest(data) != ready['report_sha256'] or
+                data != host['message'].encode() or
+                json.loads(data).get('status') != 'READY'):
+            raise ValueError('admission readiness evidence changed or is not READY')
         path = self.runtime / 'decision.json'
         previous = json.loads(path.read_text()) if path.is_file() else None
         verifier, readiness = self.admission_facts()
@@ -2227,6 +2232,13 @@ class Delivery:
                     # Evidence must remain valid on this exact executable and
                     # policy. A declaration of enforcement is not an attestation.
                     self.receipt(done)
+                    previous = self.state.get('admission_decision')
+                    if previous and previous.get('status') == 'ADMITTED':
+                        expected = {row['name']: row['identity'] for row in previous['conditions']}
+                        current, _ = self.admission_facts()
+                        if expected.get('verifier') != current:
+                            raise ValueError('host executable or sandbox capability configuration changed; '
+                                             're-establish verifier isolation on a new safe admission')
                     continue
                 # An instruction upgrade preserves the agreement and host. It does
                 # not by itself invalidate observed tools, inputs or sandbox access.
@@ -2779,6 +2791,13 @@ assert results['scratch'] == 'ok'
                 not self.state.get('preflight_complete') or
                 self.state.get('task_readiness_invalidated')):
             raise ValueError('completed delivery lacks current host readiness; resume at existing preflight')
+        prior = self.state.get('admission_decision')
+        if prior:
+            expected = {row['name']: row['identity'] for row in prior['conditions']}
+            verifier, readiness = self.admission_facts()
+            current = admission_decision.facts(self.state, verifier, readiness)
+            if prior.get('status') != 'ADMITTED' or any(expected.get(k) != v for k, v in current.items()):
+                raise ValueError('completed admission material facts changed; recheck before reuse')
         if any(a.get('status') not in ('complete', 'retired')
                for a in self.state.get('attempts', [])):
             raise ValueError('uncertain worker reservation must be reconciled before reuse')
