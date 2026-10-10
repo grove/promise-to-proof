@@ -354,3 +354,217 @@ def git_receipt(root, remote, target, record, checkpoint, mandate,
     need(actual == value, "remote receipt object bytes differ from the approved record")
     return {"status": "RECORDED", "url": remote + ":" + ref + ":" + path,
             "remote_commit": commit}
+
+
+def finalize(root, original, checkpoint, *, repository, remote, method,
+             pr_url=None, readiness=None, before=None, after=None,
+             confirmed_at=None, mandate=None, receipt_issue=None,
+             receipt_ref=None, execute=False, runner=subprocess.run):
+    """One resumable outer operation, using only the existing #50 record.
+
+    Every rerun rereads the live PR and receipt before any further effect.
+    Unknown/lost merge responses are NEVER treated as permission to merge again.
+    """
+    root = Path(root).resolve()
+    base_record = {key: value for key, value in original.items() if key != "landing"}
+    observed = records.validate(root, base_record, checkpoint=checkpoint)
+    need(observed["status"] == "LOCAL_REVIEWED_PROVEN",
+         "delivery lacks current matching local full review and proof")
+    need(isinstance(repository, str) and
+         re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository),
+         "invalid selected delivery repository")
+    need(method in records.METHODS, "unsupported Git delivery method")
+    pr = None
+    merged = False
+    merge_attempted = False
+    if pr_url:
+        match = PR.fullmatch(pr_url)
+        need(match and match[1] == repository,
+             "PR belongs to another repository")
+        need(method in ("merge", "squash", "rebase"),
+             "a PR needs an explicit ordinary merge/squash/rebase method")
+        pr = read_pr(repository, int(match[2]), runner=runner)
+        need(pr["base"]["ref"] == original["routing"]["destination"],
+             "PR target conflicts with approved delivery routing")
+        head = pr["head"]["sha"]
+        need(fs.snapshot_key(fs.snapshot(
+            root, head, exclude=original["agreement_paths"])) ==
+             original["candidate_key"],
+             "the remote PR head no longer matches the independently proven candidate")
+        merged = bool(pr.get("merged"))
+        if not merged:
+            need(pr.get("state") == "open",
+                 "closed, unmerged PR cannot be finalized")
+            saved = read_readiness(readiness)
+            checked = check_ready(root, original, remote, repository,
+                                  pr, method, saved, runner=runner)
+            if not execute:
+                return {"status": "READY_TO_MERGE", "readiness": checked,
+                        "receipt_published": False,
+                        "next_action": "A separately authorized merge and exact readback are required."}
+            need(mandate is not None,
+                 "missing selected standing mandate for the exact merge effect")
+            autonomy.authorize(mandate, "merge", repository, pr_url)
+            # Disallow a TOCTOU head/base change after checking all the gates.
+            rechecked = read_pr(repository, int(match[2]), runner=runner)
+            need(rechecked["head"]["sha"] == head and
+                 rechecked["base"]["sha"] == checked["base"] and
+                 rechecked["state"] == "open" and
+                 rechecked.get("mergeable_state") == "clean",
+                 "PR changed after the merge-readiness decision")
+            merge_attempted = True
+            try:
+                run(["gh", "api", "-X", "PUT",
+                     f"repos/{repository}/pulls/{pr['number']}/merge",
+                     "-f", "merge_method=" + method,
+                     "-f", "sha=" + head],
+                    check=False, runner=runner)
+            except (OSError, subprocess.SubprocessError):
+                pass  # An unknown response might still mean an applied merge.
+            try:
+                pr = read_pr(repository, int(match[2]), runner=runner)
+            except (ValueError, OSError, KeyError, TypeError) as error:
+                return {"status": "PARTIAL", "phase": "MERGE_UNCONFIRMED",
+                        "reason": "merge response/readback uncertain: " + str(error),
+                        "next_action": "Read back the PR before any new merge effect."}
+            if not pr.get("merged"):
+                return {"status": "PARTIAL", "phase": "MERGE_UNCONFIRMED",
+                        "reason": "GitHub has not confirmed a merge; do not retry automatically.",
+                        "next_action": "Inspect GitHub PR state and preserve the candidate."}
+            merged = True
+        after = pr.get("merge_commit_sha")
+        need(isinstance(after, str) and COMMIT.fullmatch(after),
+             "GitHub reports a merge without a valid delivered commit")
+        confirmed_at = pr.get("merged_at")
+        need(isinstance(confirmed_at, str) and confirmed_at,
+             "GitHub reports a merge without its timestamp")
+        if method in ("merge", "squash"):
+            need(fs.full_commit(root, after) == after,
+                 "the merged commit is not available; fetch it for mapping verification")
+            parents = fs.git(root, "rev-list", "--parents", "-n", "1", after).decode().split()
+            need(len(parents) >= 2, "landed commit lacks a confirmed predecessor")
+            before = parents[1]
+        else:
+            need(before is not None,
+                 "rebase requires the exact pre-merge destination identity")
+    else:
+        need(method in ("direct", "integrated"),
+             "without a PR only direct/assembled-parent landed code is supported")
+        need(all(isinstance(v, str) and v for v in (before, after, confirmed_at)),
+             "direct/parent finalization requires predecessor, delivered SHA and timestamp")
+    try:
+        branches = remote_branches(root, remote, runner=runner)
+        target_ref = "refs/heads/" + original["routing"]["destination"]
+        tip = branches.get(target_ref)
+        need(tip and remote_contains(root, after, (tip,)),
+             "delivered commit cannot be found on the remote destination history")
+        need(fs.full_commit(root, tip) == tip,
+             "current remote target needs exact local Git objects before verification")
+        final_record = records.preview(
+            root, original, checkpoint=checkpoint, method=method,
+            repository=repository, destination_ref=original["routing"]["target_ref"],
+            before=before, after=after, confirmed_at=confirmed_at,
+            pull_request=pr_url, pr_head=pr["head"]["sha"] if pr else None,
+            merged_at=pr["merged_at"] if pr else None)
+        mapping = records.validate(root, final_record, checkpoint=checkpoint)
+        transfer = portable(root, checkpoint, remote, runner=runner)
+    except (ValueError, OSError, KeyError, TypeError) as error:
+        if merged or merge_attempted:
+            return {"status": "PARTIAL", "phase": "LANDED_MAPPING_PENDING",
+                    "delivered_commit": after,
+                    "reason": str(error),
+                    "next_action": "Reconcile the missing Git/contract/checkpoint identity; do not merge again."}
+        raise
+    if not execute:
+        return {"status": "READY_TO_RECORD", "record": final_record,
+                "mapping": mapping, "portable": transfer,
+                "receipt_published": False}
+    need(mandate is not None,
+         "completion receipt needs a selected, exact effect mandate")
+    destination = receipt_target(root, final_record, pr_url,
+                                 receipt_issue, receipt_ref)
+    try:
+        if destination["kind"] == "comment":
+            receipt = comment_receipt(final_record, destination, mandate,
+                                      runner=runner)
+        else:
+            receipt = git_receipt(root, remote, destination, final_record,
+                                  checkpoint, mandate, runner=runner)
+        if receipt["status"] != "RECORDED":
+            return {"status": "PARTIAL", "phase": "RECEIPT_PENDING",
+                    "mapping": mapping, "receipt": receipt,
+                    "next_action": "Read back the exact receipt before any new write."}
+        # No stored success flag can overrule changed GitHub/remote facts.
+        if pr:
+            again = read_pr(repository, pr["number"], runner=runner)
+            need(again.get("merged") and again.get("merge_commit_sha") == after and
+                 again["head"]["sha"] == pr["head"]["sha"],
+                 "GitHub PR merge changed after receipt publication")
+        branches = remote_branches(root, remote, runner=runner)
+        need(remote_contains(root, after, (branches.get(target_ref),)),
+             "remote destination no longer contains delivered commit")
+        portable(root, checkpoint, remote, runner=runner)
+        validated = records.validate(root, final_record, checkpoint=checkpoint)
+        need(validated["receipt_id"] == mapping["receipt_id"],
+             "delivered-code mapping changed after receipt readback")
+    except (ValueError, OSError, KeyError, TypeError) as error:
+        return {"status": "PARTIAL", "phase": "RECEIPT_RECONCILIATION",
+                "mapping": mapping, "reason": str(error),
+                "next_action": "Reconcile readback of the already attempted effect before cleanup."}
+    return {"status": "FINALIZED", "record": final_record, "mapping": mapping,
+            "portable": transfer, "receipt": receipt,
+            "finalization": {
+                "status": "FINALIZED", "receipt_verified": True,
+                "candidate_mapping_verified": True, "destination_verified": True,
+                "candidate_key": final_record["candidate_key"],
+                "delivered_commit": mapping["delivered_commit"],
+                "receipt_id": final_record["landing"]["receipt_id"],
+                "receipt_url": receipt["url"]},
+            "next_action": "Verified complete; optional existing safe cleanup may proceed."}
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--repo", default=".")
+    commands = parser.add_subparsers(dest="action", required=True)
+    for name in ("preview", "finalize"):
+        command = commands.add_parser(name)
+        command.add_argument("record", help="original Delivery Record v1 JSON")
+        command.add_argument("--checkpoint", required=True)
+        command.add_argument("--repository", required=True)
+        command.add_argument("--remote", required=True)
+        command.add_argument("--method", choices=sorted(records.METHODS), required=True)
+        command.add_argument("--pr")
+        command.add_argument("--readiness")
+        command.add_argument("--before")
+        command.add_argument("--after")
+        command.add_argument("--confirmed-at")
+        command.add_argument("--mandate", help="explicit exact effects mandate JSON")
+        command.add_argument("--receipt-issue")
+        command.add_argument("--receipt-ref")
+    args = parser.parse_args(argv)
+    try:
+        root = Path(fs.git(Path(args.repo), "rev-parse",
+                           "--show-toplevel").decode().strip())
+        original = json.loads(Path(args.record).read_bytes())
+        checkpoint = Path(args.checkpoint).read_bytes()
+        mandate = (autonomy.load(args.mandate) if args.mandate else
+                   original.get("autonomy"))
+        output = finalize(root, original, checkpoint,
+                          repository=args.repository, remote=args.remote,
+                          method=args.method, pr_url=args.pr,
+                          readiness=args.readiness, before=args.before,
+                          after=args.after, confirmed_at=args.confirmed_at,
+                          mandate=mandate, receipt_issue=args.receipt_issue,
+                          receipt_ref=args.receipt_ref,
+                          execute=args.action == "finalize")
+        print(json.dumps(output, indent=2, ensure_ascii=False))
+        return 0 if output["status"] in ("FINALIZED", "READY_TO_RECORD", "READY_TO_MERGE") else 1
+    except (ValueError, OSError, KeyError, TypeError, UnicodeError,
+            json.JSONDecodeError, subprocess.SubprocessError) as error:
+        print("p2p finalization: " + str(error), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
