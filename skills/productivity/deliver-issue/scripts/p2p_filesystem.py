@@ -1139,16 +1139,25 @@ def product_index_sha256(root):
     return digest(b"\0".join(record for record in records if record and product_path(record.split(b"\t", 1)[1].decode())))
 
 
-def capture(root, work, base, commit=None, exclude=()):
+def capture(root, work, base, commit=None, exclude=(), *, prepared=None):
     item, _ = paths(root, work)
     check_index(root)
-    manifest = snapshot(root, exclude=exclude)
+    # A delivery may supply two snapshots that it *just inspected* for excluded
+    # product drift. Reuse those exact bytes rather than scanning the same tree
+    # for a second time. Standalone capture still reads fresh inputs as before.
+    if prepared is None:
+        manifest = snapshot(root, exclude=exclude)
+    else:
+        if not isinstance(prepared, tuple) or len(prepared) != 2:
+            raise ValueError("prepared capture requires exact candidate/base snapshots")
+        manifest, base_manifest = prepared
     chosen = full_commit(root, commit or "HEAD")
     committed = snapshot(root, chosen, exclude=exclude)
     if commit and manifest != committed:
         raise ValueError("working tree differs from requested committed candidate")
     comparison_base = full_commit(root, base)
-    base_manifest = snapshot(root, comparison_base, exclude=exclude)
+    if prepared is None:
+        base_manifest = snapshot(root, comparison_base, exclude=exclude)
     record = {"work_item": work, "work_item_sha256": digest(item.read_bytes()),
               "comparison_base": comparison_base, "binding_inputs": bindings(root, work),
               "key": snapshot_key(manifest), "changes": tree_changes(base_manifest, manifest)}
