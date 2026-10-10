@@ -1786,7 +1786,8 @@ class Delivery:
             data = fs.safe(self.runtime, attempt['report']).read_bytes()
             if fs.digest(data) != attempt['report_sha256']:
                 raise ValueError('slice capture report differs from authenticated attempt')
-            slices.attach(self.state, attempt, json.loads(data), generation)
+            if attempt.get('report_validation') != 'rejected':
+                slices.attach(self.state, attempt, json.loads(data), generation)
         self._generation_chain_verified = False
         return candidate
 
@@ -3559,7 +3560,18 @@ assert results['scratch'] == 'ok'
             self.check_report_rejection(last)
         if last and last['stage'] in ('implementation', 'repair') and last['status'] != 'retired':
             name = last['stage']
-            if last['status'] in ('reserved', 'failed'):
+            if (name == 'implementation' and last['status'] == 'complete'
+                    and name not in self.state.get('reports', {})
+                    and self.state.get('implementation_slice_version') == 1
+                    and any(item['attempt_id'] == last['id']
+                            for item in self.state.get('implementation_slices', []))):
+                # The previous VERIFIED/PARTIAL slice was checkpointed and its
+                # current report slot deliberately freed. Reuse its exact
+                # generation, not a stale report or another implementation call.
+                self.timed_source_stable()
+                slices.verify_retained(self.state, self.runtime, self.receipt)
+                report = {'status': 'PARTIAL'}
+            elif last['status'] in ('reserved', 'failed'):
                 report = self.stage(name, reconcile=True)
             else:
                 self.timed_source_stable()
