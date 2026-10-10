@@ -130,8 +130,7 @@ class NormalDeliveryFastPathTests(unittest.TestCase):
         self.assertGreater(len(old_launches), len(new_launches))
         self.assertEqual(json.loads(before)["required_commits"],
                          json.loads(after)["required_commits"])
-        self.assertTrue(any("runtime/attempts" in " ".join(args)
-                            for args in old_launches))
+        self.assertTrue(any("attempts/" in args[-1] for args in old_launches))
 
     def test_comparator_rejects_a_fake_speedup_that_skips_verification(self):
         a = {"snapshot_key": "k", "stage_sequence": ["implementation", "review", "proof"],
