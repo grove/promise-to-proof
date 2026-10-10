@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Matched, offline cold-delivery timing. Never interpreted as live model speed.
 
-Before/after replaces only Delivery._capture and source_stable with their
-exact pre-change versions from issue #57 main; host, skills, preflight,
-verification, recovery, and checkpoint code stays identical. Source and
+Before/after replaces Delivery._capture, Delivery.source_stable, and the
+checkpoint writer with their exact pre-change versions from issue #57 main.
+All other host, skill, preflight, verification, and recovery code stays identical. Source and
 candidate outcomes are checked. No live model calls are made.
 """
 import argparse
@@ -37,12 +37,24 @@ def historical_method(name):
     return namespace[name]
 
 
+def historical_checkpoint():
+    source = d.fs.git(PROJECT, "show", f"{BASE}:skills/productivity/deliver-issue/scripts/p2p_filesystem.py").decode()
+    module = ast.parse(source)
+    function = next(item for item in module.body
+                    if isinstance(item, ast.FunctionDef) and item.name == "checkpoint")
+    namespace = dict(vars(d.fs))
+    exec(compile(ast.Module(body=[function], type_ignores=[]),
+                 BASE + ":p2p_filesystem.py", "exec"), namespace)
+    return namespace["checkpoint"]
+
+
 def episode(use_historical=False):
     case = DeliveryTests("test_clean_project_delivery_uses_local_contract_and_records")
     case.setUp()
     original_run = subprocess.run
     original_snapshot = d.fs.snapshot
     original_checkpoint = d.Delivery.checkpoint
+    original_fs_checkpoint = d.fs.checkpoint
     original_capture = d.Delivery._capture
     original_source_stable = d.Delivery.source_stable
     stats = {"git_processes": 0, "snapshots": 0, "checkpoint_calls": 0,
@@ -67,6 +79,7 @@ def episode(use_historical=False):
             stats["checkpoint_seconds"] += time.monotonic() - t
     capture_fn = historical_method("_capture") if use_historical else original_capture
     stable_fn = historical_method("source_stable") if use_historical else original_source_stable
+    fs_checkpoint_fn = historical_checkpoint() if use_historical else original_fs_checkpoint
     def capture(self, *args, **kwargs):
         t = time.monotonic()
         try:
@@ -84,6 +97,7 @@ def episode(use_historical=False):
         with (patch.object(subprocess, "run", side_effect=run),
               patch.object(d.fs, "snapshot", side_effect=snapshot),
               patch.object(d.Delivery, "checkpoint", checkpoint),
+              patch.object(d.fs, "checkpoint", fs_checkpoint_fn),
               patch.object(d.Delivery, "_capture", capture),
               patch.object(d.Delivery, "source_stable", stable),
               contextlib.redirect_stderr(io.StringIO())):
