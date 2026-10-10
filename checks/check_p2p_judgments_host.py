@@ -59,7 +59,7 @@ def source_repo(case_dir, data, case):
     subprocess.run(["git", "init", "-q", str(root)], check=True)
     d.fs.git(root, "config", "user.name", "P2P Live Fixture")
     d.fs.git(root, "config", "user.email", "fixture@localhost")
-    for path, content in data["base_files"].items():
+    for path, content in (data["base_files"] | case.get("base_changes", {})).items():
         if path == "spec.md":
             content += case.get("spec_suffix", "")
         product_file(root, path, content)
@@ -69,7 +69,7 @@ def source_repo(case_dir, data, case):
     d.fs.git(root, "branch", "delivery-target", base)
     agreement = root / WORK
     agreement.parent.mkdir(parents=True)
-    agreement.write_text(data["contract"])
+    agreement.write_text(case.get("contract", data["contract"]))
     return root, base
 
 
@@ -133,6 +133,18 @@ def judgment_mismatches(review, proof, expected, previous_review=None):
             errors.append(f"proof falsely accepted missing obligation {requirement}")
     if expected["proof"] == "PROVEN" and any(row.get("verdict") != "proven" for row in rows.values()):
         errors.append("PROVEN result contains an unproven requirement")
+    for stage, required in expected.get("required_risks", {}).items():
+        report = {"review": review, "proof": proof}[stage]
+        identified = report.get("coverage_trace", {}).get("risks", [])
+        for obligation in required:
+            if not any(obligation["requirement"] in item.get("requirements", []) and
+                       obligation["path"] in item.get("paths", []) and
+                       item.get("status") == obligation["status"] and
+                       item.get("trigger") and item.get("why_applicable") and
+                       item.get("consequence") and item.get("evidence")
+                       for item in identified):
+                errors.append(f"{stage} did not identify and address the material risk for "
+                              f"{obligation['requirement']} at {obligation['path']}")
     reconciled = expected.get("reconciles_review_finding")
     if reconciled:
         # Reconciliation is an independent, fresh full-scope judgment. The old
