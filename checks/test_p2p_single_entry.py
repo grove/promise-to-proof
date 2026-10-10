@@ -53,7 +53,7 @@ class SingleEntryTests(unittest.TestCase):
     def test_exact_text_reuses_one_saved_agreement_and_checkpoint(self):
         message = 'Reject empty usernames with a "validation error"'
         receipt = ("Entry source kind: text\n"
-                   "Entry request JSON: " + json.dumps(message) + "\n"
+                   "Entry request SHA-256: " + fs.digest(message.encode()) + "\n"
                    "Approval: delegated local planning audit recorded\n")
         work = self.saved("usernames", "# Acceptance contract: usernames\n", receipt)
         reused = fs.entry_source(self.root, message)
@@ -64,6 +64,7 @@ class SingleEntryTests(unittest.TestCase):
         # to another checkout without rerunning planning.
         checkpoint = fs.checkpoint(self.root, work)
         self.assertEqual(checkpoint["status"], "LOCAL_ONLY")
+        self.assertNotIn(message, (self.root / checkpoint["path"]).read_text())
         (self.root / work).unlink()
         (self.root / ".p2p/work/usernames/planning-handoff.md").unlink()
         result = fs.entry_source(self.root, message)
@@ -108,7 +109,7 @@ class SingleEntryTests(unittest.TestCase):
 
     def test_conflicts_and_ambiguous_match_do_not_guess(self):
         msg = "A small change"
-        receipt = "Entry request JSON: " + json.dumps(msg) + "\n"
+        receipt = "Entry source kind: text\nEntry request SHA-256: " + fs.digest(msg.encode()) + "\n"
         self.saved("a", "# Acceptance contract: first\n", receipt)
         self.saved("b", "# Acceptance contract: second\n", receipt)
         with self.assertRaisesRegex(ValueError, "multiple saved contracts match"):
@@ -119,6 +120,13 @@ class SingleEntryTests(unittest.TestCase):
         (self.root / proposed["suggested_work_item"]).write_text("Unrelated existing contract")
         with self.assertRaisesRegex(ValueError, "already belongs to different source"):
             fs.entry_source(self.root, different)
+
+    def test_malformed_text_provenance_blocks_instead_of_guessing(self):
+        msg = "Safe request"
+        self.saved("malformed", "# Acceptance contract: malformed\n",
+                   "Entry source kind: text\nEntry request SHA-256: invalid\n")
+        with self.assertRaisesRegex(ValueError, "provenance is malformed"):
+            fs.entry_source(self.root, msg)
 
     def test_work_markdown_is_a_spec_unless_explicit_legacy_contract(self):
         (self.root / "work").mkdir()
