@@ -281,10 +281,18 @@ def matching_receipt(rows, record):
     return matches[0] if matches else None
 
 
-def receipt_target(root, record, pr_url=None, receipt_issue=None, receipt_ref=None):
+def receipt_target(root, record, pr_url=None, receipt_issue=None, receipt_ref=None,
+                   checkpoint=None):
     """Select the original issue, matching PR, or an exact existing Git ref."""
     source = fs.safe(root, record["work_item"])
     text = source.read_text(encoding="utf-8") if source.is_file() else ""
+    if not text and checkpoint is not None:
+        _, files = fs.read_checkpoint(root, checkpoint)
+        candidates = [data for scope, path, data in files
+                      if scope in ("project", "agreement") and path == record["work_item"]]
+        need(len(candidates) == 1,
+             "original acceptance contract is not recoverable for receipt routing")
+        text = candidates[0].decode("utf-8")
     issue_urls = set(re.findall(
         r"^Source attribution:\s*(https://github\.com/[^\s;]+/issues/\d+)",
         text, re.M))
@@ -464,6 +472,12 @@ def finalize(root, original, checkpoint, *, repository, remote, method,
             checked = check_ready(root, original, remote, repository,
                                   pr, method, saved, runner=runner)
             if not execute:
+                # A historical lost-response intent is not a fresh READY
+                # invitation to dispatch another potentially duplicate merge.
+                retained = Path(readiness).read_text(encoding="utf-8")
+                if "<!-- p2p-merge-intent:" in retained:
+                    return {"status": "PARTIAL", "phase": "MERGE_RECONCILIATION",
+                            "reason": "a previously reserved merge effect needs remote reconciliation"}
                 return {"status": "READY_TO_MERGE", "readiness": checked,
                         "receipt_published": False,
                         "next_action": "A separately authorized merge and exact readback are required."}
@@ -556,7 +570,7 @@ def finalize(root, original, checkpoint, *, repository, remote, method,
     # when an earlier grant has since expired. A NEW effect still requires an
     # exact covering mandate inside comment_receipt/git_receipt.
     destination = receipt_target(root, final_record, pr_url,
-                                 receipt_issue, receipt_ref)
+                                 receipt_issue, receipt_ref, checkpoint=checkpoint)
     try:
         if destination["kind"] == "comment":
             receipt = comment_receipt(final_record, destination, mandate,
