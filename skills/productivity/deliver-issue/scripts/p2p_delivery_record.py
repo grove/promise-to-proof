@@ -190,8 +190,8 @@ def _source_context(root, record, checkpoint, artifact_directory):
             "candidate": candidate, "review": review_bytes, "proof": proof_bytes}
 
 
-def _independent_coverage(context, record):
-    """A new landed claim needs the complete independent #82 stage receipts."""
+def _independent_coverage(root, context, record):
+    """A landed claim requires retained independent stage and scope evidence."""
     state = context["execution"]
     _need(isinstance(state, dict), "landed code needs a full verified #82 controller checkpoint")
     reports = state.get("reports")
@@ -199,6 +199,11 @@ def _independent_coverage(context, record):
     attempts = state.get("attempts")
     _need(isinstance(attempts, list), "stage receipts are missing")
     sessions = []
+    # The #41 trace is optional for historical accepted records. When it was
+    # emitted, its exact bytes and coverage must still agree with the product
+    # snapshot rather than being silently ignored by the landed-code validator.
+    snapshot = None
+    change_set = None
     for name, expected in (("review", "REVIEWED"), ("proof", "PROVEN")):
         meta = reports.get(name)
         _need(isinstance(meta, dict) and isinstance(meta.get("path"), str),
@@ -207,6 +212,37 @@ def _independent_coverage(context, record):
         _need(data is not None and fs.digest(data) == meta.get("sha256"),
               "unretrievable independent " + name + " report")
         report = json.loads(data)
+        trace_digest = meta.get("coverage_trace_sha256")
+        if trace_digest is not None or "coverage_trace" in report:
+            _digest(trace_digest, name + " coverage trace digest")
+            trace = report.get("coverage_trace")
+            _need(isinstance(trace, dict) and
+                  fs.digest(fs.canonical(trace)) == trace_digest,
+                  name + " scope/coverage trace differs from retained bytes")
+            if snapshot is None:
+                exclusions = record["agreement_paths"]
+                snapshot = fs.snapshot(root, context["checkpoint"]["candidate_commit"],
+                                       exclude=exclusions)
+                baseline = fs.snapshot(root, record["comparison_base"],
+                                       exclude=exclusions)
+                change_set = fs.tree_changes(baseline, snapshot)
+            evidence_ids = []
+            for (_scope, _path), content in context["indexed"].items():
+                if not _path.endswith(".json"):
+                    continue
+                try:
+                    evidence = json.loads(content)
+                except (ValueError, UnicodeError):
+                    continue
+                if (isinstance(evidence, dict) and
+                        evidence.get("schema") == "promise-to-proof/evidence-record/v1" and
+                        isinstance(evidence.get("id"), str) and
+                        evidence.get("candidate") == record["candidate_key"] and
+                        evidence.get("contract") == record["contract"]):
+                    evidence_ids.append("record:" + evidence["id"] + "@sha256:" +
+                                        fs.digest(fs.canonical(evidence)))
+            fs.validate_coverage_trace(trace, context["requirements"],
+                                       report, name, snapshot, change_set, evidence_ids)
         _need(report.get("status") == expected and not report.get("gaps") and
               (name != "review" or not report.get("findings")),
               "nonpassing or incomplete " + name + " verdict")
@@ -463,7 +499,7 @@ def validate(root, record, *, checkpoint=None, artifact_directory=None):
                 "next_action": "Local review and proof do not establish code landing, publication or merge."}
     _need(checkpoint is not None,
           "landed-code validation needs the exact published #82 checkpoint bytes")
-    _independent_coverage(context, record)
+    _independent_coverage(root, context, record)
     return _verified_landing(root, record, record["landing"], context, checkpoint)
 
 
