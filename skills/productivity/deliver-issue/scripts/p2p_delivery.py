@@ -4411,7 +4411,7 @@ def main(argv=None):
     except (ValueError, OSError, KeyError, TypeError, UnicodeError, subprocess.SubprocessError) as error:
         message = str(error)
         if delivery:
-            if args.action == 'resume' and delivery.read_only and delivery.state.get('status') == 'REVIEWED_AND_PROVEN':
+            if args.action in ('run', 'resume') and delivery.read_only and delivery.state.get('status') == 'REVIEWED_AND_PROVEN':
                 # A rejected fast-path readback is NOT a new delivery failure.
                 # Never destroy the last accepted immutable verdict or rewrite
                 # its receipts to BLOCKED merely because a probe detected drift.
