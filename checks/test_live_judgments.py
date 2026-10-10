@@ -63,8 +63,9 @@ class OfflineJudgmentTransport:
                 "learning_candidates": [], "details": "OFFLINE STUB: not live proof",
             }
         product = Path(prompt.split('workspace ', 1)[1].split('. ', 1)[0])
-        manifest = d.fs.snapshot(product)
-        changed = d.fs.tree_changes(d.fs.snapshot(product, inputs['comparison_base']), manifest)
+        excluded = [inputs['work_item']] + [item['path'] for item in inputs.get('binding_inputs', [])]
+        manifest = d.fs.snapshot(product, exclude=excluded)
+        changed = d.fs.tree_changes(d.fs.snapshot(product, inputs['comparison_base'], exclude=excluded), manifest)
         paths = [item['path'] for item in changed]
         report['coverage_trace'] = {
             'requirements': [{'id': row['id'], 'paths': paths,
