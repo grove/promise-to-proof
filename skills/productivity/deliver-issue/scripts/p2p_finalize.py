@@ -72,6 +72,31 @@ def remote_branches(root, remote, *, runner=subprocess.run):
     return branches
 
 
+def ensure_remote_commit(root, remote, sha, *, ref=None, runner=subprocess.run):
+    """Fetch missing Git objects without changing checkout, index or tracked refs.
+
+    Remote PR merges create a commit that usually is NOT in the publication
+    workspace. Fetch only the exact advertised ref (or requested immutable SHA)
+    into the object database; avoid FETCH_HEAD and tracking ref updates.
+    """
+    need(isinstance(sha, str) and COMMIT.fullmatch(sha),
+         "remote object requires an exact commit SHA")
+    present = subprocess.run(
+        ["git", "-C", str(root), "cat-file", "-e", sha + "^{commit}"],
+        capture_output=True)
+    if present.returncode == 0:
+        return sha
+    source = ref or sha
+    result = run(["git", "-C", str(root), "fetch", "--no-tags",
+                  "--no-write-fetch-head", "--refmap=", remote, source],
+                 check=False, runner=runner)
+    need(result.returncode == 0,
+         "exact remote Git commit could not be fetched read-only: " + sha)
+    need(fs.full_commit(root, sha) == sha,
+         "fetched remote Git objects do not include the requested exact commit")
+    return sha
+
+
 def remote_contains(root, ancestor, tips):
     return any(subprocess.run(
         ["git", "-C", str(root), "merge-base", "--is-ancestor", ancestor, tip],
@@ -86,6 +111,23 @@ def portable(root, checkpoint, remote, *, runner=subprocess.run):
     tips = set(branches.values())
     need(tips, "remote has no verifiable published Git branches")
     for sha in value["required_commits"]:
+        if not remote_contains(root, sha, tips):
+            # The checkpoint itself identifies exact source/candidate commits.
+            # Attempt a read-only fetch rather than requiring a manual step.
+            try:
+                ensure_remote_commit(root, remote, sha, runner=runner)
+            except ValueError:
+                pass
+            if not remote_contains(root, sha, tips):
+                # Remote tips can be newer than this checkout even if the
+                # checkpoint SHA is present. Resolve only unknown tip objects.
+                for tip in tips:
+                    if remote_contains(root, sha, (tip,)):
+                        break
+                    try:
+                        ensure_remote_commit(root, remote, tip, runner=runner)
+                    except ValueError:
+                        continue
         need(remote_contains(root, sha, tips),
              "checkpoint Git commit is not recoverable from the remote's branches: " + sha)
     destination = value["destination"]
@@ -501,6 +543,9 @@ def finalize(root, original, checkpoint, *, repository, remote, method,
         need(pr["base"]["ref"] == original["routing"]["destination"],
              "PR target conflicts with approved delivery routing")
         head = pr["head"]["sha"]
+        ensure_remote_commit(root, remote, head,
+                             ref=f"refs/pull/{pr['number']}/head",
+                             runner=runner)
         need(fs.snapshot_key(fs.snapshot(
             root, head, exclude=original["agreement_paths"])) ==
              original["candidate_key"],
@@ -567,8 +612,9 @@ def finalize(root, original, checkpoint, *, repository, remote, method,
         need(isinstance(confirmed_at, str) and confirmed_at,
              "GitHub reports a merge without its timestamp")
         if method in ("merge", "squash"):
-            need(fs.full_commit(root, after) == after,
-                 "the merged commit is not available; fetch it for mapping verification")
+            ensure_remote_commit(root, remote, after,
+                                 ref="refs/heads/" + original["routing"]["destination"],
+                                 runner=runner)
             parents = fs.git(root, "rev-list", "--parents", "-n", "1", after).decode().split()
             need(len(parents) >= 2, "landed commit lacks a confirmed predecessor")
             before = parents[1]
@@ -584,10 +630,10 @@ def finalize(root, original, checkpoint, *, repository, remote, method,
         branches = remote_branches(root, remote, runner=runner)
         target_ref = "refs/heads/" + original["routing"]["destination"]
         tip = branches.get(target_ref)
-        need(tip and remote_contains(root, after, (tip,)),
+        need(tip, "approved target branch is unavailable on the remote")
+        ensure_remote_commit(root, remote, tip, ref=target_ref, runner=runner)
+        need(remote_contains(root, after, (tip,)),
              "delivered commit cannot be found on the remote destination history")
-        need(fs.full_commit(root, tip) == tip,
-             "current remote target needs exact local Git objects before verification")
         final_record = records.preview(
             root, original, checkpoint=checkpoint, method=method,
             repository=repository, destination_ref=original["routing"]["target_ref"],
