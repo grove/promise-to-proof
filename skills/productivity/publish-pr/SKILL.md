@@ -207,8 +207,18 @@ Choose a repository-conforming head branch named `issue/<number>` for the source
 issue when allowed; otherwise use a repository-conforming name that includes the
 issue number, or a stable source slug when there is no numbered issue. Keep
 credentials and sensitive data out of the name. A child PR uses its child issue
-number; one integrated parent PR uses the parent issue number. Prepare a concise
-title and complete body containing:
+number; one integrated parent PR uses the parent issue number. Prepare a concise title and **human-first GitHub Markdown body**. Lead
+with what this PR changes for users, the concrete checks and observed
+acceptance proof, what the saved review found, and what still needs to happen.
+Clearly distinguish independent P2P `REVIEWED`, independently `PROVEN`,
+GitHub approval (not granted by P2P), merge readiness (NOT ASSESSED), and
+actual merge (not performed). Do not imply that proof means CI is green or
+the destination is updated. Keep identifying metadata, source/recovery links,
+immutable hashes and stable markers in one collapsed `<details>` block so
+the overview remains readable without expanding it. Never invent checks,
+findings, proof results or compatibility; derive claims from the saved reports.
+
+The complete body must still retain:
 
 - the source reference and exact contract identity;
 - the candidate snapshot identity and matching or proposed commit;
