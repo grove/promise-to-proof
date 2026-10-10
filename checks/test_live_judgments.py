@@ -75,6 +75,8 @@ class OfflineJudgmentTransport:
             **({'inspected_paths': sorted({item['path'] for item in manifest} & set(paths))}
                if stage == 'review' else {}),
         }
+        if 'coverage_trace.risks' in prompt:
+            report['coverage_trace']['risks'] = []  # No extra material risks in the low-risk offline fixture.
         session = "offline-" + uuid.uuid4().hex
         events = [
             {"type": "thread.started", "thread_id": session},
