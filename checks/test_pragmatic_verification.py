@@ -71,7 +71,7 @@ class PragmaticVerificationRules(unittest.TestCase):
                 self.assertIn(phrase, policy)
         for phrase in (
             'what observable failure',
-            'production validator',
+            'validator under test',
             'the precise test/location',
             'realistic security, concurrency or persistence failure trigger',
             'Do not require a mutation experiment',
