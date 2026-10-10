@@ -324,6 +324,70 @@ class RecoveryReceiptTests(unittest.TestCase):
         self.assertEqual(self.fake.calls.count('proof'), 1)
 
 
+    def test_unfalsifiable_diagnosis_gets_one_format_correction_not_an_unsafe_repair(self):
+        self.fake.mode = 'partial-implementation'
+
+        def wishful(stage, message):
+            if stage == 'diagnosis':
+                report = json.loads(message)
+                report['expected_result'] = 'Try harder until it looks good.'
+                return json.dumps(report)
+            return message
+
+        with self.responses(wishful):
+            code, value = self.cli()
+        self.assertEqual(code, 1, value)
+        self.assertIn('invalid after one format correction', value['blocker'])
+        self.assertIn('falsifiable expected result', value['blocker'])
+        self.assertEqual(self.fake.calls.count('diagnosis'), 2)
+        self.assertEqual(self.fake.calls.count('repair'), 0)
+
+    def test_stall_resets_approach_and_reaches_fresh_review_and_proof(self):
+        self.fake.mode = 'multi-repair'
+        original = self.fake
+
+        def different_method(*args):
+            result = original(*args)
+            stage, path = original.calls[-1], args[2]
+            if stage == 'repair' and original.calls.count('repair') == 2:
+                workspace = Path(args[0][args[0].index('-C') + 1])
+                (workspace / 'greet.py').write_text("print('hello')\n# alternative native implementation\n")
+            if stage not in ('proof', 'diagnosis'):
+                return result
+            events = [json.loads(line) for line in path.read_text().splitlines()]
+            message = next(row['item'] for row in events
+                           if row.get('item', {}).get('type') == 'agent_message')
+            report = json.loads(message['text'])
+            if stage == 'proof' and original.calls.count('proof') <= 2:
+                report['requirements'][0]['verdict'] = 'not proven'
+                report['gaps'] = ['R1: the output remains wrong' if original.calls.count('proof') == 1
+                                  else 'R1 still has no passing observation for stdout']
+            if stage == 'diagnosis' and original.calls.count('diagnosis') == 2:
+                report.update(strategy_changed=True, strategy_key='replace-cli-entrypoint',
+                              approach='Replace the previous patch with a direct native CLI implementation.',
+                              difference_from_prior='Stop patching the old function; change the CLI entry point.',
+                              expected_result='Run python3 greet.py and observe exact hello newline, exit status zero.')
+            message['text'] = json.dumps(report)
+            path.write_text(''.join(json.dumps(item) + '\n' for item in events))
+            return result
+
+        with patch.object(d, 'launch', different_method):
+            code, value = self.cli()
+        self.assertEqual(code, 0, value)
+        self.assertEqual(self.fake.calls.count('repair'), 2)
+        self.assertEqual(self.fake.calls.count('diagnosis'), 2)
+        self.assertEqual(self.fake.calls.count('review'), 3)
+        self.assertEqual(self.fake.calls.count('proof'), 3)
+        state = self.state()
+        self.assertEqual(state['recovery_history'][1]['strategy_key'], 'replace-cli-entrypoint')
+        self.assertEqual(state['recovery_history'][1]['stall']['kind'], 'unresolved_proof_behavior')
+        self.assertIn('Stall perspective reset', [prompt for name, prompt in self.fake.prompts
+                                                 if name == 'diagnosis'][1])
+        self.assertEqual(state['recovery_history'][1]['status'], 'complete')
+        self.assertNotEqual(state['recovery_history'][0]['candidate_after'],
+                            state['recovery_history'][1]['candidate_after'])
+
+
 class RecoveryProgressTests(unittest.TestCase):
     def test_candidate_cycle_forces_diagnosis_even_when_findings_change_phase(self):
         delivery = object.__new__(d.Delivery)
