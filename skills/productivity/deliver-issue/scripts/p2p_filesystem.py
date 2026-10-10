@@ -388,8 +388,21 @@ def validate_coverage_trace(trace, requirement_ids, report, stage, manifest, cha
     cites Evidence Record v1. A record reference's syntax, not authenticity or
     availability, is checked here. Direct rows remain supported.
     """
-    if not isinstance(trace, dict) or set(trace) != {"requirements", "supporting_changes"}:
-        raise ValueError("coverage trace requires requirements and supporting_changes")
+    required = {"requirements", "supporting_changes"}
+    if stage == "review":
+        required.add("inspected_paths")
+    if not isinstance(trace, dict) or set(trace) != required:
+        raise ValueError("coverage trace has missing or unsupported fields")
+    if stage == "review":
+        inspected = trace["inspected_paths"]
+        if not isinstance(inspected, list) or len(set(inspected)) != len(inspected):
+            raise ValueError("review inspected paths must be unique")
+        if any(not _coverage_path(p) or p not in {x["path"] for x in manifest}
+               for p in inspected):
+            raise ValueError("review claims inspection of an absent product path")
+        changed_current = {x["path"] for x in changed} & {x["path"] for x in manifest}
+        if report["status"] == "REVIEWED" and not changed_current <= set(inspected):
+            raise ValueError("review has not inspected all changed product files")
     if not isinstance(trace["requirements"], list) or not isinstance(trace["supporting_changes"], list):
         raise ValueError("coverage trace lists are malformed")
     current = {row["path"] for row in manifest}
@@ -404,7 +417,8 @@ def validate_coverage_trace(trace, requirement_ids, report, stage, manifest, cha
             raise ValueError("coverage requirement has missing or unsupported fields")
         name = item["id"]
         ids.append(name)
-        if (not isinstance(name, str) or not isinstance(item["paths"], list)
+        if (not isinstance(name, str) or name not in observations
+                or not isinstance(item["paths"], list)
                 or not isinstance(item["evidence"], list)
                 or type(item["existing"]) is not bool):
             raise ValueError("coverage requirement has malformed values")
