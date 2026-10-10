@@ -1283,7 +1283,7 @@ def checkpoint_documents(root, work):
     """Collect live agreements and referenced receipts, not every draft or log."""
     selected = set()
     pending = [work]
-    records = ("contract.md", "contract-origin.json", "planning-handoff.md", "delivery-shape.md", "slicing.md",
+    records = ("continuity.json", "contract.md", "contract-origin.json", "planning-handoff.md", "delivery-shape.md", "slicing.md",
                "slicing-approval.md", "source-publication.md", "tracker-publication.json",
                "tracker-publication.md", "publication.md", "archive.md", "implementation.md",
                "review.md", "proof.md", "audit.md", "repair.md", "candidate.json", "retrospective.md")
