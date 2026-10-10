@@ -353,15 +353,17 @@ A matching saved local agreement or portable checkpoint is a candidate for reuse
 not evidence that the current source is unchanged, that approval exists, or
 that review and proof are current. Re-read and reconcile the complete binding
 source, issue amendments, contract bytes, approval receipt, delivery-shape
-identity and host capabilities. For direct text, retain the exact JSON-escaped
-request in the existing `planning-handoff.md` as
-`Entry request JSON: <JSON string>`; the selected checkpoint retains that
-provenance. A request's stable filename suggestion is not authority to overwrite
+identity and host capabilities. For direct text, retain
+`Entry source kind: text` and `Entry request SHA-256: <64 lowercase hex>`
+in the existing `planning-handoff.md`; the selected checkpoint retains that
+fingerprint without duplicating potentially sensitive freeform input. A request's stable filename suggestion is not authority to overwrite
 an existing work item. Issue numbers are meaningful only under the currently
 configured tracker; do not infer the repository or permissions from a remote.
 
-When no agreement matches, `deliver-issue` uses the existing
-`plan-acceptance` and independent audit locally, obtains any needed decision
+When no local agreement matches, first import any already-approved exact issue
+planning handoff under the existing standalone planning rules. Otherwise
+`deliver-issue` uses the existing `plan-acceptance` and independent audit
+locally, obtains any needed decision
 or approval, and advances through #77 sizing and #60 admission in the **same
 outer invocation**. `/plan-acceptance` remains independently available for
 plan-only use. Resuming an admitted or checkpoint-restored request follows its
