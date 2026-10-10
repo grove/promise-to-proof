@@ -10,9 +10,11 @@ Take one repository-relative `.p2p/work/<slug>/contract.md` path and return matc
 does not need to supply stage commands or artifact paths. Read the
 [acceptance contract protocol](references/acceptance-contract-protocol.md) before
 acting. Its contract, identity, evidence, and authority rules govern every step.
-Use the installed `plan-acceptance`, `implement-contract`,
+Use `plan-acceptance`, `implement-contract`,
 `review-implementation`, `prove`, and, when needed, `repair-gaps` skills for
 their respective judgments. This skill owns their handoffs, not their verdicts.
+Controller stage contexts use the invocation's preserved instruction snapshots;
+ordinary resume does not silently adopt later installation changes.
 The delivery controller requires Python 3.11 or newer; verify `python3 --version`
 before invoking its scripts.
 
@@ -84,6 +86,33 @@ the requested new limits, then `resume`. Unlimited is supported; do not impose
 a replacement deadline or require a fresh invocation merely to represent it.
 Retain the extension receipt and prior admission. Explicit deadlines terminate
 workers and preserve observations; they never establish passing verdicts.
+
+## Upgrade instructions without restarting delivery
+
+Follow the protocol's
+[instruction identity and upgrade rules](references/acceptance-contract-protocol.md#delivery-instruction-identity-and-upgrades).
+When the user requests current P2P improvements for retained work, inspect the
+existing invocation and use `upgrade-instructions <contract>` to preview the
+installed instruction changes. Apply a compatible change with
+`upgrade-instructions <contract> --authorize-upgrade` under the covering request
+and local implementation/evidence authority, then use ordinary `resume`. Do not
+ask again when the existing request already authorizes this local adoption.
+
+Adoption preserves the agreement, candidate, base, completed implementation,
+history and saved limits. It launches no model stage. After a real instruction
+change, fresh independent review and proof assess the same candidate under the
+new instructions; use focused checks and valid observation history to avoid
+repeating unnecessary work. Repair only material findings. Selecting the
+already-effective instructions preserves completed verification without another
+transition or dispatch.
+
+Reconcile known finished workers using their original inputs before adoption.
+A running or uncertain worker blocks the transition; missing old instruction
+bytes, incompatible versions and missing authority need their precise supported
+recovery action. Preserve legacy state and recover its original installation
+when complete instruction snapshots are unavailable. Never reset delivery,
+manually edit admission hashes or rewrite the contract to force an upgrade.
+An interrupted transition resumes exactly once through the existing controller.
 
 ## Resolve the delivery destination
 
@@ -363,7 +392,9 @@ obtain any required approval before changing local routing.
     original reviewed candidate identity; they do not make a new HEAD proven.
     Reread its canonical agreement,
     saved candidate and reports; validate identities and scope before reusing
-    any result. If an artifact is missing, storage is pending, or a candidate
+    any result. Use the effective preserved instructions and retain each report's
+    original instruction identity; an explicit upgrade follows the section above.
+    If an artifact is missing, storage is pending, or a candidate
     changed, return to the earliest affected step. Preserve earlier artifacts
     as history while delivery remains unresolved; successful cleanup may remove
     only superseded generated reports after final-record readback. Do not infer
@@ -378,9 +409,12 @@ Git checkpoint and its candidate work branch, or the exact GitHub checkpoint
 comment and candidate branch; verify remote readback with the filesystem helper.
 Do not copy transcripts or execution workspaces. On another computer use
 `checkpoint-restore` (or `checkpoint-github-restore`) before the existing
-controller `resume`; restore preserves the frozen base and completed stage
-identities while requiring fresh host preflight. An uncertain dispatch or missing
-required evidence/commit blocks transfer. Never delete local state until the
+controller `resume`; restore preserves the frozen base, effective instruction
+snapshot and completed stage identities while requiring fresh host preflight.
+Select `--upgrade-instructions --authorize-upgrade` on restore only for an
+authorized compatible instruction change through the same adoption path.
+An uncertain dispatch or missing required evidence/commit blocks transfer.
+Never delete local state until the
 selected checkpoint and all required candidate/source commits are portable.
 
 Return `REVIEWED` and `PROVEN` only when the full saved reports match the current

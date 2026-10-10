@@ -2,6 +2,8 @@
 name: prove
 description: Verify an implemented issue against its promises without changing the candidate, and report PROVEN or NOT PROVEN with concrete evidence.
 disable-model-invocation: true
+metadata:
+  p2p-instruction-compatibility: delivery-v1
 ---
 
 `/prove` checks whether a ticket, specification, or agreed outcome is actually

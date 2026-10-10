@@ -1,5 +1,7 @@
 # Acceptance bundle v1
 
+<!-- p2p-instruction-dependencies: -->
+
 An acceptance bundle lets an independent process check whether retained
 `REVIEWED` and `PROVEN` claims are internally consistent without another model
 call. Version 1 supports exact contracts and reproducible snapshot candidates.

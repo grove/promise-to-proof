@@ -155,6 +155,8 @@ def projection(code, saved):
         generation = 2 if b'repaired fixture' in content else 1
     verifiers = []
     expected_identity = {k: v for k, v in (candidate or {}).items() if k not in ('manifest', 'changes')}
+    if saved.get('instruction_identity'):
+        expected_identity['instruction_identity'] = saved['instruction_identity']
     if saved.get('routing') is not None:
         expected_identity['routing'] = saved['routing']
     if saved.get('local_git_generations'):

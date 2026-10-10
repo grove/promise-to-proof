@@ -8,6 +8,12 @@ autonomy, measurement and acceptance-bundle modules in its own `scripts/` direct
 it does not require this development repository after installation. It inherits
 the configured OpenAI model and reasoning preference. Other model providers are unsupported.
 
+At admission it preserves the stage skills and their material rule/protocol
+dependencies. Stages read those snapshots, so a later installation update does
+not silently change an active delivery. Use the
+[instruction upgrade command](#upgrade-an-active-deliverys-instructions) to adopt
+a compatible update without discarding completed implementation.
+
 The execution root defaults to `~/.p2p/executions`. For new work, set
 `P2P_EXECUTION_ROOT` to an absolute, persistent directory outside the source
 checkout that the current session can write. For example:
@@ -279,6 +285,65 @@ relationship to the frozen base, and the observation time. A changed approved
 plan still blocks resume. Successful completion means the exact candidate was
 reviewed and proven against the frozen base. It does not establish compatibility
 with the current destination.
+
+## Upgrade an active delivery's instructions
+
+Install the desired P2P version, then preview its effect on the retained delivery:
+
+```sh
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source upgrade-instructions .p2p/work/example/contract.md
+```
+
+The preview is read-only. It identifies the preserved and proposed instruction
+sets, changed inputs and compatibility, and explains which verification becomes
+historical. Ordinary `resume` continues with the preserved instructions even
+when the installation has changed.
+
+When the user has requested the compatible upgrade and the current mandate
+covers local implementation and evidence decisions, adopt it and continue:
+
+```sh
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source upgrade-instructions .p2p/work/example/contract.md --authorize-upgrade
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source resume .p2p/work/example/contract.md
+```
+
+Adoption performs no model call. It preserves the exact contract, binding inputs,
+candidate, frozen base, source checkout, routing, completed implementation,
+attempts, recovery history, mandate and existing limits/deadlines. New independent
+review and proof contexts use the updated instructions and assess the retained
+candidate. They make fresh observations under the changed instructions, using
+the smallest sufficient checks and issuing their own reports. An unchanged
+agreement and host retain valid readiness observations, so this local update
+does not repeat host preflight. Implementation runs
+again only when a material finding needs a repair. Old reports and their exact
+instruction identities remain historical evidence.
+
+Selecting the already-effective instruction set changes nothing and launches
+no worker. If adoption is interrupted, run ordinary `resume`: its retained
+transition is reconciled once without resetting counters or duplicating stages.
+This operation adds no time or attempt allowance; explicitly requested limit
+extensions still use `extend` separately.
+
+| If adoption is blocked | Next action |
+|---|---|
+| A worker is still running or its exit is uncertain | Keep its records and establish completion through the existing recovery path. A known finished worker is reconciled under its original inputs before adoption. |
+| A required old instruction snapshot is missing | Recover the exact retained input. For legacy work without snapshots, recover the original installation/version and use its existing resume path. |
+| The installed instructions declare incompatible delivery meanings | Install a compatible version. Do not edit compatibility metadata to force adoption. |
+| The requested upgrade or covering local authority is missing | Obtain the specific missing grant, preserving the existing delivery and preview. |
+
+The compatibility family covers agreement, candidate, authority and stage-report
+meanings. Skill and rule authors must retain material dependency declarations;
+the [canonical instruction rules](acceptance-contract-protocol.md#delivery-instruction-identity-and-upgrades)
+define that boundary. Neither a matching family nor faster checking can weaken
+the accepted outcome, independent verification or authority requirements.
+
+Checkpoint restoration uses the same mechanism: it restores pinned instructions
+by default, or adopts the compatible installation when both
+`--upgrade-instructions --authorize-upgrade` are explicitly selected. See
+[moving work between computers](p2p-checkpoints.md#recover-on-another-computer).
+The supported live controller remains macOS with Codex CLI. Deterministic fixture
+checks establish state preservation and dispatch behavior, not measured model
+delivery times or a live host upgrade result.
 
 ## Check target movement
 

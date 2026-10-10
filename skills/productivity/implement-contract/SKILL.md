@@ -2,6 +2,8 @@
 name: implement-contract
 description: Implement a versioned acceptance contract completely and within scope, with development checks and an exact candidate handoff.
 disable-model-invocation: true
+metadata:
+  p2p-instruction-compatibility: delivery-v1
 ---
 
 Implement the agreed capability and its supporting checks. Before acting, read

@@ -2,6 +2,8 @@
 name: review-implementation
 description: Review a fixed implementation against its acceptance contract, scope, and engineering obligations without editing it or declaring acceptance.
 disable-model-invocation: true
+metadata:
+  p2p-instruction-compatibility: delivery-v1
 ---
 
 Review an implementation against the agreement. `/critique` reviews proposals;
