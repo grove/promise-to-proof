@@ -252,8 +252,34 @@ python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/t
 python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source resume .p2p/work/example/contract.md
 ```
 
-`status` reads and validates existing records without writing. `resume` continues
-the same invocation. Repeating `run` with the exact original arguments also
+`status` reads and validates existing records without writing. It places
+`human_progress` **first** in the JSON response: a deterministic account of
+what happened, why it matters, the work's actual location, whether a decision
+is required, and the next supported action. All original raw fields remain.
+For a readable terminal paragraph, or to inspect an exact known PR:
+
+```sh
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source status .p2p/work/example/contract.md --human
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery.py --repo /path/to/source status .p2p/work/example/contract.md --pr https://github.com/OWNER/REPO/pull/123 --human
+```
+
+The optional PR lookup uses read-only GitHub CLI readback and verifies the
+current PR head's complete product tree, destination branch and stable
+contract/candidate publication identity before claiming a publication or
+merge. One unambiguous saved PR URL in `publication.md` may supply a lookup
+hint; a note alone never establishes publication. If GitHub access or the
+candidate's exact Git objects are unavailable, the external effect stays
+**unconfirmed**. An open PR is not merged; a verified merge is not a
+completed-delivery receipt until the separately planned #50/#47 finalization
+is implemented. A local accepted candidate remains in the isolated workspace
+and does not modify the operator checkout.
+
+A restored checkpoint carries earlier evidence but does not prove that a
+worker is active or the receiving host's preflight passed. When host
+initialization fails, `human_progress` names the blocker and preserved
+work rather than claiming implementation, review, or proof ran. The
+independent audit's `READY_FOR_APPROVAL` is not human approval.
+`resume` continues the same invocation. Repeating `run` with the exact original arguments also
 resumes it. A changed argument blocks instead of creating a new repair allowance.
 One exclusive lock covers admission, dispatch, and result persistence.
 
