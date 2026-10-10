@@ -1384,11 +1384,20 @@ def checkpoint(root, work, destination=None, execution=None, candidate_commit=No
             required.add(head)
             files.append(row)
             return
+        # Only actual product files in the project scope can be recovered
+        # from a Git tree. Runtime, agreement, local receipts and ignored P2P
+        # documents are retained as exact checkpoint text; probing Git for
+        # each of those files cannot change the result and multiplied cold
+        # checkpoint process launches.
         commit = retained["git_commit"] if retained else head
-        committed = subprocess.run(["git", "-C", str(root), "show", str(commit) + ":" + relative], capture_output=True)
-        if scope == "project" and product_path(relative) and committed.returncode == 0 and committed.stdout == data:
-            row["git_commit"] = commit
-            required.add(commit)
+        if scope == "project" and product_path(relative):
+            committed = subprocess.run(["git", "-C", str(root), "show",
+                                        str(commit) + ":" + relative], capture_output=True)
+            if committed.returncode == 0 and committed.stdout == data:
+                row["git_commit"] = commit
+                required.add(commit)
+            else:
+                texts[sha] = data.decode("utf-8")
         else:
             texts[sha] = data.decode("utf-8")
         files.append(row)
