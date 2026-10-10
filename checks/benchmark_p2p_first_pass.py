@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Matched, offline cold-delivery timing. Never interpreted as live model speed.
 
-Before/after replaces Delivery._capture, Delivery.source_stable, and the
-checkpoint writer with their exact pre-change versions from issue #57 main.
+Before/after replaces Delivery._capture, Delivery.source_stable, Delivery.stage,
+and the checkpoint writer with their exact pre-change versions from issue #57 main.
 All other host, skill, preflight, verification, and recovery code stays identical. Source and
 candidate outcomes are checked. No live model calls are made.
 """
@@ -57,7 +57,9 @@ def episode(use_historical=False):
     original_fs_checkpoint = d.fs.checkpoint
     original_capture = d.Delivery._capture
     original_source_stable = d.Delivery.source_stable
+    original_stage = d.Delivery.stage
     stats = {"git_processes": 0, "snapshots": 0, "checkpoint_calls": 0,
+             "source_stable_calls": 0,
              "checkpoint_seconds": 0., "capture_seconds": 0.,
              "source_stable_seconds": 0.}
     def run(args, *positional, **kwargs):
@@ -80,6 +82,7 @@ def episode(use_historical=False):
     capture_fn = historical_method("_capture") if use_historical else original_capture
     stable_fn = historical_method("source_stable") if use_historical else original_source_stable
     fs_checkpoint_fn = historical_checkpoint() if use_historical else original_fs_checkpoint
+    stage_fn = historical_method("stage") if use_historical else original_stage
     def capture(self, *args, **kwargs):
         t = time.monotonic()
         try:
@@ -87,6 +90,7 @@ def episode(use_historical=False):
         finally:
             stats["capture_seconds"] += time.monotonic() - t
     def stable(self):
+        stats["source_stable_calls"] += 1
         t = time.monotonic()
         try:
             return stable_fn(self)
@@ -99,6 +103,7 @@ def episode(use_historical=False):
               patch.object(d.Delivery, "checkpoint", checkpoint),
               patch.object(d.fs, "checkpoint", fs_checkpoint_fn),
               patch.object(d.Delivery, "_capture", capture),
+              patch.object(d.Delivery, "stage", stage_fn),
               patch.object(d.Delivery, "source_stable", stable),
               contextlib.redirect_stderr(io.StringIO())):
             t = time.monotonic()
@@ -140,10 +145,13 @@ def compare(baseline, optimized):
             if old[key] != new[key]:
                 raise AssertionError(f"baseline/optimized mismatch for {key}: {old[key]} vs {new[key]}")
     fields = ("elapsed_seconds", "git_processes", "snapshots", "checkpoint_calls",
-              "checkpoint_seconds", "capture_seconds", "source_stable_seconds")
+              "checkpoint_seconds", "capture_seconds", "source_stable_seconds",
+              "source_stable_calls")
     before = {k: med(k, baseline) for k in fields}
     after = {k: med(k, optimized) for k in fields}
-    if after["snapshots"] >= before["snapshots"] or after["git_processes"] > before["git_processes"]:
+    if (after["snapshots"] >= before["snapshots"] or
+            after["git_processes"] > before["git_processes"] or
+            after["source_stable_calls"] >= before["source_stable_calls"]):
         raise AssertionError("first-pass optimization did not remove measured redundant work")
     if after["checkpoint_calls"] != before["checkpoint_calls"]:
         raise AssertionError("optimization changed durable checkpoint boundaries")
