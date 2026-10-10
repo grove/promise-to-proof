@@ -28,5 +28,15 @@ jobs:
         run: python3 -m py_compile skills/productivity/deliver-issue/scripts/p2p_finalize.py
       - name: Focused finalization regressions
         run: python3 -m unittest discover -s checks -p 'test_p2p_finalization.py' -v
+      - name: Controller regressions from latest main
+        run: |
+          cd checks
+          python3 -m unittest -v \
+            test_p2p_delivery.DeliveryTests.test_confirmed_stalled_worker_is_replaced_without_duplicate_uncertain_launch \
+            test_p2p_delivery.DeliveryTests.test_delegated_planning_is_audited_adopted_and_reimplemented \
+            test_p2p_delivery.DeliveryTests.test_legacy_approved_route_resumes_after_target_move_when_base_is_recoverable \
+            test_p2p_delivery.DeliveryTests.test_legacy_review_readback_uses_structured_summary \
+            test_p2p_delivery.DeliveryTests.test_repeated_deliveries_retain_only_final_record_growth \
+            test_p2p_delivery.DeliveryTests.test_status_and_cleanup_block_missing_state_with_local_runtime
       - name: Full deterministic regression suite
         run: python3 -m unittest discover -s checks -p 'test_*.py'
