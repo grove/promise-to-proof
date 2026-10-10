@@ -6,6 +6,8 @@ on:
       - 'checks/test_p2p_readiness.py'
       - 'checks/test_p2p_admission.py'
       - 'checks/test_p2p_delivery.py'
+      - 'checks/test_publish_pr_review.py'
+      - 'skills/productivity/publish-pr-review/**'
       - '.github/workflows/delivery-admission-tests.yml'
   workflow_dispatch:
 jobs:
@@ -19,5 +21,7 @@ jobs:
           python-version: '3.11'
       - name: Run admission and task-readiness tests (fixture host only)
         run: python3 -m unittest discover -s checks -p 'test_p2p_readiness.py' -v
+      - name: Check saved PR review submission (offline mocks only)
+        run: python3 -m unittest discover -s checks -p 'test_publish_pr_review.py' -v
       - name: Run pure admission decisions (fixture host only)
         run: python3 -m unittest discover -s checks -p 'test_p2p_admission.py' -v

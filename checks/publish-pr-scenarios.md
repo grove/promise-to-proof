@@ -320,3 +320,32 @@ retained locally, and resume/cleanup/publication use that same location despite
 a changed environment. An existing default candidate stays in place. A root
 inside the checkout is rejected. The operator's branch, HEAD, index, and product
 files remain unchanged.
+
+## Saved review publication (#70)
+
+In a disposable GitHub PR, generate a current independent review and proof for
+one exact candidate and use the ordinary authorized `publish-pr` flow.
+Supply separate precise `pr-review-comment` effect authority to submit the
+read-only previewed review. A developer unfamiliar with P2P should understand
+which behaviors were checked, whether material findings exist, whether
+acceptance was independently proven, and why GitHub approval and merge
+readiness remain separate. Pass only if the confirmed PR has exactly one
+human-readable non-approving top-level review with the same saved report
+digest, current candidate and PR head. It must not rerun the review worker.
+
+Repeat with saved material `CHANGES NEEDED` findings and a
+`pr-review-request-changes` grant. Pass when a request for changes is submitted
+only under that exact separate authority and reflects the original findings.
+Without the precise grant, do not write a review; retain the PR and
+review-publication preview and report the missing authorization.
+
+Change PR head, agreement, parent input, or reviewed product path between
+preview and submission. Pass when the old review does not appear current.
+After a lost GitHub response, inspect all submitted reviews and reconcile the
+exact original one instead of posting another. On identical retry, preserve
+one review; on a newly reviewed candidate, permit a new uniquely identified
+review only under fresh authority. Edited/duplicate matching reviews,
+unavailable readback and incomplete saved receipts must not claim publication.
+Human review discussions, unrelated PR-body edits, and prior reviews remain
+unchanged. Test this on an authorized disposable remote; offline fixtures are
+not live GitHub evidence.

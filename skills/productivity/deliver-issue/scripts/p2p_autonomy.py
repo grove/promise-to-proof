@@ -7,7 +7,7 @@ SCHEMA = 'promise-to-proof/autonomy/v1'
 DECISIONS = {'planning', 'sizing', 'routing', 'implementation', 'evidence', 'repair'}
 EFFECTS = {'issue-create', 'issue-update', 'issue-comment', 'issue-label',
            'issue-relationship', 'issue-close', 'branch-create', 'commit', 'push', 'pr-create',
-           'pr-update', 'pr-ready', 'merge', 'deploy'}
+           'pr-update', 'pr-ready', 'pr-review-comment', 'pr-review-request-changes', 'merge', 'deploy'}
 
 
 def limit(value, integer=False):

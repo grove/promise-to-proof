@@ -220,8 +220,18 @@ Choose a repository-conforming head branch named `issue/<number>` for the source
 issue when allowed; otherwise use a repository-conforming name that includes the
 issue number, or a stable source slug when there is no numbered issue. Keep
 credentials and sensitive data out of the name. A child PR uses its child issue
-number; one integrated parent PR uses the parent issue number. Prepare a concise
-title and complete body containing:
+number; one integrated parent PR uses the parent issue number. Prepare a concise title and **human-first GitHub Markdown body**. Lead
+with what this PR changes for users, the concrete checks and observed
+acceptance proof, what the saved review found, and what still needs to happen.
+Clearly distinguish independent P2P `REVIEWED`, independently `PROVEN`,
+GitHub approval (not granted by P2P), merge readiness (NOT ASSESSED), and
+actual merge (not performed). Do not imply that proof means CI is green or
+the destination is updated. Keep identifying metadata, source/recovery links,
+immutable hashes and stable markers in one collapsed `<details>` block so
+the overview remains readable without expanding it. Never invent checks,
+findings, proof results or compatibility; derive claims from the saved reports.
+
+The complete body must still retain:
 
 - the source reference and exact contract identity;
 - the candidate snapshot identity and matching or proposed commit;
@@ -350,6 +360,32 @@ For an uncertain push or pull-request response, search and read back by remote
 ref, marker, and exact identities before retrying. Reuse one confirmed exact
 effect. If no unique result can be established, return `PARTIAL` and do not
 repeat the write. Never delete a successful branch or pull request as rollback.
+
+## Publish the saved independent review with the PR
+
+After confirming an authorized draft PR by readback, use the optional
+`/publish-pr-review` skill **inside this same requested publication**.
+This reuses the saved independently produced `review.md` and original
+stage receipt; it never invokes `review-implementation` again.
+Build an exact preview against the current PR head, saved contract,
+source/parent bindings, reviewed scope, and retained candidate-to-commit
+mapping. A changed or unverifiable PR head blocks stale publication.
+
+Obtain separate exact effect authorization for the review submission:
+`pr-review-comment` for a clean non-approving `COMMENT`, or
+`pr-review-request-changes` for material saved findings. Neither is
+implied by permission to create a PR. The published review clearly
+distinguishes independent review, acceptance proof, GitHub approval and
+merge readiness. Reread the live PR head and entire review history,
+publish at most once, then read back by stable identity and exact body.
+Reconcile lost responses and identical retries without duplicate reviews.
+Preserve human reviews, PR edits and historical candidate reviews.
+
+If review-submission authority is missing, the PR can remain
+`PUBLISHED` while its review handoff is explicitly pending; retain the
+local preview and identify the one missing grant. Never falsely report
+the saved review as externally published. No new user-selected stage,
+independent verdict, extra approval policy or merge authority is added.
 
 ## Handoff to authorized finalization
 
