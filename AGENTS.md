@@ -48,12 +48,26 @@ truth for the same rule.
 
 ## Verification
 
-Run the repository's default deterministic checks after functional changes:
+During implementation and repair, run focused checks for the behavior being
+changed. Once the candidate is ready, run the repository's default deterministic
+suite once after the final functional changes:
 
 ```bash
 python3 -c 'import sys; assert sys.version_info >= (3, 11), f"Python 3.11+ required; found {sys.version.split()[0]}"' &&
 python3 -m unittest discover -s checks -p 'test_*.py'
 ```
+
+Do not repeat this full suite after every intermediate edit or merely because
+another stage needs a report. Repeat it when a later functional change invalidates
+its result or a concrete material risk requires it. Independent review and proof
+still inspect their own evidence and run the focused checks their conclusions
+need. The default suite uses an explicitly offline fixture host and requires no
+installed or authenticated Codex CLI; it is not live model or sandbox evidence.
+
+Historical comparison fixtures also need Git revisions
+`cc27a47f5ee765cff3cf13b21c36f974cb1234ae` (controller) and
+`eb84d66dd70ce8998cd43e951741785e8520c301` (agreement). If a checkout lacks
+either object, fetch that exact revision from `origin` before running the suite.
 
 The controller uses `tomllib`, which is included in Python starting with 3.11.
 Keep the version check when running the suite so an older `python3` fails before

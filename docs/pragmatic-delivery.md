@@ -36,6 +36,19 @@ it, or when focused checks cannot establish confidence in a material regression
 risk. Relevant failing checks, missing outcomes and important evidence gaps still
 block. This is not a waiver of the repository's test instructions.
 
+During a correction, run focused checks first. Run the required full suite once
+the candidate is ready for that gate, and repeat it only when a later change or
+a specific material risk invalidates the result. Review investigates engineering
+and scope concerns; it should not routinely duplicate the entire proof workload.
+Another report is useful only if it answers a question that is still open.
+
+Before implementation starts, the controller's existing host checks also inspect
+the task's required tools and evidence inputs. If, for example, the accepted
+evidence needs a service that the actual worker cannot reach, P2P reports that
+specific blocker immediately. It does not spend an implementation attempt
+rediscovering the same restriction. This inspection uses small prerequisite
+checks, and does not demand that the feature being implemented already exists.
+
 ## What happens after a small repair
 
 A changed candidate still gets fresh independent review and proof reports. Full
@@ -52,15 +65,24 @@ possibly the full set. Old verdicts never become verdicts for new code. The
 define the boundary. This change does not implement an automatic evidence cache,
 skip controller verifier dispatches, or widen verifier access to obtain history.
 
-## Resume existing work, including issue #77
+The controller now gives each verifier its own latest compatible report,
+command-evidence references, exact earlier and current Git generations, and the
+complete delta. Review never receives proof's report, and proof never receives
+review's report. Missing or corrupt optional history requires fresh observations;
+it does not create a separate repair project. A portable report without the
+original local command output is not treated as reusable local evidence.
 
-Refresh the installed P2P skills from the updated repository, including their
-shared protocol references. Verify the installed `prove` and
-`review-implementation` skills link to **Pragmatic assurance** and **Focused
-re-verification after a repair**. A worker already running with old instructions
-does not automatically reload them. Use the existing status and resume workflow
-at a safe handoff; reconcile any running or uncertain attempt before launching
-another worker. Do not reset the delivery just to load newer rules.
+## Resume existing work
+
+Use the existing status and resume workflow with the invocation's admitted
+stage-skill versions. A worker already running with old instructions does not
+automatically reload them. The controller still rejects changed installed stage
+skills; refreshing them is not an instruction-migration procedure. Supported
+instruction upgrades for an active delivery remain tracked in
+[#85](https://github.com/grove/promise-to-proof/issues/85). Preserve the retained
+state and original skill versions instead of editing admission hashes or
+resetting the delivery to hide that mismatch. New deliveries use the installed
+versions at their own admission.
 
 Keep the existing contract, requirement IDs, frozen comparison base, candidate
 workspace, execution location and history. Do not rewrite the acceptance contract
@@ -68,10 +90,12 @@ to get an easier pass or rebase the in-flight candidate merely because P2P's own
 rules changed. Resolve remaining material findings, leave optional polishing out,
 and finish once current review and proof genuinely establish the accepted result.
 
-For #77, preserving unaffected work, preventing unjustified fragmentation and
-verifying the combined #76 + #77 behavior are still obligations. The lighter rules
-remove redundant work; they do not remove those tests or promise that an existing
-candidate is already correct.
+For interrupted deliveries, a recorded process exit and an accepted stage report
+are separate facts. Invalid returned JSON must not leave a finished worker marked
+as an uncertain launch. The controller retains rejected output and a precise
+report error. A malformed read-only recovery diagnosis can receive one format
+correction against unchanged inputs; an actually uncertain process is never
+silently relaunched. Both fresh verifier verdicts are still required to finish.
 
 ## Verification of these rule changes
 

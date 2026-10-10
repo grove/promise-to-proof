@@ -208,6 +208,15 @@ runtime behavior. Preserve meaningful regression guards. Required integration
 checks still exercise the assembled outcome; historical child success alone is
 not evidence that the combined workflow works.
 
+Use focused checks while implementation or repair is changing the candidate.
+Run an expensive repository-wide check when the candidate is ready for that
+gate, rather than after each intermediate edit. A binding final-candidate check
+still runs after the last change that could affect it. Review resolves engineering
+and scope risks; it does not repeat the entire acceptance proof as a routine.
+Proof independently establishes the accepted outcomes. Before repeating a costly
+check, identify the changed input, unverified obligation, or material risk that
+makes another execution useful. A fresh report alone is not such a reason.
+
 ### Small contracts and repairs
 
 Planning captures the smallest clear set of independently checkable promises
@@ -272,6 +281,28 @@ a current-candidate receipt. When an existing validator cannot represent a
 supported applicability claim, rerun the check rather than bypassing validation.
 Resume, storage readback, publication and effect authority retain their existing
 checks.
+
+The local controller supplies the latest compatible report and command-evidence
+references from the same verification stage, together with the exact earlier
+and current Git generations and their complete product delta. It validates
+report and host-receipt identities before offering this history. Review receives
+earlier review observations; proof receives earlier proof observations. Neither
+receives the other verifier's report. This is an evidence handoff, not an automatic
+verdict cache: the receiving stage still owns applicability and its fresh verdict.
+Missing or corrupt optional history falls back to fresh checks. A changed
+agreement or unavailable original verification environment excludes reuse;
+portable receipts without original local command output do not become an
+automatic cache on another computer.
+
+Confirmed process termination is separate from report acceptance. Retain the
+exact rejected response and its validation error as a terminal attempt; a malformed
+response does not make a finished worker's effects uncertain. Invalid implementation
+or repair output preserves the partial candidate but establishes no stage success.
+One malformed read-only recovery diagnosis may receive a format-only correction
+against the same validated inputs. An invalid second response remains a concrete
+protocol blocker. Missing or conflicting termination evidence still blocks another
+launch. Consume a valid retained diagnosis once instead of repeatedly diagnosing
+the same pending decision on resume.
 
 ## Durable contract handoff
 
@@ -362,6 +393,16 @@ successful safe check retained in the host receipt. Rewording a prior approach
 is not a new strategy. The independent diagnosis must judge whether the method
 has materially changed; unavailable capabilities return a concrete blocker to
 the enclosing workflow rather than another worker that cannot execute the step.
+
+Before implementation, establish task readiness within the actual worker
+permissions as well as host isolation. Check only pre-existing tools, inputs,
+runtimes and services required by the accepted evidence path. Use small safe
+observations, not a full test suite or speculative environment checklist. Missing
+behavior that this work item is meant to implement is not a prerequisite. An
+unavailable required input returns its exact location or command, the expected
+result, and the supported next action before dependent implementation starts.
+Reuse applicable readiness evidence; refresh a blocked prerequisite after it is
+resolved, and refresh affected readiness after an agreement or host transition.
 
 An explicit extension uses `extend --authorize-extension` and stated new limits
 (including `unlimited`). Preserve the invocation, consumed attempts, old limits

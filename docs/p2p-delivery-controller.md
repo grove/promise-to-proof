@@ -153,6 +153,20 @@ gaps and the retained approach history, including on resume. Worker permissions
 and available tools must cover its proposed next step; unavailable host tools,
 inputs or missing authority remain concrete blockers for the enclosing workflow.
 
+Repetition detection uses named obligations and candidate history as well as exact
+finding text. Rewording the same requirement/location or cycling back to an earlier
+candidate triggers diagnosis. Repeating an exhausted method with the same
+capability observation is not a new strategy. A partial repair that changes the
+candidate and strictly reduces explicitly named remaining requirement IDs can
+continue without another diagnostic model call; vague or unchanged gaps still
+need diagnosis.
+
+After a repair, each verifier receives its own latest compatible observations and
+the complete delta between exact candidate generations. It independently decides
+which evidence still applies and runs fresh affected checks. Both reports still
+cover the whole agreement. This makes focused re-verification executable without
+sharing the other verifier's verdict or automatically accepting cached results.
+
 `--worker-idle-seconds SECONDS` optionally detects idle event/error logs, stops
 the process group, saves its exit receipt and replaces that worker. Partial
 candidate generations and retired attempts remain recoverable. Activity alone
@@ -249,6 +263,15 @@ Use the retained events to distinguish new observations from repeated checks.
 A timeout names the interrupted stage and retains its candidate workspace, event
 log, and process receipt. Resume does not repeat that uncertain or failed stage.
 
+A finished worker with an invalid report is recorded as a terminal rejected
+response, with the exact bytes and validation error retained. It is not left
+reserved. Invalid mutating output preserves the partial candidate without marking
+implementation complete. A malformed read-only diagnosis gets at most one
+format-only correction for its unchanged context; stale identities, missing
+capability evidence and uncertain exits still block. Resume consumes an already
+valid retained diagnosis instead of launching another diagnosis or restarting
+implementation.
+
 The admitted comparison base remains fixed on resume. A destination move alone
 does not invalidate reports or trigger another verifier run. `delivery.json` and
 the public result retain a separate observation with the destination tip, its
@@ -317,6 +340,17 @@ records through absolute paths, symlinks, and subprocesses. They also attempt a
 numeric-IP network connection. Scratch writes must succeed and every protected
 write and network attempt must be denied. The controller checks the actual command
 output, original bytes, distinct host-issued session IDs, and completion receipts.
+
+The second context also checks task readiness using the actual worker permissions.
+It inspects only pre-existing tools, evidence inputs, runtimes and services needed
+by the accepted task. Each reported check must match a command and observation in
+the host receipt. Missing required evidence or a denied service/socket blocks
+before implementation with the exact missing input and expected result. The
+feature being built is not a prerequisite, and readiness does not run a full test
+suite. This uses the existing two contexts, without another initial model call.
+An applicable successful check is reused across ordinary repairs; a resolved
+blocker or changed agreement/host refreshes the affected readiness. A retained
+boundary-only invocation receives one second-context readiness refresh.
 
 Implementation can write only its isolated workspace. Its Git metadata is outside
 that writable root. Review and proof receive the fixed candidate outside their

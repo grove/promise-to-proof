@@ -19,7 +19,7 @@ import p2p_delivery_measurements as measurements
 import compare_p2p_delivery_measurements as comparison
 import p2p_delivery as delivery
 import export_p2p_delivery_measurement as exporter
-from test_p2p_delivery import FakeTransport, repo
+from test_p2p_delivery import FakeTransport, fixture_host, repo
 
 
 def iso(seconds):
@@ -401,12 +401,11 @@ class MeasurementTests(unittest.TestCase):
             temp = Path(temporary)
             home = temp / "home"
             home.mkdir()
-            (home / ".agents").symlink_to(Path.home() / ".agents", target_is_directory=True)
             root = temp / "source"
             base = repo(root)
             fake = FakeTransport()
             with patch.dict(os.environ, {"HOME": str(home)}), patch.object(delivery, "launch", fake), \
-                    patch.object(delivery.platform, "system", lambda: "Darwin"):
+                    fixture_host():
                 output = io.StringIO()
                 args = ["--repo", str(root), "run", ".p2p/work/tiny/contract.md",
                         "--comparison-base", base, "--authorize-local", "--destination", "delivery-target"]
@@ -454,7 +453,6 @@ class MeasurementTests(unittest.TestCase):
             temp = Path(temporary)
             home = temp / "home"
             home.mkdir()
-            (home / ".agents").symlink_to(Path.home() / ".agents", target_is_directory=True)
             root = temp / "source"
             base = repo(root)
             fake = FakeTransport()
@@ -473,7 +471,7 @@ class MeasurementTests(unittest.TestCase):
                 return saved
 
             with patch.dict(os.environ, {"HOME": str(home)}), patch.object(delivery, "launch", fake), \
-                    patch.object(delivery.platform, "system", lambda: "Darwin"), \
+                    fixture_host(), \
                     patch.object(delivery, "local_save", side_effect=fail_finalization):
                 output = io.StringIO()
                 args = ["--repo", str(root), "run", ".p2p/work/tiny/contract.md",
