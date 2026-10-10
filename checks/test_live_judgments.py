@@ -235,6 +235,41 @@ class LiveJudgmentRunnerTests(unittest.TestCase):
         incomplete = dict(complete, requirements=[{"id": "R1", "observation": "not R2"}])
         self.assertTrue(evaluation.judgment_mismatches(incomplete, proof, expected, old))
 
+    def test_full_evaluation_runner_reconciles_real_candidate_history_offline(self):
+        # Run the same report/receipt/oracle path as live evaluation, but with
+        # unmistakably labeled offline transport. Never report these verdicts as
+        # behavioral model evidence.
+        case = next(c for c in self.data["cases"]
+                    if c["id"] == "review-reconcile-corrected-finding")
+        output = self.root / "runner"
+        output.mkdir()
+        fake = OfflineJudgmentTransport()
+
+        def launch(*args, **kwargs):
+            fake.bad = len(fake.prompts) < 2  # First candidate broken, second fixed.
+            return fake(*args, **kwargs)
+
+        with fixture_host(), patch.object(d, "launch", side_effect=launch):
+            result = evaluation.run_case(output, self.data, case, self.digest, 120, position=1)
+        self.assertTrue(result["passed"], result.get("error") or json.dumps(result))
+        self.assertEqual([r["observed"]["review"]["status"] for r in result["candidates"]],
+                         ["CHANGES NEEDED", "REVIEWED"])
+        self.assertEqual([r["observed"]["proof"]["status"] for r in result["candidates"]],
+                         ["NOT PROVEN", "PROVEN"])
+        self.assertEqual(len(fake.prompts), 4)
+        self.assertTrue(all("review-reconcile-corrected-finding" not in prompt
+                            for _, prompt in fake.prompts))
+        self.assertEqual([len(r["stage_attempts"]) for r in result["candidates"]], [2, 2])
+        self.assertNotEqual(result["candidates"][0]["candidate"]["key"],
+                            result["candidates"][1]["candidate"]["key"])
+        self.assertEqual(result["candidates"][1]["expected"]["reconciles_review_finding"], "R2")
+        saved = json.loads((output / "candidate-001" / "summary.json").read_text())
+        self.assertEqual(saved["fixture"], case["id"])
+        self.assertTrue(saved["passed"])
+        self.assertTrue((output / "candidate-001" / "observation-02" /
+                         "guard-sensitivity.json").is_file())
+        self.assertTrue(Path(saved["runtime"]).is_dir())
+
     def test_live_evaluation_generation_requires_explicit_admission(self):
         case = self.data["cases"][0]
         directory = self.root / "ordinary"
