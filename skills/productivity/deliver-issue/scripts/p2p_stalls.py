@@ -9,7 +9,7 @@ import re
 
 def named(text, requirements):
     return {r for r in requirements
-            if re.search(r'(?<![\\w-])' + re.escape(r) + r'(?![\\w-])', str(text))}
+            if re.search(r'(?<![\w-])' + re.escape(r) + r'(?![\w-])', str(text))}
 
 
 def signals(findings, requirements):
@@ -21,7 +21,7 @@ def signals(findings, requirements):
             ids.update(named(item, known))
             if phase == 'review' and isinstance(item, dict):
                 source = item.get('source', '')
-                location = re.sub(r':\\d+(?::\\d+)?(?:-\\d+)?', '', item.get('location', ''))
+                location = re.sub(r':\d+(?::\d+)?(?:-\d+)?', '', item.get('location', ''))
                 if source in known:
                     ids.add(source)
                 if source and location:
@@ -84,7 +84,7 @@ def strategy_repetition(plan, completed):
             continue
         same_key = bool(plan.get('strategy_key') and old.get('strategy_key') and
                         plan['strategy_key'] == old['strategy_key'])
-        clean = lambda text: ' '.join(re.findall(r'\\w+', (text or '').casefold()))
+        clean = lambda text: ' '.join(re.findall(r'\w+', (text or '').casefold()))
         same_text = clean(old.get('approach')) == clean(plan.get('approach'))
         if (same_key or same_text) and old.get('capability_check') == plan.get('capability_check'):
             return 'repeated an exhausted strategy without new capabilities'
@@ -95,9 +95,9 @@ def falsifiable(expected):
     """Concrete check/result language, not merely 'improve quality' or 'try again'."""
     value = ' '.join((expected or '').split())
     return (len(value) >= 20 and len(value.split()) >= 4 and bool(re.search(
-        r'\\b(?:test|tests|check|checks|assert|exit|status|stdout|stderr|error|'
+        r'\b(?:test|tests|check|checks|assert|exit|status|stdout|stderr|error|'
         r'output|input|return|response|record|report|proof|review|command|'
-        r'observe|observed|print|reject|accept|pass|fail|reproduc\\w*|R\\d+)\\b',
+        r'observe|observed|print|reject|accept|pass|fail|reproduc\w*|R\d+)\b',
         value, re.I)))
 
 
@@ -111,7 +111,7 @@ def recent(history, count=4):
 def reset_context(state, work, findings, history, stall):
     """Bounded fresh-context orientation; deeper original records remain on disk."""
     agreement = state['contract']
-    original = re.search(r'^Intended outcome:\\s*(.+)$', agreement.get('content', ''), re.M)
+    original = re.search(r'^Intended outcome:\s*(.+)$', agreement.get('content', ''), re.M)
     def brief(value, limit):
         result = json.dumps(value, sort_keys=True, ensure_ascii=False)
         return result if len(result) <= limit else result[:limit] + '… [inspect retained record]'
