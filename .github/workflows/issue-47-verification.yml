@@ -7,6 +7,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: issue-47-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   offline:
     runs-on: ubuntu-latest
