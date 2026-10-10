@@ -186,7 +186,9 @@ class RecoveryReceiptTests(unittest.TestCase):
                 report.update(status='ACTIONABLE', action='implementation',
                               approach='Use the now available local CLI input.', strategy_changed=True,
                               reason='The resumed capability probe confirms the prerequisite.',
-                              missing_input='', expected_result='',
+                              missing_input='', strategy_key='available-local-cli',
+                              difference_from_prior='New host readiness confirms this local CLI.',
+                              expected_result='Run python3 greet.py and observe hello newline with zero exit.',
                               capability_check='P2P_RECOVERY_CAPABILITY=fixture local CLI available')
             elif self.fake.calls.count('repair'):
                 report.update(status='REVIEWED', findings=[], gaps=[], missing_input='', expected_result='')
