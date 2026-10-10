@@ -1,0 +1,23 @@
+name: Delivery admission regressions
+on:
+  pull_request:
+    paths:
+      - 'skills/productivity/deliver-issue/scripts/**'
+      - 'checks/test_p2p_readiness.py'
+      - 'checks/test_p2p_admission.py'
+      - 'checks/test_p2p_delivery.py'
+      - '.github/workflows/delivery-admission-tests.yml'
+  workflow_dispatch:
+jobs:
+  admission:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run admission and task-readiness tests (fixture host only)
+        run: python3 -m unittest discover -s checks -p 'test_p2p_readiness.py' -v
+      - name: Run pure admission decisions (fixture host only)
+        run: python3 -m unittest discover -s checks -p 'test_p2p_admission.py' -v
