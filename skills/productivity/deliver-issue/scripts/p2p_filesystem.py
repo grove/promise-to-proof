@@ -516,16 +516,18 @@ def entry_source(root, request, issue_repository=None):
                     if relative == identity:
                         return True
             return False
-        for line in document_lines(handoff or ""):
-            if not line.startswith("Entry request JSON: "):
-                continue
-            try:
-                saved = json.loads(line[len("Entry request JSON: "):])
-            except (ValueError, TypeError):
-                raise ValueError("saved entry request provenance is malformed: " + work)
-            if saved == request:
-                return True
-        return False
+        # Retain a digest in the portable planning handoff, not a second copy
+        # of freeform user text that may contain private context.
+        lines = list(document_lines(handoff or ""))
+        sources = [line[len("Entry source kind: "):] for line in lines
+                   if line.startswith("Entry source kind: ")]
+        digests = [line[len("Entry request SHA-256: "):] for line in lines
+                   if line.startswith("Entry request SHA-256: ")]
+        if not sources and not digests:
+            return False
+        if sources != ["text"] or len(digests) != 1 or not re.fullmatch(r"[a-f0-9]{64}", digests[0]):
+            raise ValueError("saved entry request provenance is malformed: " + work)
+        return digests[0] == fingerprint
 
     def checkpoint_text(checkpoint, relative):
         rows = [row for row in checkpoint.get("files", []) if
