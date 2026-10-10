@@ -439,16 +439,22 @@ time, failed tests, review/proof defects, repair exhaustion, size/count
 proxies, or model uncertainty alone remain on the existing path; fix defects
 through the named review or proof repair workflow.
 
-When that structural signal is grounded, stop the affected dependent delivery
-work and return `BLOCKED`, including when the candidate or reports already
-contain scoped work. Retain the exact
-contract, base, candidate/worktree, reports, evidence, human edits, and known
-pull-request state; classify uncertain ownership as unresolved. State one next
-action, `/slice-contract <affected-leaf-contract>`. Do not create children,
-move or rewrite code, retarget or close pull requests, or change issue, label,
-branch, commit, push, merge, or deployment state. The slice workflow must
-preview the smallest affected subtree, preserve siblings and history, and
-obtain any required approval before changing local routing.
+When that structural signal is grounded, stop affected **dependent** work
+at a reconciled safe boundary. Retain the exact contract, base,
+candidate/worktree, reports, evidence, human edits and known pull-request state;
+classify uncertain ownership as unresolved. Under covering delegated local
+sizing authority, invoke the existing `slice-contract` workflow within the
+**same outer delivery request** for the affected leaf. It must preview the
+smallest affected subtree, preserve siblings and history, and obtain any
+approval that the standing mandate does not cover before changing local routing.
+After a safe, authorized allocation, continue the supported plan and existing
+controller resume paths without a new original implementation dispatch.
+Otherwise return `BLOCKED` with the single next supported
+`/slice-contract <affected-leaf-contract>` decision/action and preserved state.
+Never move or rewrite existing code, retarget or close pull requests, or change
+issue, label, branch, commit, push, merge or deployment state on the strength of
+a sizing recommendation alone. Do not attempt slicing while the current worker
+is running or its exit is uncertain.
 
 8. Reread the saved agreement and candidate identity before dispatch. Invoke
    `review-implementation` and `prove` in separate independent read-only
