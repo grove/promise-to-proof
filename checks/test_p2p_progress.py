@@ -314,6 +314,28 @@ class ExistingControllerIntegration(unittest.TestCase):
         self.assertEqual(self.fixture.fake.calls, before)
         readback.assert_called_once()
 
+    def test_saved_pr_hint_requires_fresh_readback_and_ambiguity_stays_unknown(self):
+        code, _ = self.fixture.cli()
+        self.assertEqual(code, 0)
+        from test_p2p_delivery import d
+        note = self.fixture.root / ".p2p/work/tiny/publication.md"
+        calls = list(self.fixture.fake.calls)
+        note.write_text("Pull request: " + PR + "\n")
+        with patch.object(d.progress_view, "inspect_github_pr",
+                          return_value=publication("OPEN")) as lookup:
+            code, status = self.fixture.cli("status")
+        self.assertEqual(code, 0, status)
+        lookup.assert_called_once()
+        self.assertEqual(status["human_progress"]["phase"], "PR_PUBLISHED_NOT_MERGED")
+        note.write_text("PRs: " + PR + "\nhttps://github.com/owner/repository/pull/16\n")
+        with patch.object(d.progress_view, "inspect_github_pr",
+                          side_effect=AssertionError("No ambiguous PR lookup")):
+            code, status = self.fixture.cli("status")
+        self.assertEqual(code, 0, status)
+        self.assertEqual(status["status"], "REVIEWED_AND_PROVEN")
+        self.assertEqual(status["human_progress"]["phase"], "PUBLICATION_UNCONFIRMED")
+        self.assertEqual(self.fixture.fake.calls, calls)
+
     def test_plain_cli_is_readable_and_does_not_dispatch(self):
         code, _ = self.fixture.cli()
         self.assertEqual(code, 0)
