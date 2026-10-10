@@ -345,6 +345,17 @@ or branch deletion.
 
 ## Report
 
+At the publication handoff, lead with an ordinary-language explanation of
+**what was established, why it matters, where the exact code currently is,
+and what happens next**. Use existing saved candidate/review/proof records
+and the required live remote readback. A saved preview is not a commit or
+PR. A confirmed published PR is still open and **not merged**; do not imply
+the operator's checkout or destination branch contains its changes.
+When readback is missing or a write is uncertain, say precisely which
+effect remains unconfirmed and which read-only reconciliation is supported.
+Do not add a model summary or new publication-status record.
+
+
 Return one status:
 
 | Status | Meaning |
