@@ -22,6 +22,7 @@ import uuid
 import p2p_filesystem as fs
 import p2p_autonomy as autonomy
 import p2p_applicability as applicability
+import p2p_admission as admission_decision
 import p2p_slices as slices
 import p2p_instructions as instructions
 import p2p_progress as progress_view
@@ -1606,6 +1607,50 @@ class Delivery:
         self.workspace = self.runtime / 'workspace'
         self._generation_chain_verified = False
 
+    def admission_facts(self):
+        """Only current checked controller facts and retained executable receipts."""
+        host = self.state.get('restored_host') or self.state['host']
+        # Worker permission enforcement is tied to its exact program and
+        # configuration, not a human-readable capability declaration.
+        import hashlib
+        executable = Path(host['executable'])
+        with executable.open('rb') as stream:
+            executable_hash = hashlib.file_digest(stream, 'sha256').hexdigest()
+        configuration = host_config(self.runtime / 'scratch' / 'identity')
+        configuration['shell_environment_policy.set']['TMPDIR'] = '<scratch>/.p2p/tmp'
+        verifier = admission_decision.digest([POLICY, host['name'], host['version'],
+            str(executable.resolve()), executable_hash, configuration,
+            self.state['invocation_id'], self.state['source_tree_key'],
+            self.state['binding_inputs']])
+        readiness = {'contract_sha256': self.state['contract']['sha256'],
+            'binding_inputs': self.state['binding_inputs'],
+            'host': host, 'policy': self.state['policy'], 'skills': self.state['skills']}
+        return verifier, readiness
+
+    def record_admission(self):
+        """Reconcile condition-specific facts after the owning checks pass."""
+        if not self.state.get('preflight_complete'):
+            return
+        attempts = self.state['attempts']
+        boundary = next((a for a in reversed(attempts)
+                         if a['stage'] == 'preflight-1' and a['status'] == 'complete'), None)
+        ready = self.state.get('task_readiness', {})
+        task = next((a for a in attempts if a['id'] == ready.get('attempt_id')
+                     and a['status'] == 'complete'), None)
+        if not boundary or not task:
+            raise ValueError('admission requires actual completed host and task receipts')
+        # receipt() rechecks the controller-recorded event stream and exit identity.
+        self.receipt(boundary)
+        self.receipt(task)
+        path = self.runtime / 'decision.json'
+        previous = json.loads(path.read_text()) if path.is_file() else None
+        verifier, readiness = self.admission_facts()
+        decision = admission_decision.admitted(self.state, verifier, readiness,
+            {'verifier': boundary['id'], 'prerequisites': ready['report_sha256']}, previous)
+        if decision != previous:
+            local_save(self.root, self.work, 'runtime/decision.json', encoded(decision))
+        self.state['admission_decision'] = decision
+
     def save(self):
         if self.state.get('status') == 'REVIEWED_AND_PROVEN' and self.state.get('completed_at'):
             local_save(self.root, self.work, 'delivery.json', encoded(self.state))
@@ -2179,6 +2224,9 @@ class Delivery:
                 self.check_report_rejection(done)
                 host = self.receipt(done)
                 if index == 0:
+                    # Evidence must remain valid on this exact executable and
+                    # policy. A declaration of enforcement is not an attestation.
+                    self.receipt(done)
                     continue
                 # An instruction upgrade preserves the agreement and host. It does
                 # not by itself invalidate observed tools, inputs or sandbox access.
@@ -2309,6 +2357,7 @@ assert results['scratch'] == 'ok'
                                  '; expected: ' + report['expected_result'] +
                                  '; supply the prerequisite and resume this delivery')
         self.state['preflight_complete'] = True
+        self.record_admission()
         self.save()
         return True
 
@@ -3602,6 +3651,8 @@ assert results['scratch'] == 'ok'
             self.save()
         self.current()
         ready = self.preflight()
+        if ready and self.state.get('admission_decision', {}).get('status') != 'ADMITTED':
+            raise ValueError('internal admission is not ADMITTED')
         if last and last['stage'] in ('review', 'proof') and last['status'] in ('reserved', 'failed'):
             self.stage(last['stage'])
             self.state['status'] = 'RUNNING'
@@ -4110,6 +4161,7 @@ def result(delivery):
         'agreement_paths': state.get('agreement_paths', [delivery.work]),
         'checkpoint_restored_from': state.get('checkpoint_restored_from'),
         'fresh_host_preflight_complete': bool(state.get('preflight_complete')),
+        'admission': state.get('admission_decision'),
         'implementation_complete': state.get('implementation_complete', False),
         'resume_count': state.get('resume_count', 0),
         'parent_has_children': any(line.strip() == '## Children' for line in
