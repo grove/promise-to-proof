@@ -55,6 +55,33 @@ class PragmaticVerificationRules(unittest.TestCase):
         self.assertIn('realistic trigger', self.policy())
         self.assertIn('smallest useful check', self.policy())
 
+    def test_reviewer_checks_material_test_oracle_quality_without_a_new_quota(self):
+        policy = self.policy()
+        review = words(self.review)
+        for phrase in (
+            'A green test command alone does not establish regression protection.',
+            'A tautology',
+            'a mock that bypasses the decision being protected',
+            'independent expectations',
+            'Prefer a reliable deterministic seam',
+            'Accept already meaningful tests without reauthoring them.',
+            'Do not demand a universal mutation experiment',
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, policy)
+        for phrase in (
+            'what observable failure',
+            'production validator',
+            'the precise test/location',
+            'realistic security, concurrency or persistence failure trigger',
+            'Do not require a mutation experiment',
+            'explicitly name the earlier material finding',
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, review)
+        self.assertIn('optional suggestions', review)
+        self.assertNotIn('must mutate the production implementation', review)
+
     def test_evidence_is_proportional_not_a_quota(self):
         self.assertIn('One credible evidence path can be sufficient', self.policy())
         self.assertIn('not a universal checklist', self.policy())
