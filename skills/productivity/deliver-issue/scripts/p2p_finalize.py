@@ -326,7 +326,39 @@ def receipt_target(root, record, pr_url=None, receipt_issue=None, receipt_ref=No
     return {"kind": "git", "ref": receipt_ref}
 
 
-def comment_receipt(record, target, mandate, *, runner=subprocess.run):
+def reserve_receipt(root, work, receipt_id, destination):
+    """Reserve a GitHub receipt write inside the existing publication handoff.
+
+    A lost comment response must never cause another POST just because an
+    eventually consistent comment listing is currently empty.
+    """
+    relative = f".p2p/work/{fs.work_slug(work)}/publication.md"
+    path = fs.safe(root, relative)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lock = path.parent.parent / (path.parent.name + ".lock")
+    fs.require_ignored(root, str(lock.relative_to(root)))
+    marker = ("<!-- p2p-receipt-intent:sha256:" +
+              fs.digest(fs.canonical([receipt_id, destination])) + " -->")
+    with lock.open("a") as owned:
+        try:
+            fcntl.flock(owned, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise ValueError("another controller/finalizer owns this work item")
+        previous = path.read_bytes() if path.is_file() else b""
+        intents = re.findall(rb"<!-- p2p-receipt-intent:sha256:[a-f0-9]{64} -->",
+                             previous)
+        if intents:
+            need(len(intents) == 1 and intents[0].decode() == marker,
+                 "same delivery has a conflicting or duplicate receipt-write reservation")
+            return False
+        updated = previous.rstrip(b"\n") + b"\n\n" + marker.encode() + b"\n"
+        fs.atomic_write(path, updated, ignored_root=root)
+        need(path.read_bytes() == updated,
+             "receipt effect intent could not be retained before publication")
+        return True
+
+
+def comment_receipt(root, record, target, mandate, *, runner=subprocess.run):
     """Read before writing; on lost reply read again without a second write."""
     body = receipt_body(record)
     need(len(body.encode()) <= 60000, "completed receipt exceeds GitHub comment limit")
@@ -336,6 +368,11 @@ def comment_receipt(record, target, mandate, *, runner=subprocess.run):
         need(mandate is not None, "missing exact issue-comment effect mandate")
         autonomy.authorize(mandate, "issue-comment", repository,
                            target["destination"])
+        if not reserve_receipt(root, record["work_item"],
+                               record["landing"]["receipt_id"],
+                               target["destination"]):
+            return {"status": "PARTIAL",
+                    "reason": "a prior receipt comment attempt is unresolved; read back the existing remote effect"}
         with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8") as file:
             file.write(body)
             file.flush()
@@ -577,7 +614,7 @@ def finalize(root, original, checkpoint, *, repository, remote, method,
                                  receipt_issue, receipt_ref, checkpoint=checkpoint)
     try:
         if destination["kind"] == "comment":
-            receipt = comment_receipt(final_record, destination, mandate,
+            receipt = comment_receipt(root, final_record, destination, mandate,
                                       runner=runner)
         else:
             receipt = git_receipt(root, remote, destination, final_record,
