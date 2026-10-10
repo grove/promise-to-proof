@@ -132,6 +132,19 @@ record the recommended later route separately but make that gate the sole next
 action. Direct delivery is advisory only: it changes neither the agreement nor
 readiness/admission state and authorizes no external effect.
 
+## Continue the original promise
+
+For a unit in an already-approved #78 sequence or parent tree, load its
+identity-bound #71 continuity pointer and the originating `slicing.md`.
+Keep the original promise and remaining sibling/sequence obligations visible
+without adding them as unrelated child acceptance rows. Link new discovered
+prerequisites back to the originating source, map exactly what they enable,
+and preserve the current unit's specific contribution. A prerequisite's
+accepted contract must not quietly replace the original complete outcome.
+Missing or stale continuity requires existing plan/sizing reconciliation, not
+new sizing or a guessed parent. Reuse existing approved contract and candidate
+identities. Record the final full-acceptance owner in the planning handoff.
+
 ## Audit and hand off
 
 Account for every source promise and justify every added invariant by the outcome
