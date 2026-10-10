@@ -1789,7 +1789,12 @@ class Delivery:
             if fs.digest(data) != attempt['report_sha256']:
                 raise ValueError('slice capture report differs from authenticated attempt')
             if attempt.get('report_validation') != 'rejected':
-                slices.attach(self.state, attempt, json.loads(data), generation)
+                report = json.loads(data)
+                sealed = slices.attach(self.state, attempt, report, generation)
+                if sealed and report['status'] == 'PARTIAL':
+                    # This is a genuine verified intra-stage boundary. Persist
+                    # its sealed generation now, before preparing portability.
+                    self.save()
         self._generation_chain_verified = False
         return candidate
 
@@ -3614,9 +3619,12 @@ assert results['scratch'] == 'ok'
                         and self.state['implementation_slices'][-1]['slice']['outcome'] == 'VERIFIED'):
                     # Checkpoint already verified slice; dispatch the next
                     # meaningful slice rather than diagnosing a failed worker.
+                    # Export the completed report/generation first; a crash
+                    # between checkpoint and next-slice dispatch retains
+                    # portable evidence, not an uncheckpointed in-memory step.
+                    self.checkpoint()
                     self.state['reports'].pop('implementation', None)
                     self.save()
-                    self.checkpoint()
                     continue
                 if report['status'] not in ('IMPLEMENTED', 'REPAIRED'):
                     report = self.recover({'implementation': report['gaps']}, force_diagnosis=True)
