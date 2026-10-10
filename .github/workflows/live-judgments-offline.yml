@@ -18,6 +18,8 @@ jobs:
           python-version: '3.11'
       - name: Verify fixture manifest, offline oracle, and failure behavior
         run: python3 -m unittest discover -s checks -p 'test_live_judgments.py' -v
+      - name: Verify exact coverage and review-scope regressions
+        run: python3 -m unittest discover -s checks -p 'test_p2p_coverage.py' -v
       - name: Check existing generation and repair behavior
         run: >-
           python3 -m unittest discover -s checks -p 'test_p2p_delivery.py'
