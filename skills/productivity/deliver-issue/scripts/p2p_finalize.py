@@ -466,6 +466,10 @@ def git_receipt(root, remote, target, record, checkpoint, mandate,
             need(len(targets) == 1,
                  "receipt branch needs one unambiguous published #82 checkpoint base")
             tip = targets[0]
+    # A fresh computer may know the exact remote branch SHA without yet
+    # having its tree. Fetch the advertised object, not a mutable tracking ref.
+    ensure_remote_commit(root, remote, tip, ref=ref if branches.get(ref) == tip
+                         else None, runner=runner)
     saved = run(["git", "-C", str(root), "show", tip + ":" + checkpoint_path],
                 check=False, runner=runner)
     need(saved.returncode == 0 and saved.stdout.encode() == checkpoint,
