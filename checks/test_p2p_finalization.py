@@ -133,6 +133,12 @@ class ReadinessGates(unittest.TestCase):
 
 class ReceiptSemantics(unittest.TestCase):
     def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        fs.git(self.root, "init", "-q")
+        (self.root / ".gitignore").write_text("/.p2p/\n")
+        (self.root / ".p2p/work/tiny").mkdir(parents=True)
         self.record = {
             "schema": "promise-to-proof/delivery-record/v1",
             "invocation_id": "inv-one",
@@ -150,7 +156,7 @@ class ReceiptSemantics(unittest.TestCase):
         self.assertIn("p2p-final:sha256:", body)
         with patch.object(final, "comments", return_value=[self.comment]), \
              patch.object(final, "run", side_effect=AssertionError("must not write")):
-            out = final.comment_receipt(self.record,
+            out = final.comment_receipt(self.root, self.record,
                                         {"repository": REPO, "number": 7,
                                          "destination": self.url},
                                         mandate())
@@ -160,17 +166,41 @@ class ReceiptSemantics(unittest.TestCase):
         with patch.object(final, "comments", side_effect=[[], [self.comment]]) as reads, \
              patch.object(final, "run", return_value=subprocess.CompletedProcess([], 1, "", "lost")) as write:
             out = final.comment_receipt(
-                self.record, {"repository": REPO, "number": 7, "destination": self.url},
+                self.root, self.record, {"repository": REPO, "number": 7, "destination": self.url},
                 mandate(("issue-comment", self.url)))
         self.assertEqual(out["status"], "RECORDED")
         self.assertEqual(reads.call_count, 2)
         self.assertEqual(write.call_count, 1)
 
+    def test_lost_unconfirmed_comment_stays_reserved_and_no_repost(self):
+        target = {"repository": REPO, "number": 7, "destination": self.url}
+        with patch.object(final, "comments", side_effect=[[], []]), \
+             patch.object(final, "run",
+                          return_value=subprocess.CompletedProcess([], 1, "", "response lost")) as effect:
+            first = final.comment_receipt(self.root, self.record, target,
+                                          mandate(("issue-comment", self.url)))
+        self.assertEqual(first["status"], "PARTIAL")
+        self.assertEqual(effect.call_count, 1)
+        path = self.root / ".p2p/work/tiny/publication.md"
+        self.assertIn("p2p-receipt-intent:", path.read_text())
+        with patch.object(final, "comments", return_value=[]), \
+             patch.object(final, "run",
+                          side_effect=AssertionError("Never repeat an uncertain comment")):
+            second = final.comment_receipt(self.root, self.record, target,
+                                           mandate(("issue-comment", self.url)))
+        self.assertEqual(second["status"], "PARTIAL")
+        with patch.object(final, "comments", return_value=[self.comment]), \
+             patch.object(final, "run",
+                          side_effect=AssertionError("Only remote readback needed")):
+            recovered = final.comment_receipt(self.root, self.record, target,
+                                              mandate())
+        self.assertEqual(recovered["status"], "RECORDED")
+
     def test_missing_authority_causes_no_comment(self):
         with patch.object(final, "comments", return_value=[]), \
              patch.object(final, "run", side_effect=AssertionError("No remote write")):
             with self.assertRaisesRegex(ValueError, "outside the standing mandate"):
-                final.comment_receipt(self.record,
+                final.comment_receipt(self.root, self.record,
                                       {"repository": REPO, "number": 7,
                                        "destination": self.url}, mandate())
 
