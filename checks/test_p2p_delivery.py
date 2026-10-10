@@ -328,19 +328,24 @@ class FakeTransport:
                 staged = self.mode == 'sliced'
                 number = self.calls.count('implementation')
                 partial = report['status'] == 'PARTIAL'
+                slice_paths = [item['path'] for item in d.fs.tree_changes(
+                    d.fs.snapshot(product, inputs.get('local_git_generation', {}).get('commit')
+                                  or inputs['comparison_base'], exclude=excluded), manifest)]
+                if not slice_paths and any(item['path'] == self.output_path for item in manifest):
+                    # A revised agreement can verify an unchanged, still-real
+                    # public seam. The fixture must name that seam explicitly.
+                    slice_paths = [self.output_path]
                 report['implementation_slice'] = {
                     'id': f'I{number}' if staged else 'I1', 'requirement_ids': ['R1'],
                     'expected_result': 'hello newline and zero exit',
                     'checks': [{'kind': 'test',
                                 'command': ('FIXTURE python3 tests/test_greet.py'
-                                            if staged and number == 2 else 'FIXTURE python3 greet.py'),
+                                            if staged and number == 2 else
+                                            'FIXTURE python3 ' + self.output_path),
                                 'result': 'passed',
                                 'observation': ('greet test passed' if staged and number == 2
                                                 else 'hello')}],
-                    'paths': [item['path'] for item in d.fs.tree_changes(
-                        d.fs.snapshot(product, inputs.get('local_git_generation', {}).get('commit',
-                                                      ) or inputs['comparison_base'], exclude=excluded),
-                        manifest)],
+                    'paths': slice_paths,
                     'outcome': 'BLOCKED' if partial and not staged else 'VERIFIED',
                     'boundary_reason': 'Regression check is a separate observable outcome.' if staged and partial else '',
                     'next_action': ('Create and verify regression check.' if staged and partial else
@@ -355,7 +360,7 @@ class FakeTransport:
                     'exit_code': 0}})
             report = json.dumps(report)
         self.messages.append((stage, report))
-        events += [{'type':'item.completed','item':{'type':'command_execution','command':'FIXTURE python3 greet.py',
+        events += [{'type':'item.completed','item':{'type':'command_execution','command':'FIXTURE python3 ' + self.output_path,
                                                     'aggregated_output':output,'exit_code':0}},
                    {'type':'item.completed','item':{'type':'agent_message','text':report}},
                    {'type':'turn.completed','usage':{'input_tokens':7,'output_tokens':3}}]
