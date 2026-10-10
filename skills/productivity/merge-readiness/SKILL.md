@@ -126,6 +126,18 @@ described below. Do not commit, push, open PRs, approve, rerun checks, or merge.
 
 ## Report
 
+Explain the verified PR state in ordinary language before listing gates.
+An assessment of `READY` establishes a current decision about the observed
+head/target pair, **not** user approval, merge authority, a completed merge,
+or a durable delivered-code receipt. An open PR remains open until current
+GitHub readback confirms a merge. If already merged, report that observed
+fact separately from #50/#47 delivered-code mapping and final receipt,
+which are not established by merge-readiness alone. Lead with what changed,
+why it matters, and the one supported next step; preserve the full gate and
+identity details for inspection rather than adding another status store or
+mandatory stage.
+
+
 Return `READY` only when candidate identity, current proof, current review,
 current-target compatibility evidence, conflict state, required checks, and
 repository approval and merge rules all pass for the identified PR state. Return
