@@ -338,6 +338,17 @@ ref, marker, and exact identities before retrying. Reuse one confirmed exact
 effect. If no unique result can be established, return `PARTIAL` and do not
 repeat the write. Never delete a successful branch or pull request as rollback.
 
+## Handoff to authorized finalization
+
+A published PR is only a historical candidate handoff. When the original
+outer `/deliver-issue` request also includes a confirmed final
+delivery and exact covering grants, continue in that *same outer request*:
+use the current independent `merge-readiness` assessment and
+the bundled `p2p_finalize.py` coordinator. It owns readback-first
+merge-effect reconciliation and the single exact Delivery Record v1 receipt,
+not this publication skill. Without authorization, return the published
+PR and its one missing grant rather than inventing completion.
+
 ## Finish publication
 
 After remote readback, compare the published commit with the candidate by path,
