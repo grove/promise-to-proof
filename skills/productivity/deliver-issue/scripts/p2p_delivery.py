@@ -2347,6 +2347,19 @@ assert results['scratch'] == 'ok'
                          'Each row needs a substantive observation. Proof rows need command/output evidence in '
                          'artifact, an assertion, and observation. Use verdict proven for established proof rows; '
                          'otherwise name the gap. ')
+        coverage_required = self.state.get('coverage_format_version') == 1
+        coverage_prompt = (
+            'Include coverage_trace. For each requirement ID give paths to real product files, '
+            'existing=true only for already-sufficient unchanged behavior, and evidence refs. '
+            'Use row for the saved stage requirement observation/evidence; check:N for an actual '
+            'zero-based review check; file:PATH for exact candidate files; or '
+            'record:ID@sha256:DIGEST for an existing verified Evidence Record v1. '
+            'Never invent references. Explain necessary changed files outside requirement mappings '
+            'as supporting_changes (path and reason). A missing implementation/evidence stays a gap. '
+            'For review, inspected_paths names the exact existing product files actually inspected, '
+            'including all changed files that still exist. Do not claim inspection you did not do. '
+            'These are compact trace facts, not a duplicate proof or a new acceptance verdict. '
+            if coverage_required else '')
         instruction_source = 'pinned' if self.state.get('instruction_identity') else 'original installed'
         prompt = (f'Invoke the {instruction_source} {STAGES[skill_stage]} skill at {self.state["skills"][skill_stage]["path"]}. '
                   f'Read it and its references. Work item {self.work}, workspace {self.workspace}. '
@@ -2366,7 +2379,7 @@ assert results['scratch'] == 'ok'
                   'Use fresh independent observations, do not trust previous judgments. '
                   f'Exact input_identity_json must encode this object: {json.dumps(inputs)}. '
                   f'Every requirement must occur exactly once: {self.state["requirements"]}. '
-                  f'{report_format}{learning_format}Status uses normal skill vocabulary. '
+                  f'{report_format}{learning_format}{coverage_prompt}Status uses normal skill vocabulary. '
                   f'{"The controller renders review text from structured fields. Do not add free-text details or other top-level fields." if name == "review" else "details contains the full human report."} '
                   'Keep generated fixtures and verbose debug output in scratch. Return the relevant command, '
                   'assertion, result, and environment in the report; do not dump entire logs or workspaces. '
@@ -2409,7 +2422,7 @@ assert results['scratch'] == 'ok'
                        'edit or repeat an unchanged passing check without a concrete reason. ')
         attempt, host = self.dispatch(name, inputs, prompt,
                                       self.workspace if name in ('implementation', 'repair') else None,
-                                      report_schema(name))
+                                      report_schema(name, coverage_required))
         self.timed_source_stable()
         if name in ('review', 'proof'):
             self.current()
@@ -2417,6 +2430,8 @@ assert results['scratch'] == 'ok'
             raw_report = host['message'].encode('utf-8')
             report = json.loads(raw_report)
             expected_fields = {'status', 'input_identity_json', 'requirements', 'gaps', 'learning_candidates'}
+            if coverage_required:
+                expected_fields.add('coverage_trace')
             if name == 'review':
                 expected_fields.update({'findings', 'coverage', 'checks', 'limitations', 'missing_input', 'expected_result'})
             else:
