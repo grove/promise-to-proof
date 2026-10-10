@@ -100,7 +100,7 @@ def classify(report, changes, requirements, stage, *, prior_candidate, report_sh
         if unknown:
             return full("Prior unchanged behavior lacks explicit dependency paths.")
 
-        for finding in report.get("findings", []):
+        for finding in (report.get("findings") or []):
             source = finding.get("source")
             if source not in indexed:
                 return full("Earlier material finding has unresolved cross-requirement reach.")
