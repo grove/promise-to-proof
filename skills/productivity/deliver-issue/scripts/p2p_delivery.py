@@ -22,6 +22,7 @@ import uuid
 import p2p_filesystem as fs
 import p2p_autonomy as autonomy
 import p2p_applicability as applicability
+import p2p_continuity as continuity
 import p2p_admission as admission_decision
 import p2p_slices as slices
 import p2p_instructions as instructions
@@ -4219,6 +4220,7 @@ def result(delivery):
         'checkpoint_restored_from': state.get('checkpoint_restored_from'),
         'fresh_host_preflight_complete': bool(state.get('preflight_complete')),
         'admission': state.get('admission_decision'),
+        'promise_continuity': continuity.load(delivery.root, delivery.work),
         'implementation_complete': state.get('implementation_complete', False),
         'resume_count': state.get('resume_count', 0),
         'parent_has_children': any(line.strip() == '## Children' for line in
