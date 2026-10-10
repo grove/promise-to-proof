@@ -109,6 +109,33 @@ needs fresh proof on the current bytes. Do not convert an earlier candidate's
 verdict into current acceptance, or assume a matching scope establishes
 compatibility with destination commits after the frozen review base.
 
+## Check which destination changes touch material seams
+
+After confirming the PR head is the saved reviewed candidate, compare the
+*exact* current destination commit with the frozen review base using the
+read-only helper:
+
+```sh
+python3 <skill-dir>/scripts/p2p_filesystem.py --repo <source> \
+  target-risk-status .p2p/work/<slug>/contract.md \
+  --destination-repo <checkout-with-exact-objects> \
+  --head-ref <full-current-pr-head-sha> \
+  --destination-ref <full-current-target-sha>
+```
+
+`TARGETED_CHECKS_REQUIRED` names candidate paths/risks affected by target
+changes and calls for independent relevant checks on the exact head/target
+pair. `NO_ADDITIONAL_RISK_CHECKS` means the recorded dependencies add no
+extra targeted check; it **does not** mean the pair has passed integration or
+repository gates. `UNKNOWN` (including missing historical risk data, wrong
+head, or uncertain ancestry) is never compatibility evidence. Check current
+CI, conflicts and ordinary target compatibility separately. Reuse existing
+meaningful checks when sufficient rather than duplicating a suite. An
+unrelated target fast-forward alone does not invalidate matching frozen
+review/proof; a material intersection or uncertain reach does require new
+target compatibility evidence. Do not relabel an old verifier result or
+infer safety from the absence of a path intersection.
+
 ## Check the final candidate
 
 Confirm that the PR head represents the exact candidate covered by a current
