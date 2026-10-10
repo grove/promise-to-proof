@@ -148,6 +148,13 @@ class DeliveryCoverageTests(unittest.TestCase):
         self.assertEqual(before["uncovered_changes"][0]["path"], "greet.py")
         (self.root / ".p2p/work/tiny/local-note.txt").write_text("records only")
         self.assertEqual(d.fs.review_scope_status(self.root, self.work, delivery.workspace)["status"], "COVERED")
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            self.assertEqual(d.main(["--repo", str(self.root), "cleanup", self.work]), 0, output.getvalue())
+        saved = json.loads((self.root / ".p2p/work/tiny/artifacts/delivery.json").read_text())
+        self.assertEqual(saved["review_scope"]["candidate_key"], state["candidate"]["key"])
+        self.assertEqual(set(saved["coverage_trace_sha256"]), {"implementation", "review", "proof"})
+        self.assertEqual(d.fs.review_scope_status(self.root, self.work, delivery.workspace)["status"], "COVERED")
 
     def test_old_unscoped_delivery_reports_unknown_without_guessing(self):
         result = d.fs.review_scope_status(self.root, self.work)
