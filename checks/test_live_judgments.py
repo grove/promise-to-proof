@@ -62,6 +62,18 @@ class OfflineJudgmentTransport:
                 "gaps": ["R2 whitespace regression"] if self.bad else [],
                 "learning_candidates": [], "details": "OFFLINE STUB: not live proof",
             }
+        product = Path(prompt.split('workspace ', 1)[1].split('. ', 1)[0])
+        manifest = d.fs.snapshot(product)
+        changed = d.fs.tree_changes(d.fs.snapshot(product, inputs['comparison_base']), manifest)
+        paths = [item['path'] for item in changed]
+        report['coverage_trace'] = {
+            'requirements': [{'id': row['id'], 'paths': paths,
+                              'existing': not bool(paths), 'evidence': ['row']}
+                             for row in report['requirements']],
+            'supporting_changes': [],
+            **({'inspected_paths': sorted({item['path'] for item in manifest} & set(paths))}
+               if stage == 'review' else {}),
+        }
         session = "offline-" + uuid.uuid4().hex
         events = [
             {"type": "thread.started", "thread_id": session},
