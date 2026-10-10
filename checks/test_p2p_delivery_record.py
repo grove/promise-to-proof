@@ -135,6 +135,88 @@ class DeliveryRecordTests(unittest.TestCase):
         self.assertEqual(record_protocol.validate(
             self.root, completed, checkpoint=self.checkpoint)["method"], "direct")
 
+    def test_assembled_parent_without_synthetic_pr_requires_parent_contract_and_proof(self):
+        # A second isolated fixture binds the full parent's own requirements,
+        # children, and independent proof, not its children's historical verdicts.
+        parent = fixture.DeliveryTests("test_clean_project_delivery_uses_local_contract_and_records")
+        parent.setUp()
+        try:
+            work = ".p2p/work/tiny/contract.md"
+            contract = parent.root / work
+            child = parent.root / ".p2p/work/tiny-child/contract.md"
+            child.parent.mkdir(parents=True)
+            child.write_text("# Acceptance contract: child\n\nContract revision: v1\n"
+                             "Parent: [Tiny](../tiny/contract.md)\n")
+            contract.write_text(contract.read_text() +
+                                "\n## Children\n\n- [Child](../tiny-child/contract.md): R1 contribution\n")
+            code, result = parent.cli()
+            self.assertEqual(code, 0, result)
+            from test_p2p_delivery import d
+            state = parent.state()
+            final_record = d.Delivery(parent.root, work, state).final_record()
+            checkpoint = (parent.root / "p2p-state/tiny.json").read_bytes()
+            cp, _ = d.fs.read_checkpoint(parent.root, checkpoint)
+            manifest = d.fs.snapshot(parent.root, cp["candidate_commit"])
+            tree = d.git_generation_tree(parent.root, manifest)
+            after = d.fs.git(parent.root, "-c", "user.name=Fixture",
+                             "-c", "user.email=test@example.invalid", "commit-tree",
+                             tree, "-p", parent.base, "-m", "Landed assembled parent").decode().strip()
+            d.fs.git(parent.root, "update-ref", "refs/heads/delivery-target", after)
+            mapped = record_protocol.preview(
+                parent.root, final_record, checkpoint=checkpoint,
+                method="integrated", repository="owner/repo",
+                destination_ref="refs/heads/delivery-target",
+                before=after, after=after,
+                confirmed_at="2026-10-10T12:00:00+00:00")
+            self.assertIsNone(mapped["landing"]["pull_request"])
+            self.assertEqual(record_protocol.validate(
+                parent.root, mapped, checkpoint=checkpoint)["method"], "integrated")
+            damaged = copy.deepcopy(cp)
+            # Delete the retained child from the otherwise exact checkpoint:
+            # assembled-parent evidence cannot invent a child contribution.
+            damaged["texts"].clear()
+            with self.assertRaises(ValueError):
+                record_protocol.validate(parent.root, mapped,
+                                         checkpoint=d.fs.canonical(damaged) + b"\n")
+        finally:
+            parent.tearDown()
+
+    def test_optional_normalized_evidence_refs_require_retrievable_exact_bytes(self):
+        evidence_path = ".p2p/work/tiny/evidence/proof-e1.json"
+        evidence = {"schema": "promise-to-proof/evidence-record/v1", "id": "E1",
+                    "candidate": self.original["candidate_key"],
+                    "contract": self.original["contract"],
+                    "requirements": ["R1"],
+                    "type": "manual", "assertion": "exact hello output",
+                    "observation": "hello and status zero",
+                    "oracle": {"expected_result": "hello and status zero"},
+                    "outcome": "passed", "environment": "fixture",
+                    "timestamp": "2026-10-10T12:00:00Z",
+                    "limitations": [], "provenance": "fixture observations"}
+        payload = fixture.d.fs.canonical(evidence)
+        digest = fixture.d.fs.digest(payload)
+        cp = copy.deepcopy(self.index)
+        cp["files"].append({"scope": "project", "path": evidence_path, "sha256": digest})
+        cp["texts"][digest] = payload.decode()
+        cpbytes = fixture.d.fs.canonical(cp) + b"\n"
+        saved, args = self.landed("direct")
+        mapped = record_protocol.preview(
+            self.root, self.original,
+            **(args | {"checkpoint": cpbytes,
+                        "evidence_refs": [{"scope": "project",
+                                           "path": evidence_path, "sha256": digest}]}))
+        checked = record_protocol.validate(self.root, mapped, checkpoint=cpbytes)
+        self.assertEqual(checked["status"], "LANDED_MAPPING_VERIFIED")
+        corrupted = copy.deepcopy(cp)
+        corrupted["texts"][digest] = "{}"
+        with self.assertRaises(ValueError):
+            record_protocol.validate(self.root, mapped,
+                                     checkpoint=fixture.d.fs.canonical(corrupted)+b"\n")
+        bad = copy.deepcopy(mapped)
+        bad["landing"]["evidence_refs"][0]["sha256"] = "e" * 64
+        with self.assertRaises(ValueError):
+            record_protocol.validate(self.root, bad, checkpoint=cpbytes)
+
     def test_idempotent_retry_changes_neither_event_nor_receipt(self):
         completed, args = self.landed("squash")
         repeated = record_protocol.preview(self.root, completed,
