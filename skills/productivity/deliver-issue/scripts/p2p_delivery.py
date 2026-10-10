@@ -2492,8 +2492,11 @@ assert results['scratch'] == 'ok'
                 base = fs.snapshot(self.workspace, self.state['comparison_base'],
                                    exclude=self.state.get('agreement_paths', ()))
                 changed = fs.tree_changes(base, manifest)
+                records = fs.available_evidence_refs(
+                    self.workspace, self.work, fs.snapshot_key(manifest),
+                    self.state['contract']['sha256'])
                 fs.validate_coverage_trace(report['coverage_trace'], self.state['requirements'],
-                                           report, name, manifest, changed)
+                                           report, name, manifest, changed, records)
                 if name == 'review':
                     scope = fs.review_scope(self.state['candidate'], manifest,
                                             self.state['local_git_generations'][-1]['commit'],
