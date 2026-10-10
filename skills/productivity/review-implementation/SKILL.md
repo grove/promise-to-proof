@@ -150,6 +150,25 @@ was mistaken, and why the current conclusion differs. Record that reasoning in
 the affected requirement observation or checks; never replace a previous report
 or treat a small diff as automatic applicability.
 
+## Name exactly what the review examined
+
+Alongside the current review's per-requirement observations, identify the code
+or already-sufficient product behavior behind each obligation and the actual
+retained evidence/check supporting your engineering assessment. Account for
+every changed product path: link it to an obligation, or name its justified
+supporting role. An unrelated scope expansion is still a finding even if a
+trace entry supplies a rationale. Include only actual inspected product paths
+in `coverage_trace.inspected_paths` when requested by the controller; inspect
+all changed existing product files before claiming a clean full review.
+The controller binds those paths to their exact bytes and file modes.
+
+For an older review without exact scope metadata, do not infer what was
+inspected from prose, a Git diff, or the count of files. Report `UNKNOWN`
+coverage and the smallest resolving inspection. A changed candidate needs
+fresh independent full-scope judgment, though earlier observations can remain
+applicable under the canonical focused re-verification rules. A trace is
+not a substitute for checking scope, quality, or material risks.
+
 ## Investigate without repairing
 
 Start from the source, contract, candidate, and constraints. The author's report
