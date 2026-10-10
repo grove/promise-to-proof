@@ -198,6 +198,12 @@ class ControllerReuseTests(unittest.TestCase):
                          before_files)
         self.assertEqual(result["work_selection"]["next"],
                          "none — current local completion already established")
+        again_code, again = self.case.cli("run")
+        self.assertEqual(again_code, 0, again.get("blocker"))
+        self.assertEqual(again["reuse"]["status"], "UNCHANGED_COMPLETION")
+        self.assertEqual(self.case.fake.calls, before_calls)
+        self.assertEqual((local / "delivery.json").read_bytes(), state)
+        self.assertEqual(cp.read_bytes(), checkpoint)
 
     def test_corrupt_candidate_and_checkpoint_never_fast_reuse(self):
         self.assertEqual(self.case.cli()[0], 0)
