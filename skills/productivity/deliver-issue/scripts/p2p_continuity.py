@@ -95,7 +95,7 @@ def persist(root, origin_work, decision, references):
     document = {"topology": decision, "continuity": record}
     content = json.dumps(document, sort_keys=True, separators=(",", ":"),
                          ensure_ascii=False).encode("utf-8")
-    block = b"<!-- p2p-continuity-v1\\n" + content + b"\\n-->".replace(b"\\n", b"\n")
+    block = b"<!-- p2p-continuity-v1\n" + content + b"\n-->"
     from re import compile as regex
     pattern = regex(rb"<!-- p2p-continuity-v1\n.*?\n-->", re.S)
     old = pattern.search(previous)
