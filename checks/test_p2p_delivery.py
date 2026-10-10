@@ -301,6 +301,8 @@ class FakeTransport:
                     **({'inspected_paths': sorted({item['path'] for item in manifest} & set(paths))}
                        if stage == 'review' else {}),
                 }
+                if 'coverage_trace.risks' in prompt:
+                    report['coverage_trace']['risks'] = []  # No extra material risks in the low-risk offline fixture.
             output = 'hello\n'
             report = json.dumps(report)
         self.messages.append((stage, report))
