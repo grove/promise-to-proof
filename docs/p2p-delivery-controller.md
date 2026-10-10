@@ -271,6 +271,36 @@ enforce a monetary ceiling. Recorded token usage is an observation; cost is unkn
 An elapsed-time deadline can terminate the local process, but provider work or
 billing may continue after that deadline.
 
+## Reuse retained facts without replaying delivery
+
+The controller derives a small read-only `work_selection` from the existing
+candidate, stage inputs, exact Git generation and host preflight. Each stage is
+`REUSED`, `MISSING` or `STALE`, with one next action. There is no additional
+workflow stage or mutable evidence cache.
+
+An unchanged completed delivery can be checked with the existing
+`resume` command. It validates the exact current product and frozen base,
+source/authority/skill identity, both independently saved complete reports,
+their distinct host sessions and the retained portable checkpoint. On success
+it returns `reuse.status=UNCHANGED_COMPLETION`, **zero new model calls** and
+**zero canonical writes**; after terminal cleanup, the same command reads the
+exact durable final records. Failure never rewrites or weakens the original
+accepted verdict. A restored checkpoint cannot take this shortcut before
+required fresh receiving-host preflight.
+
+On changed product bytes, each verifier still gets a fresh full-scope task and
+must issue a new verdict. The existing same-stage observation handoff now
+includes an `applicability` check plan. `SELECTIVE` marks specific previously
+checked observations that *might* still apply and requirements needing refreshed
+checks; `FULL_RECHECK` forces broad fresh observation for changed tests,
+unsupported dependencies, material uncertain reach or missing evidence. The
+verifier makes the final applicability judgment, cites saved original
+observations, and verifies all current obligations. Other-verifier reports
+remain inaccessible, and old verdicts do not become new conclusions.
+
+See [incremental reuse validation](../checks/incremental-reuse.md) for
+reproduction, cold/unchanged/restored/change-case measurements and limits.
+
 ## Read progress and resume
 
 ```sh
