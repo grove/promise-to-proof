@@ -1080,6 +1080,59 @@ configured external execution root. Treat project-owned `specs/` and `work/`
 inputs as unchanged source: do not rewrite, move, or use them as a second P2P
 state store.
 
+## Issue topology after justified sizing (#78)
+
+Use the **existing** #76 initial sizing or #77 evidence-backed re-sizing
+decision to establish material delivery units. Choosing how the tracker
+represents these units is separate from their number, accepted promise and
+delivery routes. Only a genuine identity-bound `SPLIT` may produce a
+multi-issue topology; local #55 verified implementation steps need no issue.
+
+When the work is naturally sequential and independent parent ownership,
+long-lived aggregate status and parent-level integration add no value, choose
+a short **standalone continuation**. Its units have explicit real
+prerequisites (never edges inferred from the display order), source-linked
+contributions, a single current and next issue, and the final replacement
+as owner of fresh complete acceptance across **all** original obligations.
+Final combined acceptance still needs one actual integrated candidate,
+frozen comparison base, independent complete review and proof; earlier unit
+verdicts cannot be composed. The originating broad ticket is history,
+not a synthetic active parent or an additional completion gate.
+
+Keep an existing **parent-child tree** when parallel ownership, genuinely
+useful long-lived aggregate status, or independently necessary parent
+integration justifies it. Parent completion follows the normal full
+assembled-parent review and proof rules. A late shape change does not edit
+accepted contracts, move code, reset candidates, rewrite reports, retarget
+PRs or erase approvals. Inventory every retained candidate, PR, review and
+human edit with its original identity, source and ownership. Preserve the
+work in place; unresolved ownership affecting the proposed transition
+blocks it. A tracker shape correction is a scoped, separately authorized
+migration, never an automatic #77 contract revision.
+
+Save the originating promise/reference/revision/digest, exact sized decision
+and supporting evidence, every original obligation and unit contribution,
+real dependency graph, ordered units, remaining work, one active/next
+action, topology factors and reason, and final acceptance owner in the
+existing `.p2p/work/<origin>/slicing.md`. Keep it outside the exact approved
+delivery-plan section and retain/read back previous history, current plan
+and source identities. This is the canonical durable handoff for later #71
+discovery. Do not add a second acceptance workflow or state store.
+
+Superseding an originating tracker ticket is **optional and separately
+authorized**. Only after every replacement issue exists with verified
+original-source links and complete allocation, construct the exact
+identity-bound supersession preview. Require explicit approval of that
+exact preview plus distinct `issue-comment` and `issue-close` effect
+grants scoped to the original issue. Recheck the original body/state and
+all replacement issue identities/human edits before writing. Retain
+original historical text and link to every replacement in a single
+supersession comment; close with `not_planned`, **never completed**.
+Read back the exact comment (uniquely), issue closure state/reason, and
+replacement links before claiming `SUPERSEDED`. Unknown results are
+`PARTIAL` and must be read back before any retry. Neither topology
+selection nor issue closure proves product delivery.
+
 ## Epic delivery plans
 
 `slice-contract` owns routing in `.p2p/work/<parent>/slicing.md`, alongside the
