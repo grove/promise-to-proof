@@ -338,6 +338,32 @@ ref, marker, and exact identities before retrying. Reuse one confirmed exact
 effect. If no unique result can be established, return `PARTIAL` and do not
 repeat the write. Never delete a successful branch or pull request as rollback.
 
+## Publish the saved independent review with the PR
+
+After confirming an authorized draft PR by readback, use the optional
+`/publish-pr-review` skill **inside this same requested publication**.
+This reuses the saved independently produced `review.md` and original
+stage receipt; it never invokes `review-implementation` again.
+Build an exact preview against the current PR head, saved contract,
+source/parent bindings, reviewed scope, and retained candidate-to-commit
+mapping. A changed or unverifiable PR head blocks stale publication.
+
+Obtain separate exact effect authorization for the review submission:
+`pr-review-comment` for a clean non-approving `COMMENT`, or
+`pr-review-request-changes` for material saved findings. Neither is
+implied by permission to create a PR. The published review clearly
+distinguishes independent review, acceptance proof, GitHub approval and
+merge readiness. Reread the live PR head and entire review history,
+publish at most once, then read back by stable identity and exact body.
+Reconcile lost responses and identical retries without duplicate reviews.
+Preserve human reviews, PR edits and historical candidate reviews.
+
+If review-submission authority is missing, the PR can remain
+`PUBLISHED` while its review handoff is explicitly pending; retain the
+local preview and identify the one missing grant. Never falsely report
+the saved review as externally published. No new user-selected stage,
+independent verdict, extra approval policy or merge authority is added.
+
 ## Handoff to authorized finalization
 
 A published PR is only a historical candidate handoff. When the original
