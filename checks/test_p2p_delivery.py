@@ -43,7 +43,11 @@ None.
 @contextlib.contextmanager
 def fixture_host():
     """Supply version/skill discovery for offline fixtures; never launch a model."""
+    # Executable bytes exist in the offline test boundary; version text alone
+    # must not serve as an executable identity.
     executable = Path(__file__).resolve().parent / 'fixtures/codex'
+    executable.parent.mkdir(parents=True, exist_ok=True)
+    executable.write_bytes(b'#!/bin/sh\nexit 0\n')
     original_which = shutil.which
     original_run = subprocess.run
 
