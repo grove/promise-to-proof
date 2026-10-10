@@ -409,7 +409,34 @@ cold delivery, no-work continuation, required receiving-host preflight, and
 changed-candidate re-verification. Keep tokens, human time and provider costs
 unknown when there is no actual observation.
 
-## Durable contract handoff
+## Voluntary backlog replanning after code changes (#56)
+
+`/replan-backlog` is a maintainer-invoked advisory inspection, never a
+mandatory post-merge stage. Compare the exact landed code and linked
+completed PR/issue with only plausibly affected open issues by default;
+inspect the whole backlog only when explicitly requested. Verify changed
+behavior and actual supporting evidence, not just issue or PR status.
+Distinguish confirmed shipped outcomes, partial completion, pending PRs,
+unexecuted required validation, unrelated work and unknown applicability.
+
+Propose closure for an issue only when every original obligation is supported
+by applicable shipped evidence. For partial implementation, preserve the
+originating promise and historical shipped contribution and narrowly describe
+remaining work. Keep active delivery contracts pinned: changes to material
+source promises require existing `plan-acceptance` revision authority and
+preserve prior candidate, review, proof and checkpoint identities. Do not
+manufacture issue merges or remove useful history for a tidier list.
+
+Explain real hard prerequisites separately from a suggested work order, name
+parallel candidates and a single immediate next action without numerical
+priority scoring or a persistent roadmap store. Every proposed tracker edit,
+closure or relationship requires a complete before/after preview, exact
+covering authority, recheck against current issue/code and successful remote
+readback. If native dependency tooling is unavailable, document actual
+links without claiming native relationships were made. Reconciliation
+proposals do not grant remote effects or establish acceptance.
+
+
 
 Keep one canonical generated acceptance contract in `.p2p/work/<slug>/contract.md`.
 The contract revision and content digest identify its exact agreement. Project

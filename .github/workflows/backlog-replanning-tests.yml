@@ -1,0 +1,23 @@
+name: Backlog replanning regressions
+on:
+  pull_request:
+    paths:
+      - 'skills/productivity/replan-backlog/**'
+      - 'checks/test_p2p_backlog.py'
+      - 'checks/test_working_style.py'
+      - 'docs/acceptance-contract-protocol.md'
+      - '.github/workflows/backlog-replanning-tests.yml'
+  workflow_dispatch:
+jobs:
+  replanning:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate scripts
+        run: python3 -m py_compile skills/productivity/replan-backlog/scripts/p2p_backlog.py
+      - name: Run backlog and packaging checks
+        run: python3 -m unittest discover -s checks -p 'test_p2p_backlog.py' -v && python3 -m unittest discover -s checks -p 'test_working_style.py' -v && python3 -m unittest discover -s checks -p 'test_onboarding_docs.py' -v

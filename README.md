@@ -270,7 +270,7 @@ situations that appear later in real work.
 | [`/merge-readiness`](./skills/productivity/merge-readiness/SKILL.md) | An existing PR is near a merge decision |
 | [`/fix-pr`](./skills/productivity/fix-pr/SKILL.md) | A pull request workflow failed |
 | [`/retrospect`](./skills/productivity/retrospect/SKILL.md) | A proven delivery has concrete experience worth learning from |
-| [`/triage-issue`](./skills/productivity/triage-issue/SKILL.md) | A tracker issue needs a next action or triage label |
+| [`/replan-backlog`](./skills/productivity/replan-backlog/SKILL.md) | After a merge, reconcile only affected open issues and propose justified narrowing, closure and dependency ordering without touching active contracts |\n| [`/triage-issue`](./skills/productivity/triage-issue/SKILL.md) | A tracker issue needs a next action or triage label |
 | [`/create-parent-issue`](./skills/productivity/create-parent-issue/SKILL.md) | A local specification needs an optional GitHub source issue |
 | [`/critique`](./skills/productivity/critique/SKILL.md) | You want an independent assessment of a proposal |
 | [`/interrogate`](./skills/productivity/interrogate/SKILL.md) | You want to question the agent's proposal and reasoning |

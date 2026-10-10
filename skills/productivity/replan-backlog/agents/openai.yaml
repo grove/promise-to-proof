@@ -1,0 +1,5 @@
+interface:
+  display_name: "Replan Backlog"
+  short_description: "Update affected issues against shipped changes"
+policy:
+  allow_implicit_invocation: false

@@ -22,6 +22,7 @@ SKILLS = (
     "publish-pr",
     "repair-gaps",
     "retrospect",
+    "replan-backlog",
     "review-implementation",
     "setup-promise-to-proof",
     "slice-contract",
