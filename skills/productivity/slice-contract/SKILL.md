@@ -70,6 +70,12 @@ does not change the agreement. Keep outcome-defining unknowns that affect slice
 boundaries or dependency order as blocking decisions. A missing evidence harness
 for a clear outcome can instead be assigned as necessary work.
 
+## Modern-agent sizing principle
+
+Assume the coding agent can autonomously plan, explore, refactor, debug, and recover within one coherent outcome. Do not split merely to reduce perceived cognitive load, enforce a sequence of agent prompts, or compensate for older model limitations. Split only when a concrete *delivery* boundary improves independently observable completeness, prerequisite isolation, integration safety, recovery, or ownership enough to justify another complete verification cycle.
+
+For each proposed slice, ask whether a strong autonomous agent could instead deliver the combined outcome and prove it in one bounded episode. Keep the fewest useful children; do not split by files, layers, tests, arbitrary size, or implementation steps. Preserve every parent promise in bidirectional allocation, and name the one exact final assembled-parent verification owner. Child acceptance never substitutes for full parent proof. This guidance refines existing sizing judgment; it introduces no new score, agent, or required record.
+
 ## Choose and account for the slices
 
 Start with the whole work item as one leaf. Inspect the source, exact agreement,
