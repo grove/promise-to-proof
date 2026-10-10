@@ -133,6 +133,10 @@ def _short_reason(message):
 
 def _kind_of_blocker(blocker):
     message = (blocker or "").lower()
+    if ("no delivery invocation exists" in message or
+            "missing delivery invocation" in message or
+            "no local delivery invocation" in message):
+        return "not-admitted"
     if ("app-server" in message or "sandbox" in message or "codex" in message) and (
             "permission" in message or "not permitted" in message or "initialize" in message):
         return "host"
@@ -276,7 +280,13 @@ def explain(status, *, publication=None, finalization=None):
         reason = _short_reason(status.get("blocker"))
         kind = _kind_of_blocker(reason)
         attempted = sum(1 for a in (status.get("attempts") or []) if a.get("stage") == "implementation")
-        if kind == "host":
+        if kind == "not-admitted":
+            phase, action_needed = "NOT_ADMITTED", True
+            what = "A delivery invocation has not yet been admitted for this work item."
+            why = "The saved request or planning agreement alone does not mean implementation started, and there are no controller stages to resume."
+            next_action = "Continue the existing /deliver-issue request from its saved source and complete any necessary agreement, approval and admission checks."
+            location = "source/planning records only; no admitted implementation candidate"
+        elif kind == "host":
             phase, action_needed = "BLOCKED_HOST", True
             what = "P2P is blocked by the execution host before it can safely continue."
             why = "The host reported " + (reason or "an unavailable worker capability") + ". A planning-audit result is not approval, and no implementation or live proof can be inferred from it."
