@@ -328,19 +328,24 @@ class FakeTransport:
                 staged = self.mode == 'sliced'
                 number = self.calls.count('implementation')
                 partial = report['status'] == 'PARTIAL'
+                slice_paths = [item['path'] for item in d.fs.tree_changes(
+                    d.fs.snapshot(product, inputs.get('local_git_generation', {}).get('commit')
+                                  or inputs['comparison_base'], exclude=excluded), manifest)]
+                if not slice_paths and any(item['path'] == self.output_path for item in manifest):
+                    # A revised agreement can verify an unchanged, still-real
+                    # public seam. The fixture must name that seam explicitly.
+                    slice_paths = [self.output_path]
                 report['implementation_slice'] = {
                     'id': f'I{number}' if staged else 'I1', 'requirement_ids': ['R1'],
                     'expected_result': 'hello newline and zero exit',
                     'checks': [{'kind': 'test',
                                 'command': ('FIXTURE python3 tests/test_greet.py'
-                                            if staged and number == 2 else 'FIXTURE python3 greet.py'),
+                                            if staged and number == 2 else
+                                            'FIXTURE python3 ' + self.output_path),
                                 'result': 'passed',
                                 'observation': ('greet test passed' if staged and number == 2
                                                 else 'hello')}],
-                    'paths': [item['path'] for item in d.fs.tree_changes(
-                        d.fs.snapshot(product, inputs.get('local_git_generation', {}).get('commit',
-                                                      ) or inputs['comparison_base'], exclude=excluded),
-                        manifest)],
+                    'paths': slice_paths,
                     'outcome': 'BLOCKED' if partial and not staged else 'VERIFIED',
                     'boundary_reason': 'Regression check is a separate observable outcome.' if staged and partial else '',
                     'next_action': ('Create and verify regression check.' if staged and partial else
@@ -355,7 +360,7 @@ class FakeTransport:
                     'exit_code': 0}})
             report = json.dumps(report)
         self.messages.append((stage, report))
-        events += [{'type':'item.completed','item':{'type':'command_execution','command':'FIXTURE python3 greet.py',
+        events += [{'type':'item.completed','item':{'type':'command_execution','command':'FIXTURE python3 ' + self.output_path,
                                                     'aggregated_output':output,'exit_code':0}},
                    {'type':'item.completed','item':{'type':'agent_message','text':report}},
                    {'type':'turn.completed','usage':{'input_tokens':7,'output_tokens':3}}]
@@ -822,7 +827,12 @@ class DeliveryTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
         resumed = self.state()
         self.assertEqual(resumed['comparison_base'], self.base)
-        self.assertEqual(resumed['destination_observation']['observed_tip'], newer)
+        # Completed delivery reuse is deliberately read-only. The current
+        # destination observation is returned, not rewritten into the original
+        # saved controller/checkpoint history.
+        observation = json.loads(result.stdout)['destination_observation']
+        self.assertEqual(observation['observed_tip'], newer)
+        self.assertNotEqual(resumed['destination_observation']['observed_tip'], newer)
 
     def planned_child(self, choice='grouped'):
         d.fs.git(self.root, 'branch', 'trunk', self.base)
@@ -1809,8 +1819,9 @@ Pending actions: none.
             self.assertEqual((d.delivery_paths(self.root, '.p2p/work/tiny/contract.md')[1] / 'delivery.json').read_bytes(), durable_record)
         saved_workspace.rename(workspace)
         code, value = self.cli('resume')
-        self.assertEqual(code, 1, value)
-        self.assertIn('missing delivery invocation; no effects can be reconciled', value['blocker'])
+        self.assertEqual(code, 0, value)
+        self.assertEqual(value['reuse']['status'], 'UNCHANGED_COMPLETION')
+        self.assertEqual(value['reuse']['new_model_calls'], 0)
         self.assertEqual(len(self.fake.calls), dispatches)
 
     def test_cleanup_rechecks_source_after_final_records_are_written(self):
@@ -2034,7 +2045,7 @@ Pending actions: none.
         self.assertEqual(len(self.fake.calls),calls)
         bundle=json.loads((self.runtime() / 'acceptance-bundle.json').read_bytes())
         summary=bundle['review']['details']['content']
-        self.assertIn('## Requirements',summary)
+        self.assertIn('Requirement coverage:',summary)
         self.assertNotIn('Legacy free-text summary.',summary)
 
     def test_admission_no_new_effects(self):

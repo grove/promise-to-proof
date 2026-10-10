@@ -108,7 +108,9 @@ uses the exact existing #82 checkpoint, product-tree and target-commit
 checks. It does **not** merge, push, record a remote receipt, or change
 authority. It returns `LANDED_MAPPING_VERIFIED` for internally consistent
 Git mapping, not a claim that remote publication/readback occurred.
-Issue #47 owns the latter action. Local/source/spec delivery has no
+The [authorized finalization workflow](finalization.md) consumes that
+same record and the published #82 checkpoint to perform and verify exact
+externally permitted effects. Local/source/spec delivery has no
 automatic issue or PR requirement. See the
 [Delivery Record v1 reference](delivery-record-v1.md) for exact preview and
 validation commands and the stable retry identity.
@@ -349,9 +351,9 @@ contract/candidate publication identity before claiming a publication or
 merge. One unambiguous saved PR URL in `publication.md` may supply a lookup
 hint; a note alone never establishes publication. If GitHub access or the
 candidate's exact Git objects are unavailable, the external effect stays
-**unconfirmed**. An open PR is not merged; a verified merge is not a
-completed-delivery receipt until the separately planned #50/#47 finalization
-is implemented. A local accepted candidate remains in the isolated workspace
+**unconfirmed**. An open PR is not merged; even a verified merge is not a
+completed-delivery receipt until the [#47 finalization workflow](finalization.md)
+validates actual landed code and the exact remote receipt. A local accepted candidate remains in the isolated workspace
 and does not modify the operator checkout.
 
 A restored checkpoint carries earlier evidence but does not prove that a

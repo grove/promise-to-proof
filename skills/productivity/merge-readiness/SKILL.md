@@ -198,6 +198,53 @@ parent integration, review, and proof remain separate. Parent readiness requires
 assembled-parent reports and the final target's required checks and approvals;
 child completion cannot substitute for them.
 
+## Machine-checkable finalization handoff (only after READY)
+
+For an actually READY, independent assessment, retain a compact JSON section
+in the existing `merge-readiness.md` under the precise delimiter
+`<!-- p2p-finalization-readiness:v1 -->`. This is a *view of
+the same readiness decision*, not a second stage, effect grant or database.
+The JSON keys are exactly:
+
+```json
+{
+  "schema": "promise-to-proof/merge-readiness/v1",
+  "status": "READY",
+  "pr": "https://github.com/OWNER/REPO/pull/123",
+  "head": "FULL_EXACT_PR_HEAD_SHA",
+  "base": "FULL_EXACT_CURRENT_TARGET_SHA",
+  "target": "approved-target-branch",
+  "integration_commit": "FULL_EXACT_GITHUB_TEST_MERGE_SHA",
+  "integration_check": "name-of-successful-head-target-integration-check",
+  "required_checks": ["check-name-defined-by-effective-branch-rules"],
+  "policy_sha256": "64-lowercase-hex-of-canonical-effective-branch-rules",
+  "synchronized": true,
+  "observed_at": "ISO-8601-time-with-offset",
+  "merge_method": "squash"
+}
+```
+
+Select the merge method from configured repository policy and the
+authorized delivery route: `merge`, `squash` or `rebase`.
+No inferred fallback. Resolve the exact test-merge commit and ensure its
+two parents are current target and PR head, in that order, before choosing
+the integration check. Read the effective branch rules with the current
+GitHub API, confirm all required checks, and compute
+`policy_sha256` using the controller's canonical JSON digest.
+If you cannot read the rules, exact test-merge commit, corresponding successful
+integration check, CI, approvals or merge method, remain `UNKNOWN` or
+`BLOCKED` and do **not** emit a READY finalization section.
+
+The PR description must also contain exactly one marker:
+`<!-- p2p-ready:sha256:HASH -->` where HASH is SHA-256 of
+`fs.canonical(readiness_object)` with `synchronized: true`.
+Preserve all other PR body content. Only *after* updating and reading back
+that exact marker, description, head/base and gates may the locally saved
+JSON state claim `synchronized: true`. The outer coordinator
+will independently reread the PR, merge policy, Git integration test and
+checks immediately before an authorized effect. The marker itself is
+never permission to merge.
+
 ## Synchronize the PR description
 
 Before the merge handoff, replace the existing `Merge readiness: NOT ASSESSED`

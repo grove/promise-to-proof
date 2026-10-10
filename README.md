@@ -153,9 +153,10 @@ example:
 
 When a matching pull request can be checked against the reviewed candidate,
 P2P distinguishes **PR open**, **merge confirmed but final receipt pending**,
-and truly finalized delivery. Until the separate completed-record work in
-#50/#47 is available, a merge is not described as fully finalized. Unknown
-GitHub status stays unknown rather than becoming an optimistic claim.
+and truly finalized delivery. The [finalization workflow](./docs/finalization.md)
+now verifies landed code, portable checkpoints and a durable receipt under
+separately granted authority. Until those checks pass, a merge remains partial.
+Unknown GitHub status stays unknown rather than becoming an optimistic claim.
 
 **Ready to try the whole flow with a tiny example?** Follow
 [Your first Promise to Proof delivery](./docs/getting-started.md).

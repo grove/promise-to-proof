@@ -178,12 +178,20 @@ def _final_receipt_ok(finalization, publication, candidate_key):
     """Only a future verified #50/#47 receipt may establish full finalization."""
     if not isinstance(finalization, dict):
         return False
-    return (publication and publication.get("verified") is True and publication.get("status") == "MERGED" and
-            finalization.get("status") == "FINALIZED" and finalization.get("receipt_verified") is True and
-            finalization.get("candidate_mapping_verified") is True and
-            finalization.get("destination_verified") is True and
-            finalization.get("candidate_key") == candidate_key and
-            finalization.get("delivered_commit") == publication.get("merge_commit"))
+    verified = (finalization.get("status") == "FINALIZED" and
+                finalization.get("receipt_verified") is True and
+                finalization.get("candidate_mapping_verified") is True and
+                finalization.get("destination_verified") is True and
+                finalization.get("candidate_key") == candidate_key and
+                isinstance(finalization.get("delivered_commit"), str) and
+                SHA.fullmatch(finalization["delivered_commit"]))
+    if not verified:
+        return False
+    # A verified direct/assembled parent can be finalized without a PR.
+    # When one is present, its actual merge commit must still agree.
+    return publication is None or (
+        publication.get("verified") is True and publication.get("status") == "MERGED" and
+        finalization["delivered_commit"] == publication.get("merge_commit"))
 
 
 def explain(status, *, publication=None, finalization=None):
@@ -234,7 +242,9 @@ def explain(status, *, publication=None, finalization=None):
         if _final_receipt_ok(finalization, pub, candidate_key):
             phase = "FULLY_FINALIZED"
             what = "The exact delivered code and its durable final receipt have been independently reconciled."
-            why = "Local review/proof, the merged target, product mapping and finalization receipt all match."
+            why = ("Local review/proof, the merged PR, delivered-code mapping and receipt all match."
+                   if verified_pub and pub["status"] == "MERGED" else
+                   "Local review/proof, the directly delivered code and durable receipt all match; no PR was required.")
             next_action = "No further delivery action is required for this outcome."
             location = "verified delivered destination branch"
         elif verified_pub and pub["status"] == "MERGED":

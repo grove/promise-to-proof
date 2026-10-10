@@ -1784,6 +1784,13 @@ class Delivery:
             attempt = next((item for item in self.state['attempts']
                             if item['id'] == source.get('attempt_id')), None)
             if not attempt or not attempt.get('report'):
+                # A confirmed stalled/terminated worker has a durable exit
+                # receipt, but no accepted implementation report. Preserve
+                # its product candidate for recovery without claiming a
+                # VERIFIED slice or inventing an implementation verdict.
+                if attempt and attempt.get('status') == 'retired':
+                    self._generation_chain_verified = False
+                    return candidate
                 raise ValueError('slice capture has no saved confirmed implementation report')
             data = fs.safe(self.runtime, attempt['report']).read_bytes()
             if fs.digest(data) != attempt['report_sha256']:
