@@ -134,11 +134,19 @@ def _source_context(root, record, checkpoint, artifact_directory):
     candidate_path = f".p2p/work/{slug}/artifacts/candidate.json"
     candidate_bytes = saved(candidate_path, artifact_name="candidate.json")
     if execution is not None:
+        route = execution.get("routing")
+        _need(isinstance(route, dict), "checkpoint execution has no approved destination")
+        recorded_route = {key: value for key, value in route.items()
+                          if not (key == "selection" and value == "approved-plan")}
         _need(execution.get("status") == LOCAL and
               execution.get("invocation_id") == record["invocation_id"] and
               execution.get("contract", {}).get("sha256") == record["contract"]["sha256"] and
-              execution.get("binding_inputs") == binding_rows,
-              "checkpoint execution differs from completed agreement or invocation")
+              execution.get("binding_inputs") == binding_rows and
+              execution.get("comparison_base") == record["comparison_base"] and
+              execution.get("completed_at") == record["completed_at"] and
+              execution.get("agreement_paths") == record["agreement_paths"] and
+              record.get("routing") == recorded_route,
+              "checkpoint execution differs from completed agreement, scope, routing, or invocation")
         state_candidate = execution.get("candidate")
         _need(isinstance(state_candidate, dict),
               "checkpoint has no retained candidate")
