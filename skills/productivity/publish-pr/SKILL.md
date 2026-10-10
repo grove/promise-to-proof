@@ -142,6 +142,24 @@ without another edit. If identity is ambiguous, return `PARTIAL` without repeati
 a write or creating a duplicate PR. A superseded target blocks publication.
 Readiness remains a separate assessment against the actual target and all gates.
 
+## Compare the exact saved review scope
+
+Before building the publication preview, compare the review's saved exact
+product scope with the candidate being published. For a current controller
+delivery, the read-only `review-scope-status <contract> --current-repo <PR checkout>`
+helper in `p2p_filesystem.py` reports exact product deltas. Use the actual
+candidate bytes and Git identity, not an inferred file count or a convenient
+branch tip. A records-only change in P2P's excluded state does not change
+product scope. Changed generated source/tests/configuration do.
+
+If the saved review has no exact scope metadata (older deliveries), report
+coverage `UNKNOWN` and name the smallest inspection needed; do not manufacture
+coverage. When product bytes differ, retain the named `UNCOVERED_DELTA` and
+obtain fresh current-candidate independent review and proof as required by the
+focused re-verification protocol. A small localized change can use targeted
+review observations; it does not imply automatically re-running every check.
+This comparison never replaces current-target compatibility or authorization.
+
 ## Prepare an exact preview
 
 Before presenting a preview for approval, check actual write access from this
