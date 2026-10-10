@@ -68,7 +68,7 @@ class ReadinessTests(unittest.TestCase):
     def test_changed_host_executable_blocks_before_implementation_or_reuse(self):
         code, value = self.fixture.cli('run', '--max-dispatches', '2')
         self.assertEqual(code, 1, value)
-        executable = fixture.Path(__file__).resolve().parent / 'fixtures/codex'
+        executable = fixture.Path(self.fixture.state()['host']['executable'])
         original = executable.read_bytes()
         try:
             executable.write_bytes(b'#!/bin/sh\\necho modified\\n')
