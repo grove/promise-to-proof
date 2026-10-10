@@ -329,7 +329,10 @@ class FakeTransport:
                     'expected_result': 'hello newline and zero exit',
                     'checks': [{'kind': 'test', 'command': 'FIXTURE python3 greet.py',
                                 'result': 'passed', 'observation': 'hello'}],
-                    'paths': ['tests/test_greet.py'] if staged and number == 2 else [self.output_path],
+                    'paths': [item['path'] for item in d.fs.tree_changes(
+                        d.fs.snapshot(product, inputs.get('local_git_generation', {}).get('commit',
+                                                      ) or inputs['comparison_base'], exclude=excluded),
+                        manifest)],
                     'outcome': 'BLOCKED' if partial and not staged else 'VERIFIED',
                     'boundary_reason': 'Regression check is a separate observable outcome.' if staged and partial else '',
                     'next_action': ('Create and verify regression check.' if staged and partial else
