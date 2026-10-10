@@ -33,6 +33,7 @@ jobs:
             test_p2p_delivery.DeliveryTests.test_parent_uses_final_destination_and_plan_loss_blocks_resume
       - name: Historical copied-controller compatibility
         run: |
+          git fetch --no-tags origin cc27a47f5ee765cff3cf13b21c36f974cb1234ae eb84d66dd70ce8998cd43e951741785e8520c301
           cd checks
           python3 -m unittest test_run_delivery_comparison.PilotTests.test_copied_controllers_repair_order_and_exhaustion -v
       - name: Historical comparison pilot compatibility
