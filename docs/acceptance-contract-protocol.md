@@ -1291,6 +1291,39 @@ broader checking. A changed candidate also requires fresh full-scope proof.
 An unchanged candidate still needs separate destination compatibility and
 merge-readiness checks. A valid trace by itself never proves a requirement.
 
+### Material seams and proportionate checks
+
+Record material candidate-specific risks in the same existing requirement trace
+as implementation paths and evidence. Each risk identifies affected requirement
+IDs, real production/caller/configuration paths, a realistic trigger, why it can
+occur in this candidate, its consequence, and the saved observation or check
+addressing it. Mark the risk addressed only when that evidence actually resolves
+it; leave a consequential uncertainty unresolved rather than calling the stage
+complete. An empty risk list is normal when a simple change has no additional
+material seam. Do not require every change to mention persistence, security,
+concurrency, or other hypothetical categories.
+
+Choose stronger checks when ordinary examples cannot establish an important
+invariant: a deterministic operation sequence after restart, a concurrent
+interleaving, a property/state-machine check, or targeted isolated fault
+injection may be justified. None is mandatory by technique or count. Respect
+independently established expected outcomes, existing meaningful tests, and
+binding repository checks. Do not repeat an expensive test merely because a
+new report is needed. A small repair must refresh affected assumptions and
+seams; uncertain behavioral reach requires fresh broader checking even if
+only one file changed. The verifier independently decides applicability;
+stored links never transfer an old verdict to a new candidate.
+
+For merge-readiness, compare destination changes **since the immutable review
+base** with the review's recorded implementation dependencies and material
+seams. A touched seam or uncertain reach calls for targeted current-head/
+current-target compatibility observations; an unrelated destination fast-forward
+does not impose extra deep verification solely because the target moved.
+This classification is an input to the ordinary exact-pair integration, CI,
+conflict and authorization checks, not a compatibility verdict or permission
+to merge. Missing historical risk data returns unknown rather than evidence
+of safety. #73 owns any later automatic cross-stage reuse of these facts.
+
 ## Proof and repair handoffs
 
 Every proof run binds an exact contract revision to one exact candidate. Record
