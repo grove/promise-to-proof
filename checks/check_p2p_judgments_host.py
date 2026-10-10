@@ -277,8 +277,17 @@ def main(argv=None):
                                      "summary": str(output / case["id"] / "summary.json")})
             write_json(output / "summary.json", summary)
         summary["passed"] = all(item["passed"] for item in summary["cases"])
-        # Only actual supported host invocations with stage receipts are live evidence.
-        summary["live_evidence"] = bool(summary["cases"])
+        # A platform check or attempted admission alone is not live evidence.
+        # Both independent stages must have real, read-back host receipts.
+        receipts = []
+        for case in selected:
+            case_result = json.loads((output / case["id"] / "summary.json").read_text())
+            for candidate in case_result["candidates"]:
+                attempts = candidate.get("stage_attempts", [])
+                verified = {a["stage"] for a in attempts if a.get("session_id") and
+                            Path(a["receipt"]).is_file() and Path(a["events"]).is_file()}
+                receipts.append(verified == {"review", "proof"})
+        summary["live_evidence"] = bool(receipts) and all(receipts)
     except (ValueError, OSError, KeyError, TypeError) as error:
         summary["error"] = str(error)
     summary["elapsed_seconds"] = round(time.monotonic() - started, 3)
