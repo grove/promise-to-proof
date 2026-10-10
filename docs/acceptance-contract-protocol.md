@@ -1087,6 +1087,33 @@ configured external execution root. Treat project-owned `specs/` and `work/`
 inputs as unchanged source: do not rewrite, move, or use them as a second P2P
 state store.
 
+## Durable original-promise continuity (#71)
+
+Consume the existing #76/#77 sized contribution records and #78 issue topology,
+without another sizing step or a second acceptance contract. The originating
+`.p2p/work/<slug>/slicing.md` owns the exact topology, unfulfilled original
+promise, per-unit contribution, dependencies, remaining obligations and final
+combined-acceptance owner. Preserve its approved delivery-plan byte range.
+Within that file, one `<!-- p2p-continuity-v1\n{canonical JSON}\n-->` block
+contains the exact #78 decision and its source-linked continuity projection.
+Each unit's `continuity.json` contains only the originating work path, unit ID,
+topology identity and digest of this canonical projection. Hashes and exact
+contract/source comparisons establish applicability; pointers alone grant no
+approval or proof. Include these existing P2P documents in #82 checkpoints,
+reconcile missing/changed origin records conservatively, and never manufacture
+missing history. A discovered prerequisite stays linked to the original
+promise, unless it is genuinely unrelated with a documented reason.
+
+Planning, independent review and proof, PR publication, complete-delivery
+records and status must explain the current contribution, incomplete original
+obligations, one next action and who owns final combined acceptance. A partial
+unit's validated review/proof does not establish the whole promise, even after
+its PR merges. PR descriptions must not include issue-closing keywords against
+the unfulfilled original issue; actual supersession follows #78's separate
+exact closure approval and readback. Late continuity reconciliation retains
+original candidate, comparison base, reports, PRs and historical receipts. No
+tracker edit, contract rewrite or additional model pass is implied.
+
 ## Issue topology after justified sizing (#78)
 
 Use the **existing** #76 initial sizing or #77 evidence-backed re-sizing
