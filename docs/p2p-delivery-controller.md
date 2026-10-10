@@ -87,6 +87,32 @@ code. It must save/read back the portable checkpoint before removing host
 receipts. Neither a local checkpoint nor cleanup authorizes deleting both local
 P2P roots; verify the published checkpoint and candidate commits first.
 
+## Inspect a delivery record and landed-code mapping
+
+Local `REVIEWED_AND_PROVEN` remains distinct from confirmed landed code. The
+controller writes the existing
+`promise-to-proof/delivery-record/v1` under
+`.p2p/work/<slug>/artifacts/delivery.json` after cleanup. Its old
+status and exact contract/candidate/report identities are unchanged. To
+check it without new model calls or effects:
+
+```sh
+python3 skills/productivity/deliver-issue/scripts/p2p_delivery_record.py \
+  --repo /path/to/source validate .p2p/work/example/artifacts/delivery.json \
+  --artifacts .p2p/work/example/artifacts
+```
+
+The same bundled helper can preview an optional `landing` extension after
+a merge, squash, rebase or direct delivery has actually been observed. It
+uses the exact existing #82 checkpoint, product-tree and target-commit
+checks. It does **not** merge, push, record a remote receipt, or change
+authority. It returns `LANDED_MAPPING_VERIFIED` for internally consistent
+Git mapping, not a claim that remote publication/readback occurred.
+Issue #47 owns the latter action. Local/source/spec delivery has no
+automatic issue or PR requirement. See the
+[Delivery Record v1 reference](delivery-record-v1.md) for exact preview and
+validation commands and the stable retry identity.
+
 ## Record an issue-backed delivery
 
 For a contract imported from one GitHub issue, use the isolated publication
