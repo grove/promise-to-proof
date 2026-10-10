@@ -289,6 +289,9 @@ def run_case(output, data, case, fixture_sha, stage_seconds, position=1):
             review = delivery.read_report("review")
             proof = delivery.read_report("proof")
             entry["observed"] = {"review": review, "proof": proof}
+            # Use the controller's exact saved inspection identity; never infer
+            # scope from a human-written coverage paragraph or file count.
+            entry["review_scope"] = delivery.state["reports"]["review"].get("review_scope")
             entry["stage_attempts"] = [{
                 "stage": a["stage"], "attempt_id": a["id"], "session_id": a.get("session_id"),
                 "inputs": a["inputs"], "report": a.get("report"),
