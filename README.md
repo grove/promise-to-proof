@@ -388,7 +388,11 @@ requirements documented in their own guides. The small
 [live judgment regression suite](./checks/fixtures/live-judgments/README.md)
 independently checks positive, incomplete, out-of-scope, optional-polish, and
 follow-up candidate outcomes using the real supported review/proof stages. Its
-offline fixture tests are not live evidence.
+offline fixture tests are not live evidence. The compact
+[combined delivery-quality check](./checks/quality-integration.md) connects
+source-contract auditing to the existing exact-candidate review/proof fixtures
+without adding a production stage. Its macOS/Codex live outcomes must be
+measured; offline unit tests alone cannot establish model behavior.
 
 ## Contributing
 
