@@ -100,6 +100,39 @@ class NormalDeliveryFastPathTests(unittest.TestCase):
                           .read_report(name)["status"] for name in ("review", "proof")},
                          {"review": "REVIEWED", "proof": "PROVEN"})
 
+    def test_old_and_new_checkpoint_writers_produce_identical_portable_bytes(self):
+        self.assertEqual(self.fixture.cli()[0], 0)
+        root = self.fixture.root
+        work = ".p2p/work/tiny/contract.md"
+        state = self.fixture.state()
+        delivery = d.Delivery(root, work, state)
+        target = root / "p2p-state/tiny.json"
+        original_writer = benchmark.historical_checkpoint()
+        real_run = d.subprocess.run
+
+        def measured(writer):
+            launches = []
+            def run(args, *positional, **kwargs):
+                if isinstance(args, (list, tuple)) and args and args[0] == "git":
+                    launches.append(list(args))
+                return real_run(args, *positional, **kwargs)
+            with patch.object(d.subprocess, "run", side_effect=run), patch.object(
+                    d.fs, "checkpoint", writer):
+                result = d.export_checkpoint(root, work, delivery=delivery)
+            self.assertEqual(result["status"], "LOCAL_ONLY")
+            payload = target.read_bytes()
+            d.fs.read_checkpoint(root, payload)
+            return payload, launches
+
+        before, old_launches = measured(original_writer)
+        after, new_launches = measured(d.fs.checkpoint)
+        self.assertEqual(before, after)
+        self.assertGreater(len(old_launches), len(new_launches))
+        self.assertEqual(json.loads(before)["required_commits"],
+                         json.loads(after)["required_commits"])
+        self.assertTrue(any("runtime/attempts" in " ".join(args)
+                            for args in old_launches))
+
     def test_comparator_rejects_a_fake_speedup_that_skips_verification(self):
         a = {"snapshot_key": "k", "stage_sequence": ["implementation", "review", "proof"],
              "fixture_calls": ["implementation", "review", "proof"],
