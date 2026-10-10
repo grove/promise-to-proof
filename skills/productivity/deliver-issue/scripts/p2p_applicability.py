@@ -159,7 +159,12 @@ def next_work(state):
             facts[stage] = "MISSING"
         elif not candidate or not current_generation:
             facts[stage] = "STALE"
-        elif row.get("inputs", {}).get("key") != candidate.get("key"):
+        elif any(row.get("inputs", {}).get(key) != expected for key, expected in (
+                ("key", candidate.get("key")),
+                ("work_item_sha256", state.get("contract", {}).get("sha256")),
+                ("comparison_base", state.get("comparison_base")),
+                ("binding_inputs", state.get("binding_inputs")),
+                ("routing", state.get("routing")))):
             facts[stage] = "STALE"
         elif row.get("inputs", {}).get("instruction_identity") != state.get("instruction_identity"):
             facts[stage] = "STALE"
