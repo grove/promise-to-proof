@@ -108,7 +108,9 @@ uses the exact existing #82 checkpoint, product-tree and target-commit
 checks. It does **not** merge, push, record a remote receipt, or change
 authority. It returns `LANDED_MAPPING_VERIFIED` for internally consistent
 Git mapping, not a claim that remote publication/readback occurred.
-Issue #47 owns the latter action. Local/source/spec delivery has no
+The [authorized finalization workflow](finalization.md) consumes that
+same record and the published #82 checkpoint to perform and verify exact
+externally permitted effects. Local/source/spec delivery has no
 automatic issue or PR requirement. See the
 [Delivery Record v1 reference](delivery-record-v1.md) for exact preview and
 validation commands and the stable retry identity.
