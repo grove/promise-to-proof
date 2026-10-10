@@ -187,13 +187,24 @@ gaps and the retained approach history, including on resume. Worker permissions
 and available tools must cover its proposed next step; unavailable host tools,
 inputs or missing authority remain concrete blockers for the enclosing workflow.
 
-Repetition detection uses named obligations and candidate history as well as exact
-finding text. Rewording the same requirement/location or cycling back to an earlier
-candidate triggers diagnosis. Repeating an exhausted method with the same
-capability observation is not a new strategy. A partial repair that changes the
-candidate and strictly reduces explicitly named remaining requirement IDs can
-continue without another diagnostic model call; vague or unchanged gaps still
-need diagnosis.
+Repetition detection uses named obligations, observed failed review commands and
+candidate history as well as exact finding text. Rewording the same requirement/
+location, unchanged failed behavior after code changes, or cycling back to an
+earlier candidate triggers diagnosis. A single transient error is not a stall.
+On a real stall, the existing diagnosis worker gets a bounded perspective reset:
+original promise, exact approved agreement, material remaining failures, current
+candidate/base, constraints and the four latest strategies; detailed prior
+reports remain available on demand without being sent wholesale. Its actionable
+result must record a stable mechanism key, what materially differs from prior
+strategies and a falsifiable expected check/observation, supported by a successful
+capability probe in the same host. A renamed exhausted method is not a new
+strategy. Real missing authority or unavailable required inputs remain blockers,
+not evidence that the promise is impossible. Difficulty or failing checks alone
+never trigger #77 re-sizing. A partial repair that changes the candidate and
+strictly reduces explicitly named remaining requirement IDs can continue without
+another diagnostic model call. Both verifiers still issue fresh full-contract
+judgments tied to the exact post-repair candidate; #82 checkpoints retain old
+history, not fresh verdicts.
 
 After a repair, each verifier receives its own latest compatible observations and
 the complete delta between exact candidate generations. It independently decides
