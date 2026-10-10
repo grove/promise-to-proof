@@ -451,7 +451,14 @@ def entry_source(root, request, issue_repository=None):
     if not isinstance(request, str) or not request.strip():
         raise ValueError("provide one nonempty delivery request")
     request = request.strip()
-    if WORK.fullmatch(request):
+    # A project-owned work/*.md is NOT automatically a legacy P2P contract.
+    # Only an explicitly recognizable acceptance contract uses the legacy route.
+    legacy_file = safe(root, request) if re.fullmatch(rf"work/{SLUG}\\.md", request) else None
+    legacy_contract = bool(legacy_file and legacy_file.is_file() and
+                           re.search(r"^# Acceptance contract:", legacy_file.read_text(encoding="utf-8"), re.M) and
+                           re.search(r"^Contract revision: v[1-9][0-9]*\\s*$",
+                                     legacy_file.read_text(encoding="utf-8"), re.M))
+    if (request.startswith(".p2p/") and WORK.fullmatch(request)) or legacy_contract:
         selected = safe(root, request)
         if selected.is_file():
             return {"action": "USE", "kind": "contract", "work_item": request,
@@ -474,8 +481,9 @@ def entry_source(root, request, issue_repository=None):
         identity = f"https://github.com/{issue_repository}/issues/{issue[1]}"
         fingerprint = digest(identity.encode())
         stem = "issue-" + issue[1] + "-" + fingerprint[:12]
-    elif (request.endswith(".md") or
-          ("/" in request and not any(ch.isspace() for ch in request))):
+    elif ((not any(char.isspace() for char in request) and
+           (request.endswith(".md") or "/" in request)) or
+          (request.endswith(".md") and (root / request).is_file())):
         if request.startswith(".p2p/") or request.startswith(CHECKPOINT_DIRECTORY + "/"):
             raise ValueError("generated state is not a project specification; provide the exact contract path")
         source_file = safe(root, request)
@@ -565,12 +573,12 @@ def entry_source(root, request, issue_repository=None):
                          ", ".join(sorted(candidates)))
     if candidates:
         chosen = next(iter(candidates.values()))
-        return chosen | {"kind": kind, "source_sha256": fingerprint,
+        return chosen | {"kind": kind, "entry_fingerprint_sha256": fingerprint,
                          "next": "Check exact source changes, agreement and approval identity; restore if needed, then status/resume before planning."}
     suggested = f".p2p/work/{stem}/contract.md"
     if safe(root, suggested).exists():
         raise ValueError("suggested work-item path already belongs to different source: " + suggested)
-    return {"action": "PLAN", "kind": kind, "source_sha256": fingerprint,
+    return {"action": "PLAN", "kind": kind, "entry_fingerprint_sha256": fingerprint,
             "suggested_work_item": suggested,
             "next": "Use existing plan-acceptance and audit within delivery, save exact source provenance and contract, then follow existing sizing and admission."}
 
