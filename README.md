@@ -104,32 +104,28 @@ Setup creates the ignored local P2P workspace and checks the repository's ignore
 rules. It does **not** require GitHub, and it does not take over project-owned
 `specs/` or `work/` directories.
 
-### 3. Turn a small promise into an acceptance contract
+### 3. Deliver from one request
 
-You can start from an issue, a project document, or simply agreed text:
-
-```text
-/plan-acceptance "Reject an empty username with a clear validation error."
-```
-
-P2P turns that informal outcome into a saved acceptance contract under
-`.p2p/work/<slug>/contract.md`. The contract says what must be true, what would
-falsify it, and what evidence should establish it. Inspect the proposal and approve
-the exact agreement before implementation proceeds.
-
-### 4. Deliver the saved contract
-
-Use the exact path returned by planning:
+Start with the result you want. There is no preliminary planning command or
+internal contract path to copy:
 
 ```text
-/deliver-issue .p2p/work/<slug>/contract.md
+/deliver-issue "Reject an empty username with a clear validation error."
 ```
 
-The coordinated path implements the contract, freezes an exact candidate, runs
-independent implementation review and proof, and returns either matching
-`REVIEWED` + `PROVEN` results or a specific blocker/gap that still needs work.
+The same entry also accepts `/deliver-issue #123` when GitHub is configured,
+`/deliver-issue specs/authentication.md` for a repository spec, or an existing
+`/deliver-issue .p2p/work/<slug>/contract.md` when you already have one.
 
-### 5. Read the result correctly
+P2P locates a matching saved agreement or plans it from your request, independently
+audits the proposal, and handles any required approval. It chooses direct delivery
+or existing sizing inspection rather than making you operate each stage. Once the
+agreement and required authority are in place, it implements, runs independent
+review and proof, and repairs justified gaps. Saved progress and approved unchanged
+work are reused. Missing decisions, host capabilities and effect permissions produce
+specific blockers, not guesses.
+
+### 4. Read the result correctly
 
 A successful delivery separates three claims:
 
@@ -154,19 +150,21 @@ of the work actually requires them.
 
 | I have… | Start here |
 |---|---|
-| An agreed outcome | `/plan-acceptance` → P2P recommends the next route |
-| A GitHub issue | `/plan-acceptance <issue>` → follow the saved P2P recommendation |
-| A project specification | `/plan-acceptance <path>` → direct delivery or sizing inspection |
-| A sizing inspection recommended after planning | Plan the parent → `/slice-contract` |
+| An agreed outcome | `/deliver-issue "your agreed change"` |
+| A configured GitHub issue | `/deliver-issue #123` |
+| A project specification | `/deliver-issue specs/your-change.md` |
+| An approved saved contract | `/deliver-issue .p2p/work/<slug>/contract.md` |
+| Plan or inspect the agreement without implementing | `/plan-acceptance <source>` |
+| Manually inspect or manage a decomposition | `/slice-contract <contract>` |
 | A proven candidate that should become a draft PR | `/publish-pr` |
 | An existing PR near the merge decision | `/merge-readiness` |
 | A failed PR workflow | `/fix-pr` |
 
-You do not need to choose direct delivery or slicing in advance. After
-`plan-acceptance` establishes the outcome, it recommends direct delivery for a
-manageable unit or `/slice-contract` when sizing needs inspection. `NO SPLIT` is
-a normal result. Direct delivery still passes through `/deliver-issue` and its
-#60 admission before implementation.
+You do not need to choose direct delivery or slicing in advance. The ordinary
+`/deliver-issue` flow plans when necessary, uses the existing recommendation,
+and resolves `NO SPLIT` without another user command. Direct delivery still
+passes through #60 admission before implementation. Expert stage skills remain
+available individually when you want planning-only or manual control.
 
 During delivery, P2P may recommend re-sizing only when inspected work shows a
 material boundary that makes one complete contribution or its verification and
