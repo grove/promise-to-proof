@@ -56,8 +56,9 @@ PR and matching product-tree identity must be verified.
 
 **Read these distinctions literally.** `REVIEWED + PROVEN` refers to the
 isolated local candidate, not the operator checkout or the destination branch.
-An open PR has not merged. A confirmed merge still lacks a validated durable
-final receipt until #50/#47 deliver that step. An imported checkpoint keeps
+An open PR has not merged. A confirmed merge is still only partial until
+the [finalization workflow](finalization.md) validates the delivered code
+against #50 and reads back the complete receipt. An imported checkpoint keeps
 previously proven work but requires new host preflight, and a failed host
 initialization needs the host restriction resolved rather than another
 blind retry. The raw evidence remains available if you need details.
@@ -75,9 +76,10 @@ assembled parent's own proof even when all child PRs have merged.
 The new optional `landing` section preserves the historical local record's
 meaning, and the same confirmed delivery keeps one stable event/receipt
 identity across retries. See [Delivery Record v1](delivery-record-v1.md) for
-the exact validation and preview commands. **This is not yet receipt
-publication or authorized merge automation**: #47 completes those effects,
-checks remote readback, and confirms the durable final delivery receipt.
+exact validation and preview commands. The [authorized finalization
+workflow](finalization.md) now performs permitted merges, reads back the
+remote result and stores a durable receipt. It does not infer that authority
+from local acceptance.
 Do not treat a local matching Git branch as a remotely confirmed delivery.
 
 ## Re-size from delivery evidence

@@ -177,10 +177,45 @@ children remain separate from the parent's current independent acceptance.
 Even matching local `REVIEWED` and `PROVEN` results do not establish
 publication, merge, delivered-code mapping or durable finalization. A confirmed
 matching **open** PR is published but not merged. A confirmed merge still
-needs the separately implemented #50/#47 mapping/receipt and must remain
-visibly partial until then. Never invent a `finalize` command or claim
-these outstanding features are already available. Keep valid source and
+needs the exact #50 landed-code mapping and the new #47 read-back completion
+receipt; describe the result as partial until both are verified. Keep valid source and
 candidate IDs, grant/approval boundaries and prior stage decisions unchanged.
+
+## Complete a separately authorized delivery
+
+After one unchanged candidate has matching full `REVIEWED` and
+`PROVEN`, inspect the **objective and exact standing effect grants**.
+Local-only delivery ends here with no remote work. When the objective explicitly
+includes publication/merge/finalization and covering grants exist, stay in the
+same outer delivery request: use the established `publish-pr`
+preview/readback, independently run `merge-readiness` for the
+actual current PR, then invoke the bundled **readback-first**
+`p2p_finalize.py` path using the original compact Delivery Record v1
+and published #82 checkpoint. Do not require the user to choose an extra skill
+or copy a generated path.
+
+The finalizer first validates the exact candidate, contract, full independent
+stage receipts and portable checkpoint. For an open PR, require its current
+machine-readable synchronized READY section, head/target test-merge CI, branch
+rules and all current checks and approvals. Under an exact `merge`
+grant for the PR URL, it records the attempt in the existing
+`merge-readiness.md` and executes **at most one** direct merge.
+If the merge reply is lost, read the actual PR state: never dispatch again
+while the previous effect remains uncertain. An already merged PR bypasses
+READY/merge execution and proceeds directly to #50 landed-code reconciliation.
+
+Publish the **same** record's stable receipt once and read it back. Prefer the
+original source issue with `issue-comment` authority; otherwise
+an authorized PR comment; for issue-less, no-PR direct/assembled-parent work
+use a #82-checkpoint-backed Git receipt branch under exact
+`branch-create`, `commit` and `push` effects.
+Do not manufacture a source issue or parent PR. Complete only when the
+actual remote delivered code, checkpoint Git objects and receipt all match.
+On a blocker, preserve verified partial progress and one clear next action;
+never say `FINALIZED` based on local proof, a merge response alone,
+or a proposed receipt. Existing source-checkout-safe cleanup may follow
+confirmed full finalization, never precede it. Issue closure still requires
+a separate exact authorized tracker effect.
 
 ## Continue under standing authority
 

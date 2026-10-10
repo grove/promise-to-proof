@@ -12,7 +12,7 @@ change the contract, create a second status store, or perform a merge.
 |---|---|
 | `status: REVIEWED_AND_PROVEN`, no `landing` | One **local** exact candidate has matching independent review and proof. Nothing here says a branch, PR or destination was updated |
 | Validated `landing.status: LANDED` extension | The recorded delivered Git commit and product tree match the reviewed candidate on the recorded destination history, under the *current local reference observation*. The old top-level local verdict is unchanged |
-| Remotely published and read-back completion receipt | **Not established by this validator.** Issue #47 separately requires effect authority, merge/readback reconciliation, durable publication and receipt verification |
+| Remotely published and read-back completion receipt | **Not established by this read-only validator.** The [authorized #47 workflow](finalization.md) performs and verifies separately granted merge and receipt effects |
 
 A new `landing` may be constructed only from a passing local record and
 recoverable #82 checkpoint. A GitHub PR title, merge note, agent assertion, an
