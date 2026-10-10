@@ -167,7 +167,7 @@ def audit_one(output, fixture, data, executable, skill, max_stage_seconds, posit
         "receipt": str(directory / "exit.json"),
         "source": str(root / "spec.md"),
         "report": str(directory / "report.json"),
-        "host_version": response.get("outcome"),
+        "host_outcome": response.get("outcome"),
     }
 
 
@@ -182,6 +182,7 @@ def assess_case(result, case, contract):
     required = set(requirements)
     sessions = []
     identities = []
+    repository = Path(result.get("runtime") or "/nonexistent") / "repository.git"
     for candidate in result.get("candidates", []):
         name = candidate["name"]
         saved = candidate.get("candidate")
@@ -190,9 +191,17 @@ def assess_case(result, case, contract):
             continue
         key = saved["key"]
         identities.append(key)
-        if (candidate.get("generation", {}).get("candidate_key") != key or
+        generation = candidate.get("generation", {})
+        if (generation.get("candidate_key") != key or
                 saved.get("comparison_base") != result.get("source_base")):
             problems.append(name + ": retained Git generation or frozen base differs")
+        try:
+            product = d.fs.snapshot(repository, generation["commit"])
+            if d.fs.snapshot_key(product) != key:
+                problems.append(name + ": retained Git object differs from evaluated candidate")
+        except (OSError, KeyError, ValueError) as error:
+            problems.append(name + ": exact retained candidate Git object missing: " + str(error))
+            product = None
         attempts = candidate.get("stage_attempts", [])
         if [attempt["stage"] for attempt in attempts] != ["review", "proof"]:
             problems.append(name + ": unexpected or missing independent verifier dispatch")
@@ -232,6 +241,11 @@ def assess_case(result, case, contract):
             if scope.get("trace_sha256") != d.fs.digest(d.fs.canonical(
                     review.get("coverage_trace"))):
                 problems.append(name + ": review scope does not bind its risk/evidence trace")
+            if product is not None:
+                identities_in_object = d.fs.tree_identity(product)
+                if (scope.get("manifest_sha256") != d.fs.digest(d.fs.canonical(identities_in_object)) or
+                        any(item not in identities_in_object for item in scope.get("inspected", []))):
+                    problems.append(name + ": exact inspected bytes or file modes differ from Git generation")
         if case["id"] == "review-meaningful-tests":
             if review.get("coverage_trace", {}).get("risks") != []:
                 problems.append(name + ": low-risk change acquired unnecessary material risk work")
