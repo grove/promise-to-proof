@@ -122,6 +122,10 @@ def validate(report, requirements, records, host_executions, current_manifest,
                 old["id"] in retired or not _bounded(old["reason"], 240)):
             raise ValueError("obsolete slice replacement requires a prior active ID and substantive reason")
         retired.add(old["id"])
+    invalidated = {item["slice"]["id"] for item in active(records)
+                   if set(item["slice"]["paths"]) & changed}
+    if invalidated - retired:
+        raise ValueError("changed previously verified slice paths need an explicit checked replacement")
     if progress["outcome"] == "VERIFIED":
         if not checks:
             raise ValueError("verified slice requires exercised test or approved non-test evidence")
