@@ -166,7 +166,7 @@ def render(work, raw, sources, check=True):
     exact = raw.decode()
     fence = "`" * max(3, max((len(x) for x in re.findall(r"`+", exact)), default=0) + 1)
     other = "`" * max(3, max((len(x) for x in re.findall(r"`+", snapshot)), default=0) + 1)
-    body = ("\n".join(lines) + "<details>\n<summary>Technical details: exact agreement and recovery</summary>\n\n" +
+    body = ("\n".join(lines) + "\n<details>\n<summary>Technical details: exact agreement and recovery</summary>\n\n" +
             f"Contract: `{work}`; revision: `{revision}`; SHA-256: `{sha}`\n\n" +
             "<!-- p2p-exact-contract -->\n" + fence + "markdown\n" + exact + fence + "\n\n" +
             "<!-- p2p-binding-snapshot -->\n" + other + "json\n" + snapshot + other + "\n\n</details>\n")
