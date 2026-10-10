@@ -235,6 +235,36 @@ class DeliveryRecordTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "changed-path scope|identity"):
             record_protocol.validate(self.root, bad, checkpoint=self.checkpoint)
 
+    def test_checkpoint_and_completed_mapping_survive_cleanup_and_fresh_clone(self):
+        # A real Git remote and fresh checkout, not a mocked checkpoint read.
+        initial, args = self.landed("merge", pr=True)
+        code, outcome = self.item.cli("cleanup")
+        self.assertEqual(code, 0, outcome)
+        compact = self.root / ".p2p/work/tiny/artifacts"
+        record = json.loads((compact / "delivery.json").read_bytes())
+        cpdata = (self.root / "p2p-state/tiny.json").read_bytes()
+        published = record_protocol.preview(
+            self.root, record, **(args | {"checkpoint": cpdata}))
+        source_candidate = self.index["candidate_commit"]
+        self.git("branch", "portable-candidate", source_candidate)
+        self.git("add", "p2p-state")
+        self.git("commit", "-qm", "Publish approved checkpoint bytes")
+        remote = Path(self.item.temp.name) / "published.git"
+        clone = Path(self.item.temp.name) / "fresh-computer"
+        subprocess.run(["git", "init", "--bare", "-q", str(remote)], check=True)
+        self.git("push", "--quiet", str(remote), "--all")
+        subprocess.run(["git", "clone", "-q", str(remote), str(clone)], check=True)
+        self.assertFalse((clone / ".p2p").exists())
+        subprocess.run(["git", "-C", str(clone), "branch", "delivery-target",
+                        "origin/delivery-target"], check=True, capture_output=True)
+        durable_checkpoint = (clone / "p2p-state/tiny.json").read_bytes()
+        self.assertEqual(durable_checkpoint, cpdata)
+        verified = record_protocol.validate(clone, published, checkpoint=durable_checkpoint)
+        self.assertEqual(verified["status"], "LANDED_MAPPING_VERIFIED")
+        self.assertEqual(verified["delivered_commit"], published["landing"]["destination"]["after"])
+        self.assertEqual(verified["receipt_id"], initial["landing"]["receipt_id"])
+        self.assertFalse(verified["receipt_published"])  # #47 still owns external receipt.
+
     def test_changed_contract_binding_and_checkpoint_are_rejected(self):
         completed, _ = self.landed("squash")
         for mutated, expected in (
