@@ -201,6 +201,8 @@ class ControllerReuseTests(unittest.TestCase):
 
     def test_corrupt_candidate_and_checkpoint_never_fast_reuse(self):
         self.assertEqual(self.case.cli()[0], 0)
+        stable_record = (d.local_directory(self.case.root, self.work) /
+                         "delivery.json").read_bytes()
         source = self.case.runtime() / "workspace/greet.py"
         original = source.read_bytes()
         source.write_text("print('wrong')\n")
@@ -214,6 +216,8 @@ class ControllerReuseTests(unittest.TestCase):
         code, response = self.case.cli("resume")
         self.assertEqual(code, 1)
         self.assertIn("checkpoint", response["blocker"].lower())
+        self.assertEqual((d.local_directory(self.case.root, self.work) /
+                          "delivery.json").read_bytes(), stable_record)
 
     def test_completed_after_cleanup_returns_verified_saved_record_without_write(self):
         self.case.complete_and_cleanup()
@@ -226,6 +230,47 @@ class ControllerReuseTests(unittest.TestCase):
         self.assertEqual(output["reuse"]["status"], "UNCHANGED_COMPLETION")
         self.assertEqual(len(self.case.fake.calls), calls)
         self.assertEqual({name: (directory / name).read_bytes() for name in before}, before)
+
+    def test_records_only_changes_and_ordinary_target_fast_forward_do_not_repeat_checks(self):
+        self.assertEqual(self.case.cli()[0], 0)
+        original_calls = len(self.case.fake.calls)
+        original = self.case.state()
+        local = d.local_directory(self.case.root, self.work)
+        before_state = (local / "delivery.json").read_bytes()
+        before_checkpoint = (self.case.root / "p2p-state/tiny.json").read_bytes()
+        # A P2P-owned note is metadata, not product input.
+        note = self.case.root / ".p2p/work/tiny/local-observation.md"
+        note.write_text("A new local note; not part of the candidate\n")
+        # Destination advances along a normal fast-forward with the same tree.
+        tree = d.fs.git(self.case.root, "rev-parse",
+                        self.case.base + "^{tree}").decode().strip()
+        new_target = d.fs.git(self.case.root, "-c", "user.name=Fixture", "-c",
+                              "user.email=fixture@localhost", "commit-tree",
+                              tree, "-p", self.case.base, "-m",
+                              "unrelated destination movement").decode().strip()
+        d.fs.git(self.case.root, "update-ref", "refs/heads/delivery-target", new_target)
+        code, outcome = self.case.cli("resume")
+        self.assertEqual(code, 0, outcome.get("blocker"))
+        self.assertEqual(outcome["reuse"]["status"], "UNCHANGED_COMPLETION")
+        self.assertEqual(len(self.case.fake.calls), original_calls)
+        self.assertEqual(outcome["candidate"]["key"], original["candidate"]["key"])
+        self.assertEqual((local / "delivery.json").read_bytes(), before_state)
+        self.assertEqual((self.case.root / "p2p-state/tiny.json").read_bytes(),
+                         before_checkpoint)
+        note.unlink()
+
+    def test_interrupted_authority_or_instruction_transition_blocks_without_rewriting(self):
+        self.assertEqual(self.case.cli()[0], 0)
+        local = d.local_directory(self.case.root, self.work)
+        stable = (local / "delivery.json").read_bytes()
+        transition = self.case.runtime() / "instruction-transition.json"
+        transition.write_text('{"complete": false}\n')
+        code, output = self.case.cli("resume")
+        self.assertEqual(code, 1)
+        self.assertIn("instruction-transition", output["blocker"])
+        self.assertEqual((local / "delivery.json").read_bytes(), stable)
+        transition.unlink()
+        self.assertEqual(self.case.cli("resume")[0], 0)
 
     def test_missing_new_host_preflight_cannot_take_unchanged_fast_path(self):
         self.assertEqual(self.case.cli()[0], 0)
