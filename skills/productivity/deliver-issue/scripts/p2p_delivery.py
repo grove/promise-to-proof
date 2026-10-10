@@ -2663,6 +2663,19 @@ assert results['scratch'] == 'ok'
         if any(a.get('status') not in ('complete', 'retired')
                for a in self.state.get('attempts', [])):
             raise ValueError('uncertain worker reservation must be reconciled before reuse')
+        if any(entry.get('status') == 'reserved'
+               for entry in self.state.get('recovery_history', [])) or (
+                   self.state.get('recovery_decision', {}).get('status') in
+                   ('pending', 'diagnosed', 'rejected')):
+            raise ValueError('pending recovery needs reconciliation before reuse')
+        for name in ('instruction-transition.json', 'agreement-transition.json',
+                     'limit-extension.json'):
+            journal = self.runtime / name
+            if journal.is_file():
+                record = json.loads(journal.read_bytes())
+                if not (record.get('complete') is True or
+                        (name == 'agreement-transition.json' and record.get('status') == 'complete')):
+                    raise ValueError('unfinished ' + name + ' must be reconciled before reuse')
         candidate = self.current()
         if not candidate or not self.state.get('implementation_complete'):
             raise ValueError('completed implementation/candidate identity is unavailable')
