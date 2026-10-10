@@ -3834,6 +3834,10 @@ assert results['scratch'] == 'ok'
         local_save(self.root, self.work, 'runtime/admission.json', encoded(transition['new_admission']))
         self.state['reports'] = {}
         self.state['implementation_complete'] = False
+        # The approved agreement has changed. Earlier implementation checks
+        # remain in exact attempt/Git history but cannot count as verified
+        # slices for this new set of accepted promises.
+        self.state['implementation_slices'] = []
         self.state.pop('continuation', None)
         history = self.state.setdefault('agreement_history', [])
         adoption = {
