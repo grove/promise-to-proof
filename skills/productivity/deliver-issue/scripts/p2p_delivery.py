@@ -4196,8 +4196,8 @@ def main(argv=None):
         else:
             work = getattr(args, 'work', None)
             output = {'status': 'BLOCKED', 'blocker': message, 'work_item': work,
-                      'resume': (f'python3 {Path(__file__).resolve()} --repo {args.repo} resume {work}'
-                                 if work else None)}
+                      'invocation_exists': False,
+                      'resume': None}
         output = {'human_progress': progress_view.explain(output), **output}
         print(_human_output(output) if args.action == 'status' and args.human else json.dumps(output, indent=2))
         return 1
