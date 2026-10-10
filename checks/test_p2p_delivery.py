@@ -45,8 +45,8 @@ def fixture_host():
     """Supply version/skill discovery for offline fixtures; never launch a model."""
     # Executable bytes exist in the offline test boundary; version text alone
     # must not serve as an executable identity.
-    executable = Path(__file__).resolve().parent / 'fixtures/codex'
-    executable.parent.mkdir(parents=True, exist_ok=True)
+    directory = tempfile.TemporaryDirectory()
+    executable = Path(directory.name) / 'codex'
     executable.write_bytes(b'#!/bin/sh\nexit 0\n')
     original_which = shutil.which
     original_run = subprocess.run
@@ -71,7 +71,10 @@ def fixture_host():
             patch.object(d.shutil, 'which', side_effect=which), \
             patch.object(d.subprocess, 'run', side_effect=run), \
             patch.object(d, 'installed_skill', side_effect=installed):
-        yield
+        try:
+            yield
+        finally:
+            directory.cleanup()
 
 
 def repo(path):
