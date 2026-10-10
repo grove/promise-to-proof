@@ -17,6 +17,7 @@ import tempfile
 import p2p_autonomy as autonomy
 import p2p_delivery_record as records
 import p2p_filesystem as fs
+import p2p_progress as progress
 
 PR = re.compile(r"https://github\.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)/pull/([1-9][0-9]*)\Z")
 ISSUE = re.compile(r"https://github\.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)/issues/([1-9][0-9]*)\Z")
@@ -310,6 +311,7 @@ def comment_receipt(record, target, mandate, *, runner=subprocess.run):
     repository, number = target["repository"], target["number"]
     first = matching_receipt(comments(repository, number, runner=runner), record)
     if first is None:
+        need(mandate is not None, "missing exact issue-comment effect mandate")
         autonomy.authorize(mandate, "issue-comment", repository,
                            target["destination"])
         with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8") as file:
@@ -355,9 +357,14 @@ def git_receipt(root, remote, target, record, checkpoint, mandate,
                         check=False, runner=runner)
             if check.returncode == 0 and check.stdout.encode() == checkpoint:
                 targets.append(head)
-        need(len(targets) == 1,
-             "receipt branch needs one unambiguous published #82 checkpoint base")
-        tip = targets[0]
+        preferred = branches.get("refs/heads/" +
+                                 record["routing"]["destination"])
+        if preferred in targets:
+            tip = preferred
+        else:
+            need(len(targets) == 1,
+                 "receipt branch needs one unambiguous published #82 checkpoint base")
+            tip = targets[0]
     saved = run(["git", "-C", str(root), "show", tip + ":" + checkpoint_path],
                 check=False, runner=runner)
     need(saved.returncode == 0 and saved.stdout.encode() == checkpoint,
@@ -369,6 +376,7 @@ def git_receipt(root, remote, target, record, checkpoint, mandate,
              "remote receipt branch contains a conflicting completed record")
         return {"status": "RECORDED", "url": remote + ":" + ref + ":" + path,
                 "remote_commit": tip}
+    need(mandate is not None, "missing exact commit/push effect mandate")
     autonomy.authorize(mandate, "commit", record["landing"]["repository"], ref)
     autonomy.authorize(mandate, "push", record["landing"]["repository"], ref)
     timestamp = datetime.datetime.fromisoformat(
@@ -567,15 +575,24 @@ def finalize(root, original, checkpoint, *, repository, remote, method,
         return {"status": "PARTIAL", "phase": "RECEIPT_RECONCILIATION",
                 "mapping": mapping, "reason": str(error),
                 "next_action": "Reconcile readback of the already attempted effect before cleanup."}
+    completed = {
+        "status": "FINALIZED", "receipt_verified": True,
+        "candidate_mapping_verified": True, "destination_verified": True,
+        "candidate_key": final_record["candidate_key"],
+        "delivered_commit": mapping["delivered_commit"],
+        "receipt_id": final_record["landing"]["receipt_id"],
+        "receipt_url": receipt["url"]}
+    publication = ({"status": "MERGED", "verified": True,
+                    "merge_commit": after, "target": original["routing"]["destination"],
+                    "url": pr_url} if pr else None)
+    human = progress.explain(
+        {"status": "REVIEWED_AND_PROVEN",
+         "candidate": {"key": final_record["candidate_key"]},
+         "work_item": final_record["work_item"]},
+        publication=publication, finalization=completed)
     return {"status": "FINALIZED", "record": final_record, "mapping": mapping,
             "portable": transfer, "receipt": receipt,
-            "finalization": {
-                "status": "FINALIZED", "receipt_verified": True,
-                "candidate_mapping_verified": True, "destination_verified": True,
-                "candidate_key": final_record["candidate_key"],
-                "delivered_commit": mapping["delivered_commit"],
-                "receipt_id": final_record["landing"]["receipt_id"],
-                "receipt_url": receipt["url"]},
+            "finalization": completed, "human_progress": human,
             "next_action": "Verified complete; optional existing safe cleanup may proceed."}
 
 
