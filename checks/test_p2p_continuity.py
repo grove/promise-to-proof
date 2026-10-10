@@ -100,13 +100,13 @@ class ContinuityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
             subprocess.run(["git","init","-q",str(root)],check=True)
-            (root/".gitignore").write_text("/.p2p/\\n")
+            (root/".gitignore").write_text("/.p2p/\n")
             for slug in ("react","react-prereq","react-final"):
                 folder=root/".p2p/work"/slug
                 folder.mkdir(parents=True)
-                (folder/"contract.md").write_text("# Accepted contract\\n")
+                (folder/"contract.md").write_text("# Accepted contract\n")
             parent=root/".p2p/work/react/slicing.md"
-            original=b"## Approved delivery plan\\nPlan revision: v1\\n"
+            original=b"## Approved delivery plan\nPlan revision: v1\n"
             parent.write_bytes(original)
             saved=c.persist(root,".p2p/work/react/contract.md",self.decision,self.refs)
             self.assertEqual(saved["status"],"PRESERVED")
