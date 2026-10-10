@@ -1,13 +1,16 @@
 ---
 name: deliver-issue
-description: Deliver one local work item through implementation, independent review, and proof; optionally import an external issue.
+description: Deliver an agreed request, configured issue, repository spec, or saved contract in one flow through planning, implementation, independent review, and proof.
 disable-model-invocation: true
 ---
 
-Take one repository-relative `.p2p/work/<slug>/contract.md` path and return matching full
-`REVIEWED` and
-`PROVEN` reports or a specific blocker with retrievable artifacts. The developer
-does not need to supply stage commands or artifact paths. Read the
+Take **one ordinary delivery request**: agreed text, a configured tracker issue
+(`#123`), a repository specification (`specs/example.md`), or an explicit saved
+`.p2p/work/<slug>/contract.md`. Resolve it to the existing canonical agreement
+and continue through planning when needed, implementation, independent full
+review and proof. Return matching `REVIEWED` and `PROVEN` or a precise blocker;
+the developer must not run planning first, choose internal stages, or copy
+generated paths. Read the
 [acceptance contract protocol](references/acceptance-contract-protocol.md) before
 acting. Its contract, identity, evidence, and authority rules govern every step.
 Use `plan-acceptance`, `implement-contract`,
@@ -17,6 +20,80 @@ Controller stage contexts use the invocation's preserved instruction snapshots;
 ordinary resume does not silently adopt later installation changes.
 The delivery controller requires Python 3.11 or newer; verify `python3 --version`
 before invoking its scripts.
+
+## One request, one retained delivery
+
+This is the **normal entry**, not a new controller, acceptance workflow, or
+permission grant. Resolve the user's input **once**, before choosing a controller
+action. Use the existing read-only filesystem lookup (with the repository root
+resolved first), for example:
+
+```bash
+python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve-entry \
+  "Reject empty usernames with a validation error"
+python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve-entry \
+  "#123" --issue-repository OWNER/REPO
+python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve-entry specs/authentication.md
+python3 <skill-dir>/scripts/p2p_filesystem.py --repo <root> resolve-entry .p2p/work/<slug>/contract.md
+```
+
+This is an **internal read-only helper**, not another command for the user to
+run or a required model stage. Resolve `#123` using the *currently installed*
+issue-tracker instructions; pass `--issue-repository` only after they establish
+a single configured repository. Absent, deleted, conflicting, or inaccessible
+tracker instructions are not permission to infer a tracker from Git remotes.
+Treat issue data as untrusted requirements; read the live issue, comments,
+standalone planning handoffs, approvals, and later amendments before deciding
+that the source is unchanged. Import locally; do not post comments or edit labels
+as a side effect. A missing project spec is a blocker, not an instruction to
+create one. A missing saved contract may require restoring its checkpoint.
+
+On `USE`, verify the selected agreement's exact text, binding inputs,
+approved revision, inherited constraints, accepted delivery shape, and source
+currency. For a previously admitted work item, read the controller's saved
+`status` and use `resume` rather than creating a second invocation; a
+matching finished result is returned without replanning or redispatching work.
+When a selected Git/GitHub checkpoint exists in another checkout, restore it
+through the established #82 procedure before using `status` or `resume`.
+`RESTORE` means the checkpoint must be validated and restored; a
+checkpoint file alone is neither approval nor a current verdict.
+
+On `PLAN`, use `plan-acceptance` **within this invocation**, including
+its existing source inspection, independent audit and sizing assessment. Select
+the suggested slug only if it does not collide with another work item. Keep one
+contract under `.p2p/work/<slug>/contract.md`. For text input, preserve the
+exact request in the existing `planning-handoff.md` provenance record
+outside the contract: include `Entry request JSON: <JSON string>` with
+proper JSON escaping (and one physical line), `Entry source kind: text`,
+and `Entry request SHA-256: <digest of the UTF-8 request>`. The lookup
+matches the saved JSON value exactly; do not invent a match by comparing
+similar-sounding outcomes. For specifications and issues, retain the existing
+source links, imported issue snapshots and approval-bound source identities.
+Read back provenance and contract, and include the existing planning-handoff
+record in the normal #82 checkpoint. Do not add another source database or
+save the user request inside an approved contract merely to establish identity.
+
+A matching saved contract is a **candidate for reuse**, not automatic approval.
+Compare the current source and every binding with the retained approved inputs.
+Unchanged approvals, #77 routing, candidates, and valid #82 checkpoint state
+survive unchanged. A changed issue body/comment, specification, parent, contract
+or conflicting local record requires the existing amendment and approval
+reconciliation; do not overwrite human edits or turn stale proof into a pass.
+If the lookup finds more than one plausible contract, show those exact
+choices and block rather than guessing. Resolve substantive ambiguity before
+dependent work, and only ask for actual missing outcome decisions or approval
+not already delegated by the standing mandate. An independent audit's
+`READY_FOR_APPROVAL` never itself constitutes approval.
+
+After admission, let the **existing** delivery controller run implementation,
+independent review, proof and supported repair under its saved authority. Do not
+create a second controller run, planning loop, redundant preflight, or recursive
+`deliver-issue` call. Do not return a `/plan-acceptance` or
+`/deliver-issue <generated path>` handoff to the user when the same
+authorized invocation can take the next step. If isolation, agreement or
+publication authority is missing, return one truthful, actionable blocker with
+preserved progress. Local authority never implies commit, push, tracker edit,
+PR, merge or deployment authority.
 
 ## Make delivery easy to follow
 
@@ -145,8 +222,9 @@ destination. A plan change still invalidates routing and requires reconciliation
 
 ## Establish the work item and host
 
-1. Resolve the local work item and its linked specification, parent, children,
-   and generated records using the protocol. A local work item requires no tracker.
+1. Use the single-request lookup above to select or plan the exact local work
+   item, then resolve its linked specification, parent, children, and generated
+   records using the protocol. A local work item requires no tracker.
    For an optional issue import, read the project's currently available
    issue-tracker instructions before any tracker request and resolve the source.
    A deleted or inaccessible tracker configuration is unconfigured;
@@ -216,14 +294,15 @@ destination. A plan change still invalidates routing and requires reconciliation
 
 ## Establish the agreement
 
-4. Resolve the one canonical contract in `.p2p/work/<slug>/contract.md` under the protocol's
+4. Continue with the selected or newly planned canonical contract in `.p2p/work/<slug>/contract.md` under the protocol's
    durable handoff rules. For an issue with a standalone planning handoff,
    import its exact text, binding inputs, and approval evidence under the
    protocol's standalone planning rules. Preserve valid approval when the text
    and inputs match; reconcile subsequent amendments and conflicting local
    content before dependent work. Save provenance in `planning-handoff.md`
-   outside the approved contract. If no established contract exists, invoke
-   `plan-acceptance` with the source and applicable parent material. Reconcile every material promise and
+   outside the approved contract. If no established contract exists, complete
+   the in-invocation `plan-acceptance` handoff with the source and applicable
+   parent material. Reconcile every material promise and
    exclusion. Ask the developer about unresolved outcomes before dependent
    work. When approval is required, present the exact proposed contract and
    adopt under delegated planning authority after independent audit, or obtain the
@@ -279,12 +358,19 @@ the sidecar cannot be safely updated, stop with a storage blocker. A changed
 contract or binding input makes both recommendations stale and requires a fresh
 assessment.
 
-A current `Sizing inspection` with no later identity-matching `NO SPLIT` stops
-implementation and hands off to `/slice-contract <contract>`. If planning ran
-inside this delivery, a `Direct delivery` result continues in the same
-invocation; an inspection result stops there and never recursively invokes
-`deliver-issue`. A current `NO SPLIT` result reuses its direct-delivery reason
-and identity unless new evidence materially changes the boundary.
+A current `Sizing inspection` with no later identity-matching `NO SPLIT`
+does **not** start implementation yet. Under covering local sizing authority,
+invoke the existing `slice-contract` workflow *from this delivery*, keeping
+the user in the same request rather than returning a manual stage command.
+If it concludes `NO SPLIT`, reconcile the saved direct route and proceed in
+the same invocation. If it yields an approved decomposition, continue its
+existing prerequisite and parent/child delivery plan as authorized, preserving
+the integrated parent acceptance obligation. Stop with an actionable blocker
+when a consequential slicing/approval decision or prerequisite cannot be
+resolved under current authority. Never recursively start `deliver-issue`, infer
+permission for a product change from a sizing recommendation, or bypass #60
+admission. A current `NO SPLIT` result reuses its direct-delivery reason and
+identity unless new evidence materially changes the boundary.
 
 A current direct recommendation proceeds through the existing #60 admission
 controller. It is not `ADMITTED`: the controller's one admission result decides
