@@ -440,6 +440,151 @@ def bindings(root, work, require_trackable=True, _follow_origin=True):
     return [{"path": path, "sha256": value} for path, value in sorted(found.items())]
 
 
+
+def entry_source(root, request, issue_repository=None):
+    """Resolve a user-facing request without creating a second delivery state.
+
+    This only selects a saved contract or a planning/restore handoff. It never
+    infers approval, source currency, a current verdict, or write authority.
+    """
+    root = Path(root).resolve()
+    if not isinstance(request, str) or not request.strip():
+        raise ValueError("provide one nonempty delivery request")
+    request = request.strip()
+    # A project-owned work/*.md is NOT automatically a legacy P2P contract.
+    # Only an explicitly recognizable acceptance contract uses the legacy route.
+    legacy_file = safe(root, request) if re.fullmatch(rf"work/{SLUG}\.md", request) else None
+    legacy_contract = bool(legacy_file and legacy_file.is_file() and
+                           re.search(r"^# Acceptance contract:", legacy_file.read_text(encoding="utf-8"), re.M) and
+                           re.search(r"^Contract revision: v[1-9][0-9]*\s*$",
+                                     legacy_file.read_text(encoding="utf-8"), re.M))
+    if (request.startswith(".p2p/") and WORK.fullmatch(request)) or legacy_contract:
+        selected = safe(root, request)
+        if selected.is_file():
+            return {"action": "USE", "kind": "contract", "work_item": request,
+                    "next": "Validate the saved agreement, approvals, current sources and controller status."}
+        checkpoint_file = safe(root, f"{CHECKPOINT_DIRECTORY}/{work_slug(request)}.json")
+        if checkpoint_file.is_file():
+            record = json.loads(checkpoint_file.read_bytes())
+            if record.get("schema") != CHECKPOINT_SCHEMA or record.get("work_item") != request:
+                raise ValueError("checkpoint conflicts with the requested contract; reconcile it before restoration")
+            return {"action": "RESTORE", "kind": "contract", "work_item": request,
+                    "checkpoint": checkpoint_file.relative_to(root).as_posix(),
+                    "next": "Restore the validated checkpoint before resuming; never infer approval from its presence."}
+        raise ValueError("contract is missing; restore its checkpoint or provide its original source")
+
+    issue = re.fullmatch(r"#([1-9][0-9]*)", request)
+    if issue:
+        if not issue_repository or not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", issue_repository):
+            raise ValueError("issue number needs an unambiguous configured OWNER/REPO; read the active issue-tracker instructions")
+        kind = "issue"
+        identity = f"https://github.com/{issue_repository}/issues/{issue[1]}"
+        fingerprint = digest(identity.encode())
+        stem = "issue-" + issue[1] + "-" + fingerprint[:12]
+    elif ((not any(char.isspace() for char in request) and
+           (request.endswith(".md") or "/" in request)) or
+          (request.endswith(".md") and (root / request).is_file())):
+        if request.startswith(".p2p/") or request.startswith(CHECKPOINT_DIRECTORY + "/"):
+            raise ValueError("generated state is not a project specification; provide the exact contract path")
+        source_file = safe(root, request)
+        if not source_file.is_file():
+            raise ValueError("specification does not exist: " + request)
+        trackable(root, [request])
+        kind = "spec"
+        identity = request
+        fingerprint = digest(source_file.read_bytes())
+        stem = re.sub(r"[^a-z0-9]+", "-", PurePosixPath(request).stem.lower()).strip("-")
+        stem = (stem[:40].strip("-") or "spec") + "-" + digest(request.encode())[:12]
+    else:
+        kind = "text"
+        identity = request
+        fingerprint = digest(request.encode("utf-8"))
+        stem = "request-" + fingerprint[:16]
+
+    def matches(work, contract_text, handoff):
+        if kind == "issue":
+            return any(re.fullmatch(r"Source attribution:\s*" + re.escape(identity) + r"(?:[;\s].*)?", line.strip())
+                       for line in document_lines(contract_text))
+        if kind == "spec":
+            for line in document_lines(contract_text):
+                if not re.match(r"^Source:\s*", line):
+                    continue
+                for target in re.findall(r"\[[^\]]*\]\(([^)]+)\)", line):
+                    if re.match(r"[a-zA-Z][a-zA-Z0-9+.-]*:", target):
+                        continue
+                    relative = os.path.normpath(str(PurePosixPath(work).parent / target.split("#", 1)[0]))
+                    if relative == identity:
+                        return True
+            return False
+        # Retain a digest in the portable planning handoff, not a second copy
+        # of freeform user text that may contain private context.
+        lines = list(document_lines(handoff or ""))
+        sources = [line[len("Entry source kind: "):] for line in lines
+                   if line.startswith("Entry source kind: ")]
+        digests = [line[len("Entry request SHA-256: "):] for line in lines
+                   if line.startswith("Entry request SHA-256: ")]
+        if not sources and not digests:
+            return False
+        if sources != ["text"] or len(digests) != 1 or not re.fullmatch(r"[a-f0-9]{64}", digests[0]):
+            raise ValueError("saved entry request provenance is malformed: " + work)
+        return digests[0] == fingerprint
+
+    def checkpoint_text(checkpoint, relative):
+        rows = [row for row in checkpoint.get("files", []) if
+                row.get("scope") == "project" and row.get("path") == relative]
+        if len(rows) != 1:
+            return None
+        row = rows[0]
+        sha = row.get("sha256")
+        if not isinstance(sha, str) or not re.fullmatch(r"[a-f0-9]{64}", sha):
+            raise ValueError("checkpoint file digest is invalid: " + relative)
+        text = checkpoint.get("texts", {}).get(sha)
+        if text is None and row.get("git_commit"):
+            try:
+                text = git(root, "show", row["git_commit"] + ":" + relative).decode("utf-8")
+            except (ValueError, UnicodeError):
+                return None
+        if text is not None and digest(text.encode("utf-8")) != sha:
+            raise ValueError("checkpoint source bytes differ from saved digest: " + relative)
+        return text
+
+    candidates = {}
+    for file in sorted((root / ".p2p/work").glob("*/contract.md")):
+        relative = file.relative_to(root).as_posix()
+        if not WORK.fullmatch(relative):
+            continue
+        content = safe(root, relative).read_text(encoding="utf-8")
+        handoff = safe(root, f".p2p/work/{work_slug(relative)}/planning-handoff.md")
+        provenance = handoff.read_text(encoding="utf-8") if handoff.is_file() else None
+        if matches(relative, content, provenance):
+            candidates[relative] = {"action": "USE", "work_item": relative}
+    for file in sorted((root / CHECKPOINT_DIRECTORY).glob("*.json")):
+        relative = file.relative_to(root).as_posix()
+        record = json.loads(safe(root, relative).read_bytes())
+        if record.get("schema") != CHECKPOINT_SCHEMA or not WORK.fullmatch(record.get("work_item", "")):
+            continue
+        work = record["work_item"]
+        if work in candidates:
+            continue
+        content = checkpoint_text(record, work)
+        provenance = checkpoint_text(record, f".p2p/work/{work_slug(work)}/planning-handoff.md")
+        if content and matches(work, content, provenance):
+            candidates[work] = {"action": "RESTORE", "work_item": work, "checkpoint": relative}
+    if len(candidates) > 1:
+        raise ValueError("multiple saved contracts match this request; select the exact contract: " +
+                         ", ".join(sorted(candidates)))
+    if candidates:
+        chosen = next(iter(candidates.values()))
+        return chosen | {"kind": kind, "entry_fingerprint_sha256": fingerprint,
+                         "next": "Check exact source changes, agreement and approval identity; restore if needed, then status/resume before planning."}
+    suggested = f".p2p/work/{stem}/contract.md"
+    if safe(root, suggested).exists():
+        raise ValueError("suggested work-item path already belongs to different source: " + suggested)
+    return {"action": "PLAN", "kind": kind, "entry_fingerprint_sha256": fingerprint,
+            "suggested_work_item": suggested,
+            "next": "Use existing plan-acceptance and audit within delivery, save exact source provenance and contract, then follow existing sizing and admission."}
+
+
 def reconcile(root, legacy):
     """Copy an explicitly selected legacy contract into ignored active state."""
     match = re.fullmatch(rf"work/(?P<slug>{SLUG})\.md", legacy)
@@ -1206,6 +1351,9 @@ def main(argv=None):
         command.add_argument("work")
         if name == "publication-access":
             command.add_argument("--workspace", help="retained isolated candidate workspace")
+    entry_command = commands.add_parser("resolve-entry", help="read-only lookup for a single delivery request")
+    entry_command.add_argument("source", help="quoted text, configured #issue, repository spec, or saved contract path")
+    entry_command.add_argument("--issue-repository", help="configured GitHub OWNER/REPO for an issue number")
     reconcile_command = commands.add_parser("reconcile")
     reconcile_command.add_argument("work")
     for name in ("resolve", "create", "capture", "validate", "resume", "save"):
@@ -1287,6 +1435,8 @@ def main(argv=None):
             result = prepare_execution(root, args.work)
         elif args.command == "publication-access":
             result = publication_access(root, args.work, args.workspace)
+        elif args.command == "resolve-entry":
+            result = entry_source(root, args.source, args.issue_repository)
         elif args.command == "reconcile":
             result = reconcile(root, args.work)
         elif args.command == "create":

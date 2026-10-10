@@ -124,22 +124,25 @@ P2P working state     → ignored .p2p/
 Portable checkpoints  → p2p-state/<slug>.json (Git), or a selected GitHub issue
 ```
 
-## Step 3: start with one small promise
+## Step 3: start the entire delivery with one promise
 
 Now give P2P the outcome you want:
 
 ```text
-/plan-acceptance "Reject an empty username with a clear validation error."
+/deliver-issue "Reject an empty username with a clear validation error."
 ```
 
-You can also plan from a project document or a tracker issue, but direct agreed
-text is the cleanest first example.
+This one request starts the normal path from promise through planning, independent
+review and proof. You may also provide `#123` for a configured tracker issue,
+a project spec such as `specs/authentication.md`, or an existing saved contract
+path. Repeating the same request should use matching saved work rather than start
+from scratch.
 
 ### What you are doing
 
-You are not asking the agent to code yet. You are asking it to turn an informal
-request into a precise agreement about what must be true before the work counts as
-delivered.
+You are asking P2P to carry the whole change through delivery. Before writing
+code, P2P must turn your informal request into a precise agreement about what
+must be true before the work counts as delivered.
 
 This separation is one of the most important ideas in P2P. If implementation
 begins while “done” is still vague, the coding agent can accidentally decide the
@@ -148,8 +151,9 @@ agreement explicit first.
 
 ### What P2P is doing
 
-`/plan-acceptance` reads the relevant repository context and turns the promise
-into independently checkable requirements. It records the important boundaries,
+Inside `/deliver-issue`, the existing `plan-acceptance` stage reads the
+relevant repository context and turns the promise into independently checkable
+requirements. It records the important boundaries,
 where the behavior can be observed, what the expected result is, and what evidence
 should establish it. It also keeps unrelated behavior out of scope.
 
@@ -159,8 +163,9 @@ The generated contract is saved at:
 .p2p/work/<slug>/contract.md
 ```
 
-Use the exact path P2P returns. The slug is derived from the work item and should
-not be guessed when another path has already been reported.
+P2P retains that path internally for every later stage. You need not remember
+or copy it. The record remains inspectable whenever you want to see the
+agreement or resume on another computer.
 
 ### What you should expect afterward
 
@@ -188,9 +193,12 @@ scope, it should surface that question instead of guessing. Resolve the question
 before implementation. If it finds only an evidence gap, it should tell you what
 observation path is missing.
 
-## Step 4: inspect and approve the agreement
+## Step 4: approve the agreement if required
 
-Read the proposed contract before you let implementation continue.
+Review the proposed agreement when P2P needs a decision or approval. You do not
+need to start another command to continue: within covering standing authority,
+P2P can apply a source-preserving, independently audited planning proposal.
+It must ask when the outcome changes or approval is otherwise required.
 
 You are looking for a straightforward question:
 
@@ -223,21 +231,19 @@ an agreement revision rather than silently rewriting history.
 
 For a first local delivery, you do not need a planning PR or a GitHub issue.
 
-## Step 5: deliver the contract
+## Step 5: P2P continues automatically
 
-Now hand the saved agreement to the coordinated workflow:
-
-```text
-/deliver-issue .p2p/work/<slug>/contract.md
-```
-
-Again, use the exact contract path returned by planning.
+Once the agreement is established and the necessary authority and host
+capabilities are available, `/deliver-issue` continues the **same request**.
+It does not ask you to paste an internal path or select implementation, review
+or proof manually. When an actual decision or prerequisite blocks the work, it
+preserves completed stages and tells you the next supported action.
 
 ### What you are doing
 
-You are asking P2P to carry one agreed work item through implementation,
-independent review, and proof. You are not manually telling each stage what the
-previous stage said; the saved contract and candidate handoffs carry that context.
+Your initial request already asked P2P to carry one agreed work item through
+implementation, independent review, and proof. The saved contract and candidate
+handoffs carry the context without another instruction from you.
 
 ### What P2P is doing
 
@@ -373,10 +379,12 @@ a reason to choose something else.
 
 | What you have | Good next path |
 |---|---|
-| Another small local outcome | `/plan-acceptance` → `/deliver-issue` |
-| An existing GitHub issue | `/plan-acceptance <issue>` → `/deliver-issue <issue>` |
-| A project specification | `/plan-acceptance <path>` |
-| One contract that is genuinely too large for one coherent delivery | `/slice-contract` after planning the parent |
+| Another small local outcome | `/deliver-issue "your outcome"` |
+| An existing configured GitHub issue | `/deliver-issue #123` |
+| A project specification | `/deliver-issue specs/feature.md` |
+| A saved acceptance contract | `/deliver-issue .p2p/work/<slug>/contract.md` |
+| Plan only (no implementation) | `/plan-acceptance <source>` |
+| An explicit decomposition review | `/slice-contract <contract>` |
 | A reviewed and proven candidate that should become a draft PR | `/publish-pr` |
 | An existing PR approaching the merge decision | `/merge-readiness` |
 | A proof report with named repairable gaps | `/repair-gaps`, followed by fresh proof |
