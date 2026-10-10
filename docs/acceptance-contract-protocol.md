@@ -573,17 +573,24 @@ not issue-body replacement, labels, closure, commits, or PRs. Planning invoked b
 `deliver-issue` or another workflow inherits that workflow's authority and stays
 local unless issue publication was separately authorized.
 
-Save the proposal locally first. Post its exact UTF-8 text in a fenced block,
-with its `.p2p/work/<slug>/contract.md` path, revision, and SHA-256 outside the block.
-End the proposal with one newline before hashing and presenting it for approval.
-Choose a fence longer than any fence in the contract. The fenced content includes
-that final newline; fence lines are excluded from the hash. Include retrievable copies
-and hashes of binding sources and parents, preserving their relative paths, so
-another checkout can recover the agreement without a planning PR. A local path
-or digest alone is insufficient. Keep the issue body and human comments intact.
-Read back the comment and verify the extracted contract bytes and binding inputs.
-Reuse an identical existing handoff on retries; preserve old proposals when
-posting revisions. An uncertain write requires readback before another attempt.
+Save the exact canonical proposal locally first. For direct issue publication,
+render a human-first comment using `plan-acceptance/scripts/render_issue_proposal.py`.
+The normally rendered GitHub Markdown must show intended outcome, every requirement
+ID and its exact promised behavior, boundaries, concrete check and expected result,
+parent contribution and prerequisites, exclusions, unresolved questions and gaps,
+and the precise approval action. A genuine gap or open decision displays
+**not ready for approval**. The readable view is deterministic from canonical
+facts, not an independently approved paraphrase. Reject incomplete rows,
+missing sources and a presentation that cannot be verified faithfully.
+
+Place the exact UTF-8 contract text, revision and SHA-256 plus byte-recoverable,
+hash-checked binding source and parent snapshots in collapsed `<details>`, with
+GitHub Markdown outside technical fences. The local or unpublished #82 checkpoint
+cannot replace the recoverable issue record. Read back the entire GitHub comment
+and verify both the visible view and extracted exact contract/binding bytes
+before reporting publication. Retain old comments on revisions; reuse an identical
+verified existing handoff on retries. An uncertain write needs readback before
+another attempt. Keep the issue body and existing human comments intact.
 
 The issue comment is a shared planning handoff, not a second live contract store.
 Human approval must identify the exact proposal by comment and text hash, or by
