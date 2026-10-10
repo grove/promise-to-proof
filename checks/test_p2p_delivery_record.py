@@ -99,7 +99,7 @@ class DeliveryRecordTests(unittest.TestCase):
         observed = record_protocol.validate(self.root, self.original, checkpoint=self.checkpoint)
         self.assertEqual(observed["status"], "LOCAL_REVIEWED_PROVEN")
         self.assertNotIn("landing", self.original)
-        self.assertIn("not establish", record_protocol.render(self.original, observed))
+        self.assertIn("No delivered commit", record_protocol.render(self.original, observed))
 
     def test_compact_cleaned_local_artifacts_validate_without_runtime_or_checkpoint(self):
         code, result = self.item.cli("cleanup")
