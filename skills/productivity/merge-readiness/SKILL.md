@@ -92,6 +92,23 @@ check is configured, or its result is missing, stale, or cannot be tied to the
 observed head and target, compatibility is `UNKNOWN` even when repository policy
 requires no checks. Queue membership alone is not a passing result.
 
+## Account for changes outside the saved review scope
+
+Use the exact review-scope comparison from
+`p2p_filesystem.py review-scope-status <contract> --current-repo <PR checkout>`
+when the retained candidate workspace and scope metadata are available.
+Identify the full actual product delta including generated tests, schemas,
+configuration, modes and deletions. Treat records-only P2P updates as excluded
+from product identity, not a reason to invalidate an otherwise current review.
+
+If the review is historical and exact scope metadata is missing, classify it
+`UNKNOWN` and request the smallest resolving inspection, not invented
+file-by-file coverage. A known narrow delta can receive targeted *fresh*
+independent review with complete current scope. Any changed candidate still
+needs fresh proof on the current bytes. Do not convert an earlier candidate's
+verdict into current acceptance, or assume a matching scope establishes
+compatibility with destination commits after the frozen review base.
+
 ## Check the final candidate
 
 Confirm that the PR head represents the exact candidate covered by a current

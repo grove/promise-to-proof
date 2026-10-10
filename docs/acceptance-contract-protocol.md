@@ -1253,6 +1253,44 @@ Refresh review and any stale proof after candidate changes. Neither stage requir
 an open PR or unrelated green CI. Only `prove` issues acceptance verdicts;
 the existing merge conditions still apply.
 
+## Requirement trace and exact reviewed scope
+
+For newly admitted deliveries, existing implementation, review, and proof reports
+include compact, machine-checkable **coverage facts**, not another stage or a
+separate proof verdict. Each accepted requirement identifies relevant exact
+product paths (or explicitly names already-sufficient unchanged behavior) and
+concrete saved evidence references. A retained requirement row (`row`), review
+check (`check:N`), exact candidate artifact (`file:PATH`), or already existing
+canonical Evidence Record v1 reference (`record:ID@sha256:DIGEST`) may supply
+that reference. No invented evidence, synthetic changed file, or artificial
+acceptance test is needed to fill the trace.
+
+Changes outside the requirement mappings are named as supporting changes with a
+short, concrete reason. A materially unrequested product change remains a scope
+finding rather than becoming authorized because someone recorded a reason. Trace
+validation checks referential consistency, requirement IDs and all changed product
+paths; review and proof still independently assess whether the implementation,
+scope and evidence are *good enough*.
+
+A current review saves its frozen comparison base, exact candidate key, local Git
+generation, manifest digest, exact inspected product paths and their content/mode
+identities, all changed paths including deletions, exclusions and limitations.
+Only paths actually inspected may appear as inspected. This reviewed scope is
+preserved in the existing delivery records and may be compared deterministically
+against an exact PR head or another checkout. A missing or old scope returns
+`UNKNOWN`; it cannot be reconstructed optimistically from prose. A current
+candidate with different product bytes returns an explicit `UNCOVERED_DELTA`
+with paths and identities. Record-only updates under P2P's ignored namespace do
+not change product identity. Generated source, tests, schemas and configuration
+can and do affect product identity regardless of their origin.
+
+The delta is an input to a *fresh independent* applicability judgment, not an
+automatic mandate to rerun everything. A bounded change can receive targeted
+re-review while restoring full current-candidate coverage; unclear reach needs
+broader checking. A changed candidate also requires fresh full-scope proof.
+An unchanged candidate still needs separate destination compatibility and
+merge-readiness checks. A valid trace by itself never proves a requirement.
+
 ## Proof and repair handoffs
 
 Every proof run binds an exact contract revision to one exact candidate. Record

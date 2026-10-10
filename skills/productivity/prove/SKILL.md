@@ -127,6 +127,18 @@ candidate. A later destination move alone does not change either identity. Proof
 does not establish that the candidate is compatible with newer destination
 commits.
 
+### Record links to the exact implementation and evidence
+
+For every requirement, retain the product paths or already-sufficient unchanged
+behavior it depends on, plus exact evidence references from this proof run. The
+controller's `coverage_trace` uses saved requirement observations (`row`), exact
+candidate artifacts (`file:PATH`), and existing canonical Evidence Record v1
+references; do not create an Evidence Record just to satisfy a field. Explain
+necessary supporting code changes without treating a trace as proof. Missing
+evidence is still `NOT PROVEN`; the trace cannot change the judgment.
+Use the existing independent stage and its normal evidence, not a new mapping
+stage or duplicate test suite.
+
 ### 3. Map and audit evidence
 
 For every requirement, name the observation and the independent oracle that says

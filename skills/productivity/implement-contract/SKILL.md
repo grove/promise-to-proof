@@ -175,6 +175,19 @@ affected portion and re-establish agreement or ownership. Preserve safe changes
 and report partial state rather than chasing a new target or overwriting work.
 
 
+## Retain concise requirement coverage
+
+During implementation, name the actual code paths or already-existing behavior
+that satisfy each requirement and cite its real observed check/evidence. Account
+for material changed product files that support more than one requirement or
+serve a necessary refactor; explain their purpose rather than inventing another
+acceptance obligation. For a coordinated delivery, return the controller's
+`coverage_trace` structure when requested. Use only real candidate paths,
+retained evidence rows/artifacts and existing normalized Evidence Record v1
+identities. Missing paths or checks remain honest gaps. This trace helps the
+independent reviewer find the important seams; it does not pronounce anything
+reviewed or proven.
+
 ## Preserve reusable delivery learning
 
 If this run reveals durable, non-obvious knowledge that is likely to help future

@@ -423,6 +423,36 @@ retrievable evidence. Other completed commands return JSON with `BLOCKED`, the
 specific cause, identities available so far, retained progress, and a resume
 command. A stage's exit zero alone cannot establish delivery.
 
+## Where each promise is implemented and what review actually covered
+
+New deliveries retain a small `coverage_trace` in their existing stage reports.
+Each requirement points to actual product files or sufficient unchanged behavior
+and to retained observations, checks, exact candidate files or existing
+[Evidence Record v1](./evidence-record-v1.md) references. Necessary supporting
+changes have a short justification. The controller checks the references and
+records the exact inspected product paths, blob/mode identities, frozen base,
+candidate key and local Git generation in the saved review scope. This is not a
+new agent or proof stage.
+
+To compare an already-reviewed candidate against a PR checkout or another exact
+product tree, run this **read-only** command:
+
+```sh
+python3 skills/productivity/deliver-issue/scripts/p2p_filesystem.py --repo /path/to/source \
+  review-scope-status .p2p/work/example/contract.md \
+  --current-repo /path/to/pr-checkout
+```
+
+Use `--current-ref FULL_SHA` to inspect a specific Git revision instead of the
+checked-out working tree. `COVERED` means product bytes match the saved review;
+`UNCOVERED_DELTA` names the exact changed, added or deleted files; `UNKNOWN`
+means the saved scope or original candidate is unavailable and requires a fresh
+inspection. A missing scope in historical reports is not silently inferred from a
+changed-file count. The command cannot confer review, proof or merge approval:
+a known narrow delta still needs targeted independent inspection and fresh
+current-candidate verification, while an unchanged candidate still needs a
+current-target compatibility check.
+
 ## Host boundary and checks
 
 Each invocation first launches two fresh real Codex contexts. They attempt writes

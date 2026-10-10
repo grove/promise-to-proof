@@ -18,11 +18,20 @@ jobs:
           python-version: '3.11'
       - name: Verify fixture manifest, offline oracle, and failure behavior
         run: python3 -m unittest discover -s checks -p 'test_live_judgments.py' -v
+      - name: Verify exact coverage and review-scope regressions
+        run: python3 -m unittest discover -s checks -p 'test_p2p_coverage.py' -v
       - name: Check existing generation and repair behavior
         run: >-
           python3 -m unittest discover -s checks -p 'test_p2p_delivery.py'
           -k 'test_local_git_generations_reconstruct_reuse_objects_and_bind_reports'
           -k 'test_successful_repair_rereviews_and_reproves'
+      - name: Check candidate scope and compact terminal records
+        run: >-
+          python3 -m unittest discover -s checks -p 'test_p2p_delivery.py'
+          -k 'test_footprint_metrics_p2p_self_delivery'
+          -k 'test_footprint_metrics_large_synthetic_repository'
+          -k 'test_success_prunes_execution_state_but_retains_candidate_workspace'
+          -k 'test_stale_and_missing_coverage_rejected'
       - name: Check retained verification history
         run: python3 -m unittest discover -s checks -p 'test_p2p_verification_history.py'
       - name: Check review's pragmatic test-quality instructions

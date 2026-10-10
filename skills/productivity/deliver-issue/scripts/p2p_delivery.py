@@ -1074,7 +1074,7 @@ def host_events(path):
             'message': messages[-1] if messages else '', 'executions': executions}
 
 
-def report_schema(stage):
+def report_schema(stage, coverage=False):
     string = {'type': 'string'}
     def obj(properties):
         return {'type': 'object', 'properties': properties, 'required': list(properties), 'additionalProperties': False}
@@ -1105,7 +1105,37 @@ def report_schema(stage):
                           limitations={'type': 'array', 'items': string},
                           findings={'type': 'array', 'items': finding},
                           missing_input=string, expected_result=string)
+    if coverage:
+        row = obj({'id': string, 'paths': {'type': 'array', 'items': string},
+                   'existing': {'type': 'boolean'},
+                   'evidence': {'type': 'array', 'items': string}})
+        trace = obj({'requirements': {'type': 'array', 'items': row},
+                     'supporting_changes': {'type': 'array', 'items': obj({'path': string, 'reason': string})}})
+        if stage == 'review':
+            trace['properties']['inspected_paths'] = {'type': 'array', 'items': string}
+            trace['required'].append('inspected_paths')
+        properties['coverage_trace'] = trace
     return obj(properties)
+
+
+def coverage_markdown(report, scope=None):
+    trace = report.get('coverage_trace')
+    if trace is None:
+        return ''
+    lines = ['## Where the work and evidence are', '', 'Trace references do not grant proof verdicts.']
+    for row in trace['requirements']:
+        paths = ', '.join(row['paths'])
+        source = paths or ('existing behavior' if row['existing'] else 'not yet identified')
+        evidence = ', '.join(row['evidence']) or 'not yet established'
+        lines.append(f"- {row['id']}: {source}; evidence: {evidence}")
+    for extra in trace['supporting_changes']:
+        lines.append(f"- Supporting change {extra['path']}: {extra['reason']}")
+    if scope:
+        lines.append(f"Exact reviewed product scope: {len(scope['inspected'])} inspected paths, "
+                     f"{len(scope['changed_paths'])} changed paths, "
+                     f"candidate {scope['candidate_key']}, base {scope['comparison_base']}; "
+                     f"manifest SHA-256 {scope['manifest_sha256']}.")
+    return '\n'.join(lines)
 
 
 def learning_candidates_markdown(report):
@@ -1157,7 +1187,7 @@ REVIEW_AXES = ('Contract fidelity', 'Scope and simplicity', 'Engineering quality
 
 
 def review_markdown(report, work, contract, candidate, base_manifest, destination_observation=None,
-                    environment=None, session_id=None):
+                    environment=None, session_id=None, review_scope=None):
     key = candidate_key(candidate)
     if 'changes' in candidate:
         scope = [entry['path'] for entry in candidate['changes']]
@@ -1177,6 +1207,9 @@ def review_markdown(report, work, contract, candidate, base_manifest, destinatio
     if destination_observation:
         tip = destination_observation['observed_tip'] or 'unavailable'
         lines.insert(5, f"Destination observation: `{destination_observation['destination']}` {destination_observation['relation']} at `{tip}` ({destination_observation['observed_at']}).")
+    coverage = coverage_markdown(report, review_scope)
+    if coverage:
+        lines.extend(['', coverage])
     for axis in REVIEW_AXES:
         lines.extend(['', '## ' + axis, ''])
         if axis == 'Contract fidelity':
@@ -1251,6 +1284,9 @@ def proof_markdown(report, work, contract, candidate, environment, session_id):
     lines.extend('- ' + item for item in report['gaps'])
     if not report['gaps']:
         lines.append('None.')
+    facts = coverage_markdown(report)
+    if facts:
+        lines.extend(['', facts])
     lines.extend(['', '## Proof details', '', report['details']])
     return '\n'.join(lines).rstrip() + '\n'
 
@@ -2312,6 +2348,19 @@ assert results['scratch'] == 'ok'
                          'Each row needs a substantive observation. Proof rows need command/output evidence in '
                          'artifact, an assertion, and observation. Use verdict proven for established proof rows; '
                          'otherwise name the gap. ')
+        coverage_required = self.state.get('coverage_format_version') == 1
+        coverage_prompt = (
+            'Include coverage_trace. For each requirement ID give paths to real product files, '
+            'existing=true only for already-sufficient unchanged behavior, and evidence refs. '
+            'Use row for the saved stage requirement observation/evidence; check:N for an actual '
+            'zero-based review check; file:PATH for exact candidate files; or '
+            'record:ID@sha256:DIGEST for an existing verified Evidence Record v1. '
+            'Never invent references. Explain necessary changed files outside requirement mappings '
+            'as supporting_changes (path and reason). A missing implementation/evidence stays a gap. '
+            'For review, inspected_paths names the exact existing product files actually inspected, '
+            'including all changed files that still exist. Do not claim inspection you did not do. '
+            'These are compact trace facts, not a duplicate proof or a new acceptance verdict. '
+            if coverage_required else '')
         instruction_source = 'pinned' if self.state.get('instruction_identity') else 'original installed'
         prompt = (f'Invoke the {instruction_source} {STAGES[skill_stage]} skill at {self.state["skills"][skill_stage]["path"]}. '
                   f'Read it and its references. Work item {self.work}, workspace {self.workspace}. '
@@ -2331,7 +2380,7 @@ assert results['scratch'] == 'ok'
                   'Use fresh independent observations, do not trust previous judgments. '
                   f'Exact input_identity_json must encode this object: {json.dumps(inputs)}. '
                   f'Every requirement must occur exactly once: {self.state["requirements"]}. '
-                  f'{report_format}{learning_format}Status uses normal skill vocabulary. '
+                  f'{report_format}{learning_format}{coverage_prompt}Status uses normal skill vocabulary. '
                   f'{"The controller renders review text from structured fields. Do not add free-text details or other top-level fields." if name == "review" else "details contains the full human report."} '
                   'Keep generated fixtures and verbose debug output in scratch. Return the relevant command, '
                   'assertion, result, and environment in the report; do not dump entire logs or workspaces. '
@@ -2374,14 +2423,17 @@ assert results['scratch'] == 'ok'
                        'edit or repeat an unchanged passing check without a concrete reason. ')
         attempt, host = self.dispatch(name, inputs, prompt,
                                       self.workspace if name in ('implementation', 'repair') else None,
-                                      report_schema(name))
+                                      report_schema(name, coverage_required))
         self.timed_source_stable()
         if name in ('review', 'proof'):
             self.current()
+        scope = None
         with self.report_validation(attempt, host):
             raw_report = host['message'].encode('utf-8')
             report = json.loads(raw_report)
             expected_fields = {'status', 'input_identity_json', 'requirements', 'gaps', 'learning_candidates'}
+            if coverage_required:
+                expected_fields.add('coverage_trace')
             if name == 'review':
                 expected_fields.update({'findings', 'coverage', 'checks', 'limitations', 'missing_input', 'expected_result'})
             else:
@@ -2436,6 +2488,22 @@ assert results['scratch'] == 'ok'
                         raise ValueError('BLOCKED review report must name the missing input and expected result')
                 elif report['missing_input'] or report['expected_result']:
                     raise ValueError('non-blocked review report contains blocked-only details')
+            if coverage_required:
+                manifest = fs.snapshot(self.workspace, exclude=self.state.get('agreement_paths', ()))
+                base = fs.snapshot(self.workspace, self.state['comparison_base'],
+                                   exclude=self.state.get('agreement_paths', ()))
+                changed = fs.tree_changes(base, manifest)
+                records = fs.available_evidence_refs(
+                    self.workspace, self.work, fs.snapshot_key(manifest),
+                    self.state['contract']['sha256'])
+                fs.validate_coverage_trace(report['coverage_trace'], self.state['requirements'],
+                                           report, name, manifest, changed, records)
+                if name == 'review':
+                    scope = fs.review_scope(self.state['candidate'], manifest,
+                                            self.state['local_git_generations'][-1]['commit'],
+                                            report['coverage_trace']['inspected_paths'],
+                                            self.state.get('agreement_paths', ()),
+                                            report.get('limitations', ()), report['coverage_trace'])
             if name == 'proof' and report['status'] == 'PROVEN':
                 if not host['executions'] or any(row['verdict'] != 'proven' or not row['evidence'] for row in rows):
                     raise ValueError('proof lacks full independently exercised evidence')
@@ -2453,14 +2521,21 @@ assert results['scratch'] == 'ok'
         summary = (review_markdown(report, self.work, self.state['contract'], self.state['candidate'],
                                    fs.snapshot(self.workspace, self.state['comparison_base']),
                                    attempt['destination_observation'], self.verification_environment(),
-                                   attempt['session_id'])
+                                   attempt['session_id'], scope)
                    if name == 'review' else
-                   report['details'].rstrip() + '\n\n' + learning_candidates_markdown(report) + '\n').encode()
+                   report['details'].rstrip() + '\n\n' +
+                   (coverage_markdown(report) + '\n\n' if coverage_required else '') +
+                   learning_candidates_markdown(report) + '\n').encode()
         local_save(self.root, self.work, f'attempts/{attempt["id"]}/report.md', summary)
         local_save(self.root, self.work, name + '.md', summary)
         attempt.update(status='complete', report=path, report_sha256=fs.digest(raw_report))
-        self.state.setdefault('reports', {})[name] = {'path': path, 'sha256': attempt['report_sha256'],
-                                                     'attempt_id': attempt['id'], 'inputs': inputs}
+        self.state.setdefault('reports', {})[name] = {
+            'path': path, 'sha256': attempt['report_sha256'],
+            'attempt_id': attempt['id'], 'inputs': inputs,
+            **({'coverage_trace_sha256': fs.digest(fs.canonical(report['coverage_trace']))}
+               if coverage_required else {}),
+            **({'review_scope': scope} if scope else {}),
+        }
         self.save()
         if name in ('review', 'proof'):
             self.checkpoint()
@@ -2482,14 +2557,19 @@ assert results['scratch'] == 'ok'
                                       fs.snapshot(self.workspace, self.state['comparison_base']),
                                       attempt.get('destination_observation'),
                                       attempt.get('verification_environment', self.verification_environment()),
-                                      attempt.get('session_id'))
+                                      attempt.get('session_id'), record.get('review_scope'))
         elif name == 'review' and 'details' in report:
             summary = report['details']
             if not isinstance(summary, str):
                 raise ValueError('legacy review report details are invalid')
         else:
             summary = (report_markdown(report) if name == 'review' else
-                       report['details'].rstrip() + '\n\n' + learning_candidates_markdown(report) + '\n')
+                       report['details'].rstrip() + '\n\n' +
+                       (coverage_markdown(report) + '\n\n' if 'coverage_trace' in report else '') +
+                       learning_candidates_markdown(report) + '\n')
+        if 'coverage_trace' in report and record.get('coverage_trace_sha256') != fs.digest(
+                fs.canonical(report['coverage_trace'])):
+            raise ValueError('retained coverage facts changed or lost: ' + name)
         if (self.local / (name + '.md')).read_bytes() != summary.encode():
             raise ValueError('canonical report content changed or lost: ' + name)
         if name == 'review' and 'coverage' not in report:
@@ -2527,6 +2607,11 @@ assert results['scratch'] == 'ok'
             'cleanup': cleanup or self.state.get('cleanup', 'awaiting source checkout verification'),
             'routing': route_record(self.state['routing']),
             'destination_observation': self.state.get('destination_observation'),
+            **({'review_scope': self.state['reports']['review']['review_scope'],
+                'coverage_trace_sha256': {
+                    stage: item['coverage_trace_sha256'] for stage, item in self.state['reports'].items()
+                    if 'coverage_trace_sha256' in item},
+                } if 'review_scope' in self.state.get('reports', {}).get('review', {}) else {}),
         }
         if retained_artifacts:
             value['retained_artifacts'] = list(retained_artifacts)
@@ -2681,6 +2766,13 @@ assert results['scratch'] == 'ok'
         self.current(check_source=check_source)
         already_complete = (self.state.get('status') == 'REVIEWED_AND_PROVEN' and
                             self.state.get('completed_at'))
+        if self.state.get('coverage_format_version') == 1:
+            for name in ('review', 'proof', 'implementation'):
+                record = self.state.get('reports', {}).get(name)
+                if record and 'coverage_trace_sha256' not in record:
+                    raise ValueError('missing exact requirement/evidence trace for ' + name)
+            if not self.state['reports']['review'].get('review_scope'):
+                raise ValueError('missing exact inspected product scope for review')
         self.state.update(status='REVIEWED_AND_PROVEN' if already_complete else 'RUNNING',
                           blocker=None,
                           completed_at=self.state.get('completed_at') if already_complete else None,
@@ -3687,6 +3779,7 @@ def create(root, args, invocation_started_epoch=None, *, live_evaluation=False):
     state = {'schema': 'promise-to-proof/delivery/v1', 'policy': POLICY, 'invocation_id': str(uuid.uuid4()),
              'status': 'RUNNING', 'blocker': None, 'work_item': args.work, 'comparison_base': base,
              'contract': agreement, 'requirements': requirements, 'binding_inputs': inputs,
+             'coverage_format_version': 1,
              'agreement_paths': agreement_paths,
              'source_tree_key': fs.snapshot_key(current), 'source_head': head,
              'source_index_sha256': fs.digest(fs.git(root, 'ls-files', '--stage', '-z')),
@@ -3720,7 +3813,8 @@ def create(root, args, invocation_started_epoch=None, *, live_evaluation=False):
     if live_evaluation:
         state['live_evaluation'] = True
     delivery = Delivery(root, args.work, state)
-    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'source_product_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'instruction_identity', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host', *(['live_evaluation'] if live_evaluation else []))}))
+    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'source_product_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'instruction_identity', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host', 'coverage_format_version',
+                     *(['live_evaluation'] if live_evaluation else []))}))
     delivery.save()
     delivery.capture('admission')
     delivery.save()

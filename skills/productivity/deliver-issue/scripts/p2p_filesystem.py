@@ -367,6 +367,235 @@ def tree_changes(base, candidate):
     return changes
 
 
+# Compact coverage facts are annotations on existing stage reports, not
+# acceptance verdicts. Their source of truth remains the exact candidate,
+# stage report and independently observed evidence.
+REVIEW_SCOPE_SCHEMA = "promise-to-proof/review-scope/v1"
+
+
+def _coverage_path(path):
+    return (isinstance(path, str) and bool(path) and product_path(path)
+            and path.split("/", 1)[0] != ".git"
+            and all(part not in ("", ".", "..") and part.lower() != ".git"
+                    for part in path.split("/")) and "\\" not in path and "\0" not in path)
+
+
+def validate_coverage_trace(trace, requirement_ids, report, stage, manifest, changed, record_refs=()):
+    """Validate links against actual paths/rows, without grading their meaning.
+
+    'row' is the saved stage requirement row; 'check:N' is a saved reviewer
+    check; 'file:PATH' names an exact candidate artifact; 'record:ID@sha256:HEX'
+    cites Evidence Record v1. A record reference's syntax, not authenticity or
+    availability, is checked here. Direct rows remain supported.
+    """
+    required = {"requirements", "supporting_changes"}
+    if stage == "review":
+        required.add("inspected_paths")
+    if not isinstance(trace, dict) or set(trace) != required:
+        raise ValueError("coverage trace has missing or unsupported fields")
+    if stage == "review":
+        inspected = trace["inspected_paths"]
+        if not isinstance(inspected, list) or len(set(inspected)) != len(inspected):
+            raise ValueError("review inspected paths must be unique")
+        if any(not _coverage_path(p) or p not in {x["path"] for x in manifest}
+               for p in inspected):
+            raise ValueError("review claims inspection of an absent product path")
+        changed_current = {x["path"] for x in changed} & {x["path"] for x in manifest}
+        if report["status"] == "REVIEWED" and not changed_current <= set(inspected):
+            raise ValueError("review has not inspected all changed product files")
+    if not isinstance(trace["requirements"], list) or not isinstance(trace["supporting_changes"], list):
+        raise ValueError("coverage trace lists are malformed")
+    current = {row["path"] for row in manifest}
+    changes = {row["path"] for row in changed}
+    allowed = current | changes  # A deletion may be a legitimate reviewed change.
+    linked = set()
+    ids = []
+    successful = report["status"] in ("IMPLEMENTED", "REPAIRED", "REVIEWED", "PROVEN")
+    observations = {row["id"]: row for row in report["requirements"]}
+    for item in trace["requirements"]:
+        if not isinstance(item, dict) or set(item) != {"id", "paths", "existing", "evidence"}:
+            raise ValueError("coverage requirement has missing or unsupported fields")
+        name = item["id"]
+        ids.append(name)
+        if (not isinstance(name, str) or name not in observations
+                or not isinstance(item["paths"], list)
+                or not isinstance(item["evidence"], list)
+                or type(item["existing"]) is not bool):
+            raise ValueError("coverage requirement has malformed values")
+        if len(set(item["paths"])) != len(item["paths"]) or not all(
+                _coverage_path(p) and p in allowed for p in item["paths"]):
+            raise ValueError("coverage references an absent or unsafe product path: " + str(name))
+        if len(set(item["evidence"])) != len(item["evidence"]):
+            raise ValueError("coverage has repeated evidence references: " + name)
+        for ref in item["evidence"]:
+            if not isinstance(ref, str):
+                raise ValueError("coverage evidence reference is not a string")
+            if ref == "row":
+                if not observations[name]["observation"].strip():
+                    raise ValueError("coverage row has no retained observation")
+                if stage != "review" and successful and not observations[name]["evidence"]:
+                    raise ValueError("coverage row lacks retained supporting evidence: " + name)
+            elif ref.startswith("check:") and stage == "review":
+                number = ref.removeprefix("check:")
+                if not number.isdecimal() or int(number) >= len(report["checks"]):
+                    raise ValueError("coverage references a missing review check: " + ref)
+            elif ref.startswith("file:") and ref.removeprefix("file:") in current:
+                pass  # Content is identified by the candidate manifest, not a guessed hash.
+            elif (ref.startswith("record:") and
+                  re.fullmatch(r"record:[A-Za-z][A-Za-z0-9_.-]*@sha256:[0-9a-f]{64}", ref) and
+                  ref in record_refs):
+                pass  # Only a retained matching candidate/contract record may be cited.
+            else:
+                raise ValueError("unresolved coverage evidence reference: " + ref)
+        if successful and (not item["paths"] and not item["existing"] or not item["evidence"]):
+            raise ValueError("completed stage has no implementation/evidence trace: " + name)
+        linked.update(p for p in item["paths"] if p in changes)
+    if sorted(ids) != sorted(requirement_ids):
+        raise ValueError("coverage trace omits or duplicates requirement IDs")
+    supporting = set()
+    for item in trace["supporting_changes"]:
+        if (not isinstance(item, dict) or set(item) != {"path", "reason"}
+                or not _coverage_path(item["path"])
+                or item["path"] not in changes or item["path"] in supporting
+                or item["path"] in linked or not isinstance(item["reason"], str)
+                or not item["reason"].strip()):
+            raise ValueError("unexplained, duplicate or invalid supporting product change")
+        supporting.add(item["path"])
+    missing = changes - linked - supporting
+    if successful and missing:
+        raise ValueError("unaccounted product changes: " + ", ".join(sorted(missing)))
+    return {"requirements": sorted(ids), "unaccounted_changes": sorted(missing),
+            "supporting_changes": sorted(supporting)}
+
+
+def available_evidence_refs(workspace, work, candidate_key, contract_sha256):
+    """Resolve already-retained Evidence Record v1 identities; never invent one.
+
+    Identity existence is not an authenticity or sufficiency decision: the
+    Evidence Record v1 validator and independent proof retain those obligations.
+    """
+    evidence_root = safe(workspace, f".p2p/work/{work_slug(work)}/evidence")
+    if not evidence_root.is_dir() or evidence_root.is_symlink():
+        return set()
+    references = set()
+    for path in evidence_root.glob("*.json"):
+        if path.is_symlink() or not path.is_file():
+            continue
+        try:
+            data = json.loads(path.read_bytes())
+            if (not isinstance(data, dict) or
+                    data.get("schema") != "promise-to-proof/evidence-record/v1" or
+                    data.get("candidate") != candidate_key or
+                    not isinstance(data.get("contract"), dict) or
+                    data["contract"].get("sha256") != contract_sha256 or
+                    not isinstance(data.get("id"), str) or
+                    not re.fullmatch(r"[A-Za-z][A-Za-z0-9_.-]*", data["id"])):
+                continue
+            references.add(f"record:{data['id']}@sha256:{digest(canonical(data))}")
+        except (OSError, ValueError, TypeError, UnicodeError):
+            continue
+    return references
+
+
+def review_scope(candidate, manifest, generation_commit, inspected_paths,
+                 exclusions=(), limitations=(), trace=None):
+    """Build exact checked identities; never infer that every file was inspected."""
+    if not isinstance(inspected_paths, list) or len(set(inspected_paths)) != len(inspected_paths):
+        raise ValueError("review inspected_paths must be a unique list")
+    identities = {item["path"]: item for item in tree_identity(manifest)}
+    if any(path not in identities for path in inspected_paths):
+        raise ValueError("review claims inspection of an absent product file")
+    if not isinstance(limitations, (list, tuple)) or any(not isinstance(x, str) for x in limitations):
+        raise ValueError("review limitations are malformed")
+    return {
+        "schema": REVIEW_SCOPE_SCHEMA,
+        "contract_sha256": candidate["work_item_sha256"],
+        "comparison_base": candidate["comparison_base"],
+        "candidate_key": candidate["key"],
+        "generation_commit": generation_commit,
+        "manifest_sha256": digest(canonical(list(identities.values()))),
+        "changed_paths": candidate["changes"],
+        "inspected": [identities[path] for path in sorted(inspected_paths)],
+        "excluded": sorted(set((".p2p/", "p2p-state/", *exclusions))),
+        "limitations": limitations,
+        "trace_sha256": digest(canonical(trace)) if trace is not None else None,
+    }
+
+
+def compare_review_scope(scope, before, after):
+    """Conservative exact-scope comparison for publication and merge readiness."""
+    if not isinstance(scope, dict) or scope.get("schema") != REVIEW_SCOPE_SCHEMA:
+        return {"status": "UNKNOWN", "reason": "saved review lacks exact scope metadata; refresh review on the current candidate"}
+    required = {"schema", "contract_sha256", "comparison_base", "candidate_key",
+                "generation_commit", "manifest_sha256", "changed_paths", "inspected",
+                "excluded", "limitations", "trace_sha256"}
+    if set(scope) != required:
+        return {"status": "UNKNOWN", "reason": "historical/incomplete scope metadata; inspect the candidate and refresh review"}
+    old_ident = tree_identity(before)
+    if (digest(canonical(old_ident)) != scope["manifest_sha256"]
+            or snapshot_key(before) != scope["candidate_key"]):
+        return {"status": "UNKNOWN", "reason": "saved scope does not match retrievable reviewed candidate; restore exact Git objects and review"}
+    if not isinstance(scope["inspected"], list) or any(
+            item not in old_ident for item in scope["inspected"]):
+        return {"status": "UNKNOWN", "reason": "saved inspected-file identities cannot be established"}
+    delta = tree_changes(before, after)
+    return {"status": "COVERED" if not delta else "UNCOVERED_DELTA",
+            "reviewed_candidate": scope["candidate_key"],
+            "current_candidate": snapshot_key(after),
+            "comparison_base": scope["comparison_base"],
+            "uncovered_changes": delta,
+            "next_action": ("No product delta; check agreement and destination compatibility independently."
+                            if not delta else "Assess affected seams, refresh targeted review with full current scope, and obtain fresh proof if candidate changed."),
+            "limitations": scope["limitations"]}
+
+
+def review_scope_status(root, work, current_repo=None, current_ref=None):
+    """Read-only scope comparison, including standalone installed skill wrappers."""
+    root = Path(root).resolve()
+    slug = work_slug(work)
+    local = safe(root, f'.p2p/work/{slug}')
+    common = Path(git(root, 'rev-parse', '--path-format=absolute', '--git-common-dir').decode().strip()).resolve()
+    repo_id = root.name + '-' + digest(str(common).encode())[:16]
+    legacy = Path.home() / '.p2p/work' / repo_id / slug
+    def has_state(folder):
+        return (folder / 'delivery.json').is_file() or (folder / 'artifacts/delivery.json').is_file()
+    if has_state(legacy):
+        if has_state(local):
+            return {'status': 'UNKNOWN', 'reason': 'conflicting local/legacy delivery locations; reconcile state'}
+        local = legacy
+    active = local / 'delivery.json'
+    completed = local / 'artifacts/delivery.json'
+    if active.is_file():
+        record = json.loads(active.read_bytes())
+        scope = record.get('reports', {}).get('review', {}).get('review_scope')
+        exclusions = record.get('agreement_paths', (work,))
+    elif completed.is_file():
+        record = json.loads(completed.read_bytes())
+        if record.get('schema') != 'promise-to-proof/delivery-record/v1':
+            return {'status': 'UNKNOWN', 'reason': 'unrecognized completed delivery record'}
+        scope = record.get('review_scope')
+        exclusions = record.get('agreement_paths', (work,))
+    else:
+        return {'status': 'UNKNOWN', 'reason': 'no saved review; run independent review for this candidate'}
+    if not isinstance(scope, dict):
+        return {'status': 'UNKNOWN', 'reason': 'saved review has no exact scope; refresh review, do not infer coverage'}
+    if digest(safe(root, work).read_bytes()) != scope.get('contract_sha256'):
+        return {'status': 'UNKNOWN', 'reason': 'agreement changed since saved review; reconcile contract first'}
+    local_runtime = local / 'runtime'
+    external_runtime = execution_directory(root, work) / 'runtime'
+    if local_runtime.exists() and external_runtime.exists():
+        return {'status': 'UNKNOWN', 'reason': 'conflicting execution roots; reconcile before coverage comparison'}
+    reviewed = (local_runtime if local_runtime.exists() else external_runtime) / 'workspace'
+    if not reviewed.is_dir():
+        return {'status': 'UNKNOWN', 'reason': 'exact reviewed workspace unavailable; restore it before comparison'}
+    try:
+        before = snapshot(reviewed, exclude=exclusions)
+        after = snapshot(Path(current_repo).resolve() if current_repo else root,
+                         current_ref, exclude=exclusions)
+        return compare_review_scope(scope, before, after)
+    except (ValueError, OSError) as error:
+        return {'status': 'UNKNOWN', 'reason': 'cannot inspect exact candidate: ' + str(error)}
+
 def document_lines(text):
     """Read document metadata, excluding fenced examples."""
     fence = None
@@ -1351,6 +1580,10 @@ def main(argv=None):
         command.add_argument("work")
         if name == "publication-access":
             command.add_argument("--workspace", help="retained isolated candidate workspace")
+    scope_command = commands.add_parser('review-scope-status', help='compare saved reviewed product against current PR/checkout')
+    scope_command.add_argument('work')
+    scope_command.add_argument('--current-repo', help='PR head checkout; defaults to the source repository')
+    scope_command.add_argument('--current-ref', help='exact current commit SHA or ref; defaults to the checked-out product tree')
     entry_command = commands.add_parser("resolve-entry", help="read-only lookup for a single delivery request")
     entry_command.add_argument("source", help="quoted text, configured #issue, repository spec, or saved contract path")
     entry_command.add_argument("--issue-repository", help="configured GitHub OWNER/REPO for an issue number")
@@ -1435,6 +1668,8 @@ def main(argv=None):
             result = prepare_execution(root, args.work)
         elif args.command == "publication-access":
             result = publication_access(root, args.work, args.workspace)
+        elif args.command == 'review-scope-status':
+            result = review_scope_status(root, args.work, args.current_repo, args.current_ref)
         elif args.command == "resolve-entry":
             result = entry_source(root, args.source, args.issue_repository)
         elif args.command == "reconcile":
@@ -1461,6 +1696,8 @@ def main(argv=None):
         else:
             result = resolve(root, args.work)
         print(json.dumps(result, indent=2, ensure_ascii=False))
+        if args.command == 'review-scope-status' and result['status'] != 'COVERED':
+            return 1
         return 0
     except (ValueError, OSError, KeyError, TypeError, UnicodeError) as error:
         print(f"p2p: {error}", file=sys.stderr)

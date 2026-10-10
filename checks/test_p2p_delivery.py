@@ -286,6 +286,21 @@ class FakeTransport:
             if self.mode == 'omit' and stage == 'proof': report['requirements'] = []
             if self.mode == 'stale' and stage == 'proof':
                 report['input_identity_json'] = json.dumps(dict(inputs, work_item_sha256='0'*64))
+            if stage in ('implementation', 'repair', 'review', 'proof'):
+                # Explicitly OFFLINE fixture trace; not a real reviewer judgment.
+                product = Path(prompt.split('workspace ', 1)[1].split('. ', 1)[0])
+                excluded = [inputs['work_item']]  # Binding spec inputs can also be candidate product paths.
+                manifest = d.fs.snapshot(product, exclude=excluded)
+                changed = d.fs.tree_changes(d.fs.snapshot(product, inputs['comparison_base'], exclude=excluded), manifest)
+                paths = [item['path'] for item in changed]
+                report['coverage_trace'] = {
+                    'requirements': [{'id': row['id'], 'paths': paths,
+                                      'existing': not bool(paths), 'evidence': ['row']}
+                                     for row in report['requirements']],
+                    'supporting_changes': [],
+                    **({'inspected_paths': sorted({item['path'] for item in manifest} & set(paths))}
+                       if stage == 'review' else {}),
+                }
             output = 'hello\n'
             report = json.dumps(report)
         self.messages.append((stage, report))
