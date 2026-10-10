@@ -92,9 +92,13 @@ an explicitly selected Git receipt branch with exact effect grants.
 
 The receipt is the **same** canonical Delivery Record v1 and its stable #50
 receipt ID. Comments and Git receipt objects are checked before writing and
-read back after any attempted write. Identical retries reuse a verified
-existing receipt; conflicting or duplicate records block. A lost reply with
-no confirmed remote effect returns `PARTIAL` rather than guessing success.
+read back after any attempted write. For GitHub comments, an exact attempted
+write is reserved in the existing `publication.md` handoff before POST. A
+lost response stays `PARTIAL` and a later session reconciles the remote
+comment; it never blindly posts a second copy. Identical confirmed retries
+reuse one verified receipt, while conflicts or duplicate records block.
+Git receipt pushes use deterministic commits and check the exact remote ref
+after every response.
 
 The remote must also retain the original #82 checkpoint bytes and reachable
 source/candidate Git objects. A portable checkpoint is an evidence handoff,
