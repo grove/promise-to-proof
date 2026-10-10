@@ -226,6 +226,10 @@ class FakeTransport:
         else:
             if stage in ('implementation','repair'):
                 (workspace / self.output_path).write_text("print('hello')\n" + ("# repaired fixture\n" if stage == 'repair' else ''))
+                if self.mode == 'sliced' and stage == 'implementation' and self.calls.count('implementation') == 2:
+                    test_file = workspace / 'tests/test_greet.py'
+                    test_file.parent.mkdir(exist_ok=True)
+                    test_file.write_text("def test_greeting():\n    assert True\n")
             status = {'implementation':'IMPLEMENTED','repair':'REPAIRED','review':'REVIEWED','proof':'PROVEN'}[stage]
             gap = self.mode in ('repair','exhausted') and stage == 'proof' and (self.mode == 'exhausted' or self.calls.count('proof') == 1)
             gap |= self.mode in ('multi-repair', 'evidence') and stage == 'proof' and self.calls.count('proof') <= 2
@@ -248,6 +252,9 @@ class FakeTransport:
                     'evidence':'The implementation stage exercised greet.py and observed exact hello newline output.',
                     'uncertainty':'This is candidate advice until retrospect checks it against final review and proof.'
                 }]
+            if (self.mode == 'sliced' and stage == 'implementation' and
+                    self.calls.count('implementation') == 1):
+                report.update(status='PARTIAL', gaps=['regression check remains'])
             if self.mode in ('partial-repair','partial-implementation') and stage == 'implementation':
                 report.update(status='PARTIAL', gaps=['original implementation gap'])
             if self.mode == 'partial-repair' and stage == 'repair' and self.calls.count('repair') == 1:
@@ -314,13 +321,20 @@ class FakeTransport:
                 if 'coverage_trace.risks' in prompt:
                     report['coverage_trace']['risks'] = []  # No extra material risks in the low-risk offline fixture.
             if stage == 'implementation' and 'implementation_slice' in prompt:
+                staged = self.mode == 'sliced'
+                number = self.calls.count('implementation')
+                partial = report['status'] == 'PARTIAL'
                 report['implementation_slice'] = {
-                    'id': 'I1', 'requirement_ids': ['R1'],
+                    'id': f'I{number}' if staged else 'I1', 'requirement_ids': ['R1'],
                     'expected_result': 'hello newline and zero exit',
                     'checks': [{'kind': 'test', 'command': 'FIXTURE python3 greet.py',
                                 'result': 'passed', 'observation': 'hello'}],
-                    'paths': [self.output_path], 'outcome': 'VERIFIED',
-                    'boundary_reason': '', 'next_action': '', 'retires': []}
+                    'paths': ['tests/test_greet.py'] if staged and number == 2 else [self.output_path],
+                    'outcome': 'BLOCKED' if partial and not staged else 'VERIFIED',
+                    'boundary_reason': 'Regression check is a separate observable outcome.' if staged and partial else '',
+                    'next_action': ('Create and verify regression check.' if staged and partial else
+                                    'Recover named implementation gap.' if partial else ''),
+                    'retires': []}
             output = 'hello\n'
             report = json.dumps(report)
         self.messages.append((stage, report))
