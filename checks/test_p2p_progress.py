@@ -106,6 +106,16 @@ class ExplanationTests(unittest.TestCase):
         self.assertTrue(shown["requires_user_action"])
         self.assertIn("approve", shown["next_action"].lower())
 
+    def test_host_failure_before_admission_has_no_resume_command(self):
+        shown = progress.explain(report(
+            status="BLOCKED", invocation_exists=False,
+            blocker="Codex app-server client initialization failed: Operation not permitted",
+            candidate_workspace=None))
+        self.assertEqual(shown["phase"], "NOT_ADMITTED")
+        self.assertIn("no controller invocation to resume", shown["why_it_matters"])
+        self.assertIn("Resolve the named host", shown["next_action"])
+        self.assertIn("/deliver-issue", shown["next_action"])
+
     def test_missing_invocation_is_not_resumable(self):
         shown = progress.explain(report(
             status="BLOCKED", blocker="no delivery invocation exists",
