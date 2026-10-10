@@ -2756,6 +2756,8 @@ assert results['scratch'] == 'ok'
             sessions.append(attempt.get('session_id'))
         if not all(sessions) or len(set(sessions)) != 2:
             raise ValueError('independent completed verifier sessions could not be established')
+        if self.state.get('implementation_slice_version') == 1:
+            slices.verify_retained(self.state, self.runtime, self.receipt)
         checkpoint = self.state.get('checkpoint')
         if checkpoint and checkpoint.get('status') == 'LOCAL_ONLY':
             path = fs.safe(self.root, checkpoint['path'])
@@ -4386,6 +4388,8 @@ def main(argv=None):
                 delivery.current()
             for name in delivery.state.get('reports', {}):
                 delivery.read_report(name)
+            if delivery.state.get('implementation_slice_version') == 1 and not pending:
+                slices.verify_retained(delivery.state, delivery.runtime, delivery.receipt)
             output = result(delivery)
             if pending:
                 output.update(status='RUNNING', blocker=None)
