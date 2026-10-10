@@ -27,7 +27,7 @@ jobs:
       - name: Verify first-pass capture and source identity fast paths
         run: python3 -m unittest discover -s checks -p 'test_p2p_first_pass.py' -v
       - name: Compare same-assurance first-pass baseline and optimized controller
-        run: python3 checks/benchmark_p2p_first_pass.py --repeats 3
+        run: python3 checks/benchmark_p2p_first_pass.py --repeats 4
       - name: Check existing generation and repair behavior
         run: >-
           python3 -m unittest discover -s checks -p 'test_p2p_delivery.py'
