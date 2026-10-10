@@ -343,6 +343,30 @@ authority. Missing tracker access or unavailable binding content must identify
 the incomplete issue handoff while preserving the local proposal. Record these
 tracker cases as unexecuted when no authorized test tracker is available.
 
+## 15a. Read the full acceptance proposal without technical details
+
+Provide a three-requirement issue including a material inherited parent
+boundary, a retry invariant, a non-goal, explicit evidence checks and one
+unresolved question. Invoke direct issue planning on an authorized throwaway
+tracker. Ask a developer unfamiliar with P2P what is promised, which behaviors
+remain unchanged, how every outcome will be verified and what decision they
+would make, without opening technical details.
+
+Pass when the developer can correctly name all three promises and source
+boundaries, exclusions, concrete checks and the precise approval decision.
+A readable headline alone is not sufficient; the full exact contract and
+binding files must remain recoverable under collapsed GitHub technical details.
+An unresolved material question or gap must display NOT READY rather than
+requesting approval.
+
+Repeat with one requirement omitted from the readable view or a falsely
+described exclusion. Full comment readback must reject the changed presentation.
+Repeat with sources having no final newline, nested parent files, changed source
+bytes, duplicate requirement IDs and revised contract bytes. Preserve original
+exact recovery, keep prior revision comments, and reuse the unchanged comment
+after a lost write response. Verify nested and local-only planning publish
+nothing. This is a semantic-comprehension scenario, not a wording preference.
+
 ## 16. Plan a clear source without adding ceremony
 
 Input: in a throwaway repository, provide this complete local source and invoke
