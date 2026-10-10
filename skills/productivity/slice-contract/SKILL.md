@@ -366,6 +366,23 @@ Before authorized publication or reconciliation, read and follow the
 meanings. Creating a child does not make it `ready-for-agent` while required
 contracts, decisions, or prerequisites are missing.
 
+## Retain original-promise continuity (#71)
+
+After accepting an exact #78 topology, persist its unchanged decision and an
+identity-checked continuity projection in the originating `slicing.md` inside
+one `<!-- p2p-continuity-v1 ... -->` block. Keep the original promise, complete
+allocation, actual prerequisite edges, issue/contract references, next delivery
+unit and final complete-acceptance owner. Store only a small
+`continuity.json` pointer in each unit's existing ignored work directory,
+bound to the exact origin and canonical record SHA-256. Use
+`p2p_continuity.project` and `p2p_continuity.view` to validate before saving.
+Read back the exact bytes and refresh the existing #82 checkpoint. This
+introduces no alternative issue database, sizing pass, or accepted-contract
+revision. If a discovered prerequisite enables the original promise, add it
+under the approved topology and keep its source/contribution link; an actually
+unrelated task may be standalone only with the recorded rationale. Do not move
+an existing PR, candidate, verifier report or human edit during reconciliation.
+
 ## Report and hand off
 
 After saving the decomposition, child set, approval or routing change, refresh
