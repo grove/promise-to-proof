@@ -136,8 +136,10 @@ def classify(report, changes, requirements, stage, *, prior_candidate, report_sh
 def next_work(state):
     """Explain only retained stage inputs and the next existing work item."""
     fresh_host = bool(state.get("checkpoint_restored_from"))
+    preflight_ready = bool(state.get("preflight_complete") and
+                           not state.get("task_readiness_invalidated"))
     first = (("receiving-host preflight" if fresh_host else "host preflight")
-             if not state.get("preflight_complete") else None)
+             if not preflight_ready else None)
     pending = [a for a in state.get("attempts", []) if a.get("status") in ("reserved", "failed")]
     if pending:
         first = "reconcile uncertain " + pending[-1].get("stage", "worker")
@@ -147,6 +149,9 @@ def next_work(state):
     facts = {}
     for stage in ("implementation", "review", "proof"):
         row = reports.get(stage)
+        if stage == "implementation" and row and not state.get("implementation_complete"):
+            facts[stage] = "STALE"
+            continue
         if stage == "implementation" and state.get("implementation_complete"):
             source = (current_generation or {}).get("source_attempt") or {}
             writer = reports.get("repair" if source.get("attempt_id") ==
@@ -181,7 +186,7 @@ def next_work(state):
         first = "none — current local completion already established"
     elif not first:
         first = next((name for name in ("implementation", "review", "proof")
-                      if facts[name] != "REUSED"), "check saved completion")
+                      if facts[name] != "REUSED"), "resolve remaining review/proof gaps")
     return {"stages": facts, "next": first,
-            "preflight": "READY" if state.get("preflight_complete") else "MISSING",
+            "preflight": "READY" if preflight_ready else "MISSING",
             "basis": "Existing exact candidate, stage input and host facts; no verdict transferred."}
