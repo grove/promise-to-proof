@@ -3593,12 +3593,23 @@ assert results['scratch'] == 'ok'
                 else:
                     report = self.stage('implementation')
                     self.capture('implementation')
+                if (report['status'] == 'PARTIAL' and self.state.get('implementation_slice_version') == 1
+                        and self.state.get('implementation_slices')
+                        and self.state['implementation_slices'][-1]['slice']['outcome'] == 'VERIFIED'):
+                    # Checkpoint already verified slice; dispatch the next
+                    # meaningful slice rather than diagnosing a failed worker.
+                    self.state['reports'].pop('implementation', None)
+                    self.save()
+                    self.checkpoint()
+                    continue
                 if report['status'] not in ('IMPLEMENTED', 'REPAIRED'):
                     report = self.recover({'implementation': report['gaps']}, force_diagnosis=True)
                 if report['status'] in ('IMPLEMENTED', 'REPAIRED'):
                     self.state['implementation_complete'] = True
                 self.save()
                 self.checkpoint()
+            if self.state.get('implementation_slice_version') == 1:
+                slices.verify_retained(self.state, self.runtime, self.receipt)
             if 'review' not in self.state.get('reports', {}):
                 self.stage('review')
             review = self.read_report('review')
@@ -4090,6 +4101,8 @@ def result(delivery):
         'attempts': [] if state.get('cleanup_verified_at') else state['attempts'],
         'measurement': delivery_measurement(state, delivery.runtime),
         'work_selection': applicability.next_work(state),
+        **({'implementation_progress': slices.progress_view(state)}
+           if state.get('implementation_slice_version') == 1 else {}),
         'records': str(delivery.directory),
         'local_runtime': str(delivery.runtime) if delivery.runtime.exists() else None,
         'resume': f'python3 {Path(__file__).resolve()} --repo {delivery.root} resume {delivery.work}',
