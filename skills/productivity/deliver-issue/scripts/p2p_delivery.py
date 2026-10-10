@@ -3286,10 +3286,12 @@ assert results['scratch'] == 'ok'
                      if not attempt['stage'].startswith('preflight-')), None)
         # Older invocations did not bind findings to the diagnosis input. Adopt their
         # exact host response only while it is still the unconsumed final attempt.
-        if (last and last['stage'] == 'diagnosis' and last['inputs'] == base_inputs and
+        legacy_inputs = (base_inputs, base_inputs | {'recovery_plan_version': 2})
+        if (last and last['stage'] == 'diagnosis' and last['inputs'] in legacy_inputs and
                 not last.get('recovery_context_sha256')):
             last['recovery_context_sha256'] = context_key
-            inputs = base_inputs
+            # Reconcile the exact old reservation; never change its input identity.
+            inputs = last['inputs']
         previous = [a for a in self.state['attempts'] if a['stage'] == 'diagnosis' and
                     (a['inputs'].get('recovery_context_sha256') or
                      a.get('recovery_context_sha256')) == context_key]
