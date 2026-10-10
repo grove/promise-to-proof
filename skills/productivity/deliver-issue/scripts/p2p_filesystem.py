@@ -474,7 +474,7 @@ def review_scope(candidate, manifest, generation_commit, inspected_paths,
     identities = {item["path"]: item for item in tree_identity(manifest)}
     if any(path not in identities for path in inspected_paths):
         raise ValueError("review claims inspection of an absent product file")
-    if not isinstance(limitations, list) or any(not isinstance(x, str) for x in limitations):
+    if not isinstance(limitations, (list, tuple)) or any(not isinstance(x, str) for x in limitations):
         raise ValueError("review limitations are malformed")
     return {
         "schema": REVIEW_SCOPE_SCHEMA,
@@ -519,28 +519,28 @@ def compare_review_scope(scope, before, after):
 
 
 def review_scope_status(root, work, current_repo=None, current_ref=None):
-    """Check current product bytes against one saved exact review; read-only."""
-    _, artifact = paths(root, work)
-    completed = artifact / 'delivery.json'
-    if completed.is_file():
+    """Compare exact saved review with current PR/product bytes; read-only."""
+    import p2p_delivery
+    local = p2p_delivery.local_directory(root, work)
+    active = local / 'delivery.json'
+    completed = local / 'artifacts/delivery.json'
+    if active.is_file():
+        record = json.loads(active.read_bytes())
+        scope = record.get('reports', {}).get('review', {}).get('review_scope')
+        exclusions = record.get('agreement_paths', (work,))
+    elif completed.is_file():
         record = json.loads(completed.read_bytes())
         if record.get('schema') != 'promise-to-proof/delivery-record/v1':
             return {'status': 'UNKNOWN', 'reason': 'unrecognized completed delivery record'}
         scope = record.get('review_scope')
         exclusions = record.get('agreement_paths', (work,))
     else:
-        import p2p_delivery
-        active = p2p_delivery.local_directory(root, work) / 'delivery.json'
-        if not active.is_file():
-            return {'status': 'UNKNOWN', 'reason': 'no saved review; run independent review for this candidate'}
-        record = json.loads(active.read_bytes())
-        scope = record.get('reports', {}).get('review', {}).get('review_scope')
-        exclusions = record.get('agreement_paths', (work,))
+        return {'status': 'UNKNOWN', 'reason': 'no saved review; run independent review for this candidate'}
     if not isinstance(scope, dict):
         return {'status': 'UNKNOWN', 'reason': 'saved review has no exact product scope; refresh review, do not infer coverage'}
     if digest(safe(root, work).read_bytes()) != scope.get('contract_sha256'):
         return {'status': 'UNKNOWN', 'reason': 'agreement changed since the saved review; reconcile contract first'}
-    reviewed = execution_directory(root, work) / 'runtime/workspace'
+    reviewed = p2p_delivery.execution_runtime(root, work) / 'workspace'
     if not reviewed.is_dir():
         return {'status': 'UNKNOWN', 'reason': 'the exact reviewed candidate workspace is unavailable; restore it before comparison'}
     try:
@@ -550,7 +550,6 @@ def review_scope_status(root, work, current_repo=None, current_ref=None):
         return compare_review_scope(scope, before, after)
     except (ValueError, OSError) as error:
         return {'status': 'UNKNOWN', 'reason': 'cannot inspect exact candidate: ' + str(error)}
-
 
 def document_lines(text):
     """Read document metadata, excluding fenced examples."""
