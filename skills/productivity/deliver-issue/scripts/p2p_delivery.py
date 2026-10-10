@@ -1186,7 +1186,7 @@ REVIEW_AXES = ('Contract fidelity', 'Scope and simplicity', 'Engineering quality
 
 
 def review_markdown(report, work, contract, candidate, base_manifest, destination_observation=None,
-                    environment=None, session_id=None, scope=None):
+                    environment=None, session_id=None, review_scope=None):
     key = candidate_key(candidate)
     if 'changes' in candidate:
         scope = [entry['path'] for entry in candidate['changes']]
@@ -1206,7 +1206,7 @@ def review_markdown(report, work, contract, candidate, base_manifest, destinatio
     if destination_observation:
         tip = destination_observation['observed_tip'] or 'unavailable'
         lines.insert(5, f"Destination observation: `{destination_observation['destination']}` {destination_observation['relation']} at `{tip}` ({destination_observation['observed_at']}).")
-    coverage = coverage_markdown(report, scope)
+    coverage = coverage_markdown(report, review_scope)
     if coverage:
         lines.extend(['', coverage])
     for axis in REVIEW_AXES:
