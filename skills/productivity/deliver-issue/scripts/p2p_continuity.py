@@ -71,6 +71,86 @@ def view(record, decision, unit, *, established=()):
             "topology_identity": record["topology_identity"]}
 
 
+
+def persist(root, origin_work, decision, references):
+    """Save readback-verified canonical slicing block and tiny unit pointers.
+
+    No tracker, Git or candidate effects. Refuse to replace a conflicting
+    identity; topology changes require explicit prior reconciliation.
+    """
+    import p2p_filesystem as fs
+    root = __import__("pathlib").Path(root)
+    if not fs.WORK.fullmatch(origin_work):
+        raise ValueError("invalid original work path")
+    if decision["origin"]["contract"] != origin_work:
+        raise ValueError("origin contract differs from selected topology")
+    record = project(decision, references)
+    owner = f".p2p/work/{fs.work_slug(origin_work)}"
+    plan = fs.safe(root, owner + "/slicing.md")
+    if not plan.is_file() or plan.is_symlink():
+        raise ValueError("existing canonical slicing plan is required")
+    previous = plan.read_bytes()
+    if previous.count(b"<!-- p2p-continuity-v1") > 1:
+        raise ValueError("ambiguous prior continuity section")
+    document = {"topology": decision, "continuity": record}
+    content = json.dumps(document, sort_keys=True, separators=(",", ":"),
+                         ensure_ascii=False).encode("utf-8")
+    block = b"<!-- p2p-continuity-v1\\n" + content + b"\\n-->".replace(b"\\n", b"\n")
+    from re import compile as regex
+    pattern = regex(rb"<!-- p2p-continuity-v1\n.*?\n-->", re.S)
+    old = pattern.search(previous)
+    if old:
+        prior = json.loads(old.group()[len(b"<!-- p2p-continuity-v1\n"):-len(b"\n-->")])
+        if prior.get("topology", {}).get("identity") != decision["identity"]:
+            raise ValueError("topology changed; reconcile old continuity and existing work first")
+        changed = previous[:old.start()] + block + previous[old.end():]
+    else:
+        changed = previous + (b"\n" if previous and not previous.endswith(b"\n") else b"") + block + b"\n"
+    # Reject colliding or unrecognized pointers before modifying any file.
+    pointers = []
+    for unit, ref in references.items():
+        path = fs.safe(root, f".p2p/work/{fs.work_slug(ref['work_item'])}/continuity.json")
+        if not fs.safe(root, ref["work_item"]).is_file():
+            raise ValueError("unit contract missing: " + ref["work_item"])
+        pointer = {"origin": origin_work, "unit": unit,
+                   "topology_identity": decision["identity"],
+                   "record_sha256": topology.digest(document)}
+        data = json.dumps(pointer, sort_keys=True, separators=(",", ":")).encode() + b"\n"
+        if path.is_symlink():
+            raise ValueError("continuity pointer is a symlink")
+        if path.exists():
+            previous_pointer = json.loads(path.read_bytes())
+            if (previous_pointer.get("origin"), previous_pointer.get("unit")) != (origin_work, unit):
+                raise ValueError("existing continuity pointer belongs to another origin/unit")
+            if previous_pointer.get("topology_identity") != decision["identity"]:
+                raise ValueError("unit topology changed; reconcile before writing")
+        pointers.append((path, data))
+    if previous != changed:
+        archive = fs.safe(root, owner + "/history/" + fs.digest(previous) + "/slicing.md")
+        archive.parent.mkdir(parents=True, exist_ok=True)
+        if archive.exists() and archive.read_bytes() != previous:
+            raise ValueError("conflicting retained slicing history")
+        if not archive.exists():
+            fs.atomic_write(archive, previous, ignored_root=root)
+        fs.atomic_write(plan, changed, ignored_root=root)
+        if plan.read_bytes() != changed:
+            raise ValueError("origin slicing readback failed")
+    for path, data in pointers:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if not path.exists() or path.read_bytes() != data:
+            fs.atomic_write(path, data, ignored_root=root)
+        if path.read_bytes() != data:
+            raise ValueError("unit continuity pointer readback failed")
+        # Verify consumers retrieve the same single canonical record.
+        view_result = load(root, references[next(k for k, v in references.items()
+                             if fs.work_slug(v["work_item"]) == path.parent.name)]["work_item"])
+        if view_result["topology_identity"] != decision["identity"]:
+            raise ValueError("unit continuity readback identity mismatch")
+    return {"status": "PRESERVED", "origin": origin_work,
+            "topology_identity": decision["identity"],
+            "record_sha256": topology.digest(document),
+            "unit_count": len(pointers), "tracker_effects": 0}
+
 def load(root, work, *, checkpoint_files=None):
     """Resolve saved continuity from a unit's existing canonical pointer.
 
