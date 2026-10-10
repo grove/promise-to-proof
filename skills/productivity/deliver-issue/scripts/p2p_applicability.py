@@ -134,43 +134,49 @@ def classify(report, changes, requirements, stage, *, prior_candidate, report_sh
 
 
 def next_work(state):
-    """Describe existing saved work; no datastore, writes, model calls or verdicts."""
-    if state.get("checkpoint_restored_from") and not state.get("preflight_complete"):
-        first = "receiving-host preflight"
-    elif not state.get("preflight_complete"):
-        first = "host preflight"
-    else:
-        first = None
-    attempts = state.get("attempts", [])
-    pending = [a for a in attempts if a.get("status") in ("reserved", "failed")]
+    """Explain only retained stage inputs and the next existing work item."""
+    fresh_host = bool(state.get("checkpoint_restored_from"))
+    first = (("receiving-host preflight" if fresh_host else "host preflight")
+             if not state.get("preflight_complete") else None)
+    pending = [a for a in state.get("attempts", []) if a.get("status") in ("reserved", "failed")]
     if pending:
         first = "reconcile uncertain " + pending[-1].get("stage", "worker")
     reports = state.get("reports", {})
     candidate = state.get("candidate")
+    current_generation = (state.get("local_git_generations") or [None])[-1]
     facts = {}
     for stage in ("implementation", "review", "proof"):
         row = reports.get(stage)
+        if stage == "implementation" and state.get("implementation_complete"):
+            source = (current_generation or {}).get("source_attempt") or {}
+            writer = reports.get("repair" if source.get("attempt_id") ==
+                                 reports.get("repair", {}).get("attempt_id") else "implementation")
+            if (writer and writer.get("attempt_id") == source.get("attempt_id") and
+                    writer.get("sha256") == source.get("report_sha256")):
+                facts[stage] = "REUSED"
+                continue
         if not row:
             facts[stage] = "MISSING"
-        elif not candidate:
+        elif not candidate or not current_generation:
             facts[stage] = "STALE"
         elif row.get("inputs", {}).get("key") != candidate.get("key"):
             facts[stage] = "STALE"
-        elif (row.get("inputs", {}).get("instruction_identity") !=
-              state.get("instruction_identity")):
+        elif row.get("inputs", {}).get("instruction_identity") != state.get("instruction_identity"):
             facts[stage] = "STALE"
-        elif (row.get("inputs", {}).get("local_git_generation") !=
-              {k: state["local_git_generations"][-1][k] for k in
-               ("sequence", "candidate_key", "tree", "commit", "record_sha256")}
-              if state.get("local_git_generations") else False):
+        elif row.get("inputs", {}).get("local_git_generation") != {
+                k: current_generation[k] for k in
+                ("sequence", "candidate_key", "tree", "commit", "record_sha256")}:
             facts[stage] = "STALE"
         else:
             facts[stage] = "REUSED"
-    if not first and state.get("status") == "REVIEWED_AND_PROVEN" and all(
+    if not first and state.get("status") in ("BLOCKED", "HANDOFF"):
+        first = "resolve recorded blocker or authorized handoff"
+    elif not first and state.get("status") == "REVIEWED_AND_PROVEN" and all(
             facts[s] == "REUSED" for s in ("review", "proof")):
         first = "none — current local completion already established"
     elif not first:
         first = next((name for name in ("implementation", "review", "proof")
                       if facts[name] != "REUSED"), "check saved completion")
-    return {"stages": facts, "next": first, "preflight": ("READY" if state.get("preflight_complete")
-             else "MISSING"), "basis": "Existing exact candidate, stage input and host facts; no verdict transferred."}
+    return {"stages": facts, "next": first,
+            "preflight": "READY" if state.get("preflight_complete") else "MISSING",
+            "basis": "Existing exact candidate, stage input and host facts; no verdict transferred."}
