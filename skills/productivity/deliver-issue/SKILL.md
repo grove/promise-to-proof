@@ -111,6 +111,26 @@ publication authority is missing, return one truthful, actionable blocker with
 preserved progress. Local authority never implies commit, push, tracker edit,
 PR, merge or deployment authority.
 
+## Continue the smallest justified issue topology
+
+When existing #76/#77 sizing establishes a real multi-delivery boundary,
+consume the approved #78 topology decision from the same canonical slicing
+record. A naturally sequential, independently deliverable sequence with no
+useful aggregate parent keeps one current and next standalone issue and leaves
+the final issue responsible for fresh complete original-promise acceptance.
+A useful parallel/aggregate/integration parent keeps its existing tree and
+assembled-parent proof. Do not create artificial issues for internal verified
+implementation slices (#55). Preserve the exact current candidate, PRs,
+reviews, contracts, evidence, destination and execution receipts across
+topology correction; historical reports remain attached to their own inputs.
+
+A source issue closed as superseded is not product delivery. Inspect its
+linked replacement sequence and final acceptance owner, never treat
+`not_planned` as satisfaction. An issue closure or topology migration
+needs separately approved, exact tracker effects and remote readback; local
+`deliver-issue` authority alone supplies none. Forward relevant durable
+topology facts to later #71 discovery without repeating sizing.
+
 ## Make delivery easy to follow
 
 Apply the protocol's voice and working style throughout the orchestration. In
