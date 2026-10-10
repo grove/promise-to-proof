@@ -87,6 +87,34 @@ Report stage counts, checks actually run, repairs and elapsed time when availabl
 Compare equivalent candidates and environments; do not infer a speedup from these
 scenario definitions or the structural tests alone.
 
+## 12. Review trustworthy regression guards (issue #43)
+
+Run the small fixed-candidate review-quality cases through
+`checks/check_p2p_judgments_host.py` on an authorized supported host.
+Keep the fixture's independently expected review verdict outside the worker
+workspace. For a correct candidate, green public-interface tests should
+suffice without a duplicate proof or repair. For separate candidates with
+a tautology, a circular oracle, an over-mocked validator, or a timing-dependent
+conditional assertion, reviewer findings should name the *specific* behavior
+that a broken test would miss and the smallest useful correction, rather than
+blocking on stylistic taste. The harness's private sensitivity probes demonstrate
+that these weak tests can remain green against a broken validator; they do not
+impose a mandatory mutation experiment on the reviewing agent.
+
+## 13. Reconcile a real finding and stop (issue #43)
+
+Review a first candidate whose public CLI wrongly accepts whitespace-only
+usernames; retain the material R2 finding, its source and original report.
+Review a second candidate with a narrow fix and meaningful regression guards
+through the normal current-generation re-verification path. The reviewer must
+account for R2 afresh, reconcile the earlier mistaken *current applicability*,
+retain the old report, and finish with `REVIEWED`. Do not silently turn an
+unrepaired original defect into optional polish. Compare this with a correct
+low-risk candidate carrying only an optional helper-rename suggestion: it
+should finish without a repair. Separately inspect a candidate with untrusted
+shell input and a realistic injection trigger, for which review depth must
+increase despite green ordinary tests.
+
 ## 11. Plain-language, solution-oriented delivery
 
 Give P2P a small accepted change where an existing repository helper and meaningful

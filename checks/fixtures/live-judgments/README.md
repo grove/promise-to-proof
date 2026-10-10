@@ -58,6 +58,53 @@ a mock or an attempted admission is explicitly **not** live judgment evidence.
 The live suite cannot run on unsupported hosts and reports that limitation
 instead of silently simulating success.
 
+## Review quality and stopping: issue #43
+
+The same live-host command also evaluates independent review judgments on
+correct and deliberately defective candidates. It does not start another
+reviewer, benchmark engine, or mandatory test-writing stage.
+
+* **Meaningful existing public-interface tests:** independently assert actual
+  CLI exit status, stderr and stdout for empty, whitespace-only and visible
+  usernames. Review accepts them as adequate without a duplicate suite.
+* **Tautological and circular oracles:** supplied unit tests are green but
+  compare a result to itself or compute the expected answer using production
+  code. Review must identify that R2 is not protected.
+* **Over-mocked boundary:** tests patch out the validator they purport to
+  exercise. Review must name the production decision that a regression could
+  bypass.
+* **Unreliable timing-based guard:** an R2 assertion is skipped on alternate
+  seconds. A reviewer must flag the material CI regression gap, not a cosmetic
+  test-style preference.
+* **Sample-only implementation:** a public CLI works for supplied examples but
+  rejects another ordinary visible name. Review and proof flag R3.
+* **Real conditional security risk:** a CLI dispatches untrusted input through
+  a shell. Review must name the applicable injection trigger and smallest safe
+  correction. A harmless metacharacter counterexample also demonstrates R3
+  is broken; proof must not pass.
+* **Reconciled finding:** a deliberately broken R2 candidate has a material
+  review finding. The next exact candidate fixes R2 and adds meaningful tests;
+  the same reviewer stage gets its own checked previous observations and must
+  produce a fresh clean judgment without rewriting the original failing report.
+
+The harness performs **private disposable regression-sensitivity probes after
+the two independent stages**. Each probe substitutes a known-broken R2
+implementation *outside* the candidate and reruns the supplied tests. Hollow
+tests remain green; meaningful guards fail; a timing-dependent guard shows
+both outcomes under frozen time inputs. These probes establish human-authored
+fixture validity, **not** a mutation-testing requirement for normal review.
+Reviewer workers never receive these expected results or probes, and the
+harness uses neutral candidate directory names to avoid labeling the intended
+judgment in their workspace paths.
+
+To investigate one example without paying for the whole suite, use the same
+command with `--only review-overmocked-boundary` or another case ID. The
+default live gate exercises all cases. The runner retains independent oracle
+outputs and actual model reports so a disagreement can be diagnosed. None of
+these scenarios claims universal review reliability until it has been run on
+the real supported host; offline fixture checks are explicitly not live
+evidence.
+
 This is a **small specified-error detector**, not universal model reliability,
 a numerical quality score, or the larger #52 benchmark. It does not establish
 a speedup without matched measurements. #73 can later extend the same follow-up

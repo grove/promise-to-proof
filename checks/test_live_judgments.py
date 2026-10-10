@@ -95,18 +95,28 @@ class LiveJudgmentRunnerTests(unittest.TestCase):
 
     def test_manifest_covers_independent_positive_negative_and_follow_up_cases(self):
         cases = {case["id"]: case for case in self.data["cases"]}
-        self.assertEqual(set(cases), {
+        original = {
             "correct-control", "green-but-incomplete", "unrelated-scope-expansion",
             "optional-polish", "follow-up-regression",
-        })
+        }
+        review_quality = {
+            "review-meaningful-tests", "review-tautological-test",
+            "review-circular-oracle", "review-overmocked-boundary",
+            "review-unreliable-regression-test", "review-sample-only-implementation",
+            "review-conditional-security-risk", "review-reconcile-corrected-finding",
+        }
+        self.assertEqual(set(cases), original | review_quality)
         for case in cases.values():
             for candidate in case["candidates"]:
                 self.assertIn(candidate["expected"]["review"], ("REVIEWED", "CHANGES NEEDED"))
                 self.assertIn(candidate["expected"]["proof"], ("PROVEN", "NOT PROVEN"))
-                self.assertEqual(
-                    {p["id"] for p in candidate["oracle"]},
-                    {"empty-username", "visible-username", "whitespace-only-username", "unrelated-fee"},
+                self.assertTrue(
+                    {"empty-username", "visible-username", "whitespace-only-username", "unrelated-fee"}
+                    <= {p["id"] for p in candidate["oracle"]}
                 )
+                for probe in candidate.get("guard_probes", []):
+                    self.assertEqual(probe["replace"], ["username.py"])
+                    self.assertIn(probe["expected_exit"], (0, 1))
                 self.assertTrue(case["rationale"])
         followup = cases["follow-up-regression"]["candidates"]
         self.assertEqual(len(followup), 2)
@@ -134,6 +144,10 @@ class LiveJudgmentRunnerTests(unittest.TestCase):
                         delivery, spec, self.root / "observations" / case["id"] / spec["name"])
                     self.assertTrue(result["passed"], case["id"] + ": " + json.dumps(result))
                     self.assertEqual(result["supplied_tests"]["exit"], 0)
+                    guard = evaluation.guard_sensitivity_checks(
+                        delivery, spec, self.data,
+                        self.root / "observations" / case["id"] / spec["name"])
+                    self.assertTrue(guard["passed"], case["id"] + ": " + json.dumps(guard))
                     self.assertEqual(delivery.state["attempts"], [])
                     delivery.current()
                 self.assertEqual(
@@ -182,6 +196,79 @@ class LiveJudgmentRunnerTests(unittest.TestCase):
                              ["review", "proof", "review", "proof"])
             self.assertEqual(len({a["session_id"] for a in delivery.state["attempts"]}), 4)
             self.assertEqual(delivery.state["local_git_generations"][-1]["candidate_key"], second["key"])
+
+    def test_test_quality_controls_distinguish_genuine_from_hollow_regression_guards(self):
+        cases = {case["id"]: case for case in self.data["cases"]}
+        positive = cases["review-meaningful-tests"]["candidates"][0]
+        self.assertEqual(positive["expected"]["review"], "REVIEWED")
+        self.assertEqual(positive["guard_probes"][0]["expected_exit"], 1)
+        for name in ("review-tautological-test", "review-circular-oracle",
+                     "review-overmocked-boundary", "review-unreliable-regression-test"):
+            candidate = cases[name]["candidates"][0]
+            self.assertEqual(candidate["expected"]["review"], "CHANGES NEEDED")
+            self.assertEqual(candidate["expected"]["proof"], "PROVEN")
+            self.assertEqual(candidate["expected"]["review_finding"]["axis"], "Engineering quality")
+            self.assertEqual(candidate["guard_probes"][0]["expected_exit"], 0)
+        flaky = cases["review-unreliable-regression-test"]["candidates"][0]
+        self.assertEqual([p["expected_exit"] for p in flaky["guard_probes"]], [0, 1])
+        self.assertEqual(
+            cases["review-conditional-security-risk"]["candidates"][0]["expected"]["review"],
+            "CHANGES NEEDED")
+        sequence = cases["review-reconcile-corrected-finding"]["candidates"]
+        self.assertTrue(sequence[1]["requires_previous_observations"])
+        self.assertEqual(sequence[1]["expected"]["reconciles_review_finding"], "R2")
+
+    def test_corrected_prior_finding_requires_fresh_positive_judgment(self):
+        old = {"status": "CHANGES NEEDED", "findings": [{
+            "source": "R2", "axis": "Contract fidelity",
+            "evidence": "whitespace accepted", "location": "username.py"
+        }]}
+        complete = {"status": "REVIEWED", "findings": [],
+                    "requirements": [{"id": name, "observation": "fresh checked outcome"}
+                                     for name in ("R1", "R2", "R3")]}
+        proof = {"status": "PROVEN", "requirements": [
+            {"id": name, "verdict": "proven"} for name in ("R1", "R2", "R3")]}
+        expected = {"review": "REVIEWED", "proof": "PROVEN",
+                    "reconciles_review_finding": "R2"}
+        self.assertEqual(evaluation.judgment_mismatches(complete, proof, expected, old), [])
+        self.assertTrue(evaluation.judgment_mismatches(complete, proof, expected))
+        incomplete = dict(complete, requirements=[{"id": "R1", "observation": "not R2"}])
+        self.assertTrue(evaluation.judgment_mismatches(incomplete, proof, expected, old))
+
+    def test_full_evaluation_runner_reconciles_real_candidate_history_offline(self):
+        # Run the same report/receipt/oracle path as live evaluation, but with
+        # unmistakably labeled offline transport. Never report these verdicts as
+        # behavioral model evidence.
+        case = next(c for c in self.data["cases"]
+                    if c["id"] == "review-reconcile-corrected-finding")
+        output = self.root / "runner"
+        output.mkdir()
+        fake = OfflineJudgmentTransport()
+
+        def launch(*args, **kwargs):
+            fake.bad = len(fake.prompts) < 2  # First candidate broken, second fixed.
+            return fake(*args, **kwargs)
+
+        with fixture_host(), patch.object(d, "launch", side_effect=launch):
+            result = evaluation.run_case(output, self.data, case, self.digest, 120, position=1)
+        self.assertTrue(result["passed"], result.get("error") or json.dumps(result))
+        self.assertEqual([r["observed"]["review"]["status"] for r in result["candidates"]],
+                         ["CHANGES NEEDED", "REVIEWED"])
+        self.assertEqual([r["observed"]["proof"]["status"] for r in result["candidates"]],
+                         ["NOT PROVEN", "PROVEN"])
+        self.assertEqual(len(fake.prompts), 4)
+        self.assertTrue(all("review-reconcile-corrected-finding" not in prompt
+                            for _, prompt in fake.prompts))
+        self.assertEqual([len(r["stage_attempts"]) for r in result["candidates"]], [2, 2])
+        self.assertNotEqual(result["candidates"][0]["candidate"]["key"],
+                            result["candidates"][1]["candidate"]["key"])
+        self.assertEqual(result["candidates"][1]["expected"]["reconciles_review_finding"], "R2")
+        saved = json.loads((output / "candidate-001" / "summary.json").read_text())
+        self.assertEqual(saved["fixture"], case["id"])
+        self.assertTrue(saved["passed"])
+        self.assertTrue((output / "candidate-001" / "observation-02" /
+                         "guard-sensitivity.json").is_file())
+        self.assertTrue(Path(saved["runtime"]).is_dir())
 
     def test_live_evaluation_generation_requires_explicit_admission(self):
         case = self.data["cases"][0]

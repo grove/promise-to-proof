@@ -49,6 +49,30 @@ specific blocker immediately. It does not spend an implementation attempt
 rediscovering the same restriction. This inspection uses small prerequisite
 checks, and does not demand that the feature being implemented already exists.
 
+## What makes a regression test trustworthy?
+
+A green test is useful when it would turn red for a meaningful failure of the
+behavior it promises to protect. Review looks at the assertions and the real
+interface being exercised, not just test counts. For example, a whitespace
+validation test that compares a result to itself can pass whether the
+validator works or not. A test that mocks out that same validator can be
+equally misleading. An assertion that executes only on some wall-clock
+seconds is unreliable even when the suite happens to be green.
+
+On the other hand, a small existing test that calls the actual public
+interface and compares its output with an independently known expected result
+is strong evidence. Review should accept it rather than making a second test
+suite for the sake of process. Mocks and helpers are fine when they do not
+remove the important decision from the check. Test maintainability, security,
+state and concurrency matter when they have realistic consequences; stylistic
+preferences do not create repair requirements.
+
+The [live review-quality fixtures](../checks/fixtures/live-judgments/README.md#review-quality-and-stopping-issue-43)
+give P2P known-good and known-bad candidates, including tests that stay green
+after a deliberate regression. The independent fixture oracle runs outside
+the workers; it is not another mandatory code-review stage. These cases must
+actually run on a supported macOS/Codex host to become live judgment evidence.
+
 ## What happens after a small repair
 
 A changed candidate still gets fresh independent review and proof reports. Full
