@@ -338,6 +338,27 @@ reviewed” even though the reviewed code is no longer the code being accepted.
 You do not need to manage those identities by hand during normal coordinated
 delivery. The controller does that work so the result remains meaningful.
 
+## Read progress without managing internal stages
+
+P2P now describes meaningful changes in ordinary language: which stages
+really finished, why the result matters, where the code lives, and whether
+your action is needed. If the delivery is interrupted, a new session can
+inspect the same saved records rather than infer progress from chat messages.
+For an advanced, read-only check:
+
+```bash
+python3 <skill-dir>/scripts/p2p_delivery.py --repo /your/project status .p2p/work/<slug>/contract.md --human
+```
+
+For example, a local `REVIEWED + PROVEN` candidate may be complete for
+local acceptance while still residing entirely in the isolated workspace. If
+a matching PR exists, P2P can read back its current GitHub state and tell
+you whether it remains open or was merged. A confirmed merge without a
+durable final receipt is still partial. A real blocked host, like a Codex
+app-server denied by the operating system, is described as a host problem:
+a successful planning audit does not mean approval, and unstarted
+implementation, review and proof are not reported as completed.
+
 ## Step 7: know what success does not authorize
 
 A `REVIEWED + PROVEN` delivery is evidence-backed acceptance of one exact

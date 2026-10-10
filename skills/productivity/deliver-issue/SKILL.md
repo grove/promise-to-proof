@@ -138,6 +138,50 @@ For unrelated dirty work, capture in the isolated authorized-scope checkout
 specified below and retain its payload only in the external P2P execution directory while the
 delivery is active or unresolved.
 
+### Explain meaningful milestones from the saved facts
+
+Use the existing controller's `status` output and its `human_progress` view
+as the factual basis for ordinary user updates. For a plain-language status in
+the same command, use:
+
+```bash
+python3 <skill-dir>/scripts/p2p_delivery.py --repo <root> status .p2p/work/<slug>/contract.md --human
+```
+
+When a PR is known, pass `--pr https://github.com/OWNER/REPO/pull/N`
+to read back its **current** status. The controller may discover one unambiguous
+PR URL in the saved `publication.md`; either way it checks identity
+before it claims anything was published or merged. If current GitHub readback
+or the exact product-tree comparison is unavailable, describe that uncertainty.
+Do not treat saved publication prose as proof of a remote write.
+
+At significant decisions, implementation completion, repairs, independent
+review/proof results, interruption, host failure, checkpoint import, publication,
+merge and handoff, explain in one short connected paragraph **what happened,
+why it matters, where the code actually is, and what happens next**. Report
+the one supported action, whether it is automatically covered by the mandate or
+needs the user. Let the user inspect raw controller JSON, receipts, logs and
+report paths on demand, but do not lead with them. Do not narrate every
+command, poll in a new mandatory stage or invoke another summarization agent.
+
+A passing acceptance-planning audit is **not** approval. For the observed #85
+case, where planning/audit completed but the Codex app-server failed
+initialization with `Operation not permitted`, explicitly say
+implementation, live review and proof did **not** start and the preserved
+run cannot be safely repaired by blindly retrying. If an invocation was
+restored via a #82 checkpoint, imported work and old verifiers' evidence
+survive but the *receiving host* still needs its own preflight; old worker
+receipts are not a currently running worker. For assembled parents, successful
+children remain separate from the parent's current independent acceptance.
+
+Even matching local `REVIEWED` and `PROVEN` results do not establish
+publication, merge, delivered-code mapping or durable finalization. A confirmed
+matching **open** PR is published but not merged. A confirmed merge still
+needs the separately implemented #50/#47 mapping/receipt and must remain
+visibly partial until then. Never invent a `finalize` command or claim
+these outstanding features are already available. Keep valid source and
+candidate IDs, grant/approval boundaries and prior stage decisions unchanged.
+
 ## Continue under standing authority
 
 Before dispatch, record the invocation, start time, limits, dispatch count,

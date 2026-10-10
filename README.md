@@ -140,6 +140,23 @@ make an older review or proof inapplicable; green CI alone does not prove every
 promise; and acceptance does not itself authorize a commit, push, publication,
 merge, or deployment.
 
+P2P's ordinary updates now explain **what actually happened, why it matters,
+where the code is, and what happens next**. For an existing run you can ask
+`/deliver-issue` for its current state; the controller's `status --human`
+option gives the same readable interpretation without rerunning stages. For
+example:
+
+> The exact local candidate passed independent review and proof. It remains in
+> P2P's isolated workspace; it has **not** been published or merged. Nothing
+> more is required for a local-only delivery. Publishing it requires separately
+> authorized instructions.
+
+When a matching pull request can be checked against the reviewed candidate,
+P2P distinguishes **PR open**, **merge confirmed but final receipt pending**,
+and truly finalized delivery. Until the separate completed-record work in
+#50/#47 is available, a merge is not described as fully finalized. Unknown
+GitHub status stays unknown rather than becoming an optimistic claim.
+
 **Ready to try the whole flow with a tiny example?** Follow
 [Your first Promise to Proof delivery](./docs/getting-started.md).
 

@@ -34,6 +34,34 @@ you want **only a plan**, or `/slice-contract <contract>` for explicit, expert
 decomposition control. Sizing inspection and `NO SPLIT` are handled inside
 ordinary delivery when current authority covers them.
 
+## See what is finished and where your code is
+
+The existing `/deliver-issue` flow explains saved progress at meaningful
+milestones. You can inspect it again in a new session, without recreating the
+agreement or issuing another implementation request:
+
+```bash
+python3 <skill-dir>/scripts/p2p_delivery.py --repo /your/project status .p2p/work/<slug>/contract.md --human
+```
+
+This displays what the controller has actually established, why that matters,
+where the retained candidate is, and its one next supported action. The normal
+`status` command still emits machine-readable JSON with `human_progress` and
+the detailed stage/receipt fields. If the work has a known PR, add
+`--pr https://github.com/OWNER/REPO/pull/123` to request current GitHub
+readback. The status call is read-only: it does not authorize effects or
+start another model stage. A single saved PR URL may also be discovered from
+the existing `publication.md` record, but it is only a hint; the current
+PR and matching product-tree identity must be verified.
+
+**Read these distinctions literally.** `REVIEWED + PROVEN` refers to the
+isolated local candidate, not the operator checkout or the destination branch.
+An open PR has not merged. A confirmed merge still lacks a validated durable
+final receipt until #50/#47 deliver that step. An imported checkpoint keeps
+previously proven work but requires new host preflight, and a failed host
+initialization needs the host restriction resolved rather than another
+blind retry. The raw evidence remains available if you need details.
+
 ## Re-size from delivery evidence
 
 A delivery may expose a useful boundary that was not visible during planning.
