@@ -1,5 +1,10 @@
 # Move P2P work between computers
 
+These checkpoint procedures also underpin [authorized finalization](finalization.md).
+A delivered-code receipt is valid only when the original checkpoint bytes and
+required source/candidate Git commits are remotely recoverable. A local
+checkpoint alone neither authorizes a merge nor proves a delivered result.
+
 P2P saves small, portable checkpoints at meaningful boundaries. `.p2p/` and
 `~/.p2p/` are local working storage; neither directory needs to be copied to a
 second computer after the checkpoint and its Git objects have been published.
