@@ -219,7 +219,7 @@ def explain(status, *, publication=None, finalization=None):
         next_action = "Review and approve the exact agreement, or resolve the named product decision."
         location = "no confirmed implementation candidate"
         not_established = ["User approval", "Implementation", "Independent review", "Proof"]
-    elif checkpoint_restored and not fresh_preflight and not accepted:
+    elif checkpoint_restored and not fresh_preflight and not accepted and not status.get("blocker"):
         phase = "RESTORED_NEEDS_PREFLIGHT"
         what = "Saved delivery work was restored from a portable checkpoint."
         why = "Historical reports and worker receipts were imported, but the receiving host's isolation and task prerequisites have not been rechecked. No current worker is proven to be running."
@@ -237,7 +237,7 @@ def explain(status, *, publication=None, finalization=None):
             phase = "MERGED_RECEIPT_PENDING"
             what = "GitHub confirms that the matching pull request was merged into " + pub["target"] + "."
             why = "The accepted local candidate and published PR head are verified, but a completed-delivery mapping and durable final receipt have not been confirmed."
-            next_action = "Reconcile the landed code and publish/read back the authorized #50/#47 final receipt when that workflow is available."
+            next_action = "Inspect the actual merged commit and retain finalization as pending. #50/#47 must supply a supported validated receipt before P2P can claim delivery fully finalized."
             location = "merged pull request " + pub["url"] + " (destination branch reported by GitHub)"
             not_established = ["Delivered-code mapping", "Durable final receipt"]
         elif verified_pub and pub["status"] == "OPEN":
@@ -303,6 +303,14 @@ def explain(status, *, publication=None, finalization=None):
             next_action = "Resolve the named blocker using the saved supported handoff, then resume this invocation rather than starting over."
         if kind == "host" and not attempted:
             location = "planning/host records; no confirmed implementation candidate"
+            if any(a.get("stage") == "planning-audit" and a.get("status") == "complete"
+                   for a in (status.get("attempts") or []) if isinstance(a, dict)):
+                what = "Planning and an independent audit finished, but execution was blocked before implementation."
+                why = ("The audit does not approve the agreement. The worker could not initialize: " +
+                       (reason or "host capability unavailable") +
+                       ". Implementation, live review and proof never started.")
+            if status.get("resume_count", 0) > 0:
+                why += " A saved reconciliation or resume was attempted; it has not established host recovery."
         not_established = ["Full local review and proof", "Publication", "Merge"]
     elif state == "RUNNING" and active is True:
         phase = "IN_PROGRESS"
@@ -338,6 +346,10 @@ def explain(status, *, publication=None, finalization=None):
         next_action = "Inspect the existing work-item records and resolve the missing agreement or invocation before continuing."
         action_needed = True
         not_established = ["Implementation", "Review", "Proof", "Publication"]
+    if checkpoint_restored and not fresh_preflight and phase != "RESTORED_NEEDS_PREFLIGHT":
+        why += " Restored evidence does not replace a fresh preflight on this host."
+        if "Receiving-host preflight" not in not_established:
+            not_established.append("Receiving-host preflight")
     if not accepted and status.get("parent_has_children"):
         why += " Child completion does not establish acceptance for an assembled parent."
         if "Assembled-parent review and proof" not in not_established:
