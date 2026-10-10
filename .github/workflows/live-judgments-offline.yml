@@ -1,0 +1,27 @@
+name: Live judgments runner (offline regressions)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  fixture-runner:
+    name: Offline fixture and runner checks (not live evidence)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Some historical deterministic fixtures need exact past commits.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify fixture manifest, offline oracle, and failure behavior
+        run: python3 -m unittest discover -s checks -p 'test_live_judgments.py' -v
+      - name: Check existing generation and repair behavior
+        run: >-
+          python3 -m unittest discover -s checks -p 'test_p2p_delivery.py'
+          -k 'test_local_git_generations_reconstruct_reuse_objects_and_bind_reports'
+          -k 'test_successful_repair_rereviews_and_reproves'
+      - name: Check retained verification history
+        run: python3 -m unittest discover -s checks -p 'test_p2p_verification_history.py'

@@ -449,6 +449,31 @@ file hashes, all host receipts, protected-write results, reports, evidence, sour
 and candidate content. Fixture transport tests establish controller decisions;
 they are never treated as live host isolation or independent stage evidence.
 
+### Independently known live review/proof outcomes
+
+The end-to-end tiny-host check above verifies isolation and basic completion; it
+is not a quality regression gate for review/proof *judgments*. The independent
+fixture suite exercises correct behavior, missing whitespace validation despite
+green supplied tests, unrelated scope expansion, optional polish, and a follow-up
+edit that invalidates an earlier outcome. Expected outcomes and private CLI oracles
+stay outside the candidate workspace and are never supplied to model stages.
+
+Run on an explicitly authorized supported **macOS + authenticated Codex CLI** host:
+
+```sh
+python3 checks/check_p2p_judgments_host.py --output-dir /path/to/new-live-judgment-evidence
+```
+
+Each case retains its exact contract, candidate generations, pinned instructions,
+real review/proof host events and receipts, stage reports, external public-interface
+oracle observations, and expected-versus-observed results. The aggregate exits
+nonzero on any disagreement. For a narrow diagnostic rerun, use `--only CASE_ID`
+and a new output directory. The tests in `checks/test_live_judgments.py` are
+specifically labeled **offline**; they validate setup and the harness without
+claiming live model judgments. See the
+[fixture guide](../checks/fixtures/live-judgments/README.md) for cases and limits.
+
+
 
 ## Delivery measurements
 

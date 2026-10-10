@@ -314,8 +314,10 @@ def record_generation(delivery, candidate, stage):
                             'inputs': attempt['inputs']}
                            for attempt in reversed(state['attempts'])
                            if attempt['stage'] == stage and attempt['status'] in ('complete', 'retired')), None)
-    if stage != 'admission' and source_attempt is None:
+    if stage not in ('admission', 'live-evaluation') and source_attempt is None:
         raise ValueError('candidate generation has no completed stage attempt: ' + stage)
+    if stage == 'live-evaluation' and not state.get('live_evaluation'):
+        raise ValueError('fixture candidate admission is reserved for explicit live evaluations')
     manifest = fs.snapshot(workspace, exclude=delivery.state.get('agreement_paths', ()))
     tree = git_generation_tree(workspace, manifest)
     parent = generations[-1]['commit'] if generations else state['local_git_base']['local_commit']
@@ -1671,6 +1673,8 @@ class Delivery:
             self._record_controller_time('identity_snapshot_validation', started)
 
     def capture(self, stage='implementation'):
+        if stage == 'live-evaluation' and not self.state.get('live_evaluation'):
+            raise ValueError('fixture candidate admission is not enabled in this delivery')
         started = time.monotonic()
         try:
             return self._capture(stage)
@@ -1745,13 +1749,18 @@ class Delivery:
                         {entry['old_sha256'] for entry in self.state.get('agreement_history', [])}) or
                     record.get('parent_commit') != parent or
                     record.get('previous_candidate_key') != previous_key or
-                    record.get('stage') not in ('admission', 'implementation', 'repair', 'planning-audit') or
+                    record.get('stage') not in ('admission', 'implementation', 'repair', 'planning-audit', 'live-evaluation') or
                     (sequence == 1) != (record.get('stage') == 'admission')):
                 raise ValueError('local Git generation mapping changed: ' + path)
             source_attempt = record.get('source_attempt')
             if sequence == 1:
                 if source_attempt is not None:
                     raise ValueError('admission generation unexpectedly names a stage attempt')
+            elif record['stage'] == 'live-evaluation':
+                # The trusted live suite admits fixed candidates; there was no implementation worker.
+                # This path is deliberately unavailable to ordinary deliveries.
+                if not self.state.get('live_evaluation') or source_attempt is not None:
+                    raise ValueError('live evaluation generation has no admitted fixture provenance')
             else:
                 attempt = next((item for item in self.state['attempts']
                                 if item['id'] == (source_attempt or {}).get('attempt_id')), None)
@@ -3538,7 +3547,7 @@ assert results['scratch'] == 'ok'
         local_save(self.root, self.work, 'runtime/agreement-transition.json', encoded(transition))
 
 
-def create(root, args, invocation_started_epoch=None):
+def create(root, args, invocation_started_epoch=None, *, live_evaluation=False):
     agreement, requirements = contract(root, args.work)
     if not args.authorize_local:
         raise ValueError('local agent-stage authority missing; run requires --authorize-local')
@@ -3707,8 +3716,10 @@ def create(root, args, invocation_started_epoch=None):
                                    'isolated configuration', 'dispatch admission', 'durable recovery reservations'],
                       'elapsed_limit': 'admission and process termination; provider billing may continue',
                       'trust': 'controller and OS trusted; no arbitrary same-user tamper resistance'}}
+    if live_evaluation:
+        state['live_evaluation'] = True
     delivery = Delivery(root, args.work, state)
-    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'source_product_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'instruction_identity', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host')}))
+    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'source_product_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'instruction_identity', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host', *(['live_evaluation'] if live_evaluation else []))}))
     delivery.save()
     delivery.capture('admission')
     delivery.save()
