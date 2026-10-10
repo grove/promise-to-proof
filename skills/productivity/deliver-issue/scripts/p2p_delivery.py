@@ -2871,6 +2871,8 @@ assert results['scratch'] == 'ok'
             'review_sha256': fs.digest(review_bytes),
             'proof_sha256': fs.digest(proof_bytes),
             'completed_at': self.state['completed_at'],
+            **({'promise_continuity': continuity.load(self.root, self.work)}
+               if continuity.load(self.root, self.work) is not None else {}),
             'autonomy': self.state.get('autonomy'),
             'limits': self.state['limits'],
             'recovery_count': len(self.state.get('recovery_history', [])),
@@ -4320,6 +4322,7 @@ def completed_result(root, work, directory):
         'candidate': identity(candidate), 'routing': record.get('routing'),
         'contract': record['contract'], 'agreement_paths': record.get('agreement_paths', [work]),
         'implementation_complete': True,
+        'promise_continuity': continuity.load(root, work),
         'parent_has_children': any(line.strip() == '## Children' for line in
                                    fs.document_lines(agreement['content'])),
         'destination_observation': record.get('destination_observation'),
