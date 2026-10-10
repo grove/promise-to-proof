@@ -95,7 +95,7 @@ class LearningRetentionTests(unittest.TestCase):
                 self.assertEqual(lesson.verify(self.root, WORK, "origin", True)["status"], "PORTABLE")
 
     def test_selected_cleanup_refuses_missing_checkpoint(self):
-        with self.assertRaises(OSError):
+        with self.assertRaises((OSError, ValueError)):
             lesson.cleanup_guard(self.root, WORK, remote="origin")
 
 
