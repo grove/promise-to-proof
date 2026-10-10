@@ -67,7 +67,10 @@ def _source_context(root, record, checkpoint, artifact_directory):
     indexed, cp = {}, None
     if checkpoint is not None:
         _need(isinstance(checkpoint, bytes), "checkpoint must contain exact bytes")
-        cp, contents = fs.read_checkpoint(root, checkpoint)
+        try:
+            cp, contents = fs.read_checkpoint(root, checkpoint)
+        except (ValueError, OSError, KeyError, TypeError, UnicodeError) as error:
+            raise ValueError("exact portable checkpoint is invalid or incomplete: " + str(error)) from error
         _need(cp["work_item"] == record["work_item"],
               "portable checkpoint belongs to a different delivery")
         indexed = {(scope, path): data for scope, path, data in contents}
