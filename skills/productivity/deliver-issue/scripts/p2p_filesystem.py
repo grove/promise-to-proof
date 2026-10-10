@@ -380,7 +380,7 @@ def _coverage_path(path):
                     for part in path.split("/")) and "\\" not in path and "\0" not in path)
 
 
-def validate_coverage_trace(trace, requirement_ids, report, stage, manifest, changed, record_refs=()):
+def validate_coverage_trace(trace, requirement_ids, report, stage, manifest, changed, record_refs=(), risks=False):
     """Validate links against actual paths/rows, without grading their meaning.
 
     'row' is the saved stage requirement row; 'check:N' is a saved reviewer
@@ -389,6 +389,8 @@ def validate_coverage_trace(trace, requirement_ids, report, stage, manifest, cha
     availability, is checked here. Direct rows remain supported.
     """
     required = {"requirements", "supporting_changes"}
+    if risks:
+        required.add("risks")
     if stage == "review":
         required.add("inspected_paths")
     if not isinstance(trace, dict) or set(trace) != required:
@@ -464,8 +466,66 @@ def validate_coverage_trace(trace, requirement_ids, report, stage, manifest, cha
     missing = changes - linked - supporting
     if successful and missing:
         raise ValueError("unaccounted product changes: " + ", ".join(sorted(missing)))
+    risk_ids = set()
+    if risks:
+        if not isinstance(trace["risks"], list):
+            raise ValueError("risk trace must be a list")
+        for risk in trace["risks"]:
+            fields = {"id", "requirements", "paths", "reach", "trigger",
+                      "why_applicable", "consequence", "evidence", "status"}
+            if not isinstance(risk, dict) or set(risk) != fields:
+                raise ValueError("risk must have exact seam, trigger, consequence and evidence fields")
+            rid = risk["id"]
+            if (not isinstance(rid, str) or not re.fullmatch(r"S[1-9][0-9]*", rid)
+                    or rid in risk_ids):
+                raise ValueError("risk has invalid or duplicate ID")
+            risk_ids.add(rid)
+            affected = risk["requirements"]
+            paths = risk["paths"]
+            evidence = risk["evidence"]
+            if (not isinstance(affected, list) or not affected or
+                    len(set(affected)) != len(affected) or
+                    not set(affected) <= set(requirement_ids) or
+                    not isinstance(paths, list) or not paths or
+                    len(set(paths)) != len(paths) or
+                    any(not _coverage_path(p) or p not in allowed for p in paths) or
+                    risk["reach"] not in ("bounded", "uncertain") or
+                    risk["status"] not in ("addressed", "unresolved") or
+                    any(not isinstance(risk[k], str) or not risk[k].strip()
+                        for k in ("trigger", "why_applicable", "consequence")) or
+                    not isinstance(evidence, list) or len(set(evidence)) != len(evidence)):
+                raise ValueError("risk must name applicable requirements, real paths and a realistic trigger")
+            for ref in evidence:
+                if not isinstance(ref, str):
+                    raise ValueError("risk evidence reference must be a string")
+                # Reuse the exact same existing report/evidence references.
+                if ref == "row":
+                    if not all(observations[name]["observation"].strip() for name in affected):
+                        raise ValueError("risk refers to a missing requirement observation")
+                    if stage != "review" and risk["status"] == "addressed" and not all(
+                            observations[name].get("evidence") for name in affected):
+                        raise ValueError("addressed risk has no exercised proof/implementation evidence")
+                elif ref.startswith("check:") and stage == "review":
+                    number = ref.removeprefix("check:")
+                    if (not number.isdecimal() or int(number) >= len(report["checks"])):
+                        raise ValueError("risk refers to a nonexistent review check")
+                    if risk["status"] == "addressed" and report["checks"][int(number)]["result"] not in ("passed", "observed"):
+                        raise ValueError("addressed risk cites a failed or unavailable check")
+                elif ref.startswith("file:") and ref.removeprefix("file:") in current:
+                    pass
+                elif (ref.startswith("record:") and
+                      re.fullmatch(r"record:[A-Za-z][A-Za-z0-9_.-]*@sha256:[0-9a-f]{64}", ref) and
+                      ref in record_refs):
+                    pass
+                else:
+                    raise ValueError("risk has unresolved evidence reference: " + ref)
+            if risk["status"] == "addressed" and not any(
+                    ref == "row" or ref.startswith(("check:", "record:")) for ref in evidence):
+                raise ValueError("addressed risk needs an observation or check, not a file path alone")
+            if successful and (risk["status"] != "addressed" or not evidence):
+                raise ValueError("successful stage has an unaddressed material risk: " + rid)
     return {"requirements": sorted(ids), "unaccounted_changes": sorted(missing),
-            "supporting_changes": sorted(supporting)}
+            "supporting_changes": sorted(supporting), "risks": sorted(risk_ids)}
 
 
 def available_evidence_refs(workspace, work, candidate_key, contract_sha256):
@@ -498,7 +558,7 @@ def available_evidence_refs(workspace, work, candidate_key, contract_sha256):
 
 
 def review_scope(candidate, manifest, generation_commit, inspected_paths,
-                 exclusions=(), limitations=(), trace=None):
+                 exclusions=(), limitations=(), trace=None, checks=()):
     """Build exact checked identities; never infer that every file was inspected."""
     if not isinstance(inspected_paths, list) or len(set(inspected_paths)) != len(inspected_paths):
         raise ValueError("review inspected_paths must be a unique list")
@@ -507,7 +567,26 @@ def review_scope(candidate, manifest, generation_commit, inspected_paths,
         raise ValueError("review claims inspection of an absent product file")
     if not isinstance(limitations, (list, tuple)) or any(not isinstance(x, str) for x in limitations):
         raise ValueError("review limitations are malformed")
-    return {
+    # Facts for later bounded compatibility checks. Keep only path/requirement
+    # links and previously executed review commands, not another test log.
+    seam_dependencies = None
+    if isinstance(trace, dict) and "risks" in trace:
+        covered = {path for row in trace["requirements"] for path in row["paths"]}
+        changed = {row["path"] for row in candidate["changes"]}
+        risk_rows = []
+        for risk in trace["risks"]:
+            commands = []
+            for ref in risk["evidence"]:
+                if ref.startswith("check:") and ref[6:].isdecimal() and int(ref[6:]) < len(checks):
+                    command = checks[int(ref[6:])]["command"]
+                    if command not in commands:
+                        commands.append(command)
+            risk_rows.append({"id": risk["id"], "requirements": risk["requirements"],
+                              "paths": risk["paths"], "reach": risk["reach"],
+                              "check_commands": commands})
+        seam_dependencies = {"paths": sorted(covered | changed),
+                             "risks": risk_rows}
+    result = {
         "schema": REVIEW_SCOPE_SCHEMA,
         "contract_sha256": candidate["work_item_sha256"],
         "comparison_base": candidate["comparison_base"],
@@ -520,6 +599,9 @@ def review_scope(candidate, manifest, generation_commit, inspected_paths,
         "limitations": limitations,
         "trace_sha256": digest(canonical(trace)) if trace is not None else None,
     }
+    if seam_dependencies is not None:
+        result["seam_dependencies"] = seam_dependencies
+    return result
 
 
 def compare_review_scope(scope, before, after):
@@ -529,7 +611,7 @@ def compare_review_scope(scope, before, after):
     required = {"schema", "contract_sha256", "comparison_base", "candidate_key",
                 "generation_commit", "manifest_sha256", "changed_paths", "inspected",
                 "excluded", "limitations", "trace_sha256"}
-    if set(scope) != required:
+    if set(scope) not in (required, required | {"seam_dependencies"}):
         return {"status": "UNKNOWN", "reason": "historical/incomplete scope metadata; inspect the candidate and refresh review"}
     old_ident = tree_identity(before)
     if (digest(canonical(old_ident)) != scope["manifest_sha256"]
@@ -547,6 +629,53 @@ def compare_review_scope(scope, before, after):
             "next_action": ("No product delta; check agreement and destination compatibility independently."
                             if not delta else "Assess affected seams, refresh targeted review with full current scope, and obtain fresh proof if candidate changed."),
             "limitations": scope["limitations"]}
+
+
+def assess_target_risks(scope, base, destination):
+    """Classify added *compatibility* checking; never declare merge readiness.
+
+    The destination delta is against the same immutable comparison base as the
+    saved review. A bounded risk only avoids extra work when dependencies and
+    candidate-changed product files are untouched. Behavioral reach still needs
+    an independent current-target inspection at merge-readiness.
+    """
+    if not isinstance(scope, dict) or not isinstance(scope.get("seam_dependencies"), dict):
+        return {"status": "UNKNOWN", "reason": "saved review lacks risk/seam dependencies; assess the affected scope"}
+    facts = scope["seam_dependencies"]
+    if set(facts) != {"paths", "risks"} or not isinstance(facts["paths"], list) or not isinstance(facts["risks"], list):
+        return {"status": "UNKNOWN", "reason": "malformed risk/seam dependencies"}
+    if (not isinstance(scope.get("changed_paths"), list)
+            or not all(_coverage_path(p) for p in facts["paths"])
+            or any(not isinstance(x, dict) or set(x) !=
+                   {"id", "requirements", "paths", "reach", "check_commands"}
+                   for x in facts["risks"])):
+        return {"status": "UNKNOWN", "reason": "saved risk/scope paths are incomplete"}
+    target_delta = tree_changes(base, destination)
+    touched = {item["path"] for item in target_delta}
+    critical = set(facts["paths"]) | {item["path"] for item in scope["changed_paths"]}
+    selected = []
+    for risk in facts["risks"]:
+        if (not isinstance(risk["paths"], list)
+                or not all(_coverage_path(p) for p in risk["paths"])
+                or risk["reach"] not in ("bounded", "uncertain")):
+            return {"status": "UNKNOWN", "reason": "saved risk reach cannot be inspected"}
+        intersect = sorted(touched & set(risk["paths"]))
+        if intersect or (touched and risk["reach"] == "uncertain"):
+            selected.append({**risk, "touched_paths": intersect,
+                             "why": ("dependent path changed" if intersect
+                                     else "behavioral reach is uncertain")})
+    overlapping = sorted(touched & critical)
+    status = ("TARGETED_CHECKS_REQUIRED" if selected or overlapping
+              else "NO_ADDITIONAL_RISK_CHECKS")
+    return {"status": status, "target_changes": target_delta,
+            "directly_affected_paths": overlapping, "affected_risks": selected,
+            "next_action": (
+                "Independently inspect the affected seams and run proportionate checks "
+                "on the exact PR-head/target integration candidate; record their results."
+                if status == "TARGETED_CHECKS_REQUIRED"
+                else "No extra seam-driven checks indicated by the recorded dependencies; "
+                     "still inspect behavioral reach and meet ordinary exact-pair CI/merge gates."),
+            "boundary": "Classification is not compatibility proof, a fresh verdict or merge authorization."}
 
 
 def review_scope_status(root, work, current_repo=None, current_ref=None):
