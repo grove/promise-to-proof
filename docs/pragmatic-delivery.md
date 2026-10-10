@@ -74,21 +74,34 @@ original local command output is not treated as reusable local evidence.
 
 ## Resume existing work
 
-Use the existing status and resume workflow with the invocation's admitted
-stage-skill versions. A worker already running with old instructions does not
-automatically reload them. The controller still rejects changed installed stage
-skills; refreshing them is not an instruction-migration procedure. Supported
-instruction upgrades for an active delivery remain tracked in
-[#85](https://github.com/grove/promise-to-proof/issues/85). Preserve the retained
-state and original skill versions instead of editing admission hashes or
-resetting the delivery to hide that mismatch. New deliveries use the installed
-versions at their own admission.
+Use the existing status and resume workflow. A delivery keeps a preserved copy
+of its stage instructions and their material reference documents. Installing a
+P2P update leaves those instructions pinned, so ordinary resume can finish the
+same work. An already-running worker does not automatically reload new rules.
+
+To apply an update to retained work, ask P2P to upgrade that delivery's
+instructions and continue. The controller previews the exact change through
+`upgrade-instructions <contract>`, then adopts it with `--authorize-upgrade`
+under covering local authority. This is a deterministic transition with no
+extra model stage. It preserves completed implementation and runs fresh
+independent review and proof on the same candidate. Those verifiers still use
+the smallest sufficient checks; an upgrade is not a reason to rerun every test.
+Selecting the same instructions again is a no-op. See the
+[controller upgrade recipe](./p2p-delivery-controller.md#upgrade-an-active-deliverys-instructions)
+for commands and recovery details.
 
 Keep the existing contract, requirement IDs, frozen comparison base, candidate
 workspace, execution location and history. Do not rewrite the acceptance contract
 to get an easier pass or rebase the in-flight candidate merely because P2P's own
 rules changed. Resolve remaining material findings, leave optional polishing out,
 and finish once current review and proof genuinely establish the accepted result.
+
+Upgrade only after the current worker has a reconciled completion. If its exit
+is uncertain, preserve the run and resolve that receipt first. Missing prior
+instruction snapshots, incompatible versions or missing authority produce a
+specific blocker. Legacy work without complete snapshots keeps its existing
+resume path with the original installation; never reset it or edit admission
+hashes to make a mismatch disappear.
 
 For interrupted deliveries, a recorded process exit and an accepted stage report
 are separate facts. Invalid returned JSON must not leave a finished worker marked

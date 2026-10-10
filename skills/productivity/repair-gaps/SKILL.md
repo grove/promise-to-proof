@@ -2,6 +2,8 @@
 name: repair-gaps
 description: Repair named implementation or evidence gaps from a NOT PROVEN proof, report the change honestly, and require fresh proof without declaring acceptance.
 disable-model-invocation: true
+metadata:
+  p2p-instruction-compatibility: delivery-v1
 ---
 
 ## Delegated continuation

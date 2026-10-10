@@ -1,5 +1,7 @@
 # P2P Evidence Record v1
 
+<!-- p2p-instruction-dependencies: -->
+
 One record describes one concrete observation. It captures facts, while `/prove`
 chooses checks and oracles and decides requirement verdicts in `proof.md`.
 Records are optional. A valid record never implies a requirement is proven.

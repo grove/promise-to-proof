@@ -21,6 +21,7 @@ import uuid
 
 import p2p_filesystem as fs
 import p2p_autonomy as autonomy
+import p2p_instructions as instructions
 from p2p_delivery_measurements import build as delivery_measurement
 
 import verify_acceptance_bundle as bundle
@@ -662,6 +663,30 @@ def installed_skill(name):
     return {'path': str(found), 'sha256': fs.digest(found.read_bytes())}
 
 
+def instruction_ids(state):
+    """Only retained instruction versions referenced by this delivery travel with it."""
+    identities = {state['instruction_identity']} if state.get('instruction_identity') else set()
+    for transition in state.get('instruction_history', []):
+        identities.update((transition['from'], transition['to']))
+    for attempt in state.get('attempts', []):
+        if attempt.get('inputs', {}).get('instruction_identity'):
+            identities.add(attempt['inputs']['instruction_identity'])
+    return identities
+
+
+def instruction_upgrade_authority(state):
+    mandate = state.get('autonomy')
+    if not mandate:
+        raise ValueError('instruction upgrade needs a current local decision mandate; '
+                         'continue with the pinned instructions or select a covering mandate through extend')
+    autonomy.current(mandate)
+    if not {'implementation', 'evidence'} <= set(mandate['policy']['decisions']):
+        raise ValueError('instruction upgrade needs implementation and evidence decisions in the current mandate; '
+                         'continue with the pinned instructions or select a covering mandate through extend')
+    return {'mandate_sha256': mandate['sha256'],
+            'mandate_policy_sha256': fs.digest(fs.canonical(mandate['policy']))}
+
+
 def upstream_destination(root):
     """Resolve one configured upstream without guessing from the requested SHA."""
     try:
@@ -1259,6 +1284,10 @@ def export_checkpoint(root, work, delivery=None, destination=None):
         if path.is_symlink() or not path.is_file():
             raise ValueError('missing or unsafe checkpoint input: ' + str(path))
         files.append((scope, relative, path.read_bytes()))
+    for instruction_id in sorted(instruction_ids(state)):
+        instructions.load(delivery.runtime, instruction_id)
+        retain('runtime', f'instructions/{instruction_id}.json',
+               delivery.runtime / 'instructions' / (instruction_id + '.json'))
     for attempt in state['attempts']:
         original = next(a for a in delivery.state['attempts'] if a['id'] == attempt['id'])
         attempt.setdefault('verification_environment', delivery.verification_environment())
@@ -1329,7 +1358,8 @@ def export_checkpoint(root, work, delivery=None, destination=None):
                          candidate_commit=candidate_commit, extra_files=files)
 
 
-def restore_checkpoint(root, checkpoint, contents, checkpoint_data):
+def restore_checkpoint(root, checkpoint, contents, checkpoint_data, *,
+                       upgrade_instructions=False, authorize_upgrade=False):
     """Rehost a completed boundary; never reuse the old machine's sandbox preflight."""
     state = json.loads(json.dumps(checkpoint['execution']))
     checkpoint_sha256 = fs.digest(checkpoint_data)
@@ -1339,9 +1369,48 @@ def restore_checkpoint(root, checkpoint, contents, checkpoint_data):
             any(a.get('status') not in ('complete', 'retired') for a in state['attempts']) or
             state['local_git_generations'][-1]['commit'] != checkpoint['candidate_commit']):
         raise ValueError('invalid or uncertain portable controller boundary')
-    installed = skills()
-    if {name: skill['sha256'] for name, skill in installed.items()} != {name: skill['sha256'] for name, skill in state['skills'].items()}:
-        raise ValueError('installed stage skills differ from the checkpoint; reconcile before resume')
+    if authorize_upgrade and not upgrade_instructions:
+        raise ValueError('--authorize-upgrade requires --upgrade-instructions; ordinary restore keeps pinned instructions')
+    retained = {}
+    for scope, relative, data in contents:
+        match = re.fullmatch(r'instructions/([0-9a-f]{64})\.json', relative)
+        if scope == 'runtime' and match:
+            retained[match[1]] = instructions.decode(data, match[1])
+    proposed = None
+    if state.get('instruction_identity'):
+        if instruction_ids(state) != set(retained):
+            raise ValueError('checkpoint instruction inputs are missing; recover the complete original checkpoint')
+        active_bundle = retained[state['instruction_identity']]
+        expected_stages = {name: row['name'] for name, row in active_bundle['stages'].items()}
+        if expected_stages != STAGES:
+            raise ValueError('checkpoint instruction stages are incompatible with this controller; keep the original version')
+        if upgrade_instructions:
+            proposed = instructions.capture(skills(), STAGES)
+            instructions.compatible(active_bundle, proposed)
+            if proposed['identity'] != active_bundle['identity']:
+                if not authorize_upgrade:
+                    raise ValueError('instruction adoption requires --authorize-upgrade; '
+                                     'omit --upgrade-instructions to restore the pinned version')
+                # Validate the exact portable mandate before any restore write.
+                # Its receiving-machine path does not exist yet, so verify the
+                # checkpoint bytes here and recheck the materialized file below.
+                authority_state = json.loads(json.dumps(state))
+                mandate = authority_state.get('autonomy')
+                if mandate and mandate.get('path'):
+                    data = next((data for scope, relative, data in contents
+                                 if scope == 'local' and relative == 'mandate.json'), None)
+                    if (mandate['path'] != '@checkpoint/mandate.json' or data is None or
+                            fs.digest(data) != mandate['sha256'] or json.loads(data) != mandate['policy']):
+                        raise ValueError('checkpoint instruction upgrade lacks its exact mandate; restore that authority input')
+                    mandate['path'] = None
+                instruction_upgrade_authority(authority_state)
+    else:
+        if upgrade_instructions:
+            raise ValueError('legacy checkpoint has no complete pinned instruction inputs; '
+                             'restore with the original skill installation and resume without --upgrade-instructions')
+        installed = skills()
+        if {name: skill['sha256'] for name, skill in installed.items()} != {name: skill['sha256'] for name, skill in state['skills'].items()}:
+            raise ValueError('installed stage skills differ from this legacy checkpoint; restore its original skill installation')
     if platform.system() != 'Darwin' or not shutil.which('codex'):
         raise ValueError('portable delivery restore requires the supported macOS Codex host')
     fs.check_index(root)
@@ -1369,7 +1438,8 @@ def restore_checkpoint(root, checkpoint, contents, checkpoint_data):
     checkpoint_path, _ = fs.checkpoint_path(root, work, checkpoint['destination'])
     if checkpoint_path.exists() and fs.digest(checkpoint_path.read_bytes()) != checkpoint_sha256:
         raise ValueError('selected checkpoint conflicts with the restore source')
-    state['skills'] = installed
+    if not state.get('instruction_identity'):
+        state['skills'] = installed
     state['host']['executable'] = shutil.which('codex')
     version = subprocess.run([state['host']['executable'], '--version'], capture_output=True, text=True,
                              timeout=10, check=True).stdout.strip()
@@ -1410,6 +1480,10 @@ def restore_checkpoint(root, checkpoint, contents, checkpoint_data):
         fs.atomic_write(checkpoint_path, checkpoint_data,
                         ignored_root=root if checkpoint['destination']['kind'] == 'github' else None)
     fs.prepare_execution(root, work)
+    for instruction_id, instruction_bundle in retained.items():
+        mapping = instructions.preserve(runtime, instruction_bundle)
+        if instruction_id == state['instruction_identity']:
+            state['skills'] = mapping
     repository = runtime / 'repository.git'
     subprocess.run(['git', 'init', '--bare', '--quiet', str(repository)], check=True)
     for commit in (state['comparison_base'], checkpoint['candidate_commit']):
@@ -1435,13 +1509,21 @@ def restore_checkpoint(root, checkpoint, contents, checkpoint_data):
             'source_head', 'source_index_sha256', 'source_product_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'routing', 'routing_records',
             'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits',
             'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host')
+    if state.get('instruction_identity'):
+        keys += ('instruction_identity',)
     local_save(root, work, 'runtime/admission.json', encoded({key: state[key] for key in keys}))
     delivery.save()
     delivery.read_only = True
     delivery.current()
     for name in state['reports']:
         delivery.read_report(name)
+    upgrade_result = None
+    if proposed is not None:
+        delivery.read_only = False
+        upgrade_result = delivery.upgrade_instructions(authorize_upgrade, new_bundle=proposed)
     return {'status': 'RESTORED', 'work_item': work, 'checkpoint_sha256': checkpoint_sha256,
+            'instruction_identity': delivery.state.get('instruction_identity'),
+            'instruction_upgrade': upgrade_result,
             'resume': f'python3 {Path(__file__).resolve()} --repo {root} resume {work}',
             'next_action': 'Resume at the incomplete stage; the receiving host must pass fresh sandbox preflight.'}
 
@@ -1568,8 +1650,14 @@ class Delivery:
             raise ValueError('work item changed')
         if self.state['authority'] != {'local_stages': True, 'external_effects': False} or self.state['policy'] != POLICY:
             raise ValueError('persisted authority or policy changed')
-        if skills() != self.state['skills']:
-            raise ValueError('installed stage skills changed; prior invocation inputs are no longer available')
+        if self.state.get('instruction_identity'):
+            if instructions.validate(self.runtime, self.state['instruction_identity']) != self.state['skills']:
+                raise ValueError('pinned stage instruction locations changed; restore the exact retained instruction bundle')
+            for old_identity in instruction_ids(self.state) - {self.state['instruction_identity']}:
+                instructions.load(self.runtime, old_identity)
+        elif skills() != self.state['skills']:
+            raise ValueError('installed stage skills changed; this legacy delivery has no complete pinned instructions; '
+                             'restore its original skill installation and resume the same work item')
         self.state['destination_observation'] = destination_observation(
             self.root, active_route, self.state['comparison_base'])
         if not self.read_only:
@@ -1978,7 +2066,11 @@ class Delivery:
                 host = self.receipt(done)
                 if index == 0:
                     continue
-                if done['inputs'].get('task_readiness') == readiness and done.get('report'):
+                # An instruction upgrade preserves the agreement and host. It does
+                # not by itself invalidate observed tools, inputs or sandbox access.
+                saved_readiness = done['inputs'].get('task_readiness', {})
+                if ({k: v for k, v in saved_readiness.items() if k != 'skills'} ==
+                        {k: v for k, v in readiness.items() if k != 'skills'} and done.get('report')):
                     data = (self.runtime / done['report']).read_bytes()
                     if fs.digest(data) != done['report_sha256'] or data != host['message'].encode():
                         raise ValueError('retained task-readiness report changed')
@@ -2108,6 +2200,8 @@ assert results['scratch'] == 'ok'
 
     def stage_inputs(self, candidate):
         result = report_identity(candidate)
+        if self.state.get('instruction_identity'):
+            result['instruction_identity'] = self.state['instruction_identity']
         if self.state.get('local_git_generations'):
             generation = self.state['local_git_generations'][-1]
             result['local_git_generation'] = {key: generation[key] for key in
@@ -2208,8 +2302,11 @@ assert results['scratch'] == 'ok'
                          'Each row needs a substantive observation. Proof rows need command/output evidence in '
                          'artifact, an assertion, and observation. Use verdict proven for established proof rows; '
                          'otherwise name the gap. ')
-        prompt = (f'Invoke the installed {STAGES[skill_stage]} skill at {self.state["skills"][skill_stage]["path"]}. '
+        instruction_source = 'pinned' if self.state.get('instruction_identity') else 'original installed'
+        prompt = (f'Invoke the {instruction_source} {STAGES[skill_stage]} skill at {self.state["skills"][skill_stage]["path"]}. '
                   f'Read it and its references. Work item {self.work}, workspace {self.workspace}. '
+                  f'For bundled helper commands, use the compatible controller scripts at {Path(__file__).resolve().parent}; '
+                  'the retained instruction tree contains normative text, not another controller installation. '
                   f'Comparison base {self.state["comparison_base"]} is the immutable admission base for this invocation. '
                   'Use it as the review comparison and proof binding; later destination movement is observational and '
                   'must not replace this base or trigger a verifier restart. Whole contract, full scope. '
@@ -2415,6 +2512,8 @@ assert results['scratch'] == 'ok'
             'recovery_count': len(self.state.get('recovery_history', [])),
             'agreement_history': self.state.get('agreement_history', []),
             'limit_extensions': self.state.get('limit_extensions', []),
+            'instruction_identity': self.state.get('instruction_identity'),
+            'instruction_history': self.state.get('instruction_history', []),
             'cleanup': cleanup or self.state.get('cleanup', 'awaiting source checkout verification'),
             'routing': route_record(self.state['routing']),
             'destination_observation': self.state.get('destination_observation'),
@@ -2646,6 +2745,150 @@ assert results['scratch'] == 'ok'
             raise ValueError('portable checkpoint unavailable; retain execution receipts before cleanup')
         self.remove_superseded_artifacts()
         self.remove_local_execution_state()
+
+    def instruction_boundary(self):
+        """Reconcile returned work under its old inputs, without starting a worker."""
+        self.reconcile_worker()
+        pending = [a for a in self.state['attempts'] if a['status'] in ('reserved', 'failed')]
+        if pending:
+            attempt = pending[-1]
+            if len(pending) != 1 or attempt['stage'] not in STAGES:
+                raise ValueError('instruction upgrade needs a reconciled stage boundary; '
+                                 'resume the pinned delivery to reconcile ' + attempt['stage'])
+            # stage(reconcile=True) can only consume this exact reserved response.
+            # A missing/failed receipt exits here, before dispatch could be called.
+            self.receipt(attempt)
+            self.stage(attempt['stage'], reconcile=True)
+        last = self.state['attempts'][-1] if self.state['attempts'] else None
+        if last and last['stage'] in ('implementation', 'repair') and last['status'] == 'complete':
+            self.check_report_rejection(last)
+            report = self.read_report(last['stage'])
+            generation = self.state['local_git_generations'][-1]
+            if (generation.get('source_attempt') or {}).get('attempt_id') != last['id']:
+                self.capture(last['stage'])
+            if report['status'] in ('IMPLEMENTED', 'REPAIRED'):
+                self.state['implementation_complete'] = True
+            history = self.state.get('recovery_history', [])
+            if last['stage'] == 'repair' and history and history[-1]['status'] == 'reserved':
+                self.finish_recovery(history[-1], report)
+            self.save()
+        if (any(a['status'] not in ('complete', 'retired') for a in self.state['attempts']) or
+                any(entry['status'] == 'reserved' for entry in self.state.get('recovery_history', []))):
+            raise ValueError('instruction upgrade needs completed worker and recovery receipts; '
+                             'resume the pinned delivery to reconcile them first')
+        if self.pending_diagnosis() is not None:
+            raise ValueError('instruction upgrade needs the retained recovery decision reconciled; '
+                             'resume the pinned delivery to consume that decision first')
+        self.current()
+        for name in self.state.get('reports', {}):
+            self.read_report(name)
+
+    def upgrade_instructions(self, authorize_upgrade=False, new_bundle=None):
+        """Preview or adopt compatible instructions while preserving completed work."""
+        if authorize_upgrade:
+            self.reconcile_extension()
+            self.reconcile_agreement()
+            self.reconcile_instruction_upgrade()
+        if not self.state.get('instruction_identity'):
+            raise ValueError('legacy delivery has no complete pinned instruction inputs; '
+                             'restore the original skill installation and resume this work item; '
+                             'do not reset state or invent historical protocol bytes')
+        old = instructions.load(self.runtime, self.state['instruction_identity'])
+        new = new_bundle if new_bundle is not None else instructions.capture(skills(), STAGES)
+        instructions.compatible(old, new)
+        before_files, after_files = ({row['path']: row['sha256'] for row in version['files']}
+                                    for version in (old, new))
+        preview = {'status': 'UNCHANGED' if old['identity'] == new['identity'] else 'UPGRADE_AVAILABLE',
+                   'from': old['identity'], 'to': new['identity'],
+                   'compatibility': new['compatibility'],
+                   'changed_inputs': sorted(path for path in before_files.keys() | after_files.keys()
+                                            if before_files.get(path) != after_files.get(path)),
+                   'work_item': self.work, 'candidate_key': candidate_key(self.state['candidate']),
+                   'refreshed_stages': [] if old['identity'] == new['identity'] else ['review', 'proof'],
+                   'preserved': 'Agreement, comparison base, candidate, implementation, history, mandate and limits.',
+                   'resume': result(self)['resume']}
+        if old['identity'] == new['identity']:
+            self.current()
+            return preview
+        if not authorize_upgrade:
+            self.current()
+            preview['next_action'] = (f'upgrade-instructions {self.work} --authorize-upgrade; '
+                                      'no workers launch during adoption, then resume for review and proof')
+            return preview
+        authority = instruction_upgrade_authority(self.state)
+        self.instruction_boundary()
+        admission = json.loads((self.runtime / 'admission.json').read_bytes())
+        installed = instructions.preserve(self.runtime, new)
+        record = {'from': old['identity'], 'to': new['identity'],
+                  'transition_id': fs.digest(fs.canonical([
+                      'instruction-upgrade/v1', self.state['invocation_id'],
+                      old['identity'], new['identity'], len(self.state.get('instruction_history', []))])),
+                  'approved_at': now(), 'approval_source': 'Explicit upgrade-instructions --authorize-upgrade invocation',
+                  **authority, 'candidate_key': candidate_key(self.state['candidate']),
+                  'attempt_count': len(self.state['attempts']), 'refreshed_stages': ['review', 'proof']}
+        transition = {'old_admission': admission,
+                      'new_admission': admission | {'skills': installed, 'instruction_identity': new['identity']},
+                      'record': record}
+        # One write-ahead transition, then exact old/new reconciliation. No worker
+        # reservation occurs until a later resume has completed this transaction.
+        local_save(self.root, self.work, 'runtime/instruction-transition.json', encoded(transition))
+        self.reconcile_instruction_upgrade()
+        self.checkpoint()
+        return preview | {'status': 'UPGRADED', 'transition_id': record['transition_id'],
+                          'checkpoint': self.state['checkpoint'],
+                          'next_action': 'Resume this delivery; review and proof refresh on the retained candidate.'}
+
+    def reconcile_instruction_upgrade(self):
+        path = self.runtime / 'instruction-transition.json'
+        if not path.exists():
+            return
+        transition = json.loads(path.read_bytes())
+        if transition.get('complete'):
+            return
+        old, new, record = (transition[key] for key in ('old_admission', 'new_admission', 'record'))
+        if (new != old | {key: new[key] for key in ('skills', 'instruction_identity')} or
+                record['from'] != old.get('instruction_identity') or record['to'] != new['instruction_identity']):
+            raise ValueError('instruction transition changed unrelated admission fields; preserve and reconcile the journal')
+        before, after = (instructions.load(self.runtime, value) for value in (record['from'], record['to']))
+        instructions.compatible(before, after)
+        if instructions.validate(self.runtime, record['to']) != new['skills']:
+            raise ValueError('instruction transition has changed dispatch paths; recover the saved instruction snapshot')
+        authority = instruction_upgrade_authority(self.state)
+        if any(record.get(key) != value for key, value in authority.items()):
+            raise ValueError('instruction transition mandate changed; restore its covering mandate before resume')
+        admitted = json.loads((self.runtime / 'admission.json').read_bytes())
+        if (admitted not in (old, new) or
+                any(self.state.get(key) not in (old.get(key), new.get(key)) for key in old)):
+            raise ValueError('conflicting instruction-transition admission; preserve both versions and reconcile')
+        history = self.state.setdefault('instruction_history', [])
+        existing = next((entry for entry in history if entry['transition_id'] == record['transition_id']), None)
+        if existing is not None and existing != record:
+            raise ValueError('instruction transition conflicts with its retained history')
+        expected_id = fs.digest(fs.canonical(['instruction-upgrade/v1', self.state['invocation_id'],
+                                             record['from'], record['to'],
+                                             len(history) - (1 if existing else 0)]))
+        if (record['transition_id'] != expected_id or record['attempt_count'] != len(self.state['attempts']) or
+                record['candidate_key'] != candidate_key(self.state['candidate']) or
+                record['refreshed_stages'] != ['review', 'proof'] or
+                any(a['status'] not in ('complete', 'retired') for a in self.state['attempts'])):
+            raise ValueError('instruction transition boundary changed; reconcile retained work before resume')
+        # Validate the actual source/candidate against whichever exact admission
+        # reached disk before an interruption. This shadow performs no writes.
+        shadow = Delivery(self.root, self.work, json.loads(json.dumps(self.state)) | admitted)
+        shadow.read_only = True
+        shadow.current()
+        self.state.update(new)
+        if existing is None:
+            history.append(record)
+            self.state['reports'] = {name: value for name, value in self.state.get('reports', {}).items()
+                                     if name not in ('review', 'proof')}
+            self.state.update(status='RUNNING', blocker=None, ended_at=None)
+            for name in ('completed_at', 'ended_epoch', 'final_review', 'final_proof',
+                         'final_records_written', 'cleanup_verified_at', 'cleanup_source_identity_sha256', 'cleanup'):
+                self.state.pop(name, None)
+        self.save()
+        local_save(self.root, self.work, 'runtime/admission.json', encoded(new))
+        local_save(self.root, self.work, 'runtime/instruction-transition.json', encoded(transition | {'complete': True}))
 
     def extend(self, args):
         if not args.authorize_extension:
@@ -3011,6 +3254,7 @@ assert results['scratch'] == 'ok'
     def run(self):
         self.reconcile_extension()
         self.reconcile_agreement()
+        self.reconcile_instruction_upgrade()
         self.reconcile_worker()
         # Mutating workers can return before the controller saves their new generation.
         # Validate their exact recorded receipt, never launch them a second time.
@@ -3323,6 +3567,7 @@ def create(root, args, invocation_started_epoch=None):
                          '; requested comparison base ' + base + ' is stale; start a new delivery with --comparison-base ' + decision['target_tip'])
     records = routing_records(root, decision, args.work)
     installed = skills()
+    instruction_bundle = instructions.capture(installed, STAGES)
     fs.check_index(root)
     current = fs.snapshot(root)
     head = fs.full_commit(root, 'HEAD')
@@ -3380,6 +3625,7 @@ def create(root, args, invocation_started_epoch=None):
         raise ValueError('local runtime exists without an active delivery record; preserve it and reconcile admission')
     require_repo_local_ignored(root, runtime)
     runtime.mkdir(parents=True)
+    installed = instructions.preserve(runtime, instruction_bundle)
     repository = runtime / 'repository.git'
     require_repo_local_ignored(root, repository)
     subprocess.run(['git', 'init', '--bare', '--quiet', str(repository)], check=True)
@@ -3436,6 +3682,7 @@ def create(root, args, invocation_started_epoch=None):
              'source_index_sha256': fs.digest(fs.git(root, 'ls-files', '--stage', '-z')),
              'source_product_index_sha256': fs.product_index_sha256(root),
              'excluded_dirty': sorted(excluded), 'skills': installed,
+             'instruction_identity': instruction_bundle['identity'], 'instruction_history': [],
              'routing': decision, 'routing_records': records, 'starting_commit': starting,
              'base_tree_key': base_tree_key,
              'local_git_base': local_git_base, 'local_git_generations': [],
@@ -3461,7 +3708,7 @@ def create(root, args, invocation_started_epoch=None):
                       'elapsed_limit': 'admission and process termination; provider billing may continue',
                       'trust': 'controller and OS trusted; no arbitrary same-user tamper resistance'}}
     delivery = Delivery(root, args.work, state)
-    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'source_product_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host')}))
+    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'source_product_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'instruction_identity', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host')}))
     delivery.save()
     delivery.capture('admission')
     delivery.save()
@@ -3519,6 +3766,8 @@ def result(delivery):
         'invocation_id', 'work_item', 'comparison_base', 'limits', 'repair_used', 'host')} | {
         'routing': state.get('routing'),
         'autonomy': state.get('autonomy'),
+        'instruction_identity': state.get('instruction_identity'),
+        'instruction_history': state.get('instruction_history', []),
         'checkpoint': state.get('checkpoint', {'status': 'LOCAL_ONLY', 'blocker': 'portable checkpoint not yet saved'}),
         'continuation': state.get('continuation'),
         'recovery_history': state.get('recovery_history', []),
@@ -3664,6 +3913,10 @@ def main(argv=None):
     extension.add_argument('--mandate')
     for flag in ('--max-dispatches', '--max-seconds', '--max-stage-seconds', '--max-repairs'):
         extension.add_argument(flag)
+    upgrade = commands.add_parser('upgrade-instructions', help='preview a compatible instruction upgrade; preserve implementation and limits')
+    upgrade.add_argument('work')
+    upgrade.add_argument('--authorize-upgrade', action='store_true',
+                         help='adopt the installed instruction version at a reconciled boundary; starts no workers')
     effect = commands.add_parser('authorize-effect', help='check a standing grant for an exact effect preview; performs no effect')
     effect.add_argument('work')
     effect.add_argument('--action', dest='effect_action', required=True, choices=sorted(autonomy.EFFECTS))
@@ -3811,6 +4064,13 @@ def main(argv=None):
             raise ValueError('missing delivery invocation; no effects can be reconciled')
         elif args.action == 'run':
             delivery = create(root, args, invocation_started_epoch)
+        if args.action == 'upgrade-instructions':
+            if delivery is None:
+                raise ValueError('missing active delivery invocation; restore its checkpoint before upgrading instructions')
+            delivery.read_only = not args.authorize_upgrade
+            output = delivery.upgrade_instructions(args.authorize_upgrade)
+            print(json.dumps(output, indent=2))
+            return 0
         if args.action == 'extend':
             if delivery is None:
                 raise ValueError('missing delivery invocation; nothing to extend')
@@ -3836,6 +4096,12 @@ def main(argv=None):
     except (ValueError, OSError, KeyError, TypeError, UnicodeError, subprocess.SubprocessError) as error:
         message = str(error)
         if delivery:
+            if args.action == 'upgrade-instructions':
+                output = result(delivery)
+                output.update(status='BLOCKED', instruction_upgrade_status='BLOCKED',
+                              delivery_status=delivery.state['status'], blocker=message)
+                print(json.dumps(output, indent=2))
+                return 1
             if args.action in ('github-record-preview', 'github-record-publish', 'authorize-effect'):
                 output = result(delivery)
                 output.update(blocker=message, **{('effect_status' if args.action == 'authorize-effect' else 'github_record_status'): 'BLOCKED'})

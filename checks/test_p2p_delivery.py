@@ -17,6 +17,7 @@ import unittest
 from unittest.mock import patch
 
 SCRIPTS = Path(__file__).resolve().parents[1] / 'skills/productivity/deliver-issue/scripts'
+FIXTURE_SKILLS = Path(__file__).resolve().parent / 'fixtures/skills'
 sys.path.insert(0, str(SCRIPTS))
 import p2p_delivery as d
 
@@ -50,7 +51,9 @@ def fixture_host():
         return str(executable) if name == 'codex' else original_which(name, *args, **kwargs)
 
     def installed(name):
-        path = SCRIPTS.parents[1] / name / 'SKILL.md'
+        # Small, real instruction packages exercise pinning and portable restore
+        # without pretending that fixture responses followed production skills.
+        path = FIXTURE_SKILLS / name / 'SKILL.md'
         return {'path': str(path), 'sha256': d.fs.digest(path.read_bytes())}
 
     def run(args, *positional, **kwargs):
@@ -2817,6 +2820,33 @@ class ConformanceBridgeTests(unittest.TestCase):
             self.assertTrue((runtime / 'workspace/.git').is_file())
             self.assertTrue(all((runtime / report['path']).is_file()
                                 for report in saved['reports'].values()))
+            # The bridge computes expected report identity independently of the
+            # controller. A passing candidate alone cannot hide stale instructions.
+            with patch.dict(os.environ, env):
+                spec = importlib.util.spec_from_file_location('conformance_bridge_check', bridge)
+                adapter = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(adapter)
+                for stage, index in (('review', 7), ('proof', 8)):
+                    report_path = runtime / saved['reports'][stage]['path']
+                    original = report_path.read_bytes()
+                    try:
+                        for defect in ('missing', 'changed'):
+                            with self.subTest(stage=stage, instruction_identity=defect):
+                                report = json.loads(original)
+                                inputs = json.loads(report['input_identity_json'])
+                                self.assertEqual(inputs['instruction_identity'], saved['instruction_identity'])
+                                if defect == 'missing':
+                                    inputs.pop('instruction_identity')
+                                else:
+                                    inputs['instruction_identity'] = '0' * 64
+                                report['input_identity_json'] = json.dumps(inputs)
+                                report_path.write_bytes(d.encoded(report))
+                                projected = adapter.projection(0, saved).split('|')
+                                expected = ['1', '1', '1']
+                                expected[index - 7] = '-1'
+                                self.assertEqual(projected[7:10], expected)
+                    finally:
+                        report_path.write_bytes(original)
             actions = [json.loads(line) for line in (trace / 'actions.jsonl').read_text().splitlines()]
             self.assertIn('--destination', actions[0]['controller']['command'])
             self.assertIn('delivery-target', actions[0]['controller']['command'])

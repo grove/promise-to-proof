@@ -889,7 +889,7 @@ def read_checkpoint(root, data):
             raise ValueError("invalid checkpoint file")
         safe(root, row["path"])
         if row["scope"] == "runtime" and not re.fullmatch(
-                r"base-tree-key|generations/[0-9]{6}\.json|(?:previous-records|superseded-records)/[\w.-]+|attempts/[a-f0-9-]+/(?:report|exit|portable-receipt)\.json", row["path"]):
+                r"base-tree-key|instructions/[a-f0-9]{64}\.json|generations/[0-9]{6}\.json|(?:previous-records|superseded-records)/[\w.-]+|attempts/[a-f0-9-]+/(?:report|exit|portable-receipt)\.json", row["path"]):
             raise ValueError("unsupported checkpoint runtime path")
         if row["scope"] == "local" and row["path"] not in ("implementation.md", "repair.md", "review.md", "proof.md", "mandate.json"):
             raise ValueError("unsupported checkpoint local path")
@@ -939,6 +939,7 @@ def read_checkpoint(root, data):
         if any(scope == "agreement" and relative not in allowed for scope, relative, _ in contents):
             raise ValueError("unsupported checkpoint agreement path")
         indexed = {(scope, relative): content for scope, relative, content in contents}
+        checkpoint_instructions(execution, indexed)
         contract = indexed[("project", value["work_item"])]
         if digest(contract) != execution["contract"]["sha256"] or contract.decode() != execution["contract"]["content"]:
             raise ValueError("checkpoint agreement identity mismatch")
@@ -962,14 +963,82 @@ def read_checkpoint(root, data):
     return value, contents
 
 
-def restore_checkpoint(root, data):
+def checkpoint_instructions(execution, indexed):
+    """Validate instruction provenance before a portable restore writes anything."""
+    import p2p_instructions as instructions
+    bundles = {}
+    for (scope, relative), data in indexed.items():
+        match = re.fullmatch(r"instructions/([a-f0-9]{64})\.json", relative)
+        if scope == "runtime" and match:
+            bundles[match[1]] = instructions.decode(data, match[1])
+    active = execution.get("instruction_identity")
+    history = execution.get("instruction_history", [])
+    attempt_identities = []
+    for attempt in execution.get("attempts", []):
+        inputs = attempt.get("inputs", {})
+        if not isinstance(inputs, dict):
+            raise ValueError("invalid checkpoint stage inputs")
+        candidate = inputs.get("candidate", {})
+        identities = [inputs.get("instruction_identity")]
+        if isinstance(candidate, dict):
+            identities.append(candidate.get("instruction_identity"))
+        attempt_identities.append([value for value in identities if value is not None])
+    if active is None:
+        if bundles or history or any(attempt_identities):
+            raise ValueError("checkpoint instruction provenance lacks its active identity")
+        return  # Legacy receipts retain their original, limited skill identity.
+    if not isinstance(active, str) or not re.fullmatch(r"[a-f0-9]{64}", active) or not isinstance(history, list):
+        raise ValueError("invalid checkpoint instruction identity/history")
+    referenced = {active}
+    previous, previous_count = None, 0
+    for index, entry in enumerate(history):
+        if (not isinstance(entry, dict) or not all(isinstance(entry.get(key), str) and
+                re.fullmatch(r"[a-f0-9]{64}", entry[key]) for key in ("from", "to")) or
+                entry["from"] == entry["to"] or previous is not None and entry["from"] != previous):
+            raise ValueError("checkpoint instruction transition history is inconsistent")
+        expected_id = digest(canonical(['instruction-upgrade/v1', execution['invocation_id'],
+                                        entry['from'], entry['to'], index]))
+        count = entry.get('attempt_count')
+        if (entry.get('transition_id') != expected_id or type(count) is not int or
+                not previous_count <= count <= len(attempt_identities) or
+                entry.get('refreshed_stages') != ['review', 'proof'] or
+                not isinstance(entry.get('approval_source'), str) or not entry['approval_source'].strip() or
+                not isinstance(entry.get('mandate_policy_sha256'), str) or
+                not re.fullmatch(r'[a-f0-9]{64}', entry['mandate_policy_sha256'])):
+            raise ValueError("checkpoint instruction transition provenance is invalid")
+        referenced.update((entry["from"], entry["to"]))
+        previous, previous_count = entry["to"], count
+    if previous is not None and previous != active:
+        raise ValueError("checkpoint instruction transition does not reach the active identity")
+    expected, transition = (history[0]['from'] if history else active), 0
+    for index, identities in enumerate(attempt_identities):
+        while transition < len(history) and history[transition]['attempt_count'] <= index:
+            expected = history[transition]['to']
+            transition += 1
+        for identity in identities:
+            if not isinstance(identity, str) or identity != expected:
+                raise ValueError("checkpoint stage instruction identity differs from its historical boundary")
+            referenced.add(identity)
+    if set(bundles) != referenced:
+        raise ValueError("checkpoint instruction inputs are missing or unreferenced; preserve the exact snapshots before transfer")
+    for entry in history:
+        instructions.compatible(bundles[entry["from"]], bundles[entry["to"]])
+
+
+def restore_checkpoint(root, data, upgrade_instructions=False, authorize_upgrade=False):
     """Validate the entire transfer before writing any local agreement or product input."""
+    if authorize_upgrade and not upgrade_instructions:
+        raise ValueError("--authorize-upgrade requires --upgrade-instructions")
     root = Path(root).resolve()
     value, contents = read_checkpoint(root, data)
     setup(root)
     if value["execution"]:
         import p2p_delivery
-        return p2p_delivery.restore_checkpoint(root, value, contents, data)
+        return p2p_delivery.restore_checkpoint(root, value, contents, data,
+                                              upgrade_instructions=upgrade_instructions,
+                                              authorize_upgrade=authorize_upgrade)
+    if upgrade_instructions or authorize_upgrade:
+        raise ValueError("instruction upgrades require a delivery checkpoint; restore this planning handoff normally")
     if any(scope != "project" for scope, _, _ in contents):
         raise ValueError("runtime files require a controller checkpoint")
     targets = []
@@ -1035,7 +1104,8 @@ def checkpoint_current(root, value, contents):
         current = json.loads(local.read_bytes())
         boundary = value["execution"]
         if boundary is None or any(current.get(key) != boundary.get(key) for key in
-                                  ("invocation_id", "candidate", "contract", "limits", "routing", "reports", "blocker")):
+                                  ("invocation_id", "candidate", "contract", "limits", "routing", "reports", "blocker",
+                                   "instruction_identity", "instruction_history")):
             raise ValueError("checkpoint is stale; the local controller needs a new completed boundary")
         if any(a["status"] not in ("complete", "retired") for a in current["attempts"]):
             raise ValueError("uncertain dispatch prevents portability; retain local execution state")
@@ -1122,6 +1192,11 @@ def main(argv=None):
             command.add_argument("--remote", help="verify published checkpoint and Git objects against this remote")
         if name == "checkpoint-github-publish":
             command.add_argument("--authorize-comment-sha256", required=True)
+        if name in ("checkpoint-restore", "checkpoint-github-restore"):
+            command.add_argument("--upgrade-instructions", action="store_true",
+                                 help="preview or apply the shared instruction upgrade after restoring pinned inputs")
+            command.add_argument("--authorize-upgrade", action="store_true",
+                                 help="authorize the compatible instruction transition under the current delivery mandate")
         if name == "checkpoint-github-restore":
             command.add_argument("--repository", required=True)
             command.add_argument("--issue", type=int, required=True)
@@ -1165,7 +1240,9 @@ def main(argv=None):
                 result = checkpoint(root, args.work, destination, candidate_commit=args.candidate_commit)
         elif args.command == "checkpoint-restore":
             target, _ = checkpoint_path(root, args.work)
-            result = restore_checkpoint(root, target.read_bytes())
+            result = restore_checkpoint(root, target.read_bytes(),
+                                        upgrade_instructions=args.upgrade_instructions,
+                                        authorize_upgrade=args.authorize_upgrade)
         elif args.command == "checkpoint-status":
             result = checkpoint_status(root, args.work, args.remote)
         elif args.command == "checkpoint-github-preview":
@@ -1181,7 +1258,8 @@ def main(argv=None):
             value = json.loads(data)
             if value["destination"] != {"kind": "github", "repository": args.repository, "issue": args.issue}:
                 raise ValueError("GitHub checkpoint destination differs from the selected issue")
-            result = restore_checkpoint(root, data) | {"url": url}
+            result = restore_checkpoint(root, data, upgrade_instructions=args.upgrade_instructions,
+                                        authorize_upgrade=args.authorize_upgrade) | {"url": url}
         elif args.command == "checkpoint-github-status":
             target, destination = checkpoint_path(root, args.work)
             if destination["kind"] != "github":

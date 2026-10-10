@@ -1,5 +1,7 @@
 # Acceptance contract protocol
 
+<!-- p2p-instruction-dependencies: ./evidence-record-v1.md ./acceptance-bundle-v1.md -->
+
 Build exactly the promised capability: no less in substance, no more in scope.
 Prefer the simplest complete implementation.
 
@@ -474,7 +476,9 @@ Use the filesystem helper's `checkpoint`, `checkpoint-status`,
 
 Preserve exact agreements and binding sources, approvals and their referenced
 historical versions, dependencies/routing, completed reports and necessary host
-receipts, effect receipts, limits, blocker and next action. Deduplicate text by
+receipts, effect receipts, limits, blocker and next action. Preserve the admitted
+and effective instruction identities, their required snapshots, and instruction
+upgrade receipts with the reports that used them. Deduplicate text by
 SHA-256. Reference matching committed project documents and product candidates
 by full Git commit and path; never embed product trees, transcripts, prompts,
 dependency caches or ordinary logs. Referenced evidence must remain retrievable;
@@ -499,6 +503,9 @@ existing executions or agreements. Preserve the frozen comparison base and stage
 identities. Recheck host isolation on the receiving machine; completed contexts
 are evidence, not permission to skip a new host's preflight. An uncertain dispatch
 blocks transfer/resume until reconciled; never recreate a running agent process.
+Restore the preserved effective instructions by default, even when the receiving
+installation differs. An explicitly selected instruction upgrade uses the same
+rules as a local upgrade below; transfer cannot silently adopt newer rules.
 
 Neither `.p2p/` nor `~/.p2p/` is required on a receiving machine after a verified
 checkpoint. They may be removed only after verifying the shared checkpoint and
@@ -683,6 +690,84 @@ setup, path resolution, safe creation and replacement, candidate capture,
 validation, and resume inventory. Read its `--help` for arguments. It checks
 storage and identities, not evidence adequacy or approval, and never invokes
 Git writes or external services. Stages still own their reports and verdicts.
+
+## Delivery instruction identity and upgrades
+
+The agreement describes the promised product outcome. Delivery instructions
+describe how stages work toward it. Track their identities separately. At
+admission, preserve exact stage-skill bytes and their material rule/protocol
+dependencies in an immutable instruction snapshot. Its content identity includes
+the referenced bytes, even when only a referenced protocol changed; installation
+paths alone do not identify instructions. Future stage attempts and reports bind
+to the effective instruction identity as well as the agreement and candidate.
+
+Ordinary resume uses the preserved instructions. Updating installed skills does
+not rewrite an active invocation or reload an already-running worker. It also
+does not require restarting completed work. Never edit admission hashes or
+delete retained execution state to force a version change.
+
+An explicit `upgrade-instructions <contract> --authorize-upgrade` may adopt a
+compatible installed instruction set under covering local implementation and
+evidence authority. Without the authorization flag, the command is a read-only
+preview. Preview the old and proposed identities, changed inputs, compatibility,
+and verification that will become historical. Adoption is a deterministic local
+transition; it needs no additional model stage. Use authority already granted
+for this request instead of asking the user to approve it again.
+
+Adopt only at a reconciled stage boundary. Reconcile a known finished worker
+against its original inputs and retain its result first. A running or uncertain
+dispatch blocks adoption until its completion is established; never launch a
+replacement merely to change instructions. Preserve the invocation, exact
+contract and binding inputs, frozen comparison base, source and routing, candidate
+and Git generations, completed implementation, attempts and recovery history,
+limits, deadlines and mandate. An instruction upgrade grants no additional
+attempts, time or external effects and cannot weaken the accepted promise.
+
+Retain the old and new instruction snapshots and one attributable transition
+receipt. Old attempts and report bytes keep their original instruction identity.
+After a changed instruction set is adopted, both review and proof issue fresh
+full-scope reports in new independent contexts on the retained candidate. Old
+verdicts cannot certify the new instruction set. Do not rerun implementation
+unless the new verification identifies a material gap. The current transition
+requires fresh observations under the new instructions; it does not provide a
+cross-version evidence cache. Verifiers select the smallest sufficient checks
+for their obligations, and a new report alone never requires repeating an
+expensive repository-wide check. The unchanged host's valid readiness observations
+remain applicable; an instruction update alone does not repeat host preflight.
+
+Persist and read back the transition so an interrupted adoption can be reconciled
+by ordinary `resume` exactly once. Selecting the already-effective identity is a
+no-op: retain completed reports, consumed attempts and limits without another
+transition or worker launch. Portable restore retains this same instruction
+history and uses the same adoption path when an upgrade is explicitly selected.
+A receiving host still needs its own preflight before stage dispatch.
+
+Missing snapshot bytes, incompatible instructions or missing authority block
+adoption with the exact missing input or decision and a supported next action.
+Legacy records without complete preserved instruction inputs cannot establish
+an upgrade history retrospectively. Keep those records and recover the original
+installation/version for their existing resume path. Legacy records can check
+only their saved top-level skill hashes, so matching those files alone does not
+establish that referenced rules are unchanged. Do not invent old reference hashes
+or start a replacement delivery to hide the gap.
+
+### Declare material instruction dependencies
+
+Each controller stage skill declares
+`metadata.p2p-instruction-compatibility: delivery-v1` in its YAML frontmatter.
+The compatibility family promises unchanged agreement, candidate, authority and
+stage-report meanings; authors must change it when those meanings break. A
+matching marker does not itself establish correctness or grant authority. Never
+edit a marker to bypass an incompatible-upgrade blocker.
+
+Referenced rule documents declare their further material dependencies in one
+`p2p-instruction-dependencies` HTML comment after the title, with relative paths
+separated by spaces after its colon. An empty declaration means the document is
+self-contained. Authors must include every normative dependency and keep the
+declaration current. Informational links,
+examples and user guides do not become instruction inputs merely because they
+are linked. Preserve dependency bytes and relative resolution in the snapshot;
+missing declared inputs block admission or upgrade.
 
 ## Pre-approval audit
 

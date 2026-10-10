@@ -10,6 +10,14 @@ The default record is `p2p-state/<slug>.json`. It contains exact agreements,
 approval receipts and referenced historical inputs, child scopes/dependencies,
 routing, completed reports, compact host receipts, and the controller's next
 stage, blocker, limits and effect receipts. Identical text is stored once.
+Instruction snapshots and upgrade receipts preserve both the original and
+effective instruction identities, including the material rule/protocol bytes
+used by historical reports. Installed dependencies and runtime logs stay out.
+Instruction text is compressed inside its snapshot. The existing 256 KiB
+checkpoint limit and smaller GitHub comment limit still apply. A large snapshot
+or upgrade history can exceed either limit; P2P retains local work and reports
+that preservation blocker instead of dropping required instructions. Prefer the
+Git destination when the complete record does not fit an issue comment.
 Matching committed project documents are references to full commits and paths.
 Candidate code is a Git commit reference, never an embedded repository snapshot.
 Git retains checkpoint revisions instead of a second exported `history/` tree.
@@ -77,10 +85,28 @@ existing execution require reconciliation; restore never resets or overwrites
 them. Planning restoration retains exact approval evidence without granting new
 approval. Delivery restoration rebuilds an isolated local candidate and returns
 the existing controller `resume` command. The comparison base, completed stage
-identities and limits stay fixed. The receiving machine must have the same stage
-skill versions and the currently supported macOS/Codex host; resume performs fresh
+identities and limits stay fixed. Restore uses the checkpoint's preserved
+instructions even when the receiving machine has newer skills installed. It
+still requires the currently supported macOS/Codex host; resume performs fresh
 sandbox preflight before dispatching an incomplete stage. A transfer does not
 restart a running agent or grant new publication/merge authority.
+
+To explicitly adopt a compatible installed instruction update during restore,
+under the covering request and local implementation/evidence authority, use:
+
+```sh
+python3 <helper> --repo /path/to/new-clone checkpoint-restore .p2p/work/example/contract.md --upgrade-instructions --authorize-upgrade
+```
+
+This uses the same
+[instruction transition](p2p-delivery-controller.md#upgrade-an-active-deliverys-instructions)
+as a local upgrade. It retains the candidate, completed implementation and old
+reports, then requires fresh review and proof under the new instructions. Selecting
+the same instructions preserves completed verification. Host preflight remains a
+separate requirement. Missing historical instruction bytes, an incompatible
+update or missing authority blocks adoption while preserving recovery records;
+legacy records without complete snapshots need their original installation for
+their existing resume path.
 
 Uncertain or unreconciled dispatches cannot be exported as resumable boundaries.
 Keep their local state and reconcile completion first. A failed checkpoint leaves
@@ -118,6 +144,10 @@ published checkpoint hash:
 ```sh
 python3 <helper> --repo /path/to/new-clone checkpoint-github-restore --repository OWNER/REPO --issue 42 --sha256 EXACT_CHECKPOINT_SHA256
 ```
+
+The same optional `--upgrade-instructions --authorize-upgrade` flags select the
+common instruction transition. Omitting them preserves the checkpoint's pinned
+instructions, just as Git restoration does.
 
 Use the checkpoint hash from publication, not the preview comment-body hash.
 No issue label, mutable branch name, local absolute path, or chat summary can
