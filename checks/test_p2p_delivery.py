@@ -294,7 +294,12 @@ class FakeTransport:
             if stage in ('implementation', 'repair', 'review', 'proof') and 'agreement_paths' in admission:
                 # Explicitly OFFLINE fixture trace; not a real reviewer judgment.
                 product = Path(prompt.split('workspace ', 1)[1].split('. ', 1)[0])
-                excluded = admission['agreement_paths']
+                excluded = admission.get('agreement_paths')
+                if excluded is None:
+                    # Historical pilot controllers predate this admission field.
+                    # Use their old work/binding boundary only in offline fixtures.
+                    excluded = [inputs['work_item'], *(row['path'] for row in
+                                                       inputs.get('binding_inputs', []))]
                 manifest = d.fs.snapshot(product, exclude=excluded)
                 changed = d.fs.tree_changes(d.fs.snapshot(product, inputs['comparison_base'], exclude=excluded), manifest)
                 paths = [item['path'] for item in changed]
