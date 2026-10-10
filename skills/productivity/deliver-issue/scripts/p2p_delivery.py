@@ -1666,25 +1666,35 @@ class Delivery:
                     raise ValueError('retained routing history/evidence changed: ' + record['path'])
         current = fs.snapshot(self.root)
         current_key = fs.snapshot_key(current)
-        product_key = fs.snapshot_key(fs.snapshot(self.root, exclude=self.state.get('agreement_paths', ())))
+        # The complete source snapshot already contains the product subset.
+        # Filtering these exact bytes removes a redundant checkout scan while
+        # preserving records-only vs product-change classification.
         applied_key = self.state.get('candidate', {}).get('key')
-        candidate_applied = self.state.get('status') == 'REVIEWED_AND_PROVEN' and product_key == applied_key
+        candidate_applied = (self.state.get('status') == 'REVIEWED_AND_PROVEN' and
+                             fs.snapshot_key([row for row in current
+                                              if row['path'] not in self.state.get('agreement_paths', ())]) == applied_key)
         if current_key != self.state['source_tree_key'] and not candidate_applied:
             raise ValueError('source checkout changed since admission')
         if (self.workspace / '.git').read_text() != 'gitdir: ' + str(self.runtime / 'repository.git') + '\n':
             raise ValueError('isolated Git metadata pointer changed')
         head = fs.full_commit(self.root, 'HEAD')
         index = fs.digest(fs.git(self.root, 'ls-files', '--stage', '-z'))
-        metadata_only = (self.state.get('source_product_index_sha256') == fs.product_index_sha256(self.root) and
-                         fs.snapshot_key(fs.snapshot(self.root, head)) == self.state['source_tree_key'] and
-                         fs.snapshot_key(current) == self.state['source_tree_key'])
-        if (head != self.state['source_head'] or index != self.state['source_index_sha256']) and not metadata_only:
-            committed_candidate = (candidate_applied and
-                                   fs.snapshot_key(fs.snapshot(self.root, head)) == applied_key)
-            staged_product = subprocess.run(['git', '-C', str(self.root), 'diff', '--cached', '--quiet',
-                                             '--', ':(exclude).p2p', ':(exclude)p2p-state']).returncode
-            if not committed_candidate or staged_product:
-                raise ValueError('source HEAD or index changed since admission')
+        # Inspect committed HEAD and staged product identity only when a
+        # checkout metadata change makes this distinction relevant. A normal
+        # cold delivery still checks the live full source snapshot above.
+        if head != self.state['source_head'] or index != self.state['source_index_sha256']:
+            head_key = fs.snapshot_key(fs.snapshot(self.root, head))
+            metadata_only = (self.state.get('source_product_index_sha256') ==
+                             fs.product_index_sha256(self.root) and
+                             head_key == self.state['source_tree_key'] and
+                             current_key == self.state['source_tree_key'])
+            if not metadata_only:
+                committed_candidate = candidate_applied and head_key == applied_key
+                staged_product = subprocess.run(['git', '-C', str(self.root), 'diff',
+                                                 '--cached', '--quiet', '--',
+                                                 ':(exclude).p2p', ':(exclude)p2p-state']).returncode
+                if not committed_candidate or staged_product:
+                    raise ValueError('source HEAD or index changed since admission')
         if fs.full_commit(self.workspace, self.state['comparison_base']) != self.state['comparison_base']:
             raise ValueError('comparison base unavailable')
         base_key = fs.snapshot_key(fs.snapshot(self.workspace, self.state['comparison_base']))
