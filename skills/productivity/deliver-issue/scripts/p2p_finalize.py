@@ -654,14 +654,17 @@ def main(argv=None):
     try:
         root = Path(fs.git(Path(args.repo), "rev-parse",
                            "--show-toplevel").decode().strip())
-        original = json.loads(Path(args.record).read_bytes())
-        checkpoint = Path(args.checkpoint).read_bytes()
-        mandate = (autonomy.load(args.mandate) if args.mandate else
+        selected = lambda value: (Path(value) if Path(value).is_absolute()
+                                  else root / value)
+        original = json.loads(selected(args.record).read_bytes())
+        checkpoint = selected(args.checkpoint).read_bytes()
+        mandate = (autonomy.load(selected(args.mandate)) if args.mandate else
                    original.get("autonomy"))
         output = finalize(root, original, checkpoint,
                           repository=args.repository, remote=args.remote,
                           method=args.method, pr_url=args.pr,
-                          readiness=args.readiness, before=args.before,
+                          readiness=str(selected(args.readiness)) if args.readiness else None,
+                          before=args.before,
                           after=args.after, confirmed_at=args.confirmed_at,
                           mandate=mandate, receipt_issue=args.receipt_issue,
                           receipt_ref=args.receipt_ref,
@@ -670,7 +673,10 @@ def main(argv=None):
         return 0 if output["status"] in ("FINALIZED", "READY_TO_RECORD", "READY_TO_MERGE") else 1
     except (ValueError, OSError, KeyError, TypeError, UnicodeError,
             json.JSONDecodeError, subprocess.SubprocessError) as error:
-        print("p2p finalization: " + str(error), file=sys.stderr)
+        print(json.dumps({
+            "status": "BLOCKED", "blocker": str(error),
+            "next_action": "Resolve the exact named input, GitHub gate or effect grant and rerun readback before any remote write."
+        }, indent=2, ensure_ascii=False))
         return 1
 
 
