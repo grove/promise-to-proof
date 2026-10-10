@@ -12,6 +12,7 @@ import p2p_filesystem as fs
 
 MAX_SLICES = 8
 MAX_CHECKS = 6
+MAX_PATHS = 100
 SLICE_FIELDS = {"id", "requirement_ids", "expected_result", "checks", "paths",
                 "outcome", "boundary_reason", "next_action", "retires"}
 CHECK_FIELDS = {"kind", "command", "result", "observation"}
@@ -57,6 +58,41 @@ def _command_matches(recorded, requested):
             parts[1] in ("-c", "-lc", "-ic", "-lic") and parts[2] == requested)
 
 
+def _nontrivial_check(check, paths):
+    """Disallow self-attestation; retain practical CLI/test/inspection checks.
+
+    This is a minimum plausibility guard. The independent reviewer and prover
+    still judge relevance and behavior; an executable command can lie too.
+    """
+    try:
+        parts = shlex.split(check["command"])
+    except (TypeError, ValueError):
+        return False
+    if not parts:
+        return False
+    executable = parts[0].rsplit("/", 1)[-1].lower()
+    if executable in {"echo", "printf", "true", "false", "pwd", "date",
+                      "sleep", "touch", "mkdir"}:
+        return False
+    command = check["command"]
+    if check["kind"] == "test":
+        runners = ("pytest", "unittest", "cargo test", "go test",
+                   "npm test", "npm run test", "pnpm test", "yarn test",
+                   "mvn test", "gradle test", "dotnet test",
+                   "make test", "ctest", "bats", "vitest", "jest",
+                   "phpunit", "rspec", "npx playwright test")
+        if not any(x in command for x in runners) and not any(
+                path in command or path.rsplit("/", 1)[-1] in parts
+                for path in paths):
+            return False
+    if check["kind"] == "inspection" and not (
+            any(path in command for path in paths) or
+            "git diff" in command or "git show" in command or
+            "git grep" in command):
+        return False
+    return True
+
+
 def active(records):
     retired = {old["id"] for record in records for old in record["slice"]["retires"]}
     return [row for row in records if row["slice"]["id"] not in retired]
@@ -86,9 +122,10 @@ def validate(report, requirements, records, host_executions, current_manifest,
     paths = progress["paths"]
     old_paths = {row["path"] for row in prior_manifest}
     new_paths = {row["path"] for row in current_manifest}
-    if (not isinstance(paths, list) or len(set(paths)) != len(paths) or
-            any(not isinstance(p, str) or not fs.product_path(p) or
-                p not in old_paths | new_paths for p in paths)):
+    if (not isinstance(paths, list) or len(paths) > MAX_PATHS or
+            any(not isinstance(p, str) or len(p) > 350 for p in paths) or
+            len(set(paths)) != len(paths) or
+            any(not fs.product_path(p) or p not in old_paths | new_paths for p in paths)):
         raise ValueError("slice paths must identify actual old/current product files")
     changes = fs.tree_changes(prior_manifest, current_manifest)
     changed = {item["path"] for item in changes}
@@ -105,6 +142,8 @@ def validate(report, requirements, records, host_executions, current_manifest,
                 not _bounded(check["command"], 400) or
                 not _bounded(check["observation"], 400)):
             raise ValueError("slice check lacks a meaningful observable result")
+        if progress["outcome"] == "VERIFIED" and not _nontrivial_check(check, paths):
+            raise ValueError("slice check does not exercise its named implementation or an independent test")
         executions = [event for event in host_executions
                       if _command_matches(event.get("command"), check["command"])
                       and check["observation"] in event.get("aggregated_output", "")
@@ -246,5 +285,8 @@ def progress_view(state):
         "next_slice": f"I{len(records) + 1}" if not finished else None,
         "next_action": next_action,
         "status": "IMPLEMENTED" if finished else "IN_PROGRESS",
+        "covered_requirement_ids": sorted({req for record in active(records)
+                                           for req in record["slice"]["requirement_ids"]}),
+        "latest_verified_checks": (latest["slice"]["checks"] if latest else []),
         "authority": "Only saved verified implementation; independent review and proof still required.",
     }
