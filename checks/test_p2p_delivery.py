@@ -313,6 +313,14 @@ class FakeTransport:
                 }
                 if 'coverage_trace.risks' in prompt:
                     report['coverage_trace']['risks'] = []  # No extra material risks in the low-risk offline fixture.
+            if stage == 'implementation' and 'implementation_slice' in prompt:
+                report['implementation_slice'] = {
+                    'id': 'I1', 'requirement_ids': ['R1'],
+                    'expected_result': 'hello newline and zero exit',
+                    'checks': [{'kind': 'test', 'command': 'FIXTURE python3 greet.py',
+                                'result': 'passed', 'observation': 'hello'}],
+                    'paths': [self.output_path], 'outcome': 'VERIFIED',
+                    'boundary_reason': '', 'next_action': '', 'retires': []}
             output = 'hello\n'
             report = json.dumps(report)
         self.messages.append((stage, report))
