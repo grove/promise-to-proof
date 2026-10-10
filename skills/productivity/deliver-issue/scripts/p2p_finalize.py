@@ -148,6 +148,9 @@ def _passed(name, groups):
 def check_ready(root, record, remote, repository, pr, method, readiness,
                 *, runner=subprocess.run):
     head, base, branch = pr["head"]["sha"], pr["base"]["sha"], pr["base"]["ref"]
+    marker = "<!-- p2p-ready:sha256:" + fs.digest(fs.canonical(readiness)) + " -->"
+    need(isinstance(pr.get("body"), str) and pr["body"].count(marker) == 1,
+         "READY assessment has not been read back in the PR description")
     need(readiness["pr"] == pr["html_url"] and readiness["head"] == head and
          readiness["base"] == base and readiness["target"] == branch and
          readiness["merge_method"] == method,
@@ -194,6 +197,35 @@ def check_ready(root, record, remote, repository, pr, method, readiness,
              "current GitHub PR approvals are insufficient or conflicting")
     return {"head": head, "base": base, "integration": integration,
             "target": branch}
+
+
+
+def reserve_merge(root, work, readiness_path, pr_url, head, base, method):
+    """Reserve one merge attempt in the EXISTING merge-readiness report.
+
+    A pending effect survived a lost host response. A second process must read
+    the actual PR, not blindly reissue the mutation.
+    """
+    need(readiness_path is not None, "missing persistent merge-readiness report")
+    relative = f".p2p/work/{fs.work_slug(work)}/merge-readiness.md"
+    expected = fs.safe(root, relative)
+    need(Path(readiness_path).resolve() == expected.resolve() and expected.is_file(),
+         "merge-readiness must be the original retained work-item report")
+    marker = ("<!-- p2p-merge-intent:sha256:" +
+              fs.digest(fs.canonical([pr_url, head, base, method])) + " -->")
+    original = expected.read_bytes()
+    matches = re.findall(rb"<!-- p2p-merge-intent:sha256:[a-f0-9]{64} -->",
+                         original)
+    if matches:
+        need(len(matches) == 1 and matches[0].decode() == marker,
+             "conflicting or duplicate saved merge-effect intent")
+        return False
+    fs.atomic_write(expected, original.rstrip(b"\n") + b"\n\n" +
+                    marker.encode() + b"\n", ignored_root=root)
+    need(expected.read_bytes() == original.rstrip(b"\n") + b"\n\n" +
+         marker.encode() + b"\n",
+         "merge intent write/readback failed; no remote effect was sent")
+    return True
 
 
 def receipt_body(record):
@@ -405,6 +437,12 @@ def finalize(root, original, checkpoint, *, repository, remote, method,
             need(mandate is not None,
                  "missing selected standing mandate for the exact merge effect")
             autonomy.authorize(mandate, "merge", repository, pr_url)
+            # A retained pending reservation makes lost-response retries read-only.
+            if not reserve_merge(root, original["work_item"], readiness,
+                                 pr_url, head, checked["base"], method):
+                return {"status": "PARTIAL", "phase": "MERGE_RECONCILIATION",
+                        "reason": "a merge attempt is already reserved; do not dispatch another",
+                        "next_action": "Read back the PR or reconcile this saved intent."}
             # Disallow a TOCTOU head/base change after checking all the gates.
             rechecked = read_pr(repository, int(match[2]), runner=runner)
             need(rechecked["head"]["sha"] == head and
