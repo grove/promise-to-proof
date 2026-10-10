@@ -11,7 +11,9 @@ import unittest
 from unittest.mock import patch
 
 import benchmark_p2p_first_pass as benchmark
-from test_p2p_delivery import d, repo, DeliveryTests
+import test_p2p_delivery as fixture
+
+d, repo = fixture.d, fixture.repo
 
 
 class CaptureFastPathTests(unittest.TestCase):
@@ -62,7 +64,7 @@ class CaptureFastPathTests(unittest.TestCase):
 
 class NormalDeliveryFastPathTests(unittest.TestCase):
     def setUp(self):
-        self.fixture = DeliveryTests("test_clean_project_delivery_uses_local_contract_and_records")
+        self.fixture = fixture.DeliveryTests("test_clean_project_delivery_uses_local_contract_and_records")
         self.fixture.setUp()
 
     def tearDown(self):
