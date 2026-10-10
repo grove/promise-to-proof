@@ -289,7 +289,10 @@ class FakeTransport:
             if stage in ('implementation', 'repair', 'review', 'proof'):
                 # Explicitly OFFLINE fixture trace; not a real reviewer judgment.
                 product = Path(prompt.split('workspace ', 1)[1].split('. ', 1)[0])
-                excluded = [inputs['work_item']]  # Binding spec inputs can also be candidate product paths.
+                # Use the same agreement exclusion set as the production
+                # controller; imported source material is not product code.
+                excluded = [inputs['work_item'], *(row['path'] for row in
+                                                    inputs.get('binding_inputs', []))]
                 manifest = d.fs.snapshot(product, exclude=excluded)
                 changed = d.fs.tree_changes(d.fs.snapshot(product, inputs['comparison_base'], exclude=excluded), manifest)
                 paths = [item['path'] for item in changed]
