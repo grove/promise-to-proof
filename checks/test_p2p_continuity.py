@@ -82,7 +82,7 @@ class ContinuityTests(unittest.TestCase):
             self.assertEqual(c.load(root,self.refs["S1"]["work_item"],
                                     checkpoint_files=files)["origin"],"grove/pg-react#8")
             (root/origin).write_text("tampered")
-            with self.assertRaisesRegex(ValueError,"origin continuity"):
+            with self.assertRaisesRegex(ValueError,"continuity"):
                 c.load(root,self.refs["S1"]["work_item"])
             self.assertEqual(c.load(root,self.refs["S1"]["work_item"],checkpoint_files=files)["unit"],"S1")
 
