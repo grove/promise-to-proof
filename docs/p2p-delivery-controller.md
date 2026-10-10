@@ -297,9 +297,9 @@ contract/candidate publication identity before claiming a publication or
 merge. One unambiguous saved PR URL in `publication.md` may supply a lookup
 hint; a note alone never establishes publication. If GitHub access or the
 candidate's exact Git objects are unavailable, the external effect stays
-**unconfirmed**. An open PR is not merged; a verified merge is not a
-completed-delivery receipt until the separately planned #50/#47 finalization
-is implemented. A local accepted candidate remains in the isolated workspace
+**unconfirmed**. An open PR is not merged; even a verified merge is not a
+completed-delivery receipt until the [#47 finalization workflow](finalization.md)
+validates actual landed code and the exact remote receipt. A local accepted candidate remains in the isolated workspace
 and does not modify the operator checkout.
 
 A restored checkpoint carries earlier evidence but does not prove that a
