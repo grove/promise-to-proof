@@ -104,7 +104,7 @@ class ExplanationTests(unittest.TestCase):
         self.assertEqual(shown["phase"], "AWAITING_APPROVAL")
         self.assertIn("audit", shown["why_it_matters"])
         self.assertTrue(shown["requires_user_action"])
-        self.assertIn("approval", shown["next_action"].lower())
+        self.assertIn("approve", shown["next_action"].lower())
 
     def test_restore_requires_new_host_preflight_even_with_prior_implementation(self):
         shown = progress.explain(report(
