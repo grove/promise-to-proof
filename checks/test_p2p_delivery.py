@@ -229,7 +229,11 @@ class FakeTransport:
                 if self.mode == 'sliced' and stage == 'implementation' and self.calls.count('implementation') == 2:
                     test_file = workspace / 'tests/test_greet.py'
                     test_file.parent.mkdir(exist_ok=True)
-                    test_file.write_text("def test_greeting():\n    assert True\n")
+                    test_file.write_text(
+                        "import subprocess, sys\n"
+                        "def test_greeting():\n"
+                        "    result = subprocess.run([sys.executable, 'greet.py'], capture_output=True, text=True)\n"
+                        "    assert result.returncode == 0 and result.stdout == 'hello\\n'\n")
             status = {'implementation':'IMPLEMENTED','repair':'REPAIRED','review':'REVIEWED','proof':'PROVEN'}[stage]
             gap = self.mode in ('repair','exhausted') and stage == 'proof' and (self.mode == 'exhausted' or self.calls.count('proof') == 1)
             gap |= self.mode in ('multi-repair', 'evidence') and stage == 'proof' and self.calls.count('proof') <= 2
@@ -327,8 +331,12 @@ class FakeTransport:
                 report['implementation_slice'] = {
                     'id': f'I{number}' if staged else 'I1', 'requirement_ids': ['R1'],
                     'expected_result': 'hello newline and zero exit',
-                    'checks': [{'kind': 'test', 'command': 'FIXTURE python3 greet.py',
-                                'result': 'passed', 'observation': 'hello'}],
+                    'checks': [{'kind': 'test',
+                                'command': ('FIXTURE python3 tests/test_greet.py'
+                                            if staged and number == 2 else 'FIXTURE python3 greet.py'),
+                                'result': 'passed',
+                                'observation': ('greet test passed' if staged and number == 2
+                                                else 'hello')}],
                     'paths': [item['path'] for item in d.fs.tree_changes(
                         d.fs.snapshot(product, inputs.get('local_git_generation', {}).get('commit',
                                                       ) or inputs['comparison_base'], exclude=excluded),
@@ -339,6 +347,12 @@ class FakeTransport:
                                     'Recover named implementation gap.' if partial else ''),
                     'retires': []}
             output = 'hello\n'
+            if self.mode == 'sliced' and stage == 'implementation' and self.calls.count('implementation') == 2:
+                events.append({'type': 'item.completed', 'item': {
+                    'type': 'command_execution',
+                    'command': 'FIXTURE python3 tests/test_greet.py',
+                    'aggregated_output': 'greet test passed',
+                    'exit_code': 0}})
             report = json.dumps(report)
         self.messages.append((stage, report))
         events += [{'type':'item.completed','item':{'type':'command_execution','command':'FIXTURE python3 greet.py',
