@@ -368,6 +368,47 @@ protocol blocker. Missing or conflicting termination evidence still blocks anoth
 launch. Consume a valid retained diagnosis once instead of repeatedly diagnosing
 the same pending decision on resume.
 
+### Reuse only verified applicable facts (#73)
+
+Continue an existing local or restored delivery from the **earliest genuinely
+unfinished stage** using the canonical contract, local Git generations, saved
+stage inputs and validated receipts. Do not create another cache, approval store,
+schema for portable checkpoints or user-selected stage list. A finished,
+unchanged delivery may be returned by a read-only exact-candidate/review/proof
+readback without regenerating an implementation, rewriting canonical records or
+starting another model. An invalid retained receipt, candidate, checkpoint,
+instruction identity, host prerequisite or authority is a blocker, **not** a
+reason to replace the old accepted state. A #82 receiving-machine restoration
+must still run the new host's isolation and task-readiness probes before workers
+or completion can be reused.
+
+For a changed product generation, the controller may classify prior same-stage
+observations with #41 requirement paths and #42 material seam dependencies:
+`SELECTIVE` means some observations appear disjoint from the exact delta;
+`FULL_RECHECK` means scope, evidence or behavioral reach is uncertain; and
+`UNCHANGED` means the product bytes match. That classification is a **read-only
+proposed check plan**, not a model verdict, evidence-authenticity claim or
+automatic clearance. Reusable observations require an exact retrievable previous
+report and command receipt from the same verifier, binding contract/base,
+pinned instructions and host context. Changed shared support paths, test
+oracles, configuration, unknown dependencies and uncertain seam reach trigger
+broader fresh checks. Risky edits may have wide effects even when small in lines.
+
+After **any** changed product bytes, independent review and proof still deliver
+new, complete-contract conclusions bound to the new exact candidate. A verifier
+may retain observations only after inspecting applicability and citing their
+original candidate, report/evidence reference and why their assumptions survive.
+It must rerun affected checks and mandatory final-candidate checks. Neither
+old review findings nor old proof verdicts are silently transferred. No
+published effect, merge authority, ordinary target-fast-forward compatibility,
+or explicit #85 instruction migration is inferred from unchanged local code.
+
+The existing `status` and `resume` outputs describe retained, missing and
+stale work and the next supported action. Use #59 measurements to distinguish
+cold delivery, no-work continuation, required receiving-host preflight, and
+changed-candidate re-verification. Keep tokens, human time and provider costs
+unknown when there is no actual observation.
+
 ## Durable contract handoff
 
 Keep one canonical generated acceptance contract in `.p2p/work/<slug>/contract.md`.

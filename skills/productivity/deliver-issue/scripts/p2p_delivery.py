@@ -21,6 +21,7 @@ import uuid
 
 import p2p_filesystem as fs
 import p2p_autonomy as autonomy
+import p2p_applicability as applicability
 import p2p_instructions as instructions
 import p2p_progress as progress_view
 from p2p_delivery_measurements import build as delivery_measurement
@@ -2342,13 +2343,18 @@ assert results['scratch'] == 'ok'
                     fs.snapshot_key(after) != self.state['candidate']['key']):
                 return unavailable
             events = fs.safe(self.runtime, f'attempts/{previous["id"]}/events.jsonl')
+            delta = fs.tree_changes(before, after)
+            advice = applicability.classify(
+                json.loads(data), delta, self.state['requirements'], name,
+                prior_candidate=generation['candidate_key'],
+                report_sha256=previous['report_sha256'])
             return {'stage': name, 'available': True, 'attempt_id': previous['id'],
                     'report': {'path': str(report_path), 'sha256': previous['report_sha256']},
                     'command_evidence': {'path': str(events), 'sha256': fs.digest(events.read_bytes())},
                     'scratch': previous['scratch'], 'repository': str(repository),
                     'previous_candidate': {'key': generation['candidate_key'], 'commit': generation['commit']},
                     'current_candidate': {'key': latest['candidate_key'], 'commit': latest['commit']},
-                    'complete_delta': fs.tree_changes(before, after),
+                    'complete_delta': delta, 'applicability': advice,
                     'verification_environment': previous['verification_environment']}
         except (OSError, ValueError, KeyError, TypeError):
             # History is optional. Missing old evidence means new observations,
@@ -2464,14 +2470,18 @@ assert results['scratch'] == 'ok'
                        'suite merely to produce a fresh report; run it when a binding requirement or an '
                        'unbounded material regression risk needs it. '
                        'Earlier observations from this same stage only: ' + json.dumps(history) + '. '
-                       'When available, read that report and its command evidence, inspect the complete delta '
-                       'between the exact retained Git candidates, and independently decide applicability '
-                       'under the focused re-verification protocol. Check repaired gaps, affected interactions, '
-                       'changed tests/oracles, and any changed environment afresh. For every retained observation, '
-                       'cite its original candidate/evidence and explain why it still applies in your new report. '
-                       'A missing artifact or uncertain applicability requires fresh checking of the affected '
-                       'scope. Prior verdicts never transfer. Cover every requirement, preserve mandatory '
-                       'final-candidate checks, and do not read the other verifier\'s reports. ')
+                       'When available, inspect the retained same-stage report and checked command receipts. '
+                       'The read-only applicability classification identifies candidate paths/requirements '
+                       'that appear disjoint from the exact product delta, but it is an advisory check plan '
+                       'NOT a cached result or permission to skip the current verdict. Independently assess '
+                       'upstream dependencies, caller reach, risk assumptions, and all binding final checks. '
+                       'For marked reusable observations cite their original candidate and exact evidence '
+                       'and explain continued applicability; never copy an old verdict. Refresh all affected '
+                       'checks, repaired gaps, tests/oracles and relevant interactions. FULL_RECHECK or missing '
+                       'receipts means fresh broad observations. Unknown impact requires broad fresh checks '
+                       'even for a one-file edit. Every run issues its own new full-contract independent '
+                       'REVIEWED/PROVEN judgment bound to the new exact candidate. '
+                       'Do not read the other verifier\'s reports. ')
         else:
             prompt += ('Implement the smallest complete change in the workspace. .p2p/tmp/ is disposable scratch; '
                        'do not include it in product content. Preserve agreement and binding inputs. '
@@ -2638,6 +2648,66 @@ assert results['scratch'] == 'ok'
             summary = report_markdown(report)
         report['details'] = summary
         return report
+
+    def verified_unchanged_completion(self):
+        """Read back exact final local acceptance without a new write/dispatch.
+
+        May only run after admission to this very host has passed preflight.
+        Restored checkpoints MUST pass receiving-host preflight before this path.
+        """
+        if (self.state.get('status') != 'REVIEWED_AND_PROVEN' or
+                not self.state.get('completed_at') or
+                not self.state.get('preflight_complete') or
+                self.state.get('task_readiness_invalidated')):
+            raise ValueError('completed delivery lacks current host readiness; resume at existing preflight')
+        if any(a.get('status') not in ('complete', 'retired')
+               for a in self.state.get('attempts', [])):
+            raise ValueError('uncertain worker reservation must be reconciled before reuse')
+        if any(entry.get('status') == 'reserved'
+               for entry in self.state.get('recovery_history', [])) or (
+                   self.state.get('recovery_decision', {}).get('status') in
+                   ('pending', 'diagnosed', 'rejected')):
+            raise ValueError('pending recovery needs reconciliation before reuse')
+        for name in ('instruction-transition.json', 'agreement-transition.json',
+                     'limit-extension.json'):
+            journal = self.runtime / name
+            if journal.is_file():
+                record = json.loads(journal.read_bytes())
+                if not (record.get('complete') is True or
+                        (name == 'agreement-transition.json' and record.get('status') == 'complete')):
+                    raise ValueError('unfinished ' + name + ' must be reconciled before reuse')
+        candidate = self.current()
+        if not candidate or not self.state.get('implementation_complete'):
+            raise ValueError('completed implementation/candidate identity is unavailable')
+        inputs = self.stage_inputs(candidate)
+        sessions = []
+        for name, verdict in (('review', 'REVIEWED'), ('proof', 'PROVEN')):
+            if self.state.get('reports', {}).get(name, {}).get('inputs') != inputs:
+                raise ValueError('stale ' + name + ' stage inputs prevent completed-stage reuse')
+            report = self.read_report(name)
+            if (report.get('status') != verdict or report.get('gaps') or
+                    (name == 'review' and report.get('findings')) or
+                    sorted(item['id'] for item in report['requirements']) !=
+                    sorted(self.state['requirements']) or
+                    (name == 'proof' and any(item.get('verdict') != 'proven' or
+                                             not item.get('evidence')
+                                             for item in report['requirements']))):
+                raise ValueError('completed ' + name + ' evidence no longer establishes acceptance')
+            attempt_id = self.state['reports'][name]['attempt_id']
+            attempt = next(a for a in self.state['attempts'] if a['id'] == attempt_id)
+            sessions.append(attempt.get('session_id'))
+        if not all(sessions) or len(set(sessions)) != 2:
+            raise ValueError('independent completed verifier sessions could not be established')
+        checkpoint = self.state.get('checkpoint')
+        if checkpoint and checkpoint.get('status') == 'LOCAL_ONLY':
+            path = fs.safe(self.root, checkpoint['path'])
+            if not path.is_file() or fs.digest(path.read_bytes()) != checkpoint['sha256']:
+                raise ValueError('saved portable checkpoint changed or vanished; reconcile before reuse')
+        return {'status': 'UNCHANGED_COMPLETION', 'candidate_key': candidate['key'],
+                'review': 'REUSED', 'proof': 'REUSED',
+                'checkpoint': checkpoint.get('status') if checkpoint else 'RESTORED',
+                'new_model_calls': 0, 'new_canonical_writes': 0,
+                'reason': 'Read back current exact candidate, both independent reports and host receipt identities.'}
 
     def final_record(self, cleanup=None, retained_artifacts=()):
         candidate = self.state['candidate']
@@ -3962,6 +4032,7 @@ def result(delivery):
                     if state.get('cleanup_verified_at') else state.get('reports', {})),
         'attempts': [] if state.get('cleanup_verified_at') else state['attempts'],
         'measurement': delivery_measurement(state, delivery.runtime),
+        'work_selection': applicability.next_work(state),
         'records': str(delivery.directory),
         'local_runtime': str(delivery.runtime) if delivery.runtime.exists() else None,
         'resume': f'python3 {Path(__file__).resolve()} --repo {delivery.root} resume {delivery.work}',
@@ -4285,6 +4356,15 @@ def main(argv=None):
                     (requested_destination and requested_destination != delivery.state['routing']['destination'])):
                     raise ValueError('run cannot change persisted authority, scope, base or limits; use resume')
         elif args.action == 'resume':
+            # An already-compacted result is an exact readback, not a new delivery.
+            if (directory / 'delivery.json').is_file():
+                output = completed_without_local_runtime(root, args.work, directory,
+                                                          'durable completed delivery unavailable')
+                output['reuse'] = {'status': 'UNCHANGED_COMPLETION',
+                                   'new_model_calls': 0, 'new_canonical_writes': 0,
+                                   'reason': 'Validated immutable completed delivery records.'}
+                print(json.dumps(output, indent=2))
+                return 0
             raise ValueError('missing delivery invocation; no effects can be reconciled')
         elif args.action == 'run':
             delivery = create(root, args, invocation_started_epoch)
@@ -4301,6 +4381,17 @@ def main(argv=None):
             delivery.extend(args)
             print(json.dumps({'status': 'EXTENDED', 'limits': delivery.state['limits'],
                               'deadline': delivery.state['deadline'], 'resume': result(delivery)['resume']}, indent=2))
+            return 0
+        if args.action in ('run', 'resume') and delivery.state.get('status') == 'REVIEWED_AND_PROVEN' and (
+                delivery.state.get('preflight_complete') and
+                not delivery.state.get('task_readiness_invalidated')):
+            # Verify rather than render/rewrite the same authoritative stage
+            # reports and portable checkpoint; no session or model call occurs.
+            delivery.read_only = True
+            reuse = delivery.verified_unchanged_completion()
+            output = result(delivery)
+            output['reuse'] = reuse
+            print(json.dumps(output, indent=2))
             return 0
         if args.action == 'resume':
             delivery.state['resume_count'] = delivery.state.get('resume_count', 0) + 1
@@ -4320,6 +4411,17 @@ def main(argv=None):
     except (ValueError, OSError, KeyError, TypeError, UnicodeError, subprocess.SubprocessError) as error:
         message = str(error)
         if delivery:
+            if args.action in ('run', 'resume') and delivery.read_only and delivery.state.get('status') == 'REVIEWED_AND_PROVEN':
+                # A rejected fast-path readback is NOT a new delivery failure.
+                # Never destroy the last accepted immutable verdict or rewrite
+                # its receipts to BLOCKED merely because a probe detected drift.
+                output = result(delivery)
+                output.update(status='BLOCKED', blocker=message,
+                              reuse={'status': 'STALE', 'reason': message,
+                                     'new_model_calls': 0, 'new_canonical_writes': 0})
+                output['human_progress'] = progress_view.explain(output)
+                print(json.dumps(output, indent=2))
+                return 1
             if args.action == 'upgrade-instructions':
                 output = result(delivery)
                 output.update(status='BLOCKED', instruction_upgrade_status='BLOCKED',

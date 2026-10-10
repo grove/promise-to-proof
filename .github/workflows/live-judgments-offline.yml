@@ -28,6 +28,16 @@ jobs:
         run: python3 -m unittest discover -s checks -p 'test_p2p_first_pass.py' -v
       - name: Compare same-assurance first-pass baseline and optimized controller
         run: python3 checks/benchmark_p2p_first_pass.py --repeats 1
+      - name: Verify unchanged and selective incremental delivery reuse
+        run: python3 -m unittest discover -s checks -p 'test_p2p_applicability.py' -v
+      - name: Measure cold, unchanged, restored and delta continuation (offline only)
+        run: python3 checks/benchmark_p2p_incremental.py --repeats 2
+      - name: Guard pinned instructions and same-version restored continuation
+        run: >-
+          python3 -m unittest discover -s checks -p 'test_p2p_instruction_upgrades.py'
+          -k 'test_pinned_resume_ignores_changed_installation_without_repeating_completed_work'
+          -k 'test_portable_restore_retains_pinned_instructions_and_completed_review'
+          -k 'test_upgrade_preserves_work_refreshes_only_verifiers_and_is_idempotent'
       - name: Check existing generation and repair behavior
         run: >-
           python3 -m unittest discover -s checks -p 'test_p2p_delivery.py'
