@@ -241,8 +241,14 @@ def _independent_coverage(root, context, record):
                         evidence.get("contract") == record["contract"]):
                     evidence_ids.append("record:" + evidence["id"] + "@sha256:" +
                                         fs.digest(fs.canonical(evidence)))
-            fs.validate_coverage_trace(trace, context["requirements"],
-                                       report, name, snapshot, change_set, evidence_ids)
+            # The admitted controller schema, not a guess from the report's
+            # fields, determines whether #42 risk/seam rows are mandatory.
+            # Version 1 checkpoints legitimately have no risks; version 2
+            # records must retain their complete checked risk trace.
+            fs.validate_coverage_trace(
+                trace, context["requirements"], report, name, snapshot,
+                change_set, evidence_ids,
+                risks=state.get("coverage_format_version") == 2)
         _need(report.get("status") == expected and not report.get("gaps") and
               (name != "review" or not report.get("findings")),
               "nonpassing or incomplete " + name + " verdict")
