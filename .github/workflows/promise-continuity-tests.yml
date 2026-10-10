@@ -1,0 +1,26 @@
+name: Promise continuity regressions
+on:
+  pull_request:
+    paths:
+      - 'skills/productivity/deliver-issue/scripts/p2p_continuity.py'
+      - 'skills/productivity/deliver-issue/scripts/p2p_filesystem.py'
+      - 'skills/productivity/deliver-issue/scripts/p2p_delivery.py'
+      - 'skills/productivity/deliver-issue/scripts/p2p_progress.py'
+      - 'checks/test_p2p_continuity.py'
+      - '.github/workflows/promise-continuity-tests.yml'
+  workflow_dispatch:
+jobs:
+  continuity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile changed controller code
+        run: python3 -m py_compile skills/productivity/deliver-issue/scripts/p2p_continuity.py skills/productivity/deliver-issue/scripts/p2p_delivery.py skills/productivity/deliver-issue/scripts/p2p_filesystem.py skills/productivity/deliver-issue/scripts/p2p_progress.py
+      - name: Run continuity regression tests
+        run: python3 -m unittest discover -s checks -p 'test_p2p_continuity.py' -v
+      - name: Verify unchanged topology and progress contracts
+        run: python3 -m unittest discover -s checks -p 'test_p2p_issue_topology.py' -v && python3 -m unittest discover -s checks -p 'test_p2p_progress.py' -v
