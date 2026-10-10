@@ -583,6 +583,10 @@ def review_scope(candidate, manifest, generation_commit, inspected_paths,
                         commands.append(command)
             risk_rows.append({"id": risk["id"], "requirements": risk["requirements"],
                               "paths": risk["paths"], "reach": risk["reach"],
+                              "trigger": risk["trigger"],
+                              "why_applicable": risk["why_applicable"],
+                              "consequence": risk["consequence"],
+                              "status": risk["status"],
                               "check_commands": commands})
         seam_dependencies = {"paths": sorted(covered | changed),
                              "risks": risk_rows}
@@ -647,7 +651,8 @@ def assess_target_risks(scope, base, destination):
     if (not isinstance(scope.get("changed_paths"), list)
             or not all(_coverage_path(p) for p in facts["paths"])
             or any(not isinstance(x, dict) or set(x) !=
-                   {"id", "requirements", "paths", "reach", "check_commands"}
+                   {"id", "requirements", "paths", "reach", "trigger",
+                    "why_applicable", "consequence", "status", "check_commands"}
                    for x in facts["risks"])):
         return {"status": "UNKNOWN", "reason": "saved risk/scope paths are incomplete"}
     target_delta = tree_changes(base, destination)
@@ -657,7 +662,10 @@ def assess_target_risks(scope, base, destination):
     for risk in facts["risks"]:
         if (not isinstance(risk["paths"], list)
                 or not all(_coverage_path(p) for p in risk["paths"])
-                or risk["reach"] not in ("bounded", "uncertain")):
+                or risk["reach"] not in ("bounded", "uncertain")
+                or risk["status"] not in ("addressed", "unresolved")
+                or any(not isinstance(risk[field], str) or not risk[field].strip()
+                       for field in ("trigger", "why_applicable", "consequence"))):
             return {"status": "UNKNOWN", "reason": "saved risk reach cannot be inspected"}
         intersect = sorted(touched & set(risk["paths"]))
         if intersect or (touched and risk["reach"] == "uncertain"):
