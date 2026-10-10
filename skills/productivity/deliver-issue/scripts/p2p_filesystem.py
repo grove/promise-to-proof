@@ -550,9 +550,19 @@ def compare_review_scope(scope, before, after):
 
 
 def review_scope_status(root, work, current_repo=None, current_ref=None):
-    """Compare exact saved review with current PR/product bytes; read-only."""
-    import p2p_delivery
-    local = p2p_delivery.local_directory(root, work)
+    """Read-only scope comparison, including standalone installed skill wrappers."""
+    root = Path(root).resolve()
+    slug = work_slug(work)
+    local = safe(root, f'.p2p/work/{slug}')
+    common = Path(git(root, 'rev-parse', '--path-format=absolute', '--git-common-dir').decode().strip()).resolve()
+    repo_id = root.name + '-' + digest(str(common).encode())[:16]
+    legacy = Path.home() / '.p2p/work' / repo_id / slug
+    def has_state(folder):
+        return (folder / 'delivery.json').is_file() or (folder / 'artifacts/delivery.json').is_file()
+    if has_state(legacy):
+        if has_state(local):
+            return {'status': 'UNKNOWN', 'reason': 'conflicting local/legacy delivery locations; reconcile state'}
+        local = legacy
     active = local / 'delivery.json'
     completed = local / 'artifacts/delivery.json'
     if active.is_file():
@@ -568,12 +578,16 @@ def review_scope_status(root, work, current_repo=None, current_ref=None):
     else:
         return {'status': 'UNKNOWN', 'reason': 'no saved review; run independent review for this candidate'}
     if not isinstance(scope, dict):
-        return {'status': 'UNKNOWN', 'reason': 'saved review has no exact product scope; refresh review, do not infer coverage'}
+        return {'status': 'UNKNOWN', 'reason': 'saved review has no exact scope; refresh review, do not infer coverage'}
     if digest(safe(root, work).read_bytes()) != scope.get('contract_sha256'):
-        return {'status': 'UNKNOWN', 'reason': 'agreement changed since the saved review; reconcile contract first'}
-    reviewed = p2p_delivery.execution_runtime(root, work) / 'workspace'
+        return {'status': 'UNKNOWN', 'reason': 'agreement changed since saved review; reconcile contract first'}
+    local_runtime = local / 'runtime'
+    external_runtime = execution_directory(root, work) / 'runtime'
+    if local_runtime.exists() and external_runtime.exists():
+        return {'status': 'UNKNOWN', 'reason': 'conflicting execution roots; reconcile before coverage comparison'}
+    reviewed = (local_runtime if local_runtime.exists() else external_runtime) / 'workspace'
     if not reviewed.is_dir():
-        return {'status': 'UNKNOWN', 'reason': 'the exact reviewed candidate workspace is unavailable; restore it before comparison'}
+        return {'status': 'UNKNOWN', 'reason': 'exact reviewed workspace unavailable; restore it before comparison'}
     try:
         before = snapshot(reviewed, exclude=exclusions)
         after = snapshot(Path(current_repo).resolve() if current_repo else root,
