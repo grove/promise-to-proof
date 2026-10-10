@@ -114,6 +114,28 @@ Keep unrelated pre-existing issues separate. An existing defect that prevents a
 promised outcome remains relevant outside the diff. Use no finding quota, numeric
 quality score, or mandatory redesign. Sound code can receive a short clean review.
 
+For tests that materially protect the changed behavior, follow the protocol's
+minimum-sufficient-evidence rule: look at the *assertions and real seam*, not
+only a passing command or number of test cases. Ask what observable failure
+would make the check fail. For example, a username regression test that compares
+a result to itself, computes the expected result by calling the validator under
+test, or mocks away the real validation decision does not protect rejection of
+whitespace-only input. An existing test that calls the public interface and
+compares exit status and output with independently known results may already
+be enough. Mocks for unrelated boundaries and compact reusable fixtures are
+fine when the protected production decision is still genuinely exercised.
+
+Treat a guard that silently skips in ordinary CI, relies on a fixture-only
+production path, races uncontrolled clocks, or uses fragile setup as a material
+engineering finding only when the resulting missed regression or maintenance
+burden matters to the promise or binding repository standards. Name the precise
+test/location, the behavior not actually protected, why it matters, and the
+smallest effective check or change. A realistic security, concurrency or
+persistence failure trigger may also be material without a live exploit. Do not
+require a mutation experiment, test rewrite, specific testing style, coverage
+percentage or duplicate proof solely for review. Review existing meaningful
+tests rather than reflexively authoring another suite.
+
 Return `REVIEWED` with optional suggestions when coverage is complete and no
 material finding or decision-blocking unknown remains. Do not turn optional
 suggestions into `CHANGES NEEDED` or repair prerequisites. Before adding a check,
