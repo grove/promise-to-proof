@@ -227,6 +227,8 @@ def run_case(output, data, case, fixture_sha, stage_seconds):
             entry["oracle"] = oracle
             if not oracle["passed"]:
                 errors.append("independent CLI observations or supplied green tests disagreed")
+            if d.identity(delivery.current()) != d.identity(captured):
+                errors.append("oracle probes mutated the fixed candidate")
             entry.update(passed=not errors, mismatches=errors)
             write_json(case_dir / "summary.json", summary)
         summary["passed"] = all(item["passed"] for item in summary["candidates"])
@@ -257,7 +259,9 @@ def main(argv=None):
     output.mkdir(parents=True)
     started = time.monotonic()
     summary = {"kind": "live judgment evaluation", "live_evidence": False,
-               "passed": False, "cases": [], "elapsed_seconds": None}
+               "passed": False, "cases": [], "elapsed_seconds": None,
+               "invocation_command": [sys.executable, str(Path(__file__).resolve()),
+                                      *(sys.argv[1:] if argv is None else argv)]}
     try:
         data, identity = load_manifest()
         all_ids = {case["id"] for case in data["cases"]}
