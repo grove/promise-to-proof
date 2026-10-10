@@ -210,6 +210,58 @@ branch, commit, push, pull-request, merge, or deployment effect. Do not create
 children until their contracts receive the required approval through
 `/plan-acceptance`.
 
+## Choose issue topology after justified sizing (#78)
+
+Sizing and adaptive re-sizing remain owned by #76/#77. Once their exact
+identity-bound `SPLIT` decision establishes useful delivery units, select
+the simplest **tracker lifecycle**, not another set of units. Read the
+canonical protocol's **Issue topology after sizing** rules. The deterministic
+`p2p_issue_topology.choose` helper can validate the proposed units, full
+obligation allocation, real blockers, topology facts, existing work and final
+acceptance owner. A report lacking actual sizing evidence cannot choose a tree
+or stand-alone issue sequence.
+
+Prefer a short **standalone sequence** for naturally ordered delivery with no
+useful parallel ownership, long-lived aggregate status, or independent parent
+integration. Keep one obvious current and next issue. Record original promise,
+exact step contribution, remaining obligations, verified outcome prerequisites,
+sequence, and the final replacement's responsibility to independently review
+and prove the entire original promise on one combined candidate. Earlier
+separate PRs/reviews do not become that proof. A sequential order does not
+invent blocking dependencies. Do not create a synthetic parent, empty parent
+PR, or extra acceptance lifecycle to represent a local implementation step.
+
+Retain a **parent tree** when genuine parallel ownership, aggregate tracking,
+or independent parent integration makes it useful. Explain which concrete
+factor earns the extra tracker lifecycle. Preserve the ordinary parent's
+complete-contract review and proof. For an existing tree, a different tracker
+shape needs a separately approved migration preview, not silent contract,
+candidate, branch, PR or history rewrites. Inventory source identities,
+approved contracts, open PRs, reviews, verified work and human changes. Unclear
+attribution blocks migration of that work. Continue from retained work rather
+than repeating implementation or review when exact evidence remains applicable.
+
+Keep the topology decision and source/contribution map in the existing
+`.p2p/work/<origin>/slicing.md` outside the exact approved-route section.
+Retain previous bytes/revisions and read back the canonical file. Include the
+deterministic decision identity in checkpoint handoffs for later #71 discovery;
+do not add a parallel tracker-state database. Approved units are still planned
+through their established contract path and never inherit acceptance just
+because a ticket was created or closed.
+
+Closure of an originating issue is **not** a consequence of choosing
+standalone delivery. Preview all exact replacement issues, links, order,
+original obligations, final acceptance owner, saved human edits, and the
+supersession-only comment. Require separately authorized `issue-comment`
+and `issue-close` grants for that exact source issue and the exact approved
+preview, reread the source and every replacement immediately before effects,
+and read back one exact comment and closure reason `not_planned`. If an
+operation is uncertain, inspect rather than repeat it. Keep the original issue
+history and never describe its promised outcome as completed. Tracker
+publication and closure use the existing
+[publication procedure](references/publication.md), without new effects by
+default.
+
 ## Establish dependencies and parent completion
 
 For each blocker, name the prerequisite outcome or artifact and why it is needed.
