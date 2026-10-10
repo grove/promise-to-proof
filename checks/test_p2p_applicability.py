@@ -4,11 +4,14 @@ import io
 import json
 import os
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 import uuid
 from unittest.mock import patch
 
+SCRIPTS = Path(__file__).resolve().parents[1] / "skills/productivity/deliver-issue/scripts"
+sys.path.insert(0, str(SCRIPTS))
 import p2p_applicability as applicability
 import test_p2p_delivery as fixture
 import check_p2p_judgments_host as judgments
