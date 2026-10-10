@@ -22,6 +22,7 @@ import uuid
 import p2p_filesystem as fs
 import p2p_autonomy as autonomy
 import p2p_instructions as instructions
+import p2p_progress as progress_view
 from p2p_delivery_measurements import build as delivery_measurement
 
 import verify_acceptance_bundle as bundle
@@ -3773,9 +3774,17 @@ def result(delivery):
                 'last_activity_at': datetime.datetime.fromtimestamp(latest, datetime.timezone.utc).isoformat() if latest is not None else None,
                 'last_activity_age_seconds': max(0, time.time() - latest) if latest is not None else None,
                 'activity_meaning': 'Log file activity only; not verified useful progress.'}
-    return {'status': status, 'blocker': blocker} | {key: state[key] for key in (
+    value = {'status': status, 'blocker': blocker} | {key: state[key] for key in (
         'invocation_id', 'work_item', 'comparison_base', 'limits', 'repair_used', 'host')} | {
         'routing': state.get('routing'),
+        'contract': {name: state['contract'][name] for name in ('source', 'revision', 'sha256')},
+        'agreement_paths': state.get('agreement_paths', [delivery.work]),
+        'checkpoint_restored_from': state.get('checkpoint_restored_from'),
+        'fresh_host_preflight_complete': bool(state.get('preflight_complete')),
+        'implementation_complete': state.get('implementation_complete', False),
+        'resume_count': state.get('resume_count', 0),
+        'parent_has_children': any(line.strip() == '## Children' for line in
+                                   fs.document_lines(state['contract']['content'])),
         'autonomy': state.get('autonomy'),
         'instruction_identity': state.get('instruction_identity'),
         'instruction_history': state.get('instruction_history', []),
@@ -3801,6 +3810,7 @@ def result(delivery):
         'local_runtime': str(delivery.runtime) if delivery.runtime.exists() else None,
         'resume': f'python3 {Path(__file__).resolve()} --repo {delivery.root} resume {delivery.work}',
         'cleanup': f'python3 {Path(__file__).resolve()} --repo {delivery.root} cleanup {delivery.work}'}
+    return {'human_progress': progress_view.explain(value), **value}
 
 
 def completed_result(root, work, directory):
@@ -3861,10 +3871,14 @@ def completed_result(root, work, directory):
             raise ValueError('source checkout changed after cleanup identity verification')
     except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError) as error:
         raise ValueError('durable completed delivery unavailable: ' + str(error)) from error
-    return {
+    value = {
         'status': record['status'], 'blocker': None, 'invocation_id': record['invocation_id'],
         'work_item': work, 'comparison_base': record['comparison_base'],
         'candidate': identity(candidate), 'routing': record.get('routing'),
+        'contract': record['contract'], 'agreement_paths': record.get('agreement_paths', [work]),
+        'implementation_complete': True,
+        'parent_has_children': any(line.strip() == '## Children' for line in
+                                   fs.document_lines(agreement['content'])),
         'destination_observation': record.get('destination_observation'),
         'completion_scope': 'Acceptance is for the exact candidate against the frozen comparison base; compatibility with the current destination is not established.',
         'acceptance_boundary': 'Acceptance applies to the exact candidate against its frozen comparison base. Compatibility with the current destination has not been established by this delivery.',
@@ -3879,6 +3893,7 @@ def completed_result(root, work, directory):
         'cleanup': 'already complete',
         'resume': f'python3 {Path(__file__).resolve()} --repo {root} status {work}',
     }
+    return {'human_progress': progress_view.explain(value), **value}
 
 
 def completed_without_local_runtime(root, work, directory, missing_record):
@@ -3892,6 +3907,43 @@ def completed_without_local_runtime(root, work, directory, missing_record):
     return completed_result(root, work, directory)
 
 
+def _saved_pr_hint(root, work):
+    """A saved publication link is only a lookup hint, never proof of a write."""
+    local = fs.safe(root, f'.p2p/work/{fs.work_slug(work)}/publication.md')
+    if not local.is_file():
+        return None
+    urls = set(re.findall(r'https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/pull/[1-9][0-9]*',
+                          local.read_text(encoding='utf-8')))
+    if len(urls) == 1:
+        return next(iter(urls))
+    if len(urls) > 1:
+        return 'ambiguous saved pull-request URLs'
+    return None
+
+
+def _observed_status(root, work, result_value, requested_pr=None):
+    """Add read-only current remote observations without modifying saved verdicts."""
+    hint = requested_pr if requested_pr is not None else _saved_pr_hint(root, work)
+    publication = None
+    if hint == 'ambiguous saved pull-request URLs':
+        publication = {'status': 'UNVERIFIED', 'verified': False,
+                       'reason': 'More than one PR URL appears in the saved publication handoff.'}
+    elif hint:
+        publication = progress_view.inspect_github_pr(root, result_value, hint)
+    result_value['human_progress'] = progress_view.explain(result_value, publication=publication)
+    if publication is not None:
+        result_value['publication_observation'] = publication
+    return result_value
+
+
+def _human_output(value):
+    message = value['human_progress']
+    return (message['message'] + '\n\nWhere the code is: ' + message['where_is_the_code'] +
+            '\nUser action required: ' + ('yes' if message['requires_user_action'] else 'no') +
+            '\nVerified milestones: ' + (' '.join(message['confirmed']) if message['confirmed'] else 'none yet') +
+            '\n')
+
+
 def main(argv=None):
     if sys.version_info < (3, 11):
         print('Python 3.11 or newer is required by the delivery controller.', file=sys.stderr)
@@ -3903,6 +3955,9 @@ def main(argv=None):
     for name in ('run', 'resume', 'status', 'cleanup'):
         child = commands.add_parser(name)
         child.add_argument('work')
+        if name == 'status':
+            child.add_argument('--pr', help='read back the current matching pull request before reporting publication or merge')
+            child.add_argument('--human', action='store_true', help='show only the plain-language status; standard JSON remains the default')
         if name == 'run':
             child.add_argument('--comparison-base', required=True)
             child.add_argument('--destination', help='explicit workflow destination for unsliced work')
@@ -4004,7 +4059,8 @@ def main(argv=None):
             if not state_path.exists():
                 output = completed_without_local_runtime(root, args.work, directory,
                                                           'no delivery invocation exists')
-                print(json.dumps(output, indent=2))
+                output = _observed_status(root, args.work, output, getattr(args, 'pr', None))
+                print(_human_output(output) if args.human else json.dumps(output, indent=2))
                 return 0
             delivery = Delivery(root, args.work, json.loads(state_path.read_text()))
             delivery.read_only = True
@@ -4022,7 +4078,8 @@ def main(argv=None):
             output = result(delivery)
             if pending:
                 output.update(status='RUNNING', blocker=None)
-            print(json.dumps(output, indent=2))
+            output = _observed_status(root, args.work, output, args.pr)
+            print(_human_output(output) if args.human else json.dumps(output, indent=2))
             return 0 if output['status'] == 'REVIEWED_AND_PROVEN' else 1
         if args.action in ('run', 'resume') and state_path.exists():
             fs.workspace_access(execution_runtime(root, args.work) / 'workspace', local)
@@ -4135,12 +4192,14 @@ def main(argv=None):
                     message += '; unable to persist blocker: ' + str(storage)
             output = result(delivery)
             output.update(status=delivery.state['status'] if isinstance(error, ContinuationRequired) else 'BLOCKED', blocker=message)
+            output['human_progress'] = progress_view.explain(output)
         else:
             work = getattr(args, 'work', None)
             output = {'status': 'BLOCKED', 'blocker': message, 'work_item': work,
                       'resume': (f'python3 {Path(__file__).resolve()} --repo {args.repo} resume {work}'
                                  if work else None)}
-        print(json.dumps(output, indent=2))
+        output = {'human_progress': progress_view.explain(output), **output}
+        print(_human_output(output) if args.action == 'status' and args.human else json.dumps(output, indent=2))
         return 1
     finally:
         if lock is not None:
