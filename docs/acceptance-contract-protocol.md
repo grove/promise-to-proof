@@ -524,6 +524,23 @@ for an identified unavailable input, authority or executable recovery strategy,
 not simply because one repair failed. Return observations even on interrupted
 work; a timeout or additional attempt never establishes acceptance.
 
+A repair stall is supported by retained requirement/source identities, observed
+failed reproduction, and candidate/strategy history: repeatedly failed behavior
+described in new words, unchanged results despite code edits, or an A↔B cycle.
+One transient host or check error is not a stall. When progress genuinely
+stalls, use one bounded fresh-context perspective reset of the original promise,
+exact approved agreement, remaining gaps, candidate and base, constraints and
+recent attempted methods. Consult the existing detailed reports only if needed.
+Select a materially different *executable* strategy, retain its stable mechanism
+identity, explain its difference from the last attempt, and name the observable
+test/check result expected to change. A better reproduction, a falsifiable
+hypothesis, a simpler native implementation or a justified internal work-step
+replan can be useful; none lowers the accepted proof standard. Real missing
+authority or a capability is a blocker; failed attempts or difficulty alone
+never justify contract weakening or a #77 sizing handoff. Preserve every exact
+candidate/report and portable recovery identity, and rerun fresh independent
+review/proof after any actual repair. Do not add a mandatory new model stage.
+
 Continue and resume partial implementation from the latest retained repair
 result, including its remaining gaps; do not redispatch the original gaps after
 new observations supersede them. Recovery diagnosis must assess the actual
