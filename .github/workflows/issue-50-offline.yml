@@ -31,6 +31,10 @@ jobs:
             test_p2p_delivery.DeliveryTests.test_footprint_metrics_p2p_self_delivery \
             test_p2p_delivery.DeliveryTests.test_legacy_approved_route_resumes_after_target_move_when_base_is_recoverable \
             test_p2p_delivery.DeliveryTests.test_parent_uses_final_destination_and_plan_loss_blocks_resume
+      - name: Historical copied-controller compatibility
+        run: |
+          cd checks
+          python3 -m unittest test_run_delivery_comparison.PilotTests.test_copied_controllers_repair_order_and_exhaustion -v
       - name: Repository deterministic regressions
         run: |
           git fetch --no-tags origin cc27a47f5ee765cff3cf13b21c36f974cb1234ae eb84d66dd70ce8998cd43e951741785e8520c301
