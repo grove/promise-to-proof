@@ -4482,7 +4482,7 @@ def main(argv=None):
                 repositories.add(args.repository)
             if args.repository not in repositories:
                 raise ValueError('effect repository does not match this delivery repository')
-            if args.effect_action in ('commit', 'push', 'pr-create', 'pr-update', 'pr-ready', 'merge', 'deploy'):
+            if args.effect_action in ('commit', 'push', 'pr-create', 'pr-update', 'pr-ready', 'pr-review-comment', 'pr-review-request-changes', 'merge', 'deploy'):
                 if effect_state['status'] != 'REVIEWED_AND_PROVEN':
                     raise ValueError('effect requires current full REVIEWED and PROVEN results')
                 if delivery:
