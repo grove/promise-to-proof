@@ -41,6 +41,35 @@ affected writes and present a scoped reconciliation. Regrouping unchanged promis
 changes the decomposition, not the parent revision. Child contract revisions
 still belong to `plan-acceptance`. Preserve unrelated human content.
 
+## Publish the approved topology, not a compulsory parent
+
+For an exact #76/#77 sized decomposition, first read the retained #78 topology
+decision and its identity in the canonical slicing record. For a
+`standalone-sequence`, reuse or create the approved replacement issues
+directly: each carries stable marker
+`<!-- grove:issue-topology origin=OWNER/REPO#N unit=S1 -->`,
+original-source link, qualified contribution, real blockers, and the next
+issue. The final replacement explicitly owns fresh, complete originating
+acceptance. Reuse already approved planning and publication receipts.
+Do **not** add native sub-issue links, an artificial parent index/PR,
+or an extra final-only ticket. An originating broad ticket may be linked as
+history without serving as an active parent.
+
+For a `parent-tree`, retain the existing parent index, child links and
+assembled-parent completion gates below. This is the exception justified by
+actual ownership/aggregate/integration need, not an assumed default.
+
+Prepare any standalone supersession as a separate exact preview via
+`p2p_issue_topology.supersession_preview`. Compare the original tracker
+body, original promise, complete replacement list, current comment/state and
+existing PRs with the preview. Require `authorize_supersession` and the
+configured tracker's exact `issue-comment` and `issue-close` grants; explicitly
+authorize closing this origin as `not_planned` (superseded), never as done.
+Read back its exact managed comment, closure state/reason and each replacement;
+`supersession_readback` reports `PARTIAL` on uncertainty. Never retry a
+comment or close while the previous effect is uncertain. No issue rewrite,
+candidate movement, PR retarget, or accepted-contract change is implied.
+
 ## Save tickets and relationships
 
 For GitHub, resolve the target repository explicitly. Create one issue per approved
