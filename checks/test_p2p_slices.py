@@ -93,10 +93,32 @@ class EvidenceSemanticsTests(unittest.TestCase):
         result = slices.validate(report, ["R1"], [original],
                                  self.events, after, self.after)
         self.assertEqual(result["retires"][0]["id"], "I1")
-        with self.assertRaisesRegex(ValueError, "retirement"):
+        with self.assertRaisesRegex(ValueError, "replacement"):
             slices.validate(report | {"implementation_slice": second |
                                       {"retires": [{"id": "I1", "reason": ""}]}},
                             ["R1"], [original], self.events, after, self.after)
+
+
+    def test_changed_verified_slice_file_needs_explicit_replacement_and_recheck(self):
+        earlier = {"slice": witness(boundary_reason="Separate API outcome.",
+                                    next_action="Add persistence regression"),
+                   "attempt_id": "verified-I1"}
+        next_tree = self.before + [
+            {"path": "greet.py", "type": "file", "mode": "100644",
+             "content_base64": "cHJpbnQoJ2J5ZScpCg=="}
+        ]
+        unchecked = witness(id="I2", paths=["greet.py"], retires=[])
+        with self.assertRaisesRegex(ValueError, "changed previously verified"):
+            slices.validate(
+                {"status": "IMPLEMENTED", "gaps": [],
+                 "implementation_slice": unchecked},
+                ["R1"], [earlier], self.events, next_tree, self.after)
+        checked = unchecked | {"retires": [
+            {"id": "I1", "reason": "The dependent public function changed; recheck R1."}]}
+        self.assertEqual(slices.validate(
+            {"status": "IMPLEMENTED", "gaps": [],
+             "implementation_slice": checked},
+            ["R1"], [earlier], self.events, next_tree, self.after)["id"], "I2")
 
 
 class DeliverySliceTests(unittest.TestCase):
