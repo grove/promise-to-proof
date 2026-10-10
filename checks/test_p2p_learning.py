@@ -33,7 +33,7 @@ class LearningRetentionTests(unittest.TestCase):
         }
         self.write_record()
         self.support = self.owner / "artifacts/safe-evidence.md"
-        self.support.parent.mkdir()
+        self.support.parent.mkdir(exist_ok=True)
         self.support.write_text("Confirmed reproducible safe observation.\n")
         self.write_report("selected")
 
