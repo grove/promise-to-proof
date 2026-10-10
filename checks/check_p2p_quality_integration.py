@@ -272,7 +272,7 @@ def assess_case(result, case, contract):
     return problems
 
 
-def compact_case(result, case, problems):
+def compact_case(result, case, problems, evidence_path=None):
     return {
         "fixture": case["id"],
         "passed": not problems,
@@ -281,6 +281,7 @@ def compact_case(result, case, problems):
         "contract_sha256": result.get("contract_sha256"),
         "instruction_identity": result.get("instruction_identity"),
         "host": result.get("host", {}).get("version"),
+        "evidence_report": evidence_path,
         "candidates": [{
             "name": c["name"],
             "candidate_key": c.get("candidate", {}).get("key"),
@@ -289,6 +290,12 @@ def compact_case(result, case, problems):
                          for stage in ("review", "proof")},
             "stage_sessions": {a["stage"]: a.get("session_id")
                                for a in c.get("stage_attempts", [])},
+            "host_receipts": {a["stage"]: a.get("receipt")
+                              for a in c.get("stage_attempts", [])},
+            "checks": [{"command": check.get("command"), "result": check.get("result")}
+                       for check in c.get("observed", {}).get("review", {}).get("checks", [])],
+            "proof_assertions": {row["id"]: [item["assertion"] for item in row.get("evidence", [])]
+                                 for row in c.get("observed", {}).get("proof", {}).get("requirements", [])},
             "scope_sha256": (d.fs.digest(d.fs.canonical(c["review_scope"]))
                              if c.get("review_scope") else None),
         } for c in result.get("candidates", [])],
@@ -366,7 +373,9 @@ def main(argv=None):
             result = judgments.run_case(output, fixtures, case, fixture_sha,
                                         args.max_stage_seconds, position)
             issues = assess_case(result, case, case.get("contract", fixtures["contract"]))
-            cases.append(compact_case(result, case, issues))
+            cases.append(compact_case(
+                result, case, issues,
+                evidence_path=str(output / f"candidate-{position:03d}" / "summary.json")))
         report = integrate(output, manifest, audits, cases, live_evidence=True,
                            host_version=host_version)
     except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError) as error:
