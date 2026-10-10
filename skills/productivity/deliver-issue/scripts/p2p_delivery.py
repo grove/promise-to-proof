@@ -4398,6 +4398,16 @@ def main(argv=None):
     except (ValueError, OSError, KeyError, TypeError, UnicodeError, subprocess.SubprocessError) as error:
         message = str(error)
         if delivery:
+            if args.action == 'resume' and delivery.read_only and delivery.state.get('status') == 'REVIEWED_AND_PROVEN':
+                # A rejected fast-path readback is NOT a new delivery failure.
+                # Never destroy the last accepted immutable verdict or rewrite
+                # its receipts to BLOCKED merely because a probe detected drift.
+                output = result(delivery)
+                output.update(status='BLOCKED', blocker=message,
+                              reuse={'status': 'STALE', 'reason': message,
+                                     'new_model_calls': 0, 'new_canonical_writes': 0})
+                print(json.dumps(output, indent=2))
+                return 1
             if args.action == 'upgrade-instructions':
                 output = result(delivery)
                 output.update(status='BLOCKED', instruction_upgrade_status='BLOCKED',
