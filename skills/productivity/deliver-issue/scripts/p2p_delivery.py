@@ -1073,7 +1073,7 @@ def host_events(path):
             'message': messages[-1] if messages else '', 'executions': executions}
 
 
-def report_schema(stage):
+def report_schema(stage, coverage=False):
     string = {'type': 'string'}
     def obj(properties):
         return {'type': 'object', 'properties': properties, 'required': list(properties), 'additionalProperties': False}
@@ -1104,7 +1104,37 @@ def report_schema(stage):
                           limitations={'type': 'array', 'items': string},
                           findings={'type': 'array', 'items': finding},
                           missing_input=string, expected_result=string)
+    if coverage:
+        row = obj({'id': string, 'paths': {'type': 'array', 'items': string},
+                   'existing': {'type': 'boolean'},
+                   'evidence': {'type': 'array', 'items': string}})
+        trace = obj({'requirements': {'type': 'array', 'items': row},
+                     'supporting_changes': {'type': 'array', 'items': obj({'path': string, 'reason': string})}})
+        if stage == 'review':
+            trace['properties']['inspected_paths'] = {'type': 'array', 'items': string}
+            trace['required'].append('inspected_paths')
+        properties['coverage_trace'] = trace
     return obj(properties)
+
+
+def coverage_markdown(report, scope=None):
+    trace = report.get('coverage_trace')
+    if trace is None:
+        return ''
+    lines = ['## Where the work and evidence are', '', 'Trace references do not grant proof verdicts.']
+    for row in trace['requirements']:
+        paths = ', '.join(row['paths'])
+        source = paths or ('existing behavior' if row['existing'] else 'not yet identified')
+        evidence = ', '.join(row['evidence']) or 'not yet established'
+        lines.append(f"- {row['id']}: {source}; evidence: {evidence}")
+    for extra in trace['supporting_changes']:
+        lines.append(f"- Supporting change {extra['path']}: {extra['reason']}")
+    if scope:
+        lines.append(f"Exact reviewed product scope: {len(scope['inspected'])} inspected paths, "
+                     f"{len(scope['changed_paths'])} changed paths, "
+                     f"candidate {scope['candidate_key']}, base {scope['comparison_base']}; "
+                     f"manifest SHA-256 {scope['manifest_sha256']}.")
+    return '\n'.join(lines)
 
 
 def learning_candidates_markdown(report):
@@ -1156,7 +1186,7 @@ REVIEW_AXES = ('Contract fidelity', 'Scope and simplicity', 'Engineering quality
 
 
 def review_markdown(report, work, contract, candidate, base_manifest, destination_observation=None,
-                    environment=None, session_id=None):
+                    environment=None, session_id=None, scope=None):
     key = candidate_key(candidate)
     if 'changes' in candidate:
         scope = [entry['path'] for entry in candidate['changes']]
@@ -1176,6 +1206,9 @@ def review_markdown(report, work, contract, candidate, base_manifest, destinatio
     if destination_observation:
         tip = destination_observation['observed_tip'] or 'unavailable'
         lines.insert(5, f"Destination observation: `{destination_observation['destination']}` {destination_observation['relation']} at `{tip}` ({destination_observation['observed_at']}).")
+    coverage = coverage_markdown(report, scope)
+    if coverage:
+        lines.extend(['', coverage])
     for axis in REVIEW_AXES:
         lines.extend(['', '## ' + axis, ''])
         if axis == 'Contract fidelity':
@@ -1250,6 +1283,9 @@ def proof_markdown(report, work, contract, candidate, environment, session_id):
     lines.extend('- ' + item for item in report['gaps'])
     if not report['gaps']:
         lines.append('None.')
+    facts = coverage_markdown(report)
+    if facts:
+        lines.extend(['', facts])
     lines.extend(['', '## Proof details', '', report['details']])
     return '\n'.join(lines).rstrip() + '\n'
 
