@@ -276,6 +276,32 @@ class FakeTransport:
                         'correction':'Revise and approve the acceptance contract.',
                         'handoff':'plan-acceptance'}])
             else: report['details'] = '# ' + status + '\n\nFIXTURE ONLY; full R1 observation retained.'
+            if stage == 'implementation' and admission.get('implementation_slice_version') == 1:
+                # Explicit fixture output, never a live model judgment.
+                agreed = admission.get('requirements', ['R1'])
+                previous = d.fs.snapshot(
+                    workspace, inputs['local_git_generation']['commit'],
+                    exclude=admission.get('agreement_paths', ()))
+                current = d.fs.snapshot(workspace,
+                                        exclude=admission.get('agreement_paths', ()))
+                paths = [item['path'] for item in d.fs.tree_changes(previous, current)]
+                partial = report['status'] == 'PARTIAL'
+                progress = {
+                    'id': f"I{self.calls.count('implementation')}",
+                    'requirement_ids': agreed,
+                    'expected_result': 'greet.py prints hello with newline and exits zero.',
+                    'checks': [] if partial else [{
+                        'kind': 'test', 'command': 'FIXTURE python3 greet.py',
+                        'result': 'passed', 'observation': 'hello\n',
+                    }],
+                    'paths': paths,
+                    'outcome': 'BLOCKED' if partial else 'VERIFIED',
+                    'boundary_reason': '',
+                    'next_action': ('Diagnose the remaining implementation gap.'
+                                    if partial else ''),
+                    'retires': [],
+                }
+                report['implementation_slice'] = progress
             if self.mode == 'review-proof-verdict' and stage == 'review':
                 row['verdict'] = 'proven'
             if self.mode == 'review-conflict' and stage == 'review':
