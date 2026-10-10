@@ -857,19 +857,22 @@
     },
     {
       "id": "review-conditional-security-risk",
-      "rationale": "A username flows into shell=True with string concatenation. Ordinary accepted inputs work, but shell metacharacters have an applicable command-execution risk; review blocks without needing a live exploit.",
+      "rationale": "A username flows into shell=True with string concatenation. Ordinary accepted inputs work, but shell metacharacters have an applicable command-execution risk; review blocks without needing a live exploit. A harmless metacharacter probe also exposes an extra public output line, so R3 cannot be proven.",
       "candidates": [
         {
           "name": "unsafe-shell",
           "implementation": "review-security-risk",
           "expected": {
             "review": "CHANGES NEEDED",
-            "proof": "PROVEN",
+            "proof": "NOT PROVEN",
             "review_finding": {
               "source": "R3",
               "axis": "Engineering quality",
               "path": "username.py"
-            }
+            },
+            "missing_proof": [
+              "R3"
+            ]
           },
           "oracle": [
             {
@@ -910,6 +913,16 @@
               ],
               "exit": 0,
               "stdout": "100\n",
+              "stderr": ""
+            },
+            {
+              "id": "safe-shell-metacharacter",
+              "args": [
+                "username_cli.py",
+                "Ada;printf SAFE_TOKEN"
+              ],
+              "exit": 0,
+              "stdout": "Ada\nAda;printf SAFE_TOKEN\n",
               "stderr": ""
             }
           ],
