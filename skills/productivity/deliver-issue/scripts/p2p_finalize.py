@@ -341,8 +341,23 @@ def git_receipt(root, remote, target, record, checkpoint, mandate,
     value = fs.canonical(record) + b"\n"
     branches = remote_branches(root, remote, runner=runner)
     tip = branches.get(ref)
-    need(tip, "receipt branch is not published; establish its checkpoint under branch-create authority")
     checkpoint_path = f"p2p-state/{fs.work_slug(record['work_item'])}.json"
+    if tip is None:
+        # A covering branch-create grant makes issue-less delivery fully
+        # autonomous. Select the existing published checkpoint branch, not an
+        # arbitrary code branch. Never overwrite a competing receipt branch.
+        autonomy.authorize(mandate, "branch-create",
+                           record["landing"]["repository"], ref)
+        targets = []
+        for head in sorted(set(branches.values())):
+            check = run(["git", "-C", str(root), "show",
+                         head + ":" + checkpoint_path],
+                        check=False, runner=runner)
+            if check.returncode == 0 and check.stdout.encode() == checkpoint:
+                targets.append(head)
+        need(len(targets) == 1,
+             "receipt branch needs one unambiguous published #82 checkpoint base")
+        tip = targets[0]
     saved = run(["git", "-C", str(root), "show", tip + ":" + checkpoint_path],
                 check=False, runner=runner)
     need(saved.returncode == 0 and saved.stdout.encode() == checkpoint,
@@ -437,19 +452,21 @@ def finalize(root, original, checkpoint, *, repository, remote, method,
             need(mandate is not None,
                  "missing selected standing mandate for the exact merge effect")
             autonomy.authorize(mandate, "merge", repository, pr_url)
-            # A retained pending reservation makes lost-response retries read-only.
+            # Reread every current gate immediately before the one mutation.
+            rechecked = read_pr(repository, int(match[2]), runner=runner)
+            need(rechecked["head"]["sha"] == head and
+                 rechecked["base"]["sha"] == checked["base"] and
+                 rechecked["state"] == "open",
+                 "PR changed after the merge-readiness decision")
+            check_ready(root, original, remote, repository, rechecked,
+                        method, saved, runner=runner)
+            # This reservation is stored in the existing readiness report.
+            # Repeated calls reconcile the PR, never reissue the same merge.
             if not reserve_merge(root, original["work_item"], readiness,
                                  pr_url, head, checked["base"], method):
                 return {"status": "PARTIAL", "phase": "MERGE_RECONCILIATION",
                         "reason": "a merge attempt is already reserved; do not dispatch another",
                         "next_action": "Read back the PR or reconcile this saved intent."}
-            # Disallow a TOCTOU head/base change after checking all the gates.
-            rechecked = read_pr(repository, int(match[2]), runner=runner)
-            need(rechecked["head"]["sha"] == head and
-                 rechecked["base"]["sha"] == checked["base"] and
-                 rechecked["state"] == "open" and
-                 rechecked.get("mergeable_state") == "clean",
-                 "PR changed after the merge-readiness decision")
             merge_attempted = True
             try:
                 run(["gh", "api", "-X", "PUT",
@@ -517,8 +534,9 @@ def finalize(root, original, checkpoint, *, repository, remote, method,
         return {"status": "READY_TO_RECORD", "record": final_record,
                 "mapping": mapping, "portable": transfer,
                 "receipt_published": False}
-    need(mandate is not None,
-         "completion receipt needs a selected, exact effect mandate")
+    # An already published matching receipt is a fact to read back, even
+    # when an earlier grant has since expired. A NEW effect still requires an
+    # exact covering mandate inside comment_receipt/git_receipt.
     destination = receipt_target(root, final_record, pr_url,
                                  receipt_issue, receipt_ref)
     try:
