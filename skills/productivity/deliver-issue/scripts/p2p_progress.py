@@ -394,6 +394,16 @@ def explain(status, *, publication=None, finalization=None):
         next_stage = stage_work.get("next")
         if statements and isinstance(next_stage, str):
             why += " Saved work: " + "; ".join(statements) + ". Next existing work: " + next_stage + "."
+    chain = status.get('promise_continuity')
+    if chain:
+        why += (' This unit contributes ' + chain['contribution'] + ' to the original promise ' +
+                chain['origin'] + '; it does not complete the original promise. ' +
+                'Final combined acceptance belongs to ' + str(chain['final_acceptance_owner']) + '.')
+        if phase in ('LOCAL_REVIEWED_PROVEN', 'FULLY_FINALIZED', 'PR_PUBLISHED_NOT_MERGED',
+                     'MERGED_RECEIPT_PENDING'):
+            next_action = chain['next_action']
+        if 'Original promise completion' not in not_established:
+            not_established.append('Original promise completion')
     message = " ".join((what, why, "Next: " + next_action))
     return {
         "phase": phase, "message": message, "what_happened": what,
