@@ -1,0 +1,22 @@
+name: Issue topology regressions
+on:
+  pull_request:
+    paths:
+      - 'skills/productivity/deliver-issue/scripts/p2p_issue_topology.py'
+      - 'skills/productivity/deliver-issue/scripts/p2p_autonomy.py'
+      - 'checks/test_p2p_issue_topology.py'
+      - '.github/workflows/issue-topology-tests.yml'
+  workflow_dispatch:
+jobs:
+  topology:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test topology decisions and lifecycle authority
+        run: python3 -m unittest discover -s checks -p 'test_p2p_issue_topology.py' -v
+      - name: Test unchanged mandate semantics
+        run: python3 -m unittest discover -s checks -p 'test_p2p_autonomy.py' -v
