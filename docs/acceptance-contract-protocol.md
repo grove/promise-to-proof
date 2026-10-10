@@ -90,6 +90,52 @@ At the end of a meaningful user-facing turn, make the next action obvious. Prefe
 one primary next step over a dump of workflow state. If several actions are
 genuinely required, order them and explain why.
 
+### Show what has really happened, not just controller activity
+
+At meaningful delivery boundaries, explain the **confirmed outcome**, **why it
+matters**, **where the work is**, and the **one next supported action**. Derive the
+explanation from the existing canonical contract, controller stage records,
+checkpoint, candidate identity, and exact publication/merge readback. The
+controller's read-only `status` result includes `human_progress`; `status
+--human` renders that same explanation in ordinary language, while standard
+JSON and all detailed records remain inspectable. This is a *view* of existing
+facts, never a second status database, approval, proof verdict, or stage.
+
+Distinguish these facts explicitly:
+
+- Planning and even a passing independent audit do **not** constitute the
+  user's approval; the accepted contract must be authorized through its existing
+  mandate and approval rules before implementation.
+- A running worker, a log timestamp, or a valid imported checkpoint does **not**
+  establish useful progress, a current worker on another computer, or a fresh
+  host preflight. State only which stages actually completed. An interrupted or
+  uncertain worker retains its receipts and must be reconciled before dispatch.
+- Full `REVIEWED` and `PROVEN` cover one unchanged candidate and frozen base
+  **locally**. They do not place code in the operator checkout or establish a
+  committed branch, published PR, merged destination or deployment.
+- A saved publication note or PR marker is a *lookup hint*, not publication
+  proof. Report an open PR only after readback verifies its current head, target,
+  contract marker, and complete product-tree equivalence with the reviewed
+  candidate. A closed PR is not a merge. If GitHub is unavailable or identities
+  differ, say the external state is unconfirmed rather than guessing.
+- GitHub's confirmed merge is distinct from a validated mapping to the exact
+  delivered tree and the durable completed-delivery receipt. Until #50/#47
+  establish that latter fact, show the merge as **receipt pending**, never
+  finalized. A parent with completed/closed children still requires independent
+  review and proof of the assembled parent.
+- Report a genuine missing permission, source decision, evidence path, failed
+  host initialization or effect authority as a blocker. Explain what is
+  preserved and what P2P already tried, without promising a retry or naming an
+  unavailable recovery command. Never equate host permission with user approval.
+
+User-facing wording must answer what happened, why it matters and what happens
+next in a connected paragraph, proportional to the significance of the event.
+When the current mandate covers the next action, say P2P will continue; ask the
+person only for the decision or capability actually missing. Keep hashes, logs,
+attempt IDs, report mechanics and timestamps available as supporting technical
+details rather than the main answer. No mandatory summarization worker,
+polling, extra checkpoint, effect grant or test suite is introduced.
+
 ## Contract and proof
 
 The acceptance contract says what must be true. Proof says whether it was true
