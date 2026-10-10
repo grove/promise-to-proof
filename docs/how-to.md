@@ -76,9 +76,10 @@ assembled parent's own proof even when all child PRs have merged.
 The new optional `landing` section preserves the historical local record's
 meaning, and the same confirmed delivery keeps one stable event/receipt
 identity across retries. See [Delivery Record v1](delivery-record-v1.md) for
-the exact validation and preview commands. **This is not yet receipt
-publication or authorized merge automation**: #47 completes those effects,
-checks remote readback, and confirms the durable final delivery receipt.
+exact validation and preview commands. The [authorized finalization
+workflow](finalization.md) now performs permitted merges, reads back the
+remote result and stores a durable receipt. It does not infer that authority
+from local acceptance.
 Do not treat a local matching Git branch as a remotely confirmed delivery.
 
 ## Re-size from delivery evidence
