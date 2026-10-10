@@ -340,6 +340,38 @@ relative-link resolution and binding inputs. Never infer P2P ownership from a
 Resolve conflicts before dependent work. Changed contract locations make old
 results historical until fresh matching review and proof establish the handoff.
 
+### Single-request delivery entry
+
+Ordinary `/deliver-issue` accepts one agreed text request, a configured issue
+reference, a repository-owned spec, or an explicit canonical contract path.
+Resolve these to **one** `.p2p/work/<slug>/contract.md` before controller
+admission. Use the existing read-only `p2p_filesystem.py resolve-entry` lookup
+and existing planning, audit, sizing, approval and checkpoint procedures; do not
+add a second contract database, workflow stage or remote authorization.
+
+A matching saved local agreement or portable checkpoint is a candidate for reuse,
+not evidence that the current source is unchanged, that approval exists, or
+that review and proof are current. Re-read and reconcile the complete binding
+source, issue amendments, contract bytes, approval receipt, delivery-shape
+identity and host capabilities. For direct text, retain the exact JSON-escaped
+request in the existing `planning-handoff.md` as
+`Entry request JSON: <JSON string>`; the selected checkpoint retains that
+provenance. A request's stable filename suggestion is not authority to overwrite
+an existing work item. Issue numbers are meaningful only under the currently
+configured tracker; do not infer the repository or permissions from a remote.
+
+When no agreement matches, `deliver-issue` uses the existing
+`plan-acceptance` and independent audit locally, obtains any needed decision
+or approval, and advances through #77 sizing and #60 admission in the **same
+outer invocation**. `/plan-acceptance` remains independently available for
+plan-only use. Resuming an admitted or checkpoint-restored request follows its
+existing controller status/resume path, not another planning or initial
+implementation dispatch. Fail with an exact supported blocker for material
+ambiguity, changed sources, competing contracts, unresolved sizing decisions,
+insufficient host isolation or missing effect authority. Unchanged saved work
+and authority remain intact. Local entry grants no commit, push, tracker edit,
+PR, merge or deployment effect.
+
 ### Standing autonomy mandates
 
 An explicitly selected standing mandate delegates decisions and effects for its
