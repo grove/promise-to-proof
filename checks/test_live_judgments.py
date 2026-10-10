@@ -6,10 +6,76 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+import uuid
 from unittest.mock import patch
 
 import check_p2p_judgments_host as evaluation
 from test_p2p_delivery import fixture_host, d
+
+
+
+class OfflineJudgmentTransport:
+    """Host-shaped model responses for controller wiring tests, NEVER judgment evidence."""
+
+    def __init__(self):
+        self.bad = False
+        self.prompts = []
+
+    def __call__(self, args, prompt, event_path, error_path, deadline, idle_seconds=None):
+        launch = json.loads((event_path.parent / "launch.json").read_text())
+        stage, inputs = launch["stage"], launch["inputs"]
+        if stage not in ("review", "proof"):
+            raise AssertionError("offline fixture invokes review and proof only")
+        self.prompts.append((stage, prompt))
+        if stage == "review":
+            finding = {"id": "F1", "source": "R2", "axis": "Contract fidelity",
+                       "location": "username.py", "evidence": "whitespace is accepted",
+                       "consequence": "R2 is missing", "correction": "reject whitespace-only input",
+                       "handoff": "implement-contract"}
+            report = {
+                "status": "CHANGES NEEDED" if self.bad else "REVIEWED",
+                "input_identity_json": json.dumps(inputs),
+                "requirements": [{"id": name, "observation": "offline transport, no live judgment"}
+                                 for name in ("R1", "R2", "R3")],
+                "gaps": [], "learning_candidates": [], "coverage": "R1, R2, R3",
+                "checks": [{"command": "FIXTURE check", "result": "observed",
+                            "observation": "not real host evidence"}],
+                "limitations": ["offline fixture"], "findings": [finding] if self.bad else [],
+                "missing_input": "", "expected_result": "",
+            }
+        else:
+            proof_rows = []
+            for name in ("R1", "R2", "R3"):
+                missing = self.bad and name == "R2"
+                proof_rows.append({
+                    "id": name, "verdict": "missing" if missing else "proven",
+                    "observation": "offline stub, no independent verification",
+                    "evidence": [] if missing else [{
+                        "assertion": "FIXTURE claim", "observation": "FIXTURE event",
+                        "artifact": "FIXTURE command; no model judgment"
+                    }],
+                })
+            report = {
+                "status": "NOT PROVEN" if self.bad else "PROVEN",
+                "input_identity_json": json.dumps(inputs),
+                "requirements": proof_rows,
+                "gaps": ["R2 whitespace regression"] if self.bad else [],
+                "learning_candidates": [], "details": "OFFLINE STUB: not live proof",
+            }
+        session = "offline-" + uuid.uuid4().hex
+        events = [
+            {"type": "thread.started", "thread_id": session},
+            {"type": "item.completed", "item": {
+                "type": "command_execution", "command": "FIXTURE check",
+                "exit_code": 0, "aggregated_output": "FIXTURE command output"}},
+            {"type": "item.completed", "item": {
+                "type": "agent_message", "text": json.dumps(report)}},
+            {"type": "turn.completed", "usage": {"input_tokens": 1, "output_tokens": 1}},
+        ]
+        event_path.write_text("".join(json.dumps(event) + "\n" for event in events))
+        error_path.write_text("FIXTURE transport: not live\n")
+        return {"exit_code": 0, "outcome": "finished",
+                "finished": d.now(), "elapsed_seconds": 0.01}
 
 
 class LiveJudgmentRunnerTests(unittest.TestCase):
@@ -79,6 +145,43 @@ class LiveJudgmentRunnerTests(unittest.TestCase):
         directory = Path(case["id"])
         (self.root / directory).mkdir()
         return directory
+
+
+    def test_live_candidate_follow_up_uses_normal_per_stage_verification_history(self):
+        case = next(c for c in self.data["cases"] if c["id"] == "follow-up-regression")
+        directory = self.root / "followup"
+        directory.mkdir()
+        root, base = evaluation.source_repo(directory, self.data, case)
+        transport = OfflineJudgmentTransport()
+        with fixture_host(), patch.object(d, "launch", transport):
+            delivery = evaluation.admit(root, base, 2, 120)
+            initial, changed = case["candidates"]
+            first = evaluation.capture_fixed_candidate(
+                delivery, evaluation.candidate_files(self.data, initial))
+            for stage in ("review", "proof"):
+                result = delivery.stage(stage)
+                self.assertEqual(result["status"], initial["expected"][stage])
+                self.assertEqual(delivery.read_report(stage)["status"], initial["expected"][stage])
+            self.assertEqual(delivery.verification_history("review")["previous_candidate"]["key"],
+                             first["key"])
+            transport.bad = True
+            second = evaluation.capture_fixed_candidate(
+                delivery, evaluation.candidate_files(self.data, changed))
+            self.assertNotEqual(first["key"], second["key"])
+            for stage in ("review", "proof"):
+                history = delivery.verification_history(stage)
+                self.assertTrue(history["available"], stage)
+                self.assertEqual(history["previous_candidate"]["key"], first["key"])
+                self.assertEqual(history["current_candidate"]["key"], second["key"])
+                result = delivery.stage(stage)
+                self.assertEqual(result["status"], changed["expected"][stage])
+                self.assertEqual(delivery.read_report(stage)["status"], changed["expected"][stage])
+                self.assertIn(first["key"], transport.prompts[-1][1])
+                self.assertIn(second["key"], transport.prompts[-1][1])
+            self.assertEqual([item["stage"] for item in delivery.state["attempts"]],
+                             ["review", "proof", "review", "proof"])
+            self.assertEqual(len({a["session_id"] for a in delivery.state["attempts"]}), 4)
+            self.assertEqual(delivery.state["local_git_generations"][-1]["candidate_key"], second["key"])
 
     def test_live_evaluation_generation_requires_explicit_admission(self):
         case = self.data["cases"][0]
