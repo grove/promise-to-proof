@@ -700,6 +700,42 @@ checkpoint. They may be removed only after verifying the shared checkpoint and
 recoverable candidate, and after stopping any active controller. Raw local state
 must still be retained while preservation is incomplete or an effect is uncertain.
 
+### Optional durable delivery learnings (#35)
+
+No lesson is the normal result. Completion, PR publication and merger never
+require a retrospective stage. The existing `learning_candidates` are merely
+leads; `/retrospect` independently evaluates them against the exact proven
+candidate and later evidence. Only explicit human disposition may add accepted
+scoped advice to the existing project register; promotion to binding policy
+needs separate authority.
+
+When a useful lesson is selected before completed-delivery cleanup, the
+existing `retrospective.md` identifies its delivery invocation, contract hash,
+candidate, actual PROVEN status and smallest safe hash-checked supporting
+observations. It records selected versus no lesson. Use the existing #82
+checkpoint to retain that report and its narrowly cited, readable evidence
+files. Verify the exact checkpoint contents and selected shared destination's
+readback and required remote Git objects **before deleting local support**.
+A local-only checkpoint, digest of deleted logs or remote URL that cannot be
+read back does not justify cleanup. Missing preservation keeps local state.
+Already approved register entries remain advisory, and evidence sources must
+not include private transcripts, raw logs, secrets or whole snapshots.
+
+For an explicitly abandoned or terminally blocked delivery without proof, a
+separately authorized **terminal learning handoff** may preserve selected
+observations using the same report and disposition/register rules. It must
+say `UNPROVEN`, identify a saved blocked invocation and a retrievable human
+terminal decision, and avoid any suggestion that normal `/retrospect` ran
+successfully. It grants neither approval nor proof nor permission to delete
+attempts, uncertain effects or recoverable work. The controller's successful
+cleanup is still available **only** for `REVIEWED_AND_PROVEN`.
+
+Future sessions inspect retained advice through the existing #82 restored
+`retrospective.md`, exact referenced evidence hashes, and any adopted
+`docs/retrospective-learnings.md` entry. Pending/rejected candidates stay
+nonbinding in their saved report; no new history store or required model
+worker is introduced.
+
 ### Local working records
 
 Save work-item output under `.p2p/work/<slug>/`: `implementation.md`,
