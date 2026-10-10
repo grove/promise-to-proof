@@ -415,7 +415,7 @@ observations may inform a focused **new** review and proof; unknown reach is
 rechecked rather than silently reused. The [incremental reuse guide](./checks/incremental-reuse.md)
 explains the conditions and measurements.
 
-## Contributing## Contributing
+## Contributing
 
 Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before starting work. This project
 uses an issue-first contribution model, and substantial pull requests should follow
