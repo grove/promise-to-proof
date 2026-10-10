@@ -380,7 +380,7 @@ def _coverage_path(path):
                     for part in path.split("/")) and "\\" not in path and "\0" not in path)
 
 
-def validate_coverage_trace(trace, requirement_ids, report, stage, manifest, changed):
+def validate_coverage_trace(trace, requirement_ids, report, stage, manifest, changed, record_refs=()):
     """Validate links against actual paths/rows, without grading their meaning.
 
     'row' is the saved stage requirement row; 'check:N' is a saved reviewer
@@ -441,8 +441,10 @@ def validate_coverage_trace(trace, requirement_ids, report, stage, manifest, cha
                     raise ValueError("coverage references a missing review check: " + ref)
             elif ref.startswith("file:") and ref.removeprefix("file:") in current:
                 pass  # Content is identified by the candidate manifest, not a guessed hash.
-            elif ref.startswith("record:") and re.fullmatch(r"record:[A-Za-z][A-Za-z0-9_.-]*@sha256:[0-9a-f]{64}", ref):
-                pass  # Optional Evidence Record v1; the record verifier judges content.
+            elif (ref.startswith("record:") and
+                  re.fullmatch(r"record:[A-Za-z][A-Za-z0-9_.-]*@sha256:[0-9a-f]{64}", ref) and
+                  ref in record_refs):
+                pass  # Only a retained matching candidate/contract record may be cited.
             else:
                 raise ValueError("unresolved coverage evidence reference: " + ref)
         if successful and (not item["paths"] and not item["existing"] or not item["evidence"]):
@@ -464,6 +466,35 @@ def validate_coverage_trace(trace, requirement_ids, report, stage, manifest, cha
         raise ValueError("unaccounted product changes: " + ", ".join(sorted(missing)))
     return {"requirements": sorted(ids), "unaccounted_changes": sorted(missing),
             "supporting_changes": sorted(supporting)}
+
+
+def available_evidence_refs(workspace, work, candidate_key, contract_sha256):
+    """Resolve already-retained Evidence Record v1 identities; never invent one.
+
+    Identity existence is not an authenticity or sufficiency decision: the
+    Evidence Record v1 validator and independent proof retain those obligations.
+    """
+    evidence_root = safe(workspace, f".p2p/work/{work_slug(work)}/evidence")
+    if not evidence_root.is_dir() or evidence_root.is_symlink():
+        return set()
+    references = set()
+    for path in evidence_root.glob("*.json"):
+        if path.is_symlink() or not path.is_file():
+            continue
+        try:
+            data = json.loads(path.read_bytes())
+            if (not isinstance(data, dict) or
+                    data.get("schema") != "promise-to-proof/evidence-record/v1" or
+                    data.get("candidate") != candidate_key or
+                    not isinstance(data.get("contract"), dict) or
+                    data["contract"].get("sha256") != contract_sha256 or
+                    not isinstance(data.get("id"), str) or
+                    not re.fullmatch(r"[A-Za-z][A-Za-z0-9_.-]*", data["id"])):
+                continue
+            references.add(f"record:{data['id']}@sha256:{digest(canonical(data))}")
+        except (OSError, ValueError, TypeError, UnicodeError):
+            continue
+    return references
 
 
 def review_scope(candidate, manifest, generation_commit, inspected_paths,
