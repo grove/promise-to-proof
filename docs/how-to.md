@@ -138,7 +138,19 @@ permissions: model capability cannot replace access to source issues, tests,
 CI results, or an exact candidate. `publish-pr` in particular has a demanding
 identity and authorization procedure even though its reasoning is more bounded.
 
-## Triage an existing issue
+## Reconcile open issues after implementation lands
+
+Invoke `/replan-backlog <merged PR or commit>` after meaningful changes have
+landed to assess **only plausibly affected open issues**. Ask
+`/replan-backlog --all-open` for an explicit whole-backlog audit. The skill
+distinguishes shipped outcomes, partially fulfilled promises, pending PRs
+and missing live validation, then proposes specific issue edits and an
+understandable prerequisite/parallel-work order. A proposed close or narrowed
+description still needs your separate, exact approval and fresh tracker
+readback. Active accepted delivery contracts stay pinned. Nothing runs
+automatically after every merge; no new roadmap database is created.
+
+
 
 When an issue needs a next owner or action, run triage before the delivery path:
 
@@ -584,7 +596,7 @@ tree while keeping history intact, follow the [migration guide](./p2p-state-migr
 |---|---|
 | `/setup-promise-to-proof` | Establish local storage and Git rules, with optional tracker configuration. |
 | `/create-parent-issue` | Preview an optional GitHub mirror of a specification; publish only with authority. |
-| `/triage-issue` | Recommend the next action for an existing issue; apply only approved label or closure changes. |
+| `/replan-backlog` | Reconcile open backlog issues against landed code; propose authorized edits only. |\n| `/triage-issue` | Recommend the next action for an existing issue; apply only approved label or closure changes. |
 | `/plan-acceptance` | Define and revise the acceptance contract. |
 | `/audit-acceptance` | Independently audit an exact proposed contract before human approval. |
 | `/slice-contract` | Create linked local child work items; optionally publish approved tracker mirrors. |
