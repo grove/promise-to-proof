@@ -2971,6 +2971,10 @@ assert results['scratch'] == 'ok'
             path.unlink()
 
     def remove_local_execution_state(self):
+        # A selected lesson must remain independently recoverable *before*
+        # any source, receipts or temporary execution evidence is destroyed.
+        import p2p_learning
+        p2p_learning.cleanup_guard(self.root, self.work)
         attempts = self.runtime / 'attempts'
         if attempts.is_symlink():
             raise ValueError('local attempt records are a symlink')
