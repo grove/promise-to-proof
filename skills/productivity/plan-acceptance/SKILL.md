@@ -22,6 +22,19 @@ also publishes a planning handoff under the protocol's standalone planning rules
 Before planning, read the [acceptance contract protocol](references/acceptance-contract-protocol.md).
 It defines the spec envelope, revision rules, evidence terms, and handoffs.
 
+## Agent-ready acceptance without agent micromanagement
+
+A high-quality contract tells a capable coding agent **what observable outcome must hold**, not the algorithm, edit order, architecture, or internal reasoning it must use. Keep the existing canonical contract and approval rules; do not introduce a second handoff artifact, test quota, extra approval, or model stage.
+
+- **Complete but economical:** describe each material distinct outcome once, with source traceability, representative falsifying boundaries, and binding compatibility/scope constraints. Prefer the smallest contract that fully preserves the promise, not the shortest contract at the cost of omissions. Do not duplicate constraints across rows unless the distinction is necessary.
+- **Outcome versus method:** a planned test, named seam, or example illustrates how acceptance might be observed; it is not a requirement to choose that implementation architecture. Preserve explicit source-mandated interfaces/techniques, but otherwise allow an equally credible or stronger evidence path and the agent's own implementation strategy. A different technique does not need an agreement revision when the promised semantics are unchanged.
+- **Expected behavior independent of candidate:** state expected results from the user/source, including meaningful failures and invariants. Never derive expected answers from existing implementation, mocks, snapshots, or test fixtures that may embody the bug. Mark unknown expected outcomes as decisions, not conveniently chosen assumptions.
+- **Risk-aware, not checklist-driven:** add persistence, restart, concurrency, authorization, error, or compatibility boundaries only if the promise genuinely depends on them; name the trigger and relevant invariant. No universal deep-test checklist for small changes.
+- **Proof viability, not premature implementation:** name at least one credible observable seam/oracle/evidence approach for each outcome. A missing harness is an evidence gap or enabling task, not automatically a missing product decision or an instruction to write a specific test before any work. Planned evidence remains a proposal: independent proof must challenge actual behavior and may choose different credible evidence.
+- **Immediate agent usability:** make the intended behavior, scope boundaries, prerequisites, existing relevant interfaces, and independently distinguishable success/failure easy to find in the *existing contract*. Avoid large context dumps, speculative refactors, exhaustive walkthroughs, task-by-task prescriptions, or additional reports.
+
+For an unchanged approved agreement, **reuse it**. Do not re-plan solely to satisfy a new implementation agent, host, format preference, or verification technique. An approved contract with source identity, requirements and evidence intent can be consumed by other delivery agents without importing P2P's controller; downstream systems independently validate its approval and source identity.
+
 ## Build the contract
 
 1. Accept a supported tracker issue, direct agreed text, or project-authored
