@@ -299,7 +299,7 @@ def git_generation_tree(workspace, manifest):
         Path(str(index) + '.lock').unlink(missing_ok=True)
 
 
-def record_generation(delivery, candidate, stage):
+def record_generation(delivery, candidate, stage, manifest=None):
     state = delivery.state
     generations = state.setdefault('local_git_generations', [])
     sequence = len(generations) + 1
@@ -319,7 +319,10 @@ def record_generation(delivery, candidate, stage):
         raise ValueError('candidate generation has no completed stage attempt: ' + stage)
     if stage == 'live-evaluation' and not state.get('live_evaluation'):
         raise ValueError('fixture candidate admission is reserved for explicit live evaluations')
-    manifest = fs.snapshot(workspace, exclude=delivery.state.get('agreement_paths', ()))
+    if manifest is None:
+        manifest = fs.snapshot(workspace, exclude=delivery.state.get('agreement_paths', ()))
+    if fs.snapshot_key(manifest) != candidate['key']:
+        raise ValueError('candidate generation differs from its exact prepared snapshot')
     tree = git_generation_tree(workspace, manifest)
     parent = generations[-1]['commit'] if generations else state['local_git_base']['local_commit']
     intent = encoded({'stage': stage, 'candidate': candidate, 'parent': parent,
@@ -1744,16 +1747,22 @@ class Delivery:
         if fs.bindings(self.workspace, self.work) != self.state['binding_inputs']:
             raise ValueError('implementation changed binding inputs')
         excluded = self.state['excluded_dirty']
-        base = {e['path']: e for e in fs.snapshot(self.workspace, self.state['comparison_base'])}
-        actual = {e['path']: e for e in fs.snapshot(self.workspace)}
+        base_entries = fs.snapshot(self.workspace, self.state['comparison_base'])
+        actual_entries = fs.snapshot(self.workspace)
+        base = {e['path']: e for e in base_entries}
+        actual = {e['path']: e for e in actual_entries}
         changed = [p for p in excluded if actual.get(p) != base.get(p)]
         changed = [p for p in changed if p not in self.state.get('agreement_paths', ())]
         if changed:
             raise ValueError('implementation changed excluded scope paths: ' + ', '.join(changed))
+        agreement_paths = set(self.state.get('agreement_paths', ()))
+        candidate_entries = [entry for entry in actual_entries if entry['path'] not in agreement_paths]
+        base_candidate_entries = [entry for entry in base_entries if entry['path'] not in agreement_paths]
         candidate = fs.capture(self.workspace, self.work, self.state['comparison_base'],
-                              exclude=self.state.get('agreement_paths', ()))
+                               exclude=agreement_paths,
+                               prepared=(candidate_entries, base_candidate_entries))
         self.state['candidate'] = candidate
-        record_generation(self, candidate, stage)
+        record_generation(self, candidate, stage, manifest=candidate_entries)
         self._generation_chain_verified = False
         return candidate
 
