@@ -280,7 +280,17 @@ def explain(status, *, publication=None, finalization=None):
         reason = _short_reason(status.get("blocker"))
         kind = _kind_of_blocker(reason)
         attempted = sum(1 for a in (status.get("attempts") or []) if a.get("stage") == "implementation")
-        if kind == "not-admitted":
+        if status.get("invocation_exists") is False:
+            phase, action_needed = "NOT_ADMITTED", True
+            what = "Delivery has not started an admitted controller invocation."
+            why = ("The recorded problem is: " + reason + ". " if reason else "") + (
+                "Planning and implementation may still be pending; no worker, independent review or proof "
+                "has been established, and there is no controller invocation to resume.")
+            next_action = ("Resolve the named host or agreement blocker, then continue the original "
+                           "/deliver-issue request through admission. Do not use controller resume "
+                           "until an invocation actually exists.")
+            location = "source or planning records only; no admitted implementation candidate"
+        elif kind == "not-admitted":
             phase, action_needed = "NOT_ADMITTED", True
             what = "A delivery invocation has not yet been admitted for this work item."
             why = "The saved request or planning agreement alone does not mean implementation started, and there are no controller stages to resume."
