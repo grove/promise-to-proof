@@ -402,6 +402,12 @@ source-contract auditing to the existing exact-candidate review/proof fixtures
 without adding a production stage. Its macOS/Codex live outcomes must be
 measured; offline unit tests alone cannot establish model behavior.
 
+The [measured first-pass latency work](./checks/first-pass-latency.md)
+reduces repeated Git/filesystem checks without skipping independent review,
+proof or portable checkpoints. Its reported speedup is for an offline
+controller fixture, **not** a prediction of authenticated live-model delivery
+time.
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before starting work. This project

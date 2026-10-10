@@ -299,7 +299,7 @@ def git_generation_tree(workspace, manifest):
         Path(str(index) + '.lock').unlink(missing_ok=True)
 
 
-def record_generation(delivery, candidate, stage):
+def record_generation(delivery, candidate, stage, manifest=None):
     state = delivery.state
     generations = state.setdefault('local_git_generations', [])
     sequence = len(generations) + 1
@@ -319,7 +319,10 @@ def record_generation(delivery, candidate, stage):
         raise ValueError('candidate generation has no completed stage attempt: ' + stage)
     if stage == 'live-evaluation' and not state.get('live_evaluation'):
         raise ValueError('fixture candidate admission is reserved for explicit live evaluations')
-    manifest = fs.snapshot(workspace, exclude=delivery.state.get('agreement_paths', ()))
+    if manifest is None:
+        manifest = fs.snapshot(workspace, exclude=delivery.state.get('agreement_paths', ()))
+    if fs.snapshot_key(manifest) != candidate['key']:
+        raise ValueError('candidate generation differs from its exact prepared snapshot')
     tree = git_generation_tree(workspace, manifest)
     parent = generations[-1]['commit'] if generations else state['local_git_base']['local_commit']
     intent = encoded({'stage': stage, 'candidate': candidate, 'parent': parent,
@@ -1663,25 +1666,35 @@ class Delivery:
                     raise ValueError('retained routing history/evidence changed: ' + record['path'])
         current = fs.snapshot(self.root)
         current_key = fs.snapshot_key(current)
-        product_key = fs.snapshot_key(fs.snapshot(self.root, exclude=self.state.get('agreement_paths', ())))
+        # The complete source snapshot already contains the product subset.
+        # Filtering these exact bytes removes a redundant checkout scan while
+        # preserving records-only vs product-change classification.
         applied_key = self.state.get('candidate', {}).get('key')
-        candidate_applied = self.state.get('status') == 'REVIEWED_AND_PROVEN' and product_key == applied_key
+        candidate_applied = (self.state.get('status') == 'REVIEWED_AND_PROVEN' and
+                             fs.snapshot_key([row for row in current
+                                              if row['path'] not in self.state.get('agreement_paths', ())]) == applied_key)
         if current_key != self.state['source_tree_key'] and not candidate_applied:
             raise ValueError('source checkout changed since admission')
         if (self.workspace / '.git').read_text() != 'gitdir: ' + str(self.runtime / 'repository.git') + '\n':
             raise ValueError('isolated Git metadata pointer changed')
         head = fs.full_commit(self.root, 'HEAD')
         index = fs.digest(fs.git(self.root, 'ls-files', '--stage', '-z'))
-        metadata_only = (self.state.get('source_product_index_sha256') == fs.product_index_sha256(self.root) and
-                         fs.snapshot_key(fs.snapshot(self.root, head)) == self.state['source_tree_key'] and
-                         fs.snapshot_key(current) == self.state['source_tree_key'])
-        if (head != self.state['source_head'] or index != self.state['source_index_sha256']) and not metadata_only:
-            committed_candidate = (candidate_applied and
-                                   fs.snapshot_key(fs.snapshot(self.root, head)) == applied_key)
-            staged_product = subprocess.run(['git', '-C', str(self.root), 'diff', '--cached', '--quiet',
-                                             '--', ':(exclude).p2p', ':(exclude)p2p-state']).returncode
-            if not committed_candidate or staged_product:
-                raise ValueError('source HEAD or index changed since admission')
+        # Inspect committed HEAD and staged product identity only when a
+        # checkout metadata change makes this distinction relevant. A normal
+        # cold delivery still checks the live full source snapshot above.
+        if head != self.state['source_head'] or index != self.state['source_index_sha256']:
+            head_key = fs.snapshot_key(fs.snapshot(self.root, head))
+            metadata_only = (self.state.get('source_product_index_sha256') ==
+                             fs.product_index_sha256(self.root) and
+                             head_key == self.state['source_tree_key'] and
+                             current_key == self.state['source_tree_key'])
+            if not metadata_only:
+                committed_candidate = candidate_applied and head_key == applied_key
+                staged_product = subprocess.run(['git', '-C', str(self.root), 'diff',
+                                                 '--cached', '--quiet', '--',
+                                                 ':(exclude).p2p', ':(exclude)p2p-state']).returncode
+                if not committed_candidate or staged_product:
+                    raise ValueError('source HEAD or index changed since admission')
         if fs.full_commit(self.workspace, self.state['comparison_base']) != self.state['comparison_base']:
             raise ValueError('comparison base unavailable')
         base_key = fs.snapshot_key(fs.snapshot(self.workspace, self.state['comparison_base']))
@@ -1744,16 +1757,22 @@ class Delivery:
         if fs.bindings(self.workspace, self.work) != self.state['binding_inputs']:
             raise ValueError('implementation changed binding inputs')
         excluded = self.state['excluded_dirty']
-        base = {e['path']: e for e in fs.snapshot(self.workspace, self.state['comparison_base'])}
-        actual = {e['path']: e for e in fs.snapshot(self.workspace)}
+        base_entries = fs.snapshot(self.workspace, self.state['comparison_base'])
+        actual_entries = fs.snapshot(self.workspace)
+        base = {e['path']: e for e in base_entries}
+        actual = {e['path']: e for e in actual_entries}
         changed = [p for p in excluded if actual.get(p) != base.get(p)]
         changed = [p for p in changed if p not in self.state.get('agreement_paths', ())]
         if changed:
             raise ValueError('implementation changed excluded scope paths: ' + ', '.join(changed))
+        agreement_paths = set(self.state.get('agreement_paths', ()))
+        candidate_entries = [entry for entry in actual_entries if entry['path'] not in agreement_paths]
+        base_candidate_entries = [entry for entry in base_entries if entry['path'] not in agreement_paths]
         candidate = fs.capture(self.workspace, self.work, self.state['comparison_base'],
-                              exclude=self.state.get('agreement_paths', ()))
+                               exclude=agreement_paths,
+                               prepared=(candidate_entries, base_candidate_entries))
         self.state['candidate'] = candidate
-        record_generation(self, candidate, stage)
+        record_generation(self, candidate, stage, manifest=candidate_entries)
         self._generation_chain_verified = False
         return candidate
 
@@ -2464,7 +2483,10 @@ assert results['scratch'] == 'ok'
                                       report_schema(name, coverage_required, risks_required))
         self.timed_source_stable()
         if name in ('review', 'proof'):
-            self.current()
+            # Source stability was just verified at this same receipt boundary.
+            # Validate the exact candidate here without repeating that complete
+            # source scan, pinned instruction and base preflight a second time.
+            self.current(check_source=False)
         scope = None
         with self.report_validation(attempt, host):
             raw_report = host['message'].encode('utf-8')
