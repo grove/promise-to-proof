@@ -82,11 +82,11 @@ class SingleEntryTests(unittest.TestCase):
                           "Source: [Specification](../../../specs/authentication.md)\n")
         used = fs.entry_source(self.root, source)
         self.assertEqual((used["action"], used["work_item"]), ("USE", work))
-        before = used["source_sha256"]
+        before = used["entry_fingerprint_sha256"]
         (self.root / source).write_text("# Authentication\nDifferent requirement.\n")
         changed = fs.entry_source(self.root, source)
         self.assertEqual(changed["action"], "USE")  # Reconcile before delivery; not automatic approval.
-        self.assertNotEqual(before, changed["source_sha256"])
+        self.assertNotEqual(before, changed["entry_fingerprint_sha256"])
         with self.assertRaisesRegex(ValueError, "specification does not exist"):
             fs.entry_source(self.root, "specs/missing.md")
 
@@ -119,6 +119,24 @@ class SingleEntryTests(unittest.TestCase):
         (self.root / proposed["suggested_work_item"]).write_text("Unrelated existing contract")
         with self.assertRaisesRegex(ValueError, "already belongs to different source"):
             fs.entry_source(self.root, different)
+
+    def test_work_markdown_is_a_spec_unless_explicit_legacy_contract(self):
+        (self.root / "work").mkdir()
+        spec = self.root / "work/authentication.md"
+        spec.write_text("# Project-authored spec\nNormal work, not a P2P contract.\n")
+        fs.git(self.root, "add", "work/authentication.md")
+        fs.git(self.root, "commit", "-qm", "project authored spec")
+        result = fs.entry_source(self.root, "work/authentication.md")
+        self.assertEqual(result["action"], "PLAN")
+        self.assertEqual(result["kind"], "spec")
+        legacy = self.root / "work/legacy.md"
+        legacy.write_text("# Acceptance contract: legacy\n\nContract revision: v1\n")
+        self.assertEqual(fs.entry_source(self.root, "work/legacy.md")["action"], "USE")
+
+    def test_prose_mentioning_markdown_is_not_mistaken_for_file(self):
+        result = fs.entry_source(self.root, "Please add a new README.md")
+        self.assertEqual(result["action"], "PLAN")
+        self.assertEqual(result["kind"], "text")
 
     def test_generated_paths_and_unsafe_sources_are_not_specs(self):
         for value in (".p2p/work/x/source.md", "p2p-state/x.json"):
