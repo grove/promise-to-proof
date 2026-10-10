@@ -2603,6 +2603,11 @@ assert results['scratch'] == 'ok'
             'cleanup': cleanup or self.state.get('cleanup', 'awaiting source checkout verification'),
             'routing': route_record(self.state['routing']),
             'destination_observation': self.state.get('destination_observation'),
+            **({'review_scope': self.state['reports']['review']['review_scope'],
+                'coverage_trace_sha256': {
+                    stage: item['coverage_trace_sha256'] for stage, item in self.state['reports'].items()
+                    if 'coverage_trace_sha256' in item},
+                } if 'review_scope' in self.state.get('reports', {}).get('review', {}) else {}),
         }
         if retained_artifacts:
             value['retained_artifacts'] = list(retained_artifacts)
@@ -2757,6 +2762,13 @@ assert results['scratch'] == 'ok'
         self.current(check_source=check_source)
         already_complete = (self.state.get('status') == 'REVIEWED_AND_PROVEN' and
                             self.state.get('completed_at'))
+        if self.state.get('coverage_format_version') == 1:
+            for name in ('review', 'proof', 'implementation'):
+                record = self.state.get('reports', {}).get(name)
+                if record and 'coverage_trace_sha256' not in record:
+                    raise ValueError('missing exact requirement/evidence trace for ' + name)
+            if not self.state['reports']['review'].get('review_scope'):
+                raise ValueError('missing exact inspected product scope for review')
         self.state.update(status='REVIEWED_AND_PROVEN' if already_complete else 'RUNNING',
                           blocker=None,
                           completed_at=self.state.get('completed_at') if already_complete else None,
@@ -3763,6 +3775,7 @@ def create(root, args, invocation_started_epoch=None, *, live_evaluation=False):
     state = {'schema': 'promise-to-proof/delivery/v1', 'policy': POLICY, 'invocation_id': str(uuid.uuid4()),
              'status': 'RUNNING', 'blocker': None, 'work_item': args.work, 'comparison_base': base,
              'contract': agreement, 'requirements': requirements, 'binding_inputs': inputs,
+             'coverage_format_version': 1,
              'agreement_paths': agreement_paths,
              'source_tree_key': fs.snapshot_key(current), 'source_head': head,
              'source_index_sha256': fs.digest(fs.git(root, 'ls-files', '--stage', '-z')),
@@ -3796,7 +3809,8 @@ def create(root, args, invocation_started_epoch=None, *, live_evaluation=False):
     if live_evaluation:
         state['live_evaluation'] = True
     delivery = Delivery(root, args.work, state)
-    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'source_product_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'instruction_identity', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host', *(['live_evaluation'] if live_evaluation else []))}))
+    local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'source_product_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'instruction_identity', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host', 'coverage_format_version',
+                     *(['live_evaluation'] if live_evaluation else []))}))
     delivery.save()
     delivery.capture('admission')
     delivery.save()
