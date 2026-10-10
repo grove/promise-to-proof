@@ -12,7 +12,7 @@ import p2p_filesystem as fs
 
 MAX_SLICES = 8
 MAX_CHECKS = 6
-MAX_PATHS = 100
+MAX_PATHS = 512
 SLICE_FIELDS = {"id", "requirement_ids", "expected_result", "checks", "paths",
                 "outcome", "boundary_reason", "next_action", "retires"}
 CHECK_FIELDS = {"kind", "command", "result", "observation"}
@@ -278,15 +278,16 @@ def progress_view(state):
     next_action = ("Independent review then proof" if finished else
                    latest["slice"]["next_action"] if latest else
                    "Implement the smallest complete accepted outcome")
+    next_slice = f"I{len(records) + 1}" if not finished else None
     return {
-        "verified": len(active_ids), "active": active_ids,
+        "verified": len(active_ids), "verified_slice_ids": active_ids,
+        "active_work": next_slice, "wip_limit": 1,
         "retired": sum(len(row["slice"]["retires"]) for row in records),
         "working_candidate": state.get("candidate", {}).get("key"),
-        "next_slice": f"I{len(records) + 1}" if not finished else None,
-        "next_action": next_action,
+        "next_slice": next_slice, "next_action": next_action,
         "status": "IMPLEMENTED" if finished else "IN_PROGRESS",
         "covered_requirement_ids": sorted({req for record in active(records)
                                            for req in record["slice"]["requirement_ids"]}),
-        "latest_verified_checks": (latest["slice"]["checks"] if latest else []),
+        "latest_check_count": len(latest["slice"]["checks"]) if latest else 0,
         "authority": "Only saved verified implementation; independent review and proof still required.",
     }
