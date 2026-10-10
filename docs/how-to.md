@@ -2,9 +2,10 @@
 
 New to Promise to Proof? Start with [Getting Started](./getting-started.md) first. It walks through one small delivery from an agreed outcome to `REVIEWED + PROVEN`, so the recipes below have something concrete to build on.
 
-Start here when you have a change to deliver. Pick the path that matches your
-source, save each result, and give the next skill the saved result rather than a
-summary from chat. The [detailed workflow](./promise-to-proof.md) explains each
+Start here when you have a change to deliver. The normal path is one
+`/deliver-issue` request: P2P resolves your source, keeps one saved agreement,
+and advances under the existing authority and evidence rules. You do not have
+to copy an internal path or operate each stage. The [detailed workflow](./promise-to-proof.md) explains each
 phase in depth. The [FAQ](./faq.md) answers questions about what the results mean.
 
 ## Choose a starting point
@@ -14,23 +15,24 @@ Run `/setup-promise-to-proof` in a new project. It creates `.p2p/work/` and
 projects may use them for their own files. Generated contracts and all `.p2p/**`
 state stay out of project Git history. Tracker configuration is optional.
 
-For a new change, run `/plan-acceptance <source>`; it saves the contract under
-`.p2p/work/<slug>/contract.md`. A source file may be in `specs/`, `work/`, or
-another project path. Follow the saved delivery-shape recommendation instead of
-choosing a route in advance. An agreed outcome can also go directly into a
-standalone work item without a spec.
-After acceptance planning, P2P recommends either direct delivery or sizing
-inspection; you do not need to choose first. A direct recommendation proceeds
-through `/deliver-issue`, which applies the existing #60 admission before
-implementation. For broad or materially uncertain boundaries, run
-`/slice-contract`; `NO SPLIT` means the parent remains one delivery unit and
-continues through the direct path.
+For ordinary delivery, use one of these inputs:
 
 ```text
-Local work item → deliver-issue → optional separately authorized publish-pr
-Local spec      → plan-acceptance → direct delivery or slice-contract
-Tracker issue   → import into .p2p/work/<slug>/contract.md → same local workflow
+/deliver-issue "Reject empty usernames with a validation error"
+/deliver-issue #123
+/deliver-issue specs/authentication.md
+/deliver-issue .p2p/work/<slug>/contract.md
 ```
+
+The issue form requires a configured tracker. P2P retrieves relevant source and
+approval evidence, uses the matching saved contract and #82 checkpoint if
+available, or performs existing local acceptance planning and audit when needed.
+It respects required approval and #77 sizing, then passes existing #60 admission
+before implementation. It does not automatically publish planning comments,
+commits, branches, pull requests or merges. Use `/plan-acceptance <source>` when
+you want **only a plan**, or `/slice-contract <contract>` for explicit, expert
+decomposition control. Sizing inspection and `NO SPLIT` are handled inside
+ordinary delivery when current authority covers them.
 
 ## Re-size from delivery evidence
 
@@ -143,8 +145,9 @@ nested planning step does not post a proposal comment automatically.
 
 ## Complete a local work item
 
-On a supported host, `/deliver-issue .p2p/work/retry-safe-uploads/contract.md` runs the direct
-path from the work-item reference and returns the current result and saved references. It asks for
+On a supported host, `/deliver-issue "Make uploads retry-safe"` is the normal
+single-entry flow. An existing saved-contract path is equally supported. The
+workflow resolves the request and returns the current result and saved references. It asks for
 unresolved outcome decisions and required approval of the exact proposed
 agreement. It does not imply authority to commit, push, publish, or edit triage
 labels. The [workflow scenarios](../checks/deliver-issue-scenarios.md) describe
