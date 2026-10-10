@@ -183,6 +183,24 @@ class ReceiptSemantics(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "conflicting receipt"):
             final.matching_receipt([self.comment], other)
 
+    def test_exact_source_issue_precedes_pr_and_arbitrary_issue_is_rejected(self):
+        with tempfile.TemporaryDirectory() as root:
+            work = Path(root) / CONTRACT
+            work.parent.mkdir(parents=True)
+            source = "https://github.com/owner/repo/issues/8"
+            work.write_text("# Acceptance contract: user\n"
+                            "Source attribution: " + source + "\n")
+            selected = final.receipt_target(Path(root), self.record,
+                                            pr_url=URL)
+            self.assertEqual(selected["destination"], source)
+            with self.assertRaisesRegex(ValueError, "original source issue"):
+                final.receipt_target(Path(root), self.record, receipt_issue=
+                                     "https://github.com/owner/repo/issues/9")
+            work.write_text("# Acceptance contract: local\n")
+            selected = final.receipt_target(Path(root), self.record,
+                                            pr_url=URL)
+            self.assertEqual(selected["destination"], URL)
+
     def test_record_receipt_id_is_canonical_not_timestamp_or_transport(self):
         original = final.receipt_body(self.record)
         self.assertEqual(original, final.receipt_body(copy.deepcopy(self.record)))
@@ -375,6 +393,30 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(result["status"], "FINALIZED")
         self.assertIsNone(result["record"]["landing"]["pull_request"])
         publish.assert_called_once()
+
+    def test_missing_receipt_branch_is_created_only_with_all_exact_grants(self):
+        completed, _ = self.bundle.landed("direct")
+        self.bundle.git("add", "p2p-state/tiny.json")
+        self.bundle.git("commit", "-qm", "Publish portable checkpoint")
+        subprocess.run(["git", "init", "--bare", "-q", self.remote], check=True)
+        self.bundle.git("push", "--quiet", self.remote,
+                        "HEAD:refs/heads/checkpoint")
+        ref = "refs/heads/p2p/receipts/tiny"
+        target = {"kind": "git", "ref": ref}
+        with self.assertRaisesRegex(ValueError, "outside the standing mandate"):
+            final.git_receipt(self.root, self.remote, target, completed,
+                              self.checkpoint, mandate(("commit", ref), ("push", ref)))
+        self.assertNotIn(ref, final.remote_branches(self.root, self.remote))
+        receipt = final.git_receipt(
+            self.root, self.remote, target, completed, self.checkpoint,
+            mandate(("branch-create", ref), ("commit", ref), ("push", ref)))
+        self.assertEqual(receipt["status"], "RECORDED")
+        self.assertEqual(final.remote_branches(self.root, self.remote)[ref],
+                         receipt["remote_commit"])
+        repeated = final.git_receipt(self.root, self.remote, target, completed,
+                                     self.checkpoint, mandate())
+        self.assertEqual(repeated["status"], "RECORDED")
+        self.assertEqual(repeated["remote_commit"], receipt["remote_commit"])
 
     def test_detached_git_receipt_preserves_operator_head_and_index(self):
         completed, _ = self.bundle.landed("direct")
