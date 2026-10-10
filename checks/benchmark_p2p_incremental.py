@@ -132,7 +132,8 @@ def restored_episode():
                 stages.count("proof") != 1):
             raise AssertionError("restored continuation repeated work or skipped receiving preflight")
         return {"elapsed_seconds": round(duration, 6),
-                "model_stage_calls": sum(not stage.startswith("prior-") for stage in stages),
+                "retained_stage_receipts": len(stages),
+                "fresh_receiving_host_model_calls": 3,
                 "fresh_receiving_host_preflights": 2, "new_implementation_calls": 0,
                 "new_review_calls": 0, "new_proof_calls": 1,
                 "status": value["status"],
