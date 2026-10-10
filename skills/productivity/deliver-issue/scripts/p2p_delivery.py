@@ -24,6 +24,7 @@ import p2p_autonomy as autonomy
 import p2p_applicability as applicability
 import p2p_slices as slices
 import p2p_instructions as instructions
+import p2p_stalls as stalls
 import p2p_progress as progress_view
 from p2p_delivery_measurements import build as delivery_measurement
 
@@ -3264,7 +3265,7 @@ assert results['scratch'] == 'ok'
             raise ContinuationRequired('execute delegated ' + action + ' handoff, then resume delivery')
         raise ValueError('decision outside the standing mandate: ' + action + '; ' + reason)
 
-    def diagnose(self, findings, history):
+    def diagnose(self, findings, history, *, stall=None):
         """Retain and consume one diagnosis; correct malformed output once, never blind retry."""
         self.current()
         base_inputs = self.stage_inputs(self.state['candidate'])
@@ -3280,7 +3281,7 @@ assert results['scratch'] == 'ok'
                 # unconsumed decision. A previously BLOCKED decision can be renewed.
                 readiness = active['readiness']
         context_key = fs.digest(fs.canonical(basis | {'readiness': readiness}))
-        inputs = base_inputs | {'recovery_context_sha256': context_key}
+        inputs = base_inputs | {'recovery_context_sha256': context_key, 'recovery_plan_version': 2}
         last = next((attempt for attempt in reversed(self.state['attempts'])
                      if not attempt['stage'].startswith('preflight-')), None)
         # Older invocations did not bind findings to the diagnosis input. Adopt their
@@ -3298,6 +3299,10 @@ assert results['scratch'] == 'ok'
         properties = {key: {'type': 'string'} for key in
                       ('status', 'input_identity_json', 'action', 'approach', 'reason',
                        'missing_input', 'expected_result', 'capability_check')}
+        # New diagnoses describe a distinct method and a falsifiable observation;
+        # retained old attempts keep their original schema and exact receipt.
+        properties['strategy_key'] = {'type': 'string'}
+        properties['difference_from_prior'] = {'type': 'string'}
         properties['strategy_changed'] = {'type': 'boolean'}
         properties['status']['enum'] = ['ACTIONABLE', 'BLOCKED']
         properties['action']['enum'] = ['implementation', 'evidence', 'prerequisite', 'plan-acceptance', 'none']
@@ -3307,9 +3312,16 @@ assert results['scratch'] == 'ok'
                   'Diagnose these delivery gaps in a fresh read-only context. '
                   f'Fixed candidate workspace: {self.workspace}; contract: {self.work}. '
                   f'Exact input_identity_json: {json.dumps(inputs)}. '
-                  f'Findings: {json.dumps(findings)}. Prior approaches: {json.dumps(history)}. '
+                  f'Findings: {json.dumps(findings)}. Prior approaches: {json.dumps(stalls.recent(history))}. '
                   f'Retained reports under {self.runtime}: {json.dumps(self.state.get("reports", {}))}. '
-                  f'Most recent retained diagnosis: {json.dumps(self.state.get("last_diagnosis"))}. '
+                  f'Most recent retained diagnosis approach: {json.dumps((self.state.get("last_diagnosis") or {}).get("report", {}).get("approach", ""))}. '
+                  + (('Stall perspective reset (read as a fresh context): '
+                      + json.dumps(stalls.reset_context(self.state, self.work, findings, history, stall))
+                      + '. Start from the original promise and exact agreement, not the last failed method. '
+                      'Choose ONE materially different executable action: better reproduction, a testable '
+                      'hypothesis, simpler implementation, different repository-native mechanism, justified '
+                      'internal step replan, or an actual missing input/authority blocker. '
+                      'Read deeper existing records only when needed. ') if stall else '') +
                   'On a receiving host, retain the prior proposed strategy and findings but freshly check '
                   'the specific capabilities needed here; prior host observations do not establish current '
                   'availability. Reuse the retained investigation instead of repeating unrelated exploration. '
@@ -3330,8 +3342,14 @@ assert results['scratch'] == 'ok'
                   'Do not weaken requirements, fabricate evidence, edit any inputs, or make external effects. '
                   'Use plan-acceptance for a necessary contract reconciliation. BLOCKED requires an exact '
                   'unavailable input or authority and its expected result; mere difficulty, elapsed time, or '
-                  'a previous failed attempt is not a blocker. ACTIONABLE requires action, approach, and '
-                  'reason, with missing_input and expected_result empty. Return the required JSON.')
+                  'a previous failed attempt is not a blocker. Difficulty alone is NOT a genuine #77 '
+                  'sizing boundary; that needs concrete structural evidence and the outer workflow. '
+                  'ACTIONABLE requires an executable action, approach, a stable strategy_key for its '
+                  'mechanism, difference_from_prior saying what changed when history exists, and '
+                  'expected_result naming the falsifiable check and observable result. '
+                  'ACTIONABLE requires missing_input empty. BLOCKED must name an exact missing_input '
+                  'and expected_result required to resume; use empty strategy_key and '
+                  'difference_from_prior. Return the required JSON.')
         while True:
             last = previous[-1] if previous else None
             if last and last.get('report_validation') == 'rejected':
