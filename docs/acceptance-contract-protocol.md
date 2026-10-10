@@ -1412,6 +1412,66 @@ record, archive, derived approval, model stage or receipt publication path.
 See [Delivery Record v1](delivery-record-v1.md) for the exact extension,
 reconstruction, compatibility and validator usage.
 
+## Authorized finalization after local proof
+
+Issue #47 completes the existing lifecycle **after** one unchanged candidate has
+full independent review/proof and a #82 portable checkpoint. Reuse the existing
+`promise-to-proof/delivery-record/v1` and the optional #50 `landing` section,
+not a second completion schema, progress store or background agent. The final
+record's exact content, stable `landing.receipt_id`, checkpoint bytes and
+delivered Git objects must remain independently recoverable after cleanup.
+
+An outer `deliver-issue` invocation may continue into publication, readiness,
+merge and finalization *only when the request and an explicit standing mandate
+cover each exact external effect*. The local controller alone grants no remote
+permission. The supported read-only finalization preview checks saved
+agreement, candidate, checkpoint and PR identity first. Use the existing
+`merge-readiness.md` report for a single machine-readable READY decision
+section (in addition to plain-language prose); it must bind the specific PR URL,
+head commit, target branch, exact target commit, current-target integration
+candidate/check and observed repository gates. A section with a different
+head/base, missing/unknown required check, conflict, approval, branch rule or
+unsynchronized readiness body cannot authorize a merge. The section is an
+**observation**, not a new grant.
+
+Immediately before an authorized merge, read the actual GitHub PR, repository
+merge settings, effective branch rules, required checks, approvals, current
+target and successful integration observation for exactly that head/target
+pair. Do not bypass GitHub's configured gates or pass admin override flags.
+A merge queue requires the existing supported queue path; a direct merge is
+blocked when queue admission is required. Use the exact `merge` effect grant,
+the configured merge method and a remote readback. If the PR is already merged,
+skip the merge effect and reconcile the actual commit/tree, including
+squash/rebase mappings, using #50. If a response is lost, read back the PR
+before doing anything else. If the resulting state remains uncertain, return
+PARTIAL and preserve candidate and receipts: **never retry an uncertain merge**.
+
+For a confirmed landed mapping, publish one complete **Delivery Record v1**
+payload with the stable #50 receipt ID. Prefer an existing source GitHub issue
+when available, otherwise an authorized comment on the exact PR; for local/spec
+or independently assembled parent work without either, publish the same record
+to an authorized branch that retains the #82 Git checkpoint. No synthetic source
+issue, parent PR, second contract, or record-transport protocol is required.
+Issue comment creation requires a precise `issue-comment` grant for its URL.
+A Git receipt commit requires `commit` and `push` grants for the exact
+receipt ref (and a pre-existing published checkpoint); never mutate the
+operator checkout. Read the entire destination *before* writing and *after*
+each uncertain or successful response; reuse a matching receipt unchanged,
+reject conflicting/duplicate receipts, and keep a PARTIAL recovery outcome
+if the effect cannot be confirmed. A receipt URL alone is not a valid receipt.
+
+Full finalization requires remote merge/landed identity confirmation, exact
+#50 record validation, a remotely accessible #82 checkpoint and required Git
+objects, an authorized one-time receipt publication and readback of the exact
+record body/bytes. Derive the readable result from that same record and its
+validated remote readback. Only then may the existing cleanup remove disposable
+local execution data, and only with its own safety/precondition checks.
+Issue closure is a distinct `issue-update`-authorized, read-back effect and
+must not be inferred from finalization. Under insufficient authority,
+unknown policy/host support, incomplete parent acceptance, unavailable
+checkpoint or uncertain GitHub effects, preserve the strongest verified
+partial state and give one actionable next step.
+
 ## Pull-request publication handoff
 
 `publish-pr` may prepare and, under exact publication authority, publish one
