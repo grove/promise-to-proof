@@ -120,7 +120,7 @@ def validate(report, requirements, records, host_executions, current_manifest,
         if (not isinstance(old, dict) or set(old) != RETIRE_FIELDS or
                 not isinstance(old["id"], str) or old["id"] not in previously_active or
                 old["id"] in retired or not _bounded(old["reason"], 240)):
-            raise ValueError("obsolete slice replacement requires a prior active ID and substantive reason")
+            raise ValueError("slice retirement requires a prior active ID and substantive replacement reason")
         retired.add(old["id"])
     invalidated = {item["slice"]["id"] for item in active(records)
                    if set(item["slice"]["paths"]) & changed}
