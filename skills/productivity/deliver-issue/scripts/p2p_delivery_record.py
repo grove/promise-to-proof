@@ -226,7 +226,22 @@ def _independent_coverage(context, record):
                a.get("stage") == name and a.get("status") == "complete"]
         _need(len(ids) == 1 and ids[0].get("report_validation") == "accepted",
               name + " has no completed, accepted independent stage")
-        sessions.append(ids[0].get("session_id"))
+        session = ids[0].get("session_id")
+        receipt_data = context["indexed"].get(("runtime", "attempts/" + ids[0]["id"] +
+                                               "/portable-receipt.json"))
+        _need(receipt_data is not None, "missing independent host execution receipt")
+        host = json.loads(receipt_data).get("host")
+        _need(isinstance(host, dict) and host.get("session_id") == session,
+              "independent host session does not match its stage receipt")
+        if name == "proof":
+            executions = host.get("executions")
+            _need(isinstance(executions, list) and executions and
+                  all(isinstance(e, dict) and isinstance(e.get("command"), str) and
+                      e["command"].strip() and type(e.get("exit_code")) is int and
+                      isinstance(e.get("output_sha256"), str) and
+                      SHA256.fullmatch(e["output_sha256"]) for e in executions),
+                  "proof lacks trusted execution observations in the retained host receipt")
+        sessions.append(session)
     _need(len(set(sessions)) == 2 and all(isinstance(s, str) and s for s in sessions),
           "independent review and proof need distinct host sessions")
 
@@ -335,8 +350,10 @@ def _verified_landing(root, record, landed, context, checkpoint):
     if method == "integrated":
         _need(before == after and landed["pull_request"] is None and
               fs.snapshot_key(delivered) == record["candidate_key"] and
-              "## Children" in fs.document_lines(context["contract"]),
-              "no-PR parent integration requires whole assembled candidate proof")
+              "## Children" in fs.document_lines(context["contract"]) and
+              re.search(r"(?m)^## Children\r?$[\s\S]*?\[[^\]]+\]\([^)]+\)",
+                        context["contract"]) is not None,
+              "no-PR parent integration requires an actual linked child and whole assembled candidate proof")
     else:
         _need(before != after and changes,
               "delivery needs an actual changed candidate and a distinct landed commit")
@@ -387,12 +404,15 @@ def _verified_landing(root, record, landed, context, checkpoint):
                 evidence = json.loads(content)
             except (ValueError, UnicodeError):
                 raise ValueError("normalized evidence is malformed") from None
-            if evidence.get("schema") == "promise-to-proof/evidence-record/v1":
-                _need(evidence.get("candidate") == record["candidate_key"] and
-                      evidence.get("contract") == record["contract"] and
-                      set(evidence.get("requirements", ())) <=
-                      set(context["requirements"]),
-                      "normalized evidence belongs to a different candidate or promise")
+            _need(isinstance(evidence, dict) and
+                  evidence.get("schema") == "promise-to-proof/evidence-record/v1",
+                  "evidence reference does not contain a normalized Evidence Record v1")
+            _need(evidence.get("candidate") == record["candidate_key"] and
+                  evidence.get("contract") == record["contract"] and
+                  isinstance(evidence.get("requirements"), list) and
+                  evidence["requirements"] and
+                  set(evidence["requirements"]) <= set(context["requirements"]),
+                  "normalized evidence belongs to a different candidate or promise")
     return {"status": "LANDED_MAPPING_VERIFIED", "receipt_id": landed["receipt_id"],
             "event_id": landed["event_id"], "method": method,
             "destination_ref": target["ref"], "delivered_commit": after,
