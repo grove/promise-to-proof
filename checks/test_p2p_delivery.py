@@ -2211,6 +2211,15 @@ Pending actions: none.
         self.assertEqual(self.fake.calls.count('planning-audit'),1)
         self.assertEqual(self.state()['contract']['revision'],'v2')
         self.assertEqual(len(self.state()['agreement_history']),1)
+        # A revision invalidates all old-agreement step assertions. The
+        # completed new implementation is recorded as a new I1 rather than
+        # opportunistically inheriting the previous contract's I1 result.
+        current = self.state()
+        old, new = [a for a in current['attempts'] if a['stage'] == 'implementation']
+        self.assertNotEqual(old['inputs']['work_item_sha256'],
+                            new['inputs']['work_item_sha256'])
+        self.assertEqual([row['slice']['id'] for row in current['implementation_slices']], ['I1'])
+        self.assertEqual(current['implementation_slices'][0]['attempt_id'], new['id'])
         self.assertTrue(list((self.root / '.p2p/work/tiny/history').glob('*/contract.md')))
 
     def test_planning_rejects_weakened_ids_and_independent_audit_refusal(self):
