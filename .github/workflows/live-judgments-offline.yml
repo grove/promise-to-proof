@@ -38,6 +38,8 @@ jobs:
           -k 'test_pinned_resume_ignores_changed_installation_without_repeating_completed_work'
           -k 'test_portable_restore_retains_pinned_instructions_and_completed_review'
           -k 'test_upgrade_preserves_work_refreshes_only_verifiers_and_is_idempotent'
+      - name: Validate implementation slice evidence and recovery
+        run: python3 -m unittest discover -s checks -p 'test_p2p_delivery.py' -k 'test_clean_project_delivery_uses_local_contract_and_records'
       - name: Check existing generation and repair behavior
         run: >-
           python3 -m unittest discover -s checks -p 'test_p2p_delivery.py'
