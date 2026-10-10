@@ -64,6 +64,23 @@ Excluded, uncommitted source changes can also prevent reconstructing the origina
 admission. Preserve and reconcile them before transfer; a candidate checkpoint
 does not archive unrelated local work.
 
+### Resume inside implementation without a second checkpoint format
+
+When implementation has an actual independently checked partial outcome,
+P2P stores the verified slice and its current Git-backed product identity in
+the **existing** delivery controller and checkpoint. The checkpoint retains
+each completed slice's accepted requirement IDs, outcome/check references,
+report hash, originating attempt and Git generation. It does not contain a
+new progress archive, a mandatory per-file commit or unverified promises.
+
+On another supported computer, restore this same #82 checkpoint and resume.
+The receiving machine still completes fresh sandbox/readiness preflight; the
+new implementation worker begins at the next unfinished slice and rechecks
+dependencies whose product bytes have changed. Incomplete, ambiguous or
+unobserved slice work is not classified as verified. New final review and
+proof still cover the complete agreed contract. There is no extra user-selected
+workflow stage.
+
 ## Recover on another computer
 
 Stop the controller on the old computer first. Clone/fetch the published record
