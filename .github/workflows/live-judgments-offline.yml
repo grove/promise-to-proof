@@ -24,8 +24,10 @@ jobs:
         run: python3 -m unittest discover -s checks -p 'test_p2p_risks.py' -v
       - name: Check integrated contract quality, stage bindings, and stopping (offline only)
         run: python3 -m unittest discover -s checks -p 'test_p2p_quality_integration.py' -v
-      - name: Measure current-main first-pass baseline (offline only)
-        run: python3 checks/benchmark_p2p_first_pass.py --repeats 2 --baseline-only
+      - name: Verify first-pass capture and source identity fast paths
+        run: python3 -m unittest discover -s checks -p 'test_p2p_first_pass.py' -v
+      - name: Compare same-assurance first-pass baseline and optimized controller
+        run: python3 checks/benchmark_p2p_first_pass.py --repeats 3
       - name: Check existing generation and repair behavior
         run: >-
           python3 -m unittest discover -s checks -p 'test_p2p_delivery.py'
