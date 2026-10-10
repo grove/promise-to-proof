@@ -1074,7 +1074,7 @@ def host_events(path):
             'message': messages[-1] if messages else '', 'executions': executions}
 
 
-def report_schema(stage, coverage=False):
+def report_schema(stage, coverage=False, risks=False):
     string = {'type': 'string'}
     def obj(properties):
         return {'type': 'object', 'properties': properties, 'required': list(properties), 'additionalProperties': False}
@@ -1114,6 +1114,20 @@ def report_schema(stage, coverage=False):
         if stage == 'review':
             trace['properties']['inspected_paths'] = {'type': 'array', 'items': string}
             trace['required'].append('inspected_paths')
+        if risks:
+            risk = obj({
+                'id': string,
+                'requirements': {'type': 'array', 'items': string},
+                'paths': {'type': 'array', 'items': string},
+                'reach': {'type': 'string', 'enum': ['bounded', 'uncertain']},
+                'trigger': string,
+                'why_applicable': string,
+                'consequence': string,
+                'evidence': {'type': 'array', 'items': string},
+                'status': {'type': 'string', 'enum': ['addressed', 'unresolved']},
+            })
+            trace['properties']['risks'] = {'type': 'array', 'items': risk}
+            trace['required'].append('risks')
         properties['coverage_trace'] = trace
     return obj(properties)
 
@@ -1130,6 +1144,12 @@ def coverage_markdown(report, scope=None):
         lines.append(f"- {row['id']}: {source}; evidence: {evidence}")
     for extra in trace['supporting_changes']:
         lines.append(f"- Supporting change {extra['path']}: {extra['reason']}")
+    for risk in trace.get('risks', []):
+        lines.append(f"- Material risk {risk['id']} ({', '.join(risk['requirements'])}): "
+                     f"{risk['trigger']} → {risk['consequence']}. "
+                     f"Applies because {risk['why_applicable']}; "
+                     f"checked by {', '.join(risk['evidence']) or 'not yet established'} "
+                     f"({risk['status']}, reach {risk['reach']}).")
     if scope:
         lines.append(f"Exact reviewed product scope: {len(scope['inspected'])} inspected paths, "
                      f"{len(scope['changed_paths'])} changed paths, "
@@ -2348,7 +2368,8 @@ assert results['scratch'] == 'ok'
                          'Each row needs a substantive observation. Proof rows need command/output evidence in '
                          'artifact, an assertion, and observation. Use verdict proven for established proof rows; '
                          'otherwise name the gap. ')
-        coverage_required = self.state.get('coverage_format_version') == 1
+        coverage_required = self.state.get('coverage_format_version') in (1, 2)
+        risks_required = self.state.get('coverage_format_version') == 2
         coverage_prompt = (
             'Include coverage_trace. For each requirement ID give paths to real product files, '
             'existing=true only for already-sufficient unchanged behavior, and evidence refs. '
@@ -2361,6 +2382,23 @@ assert results['scratch'] == 'ok'
             'including all changed files that still exist. Do not claim inspection you did not do. '
             'These are compact trace facts, not a duplicate proof or a new acceptance verdict. '
             if coverage_required else '')
+        risk_prompt = (
+            'Also include coverage_trace.risks: the few materially applicable candidate seams '
+            'whose realistic failure triggers matter, with id S1/S2..., requirement IDs, '
+            'exact product paths (including relevant existing callers/config/dependencies), '
+            'reach bounded or uncertain, trigger, why_applicable, concrete consequence, '
+            'saved evidence references, and addressed/unresolved status. Empty risks [] '
+            'is correct for a genuinely low-risk change with no additional material risk; '
+            'no quota or universal checklist. A static inspection can establish a material '
+            'conditional risk even without an exploit. Review does not reproduce all proof. '
+            'If a material risk or required check is unresolved, do not claim a successful '
+            'stage or downgrade the risk merely to finish. For consequential uncertainty '
+            'prefer one independently checked property/invariant, interleaving or fault '
+            'scenario only if examples leave a real gap; do not impose it on the low-risk '
+            'control. On repaired code inspect the complete diff and affected seams, '
+            'recheck invalidated assumptions, and describe bounded applicability of prior '
+            'observations instead of trusting small file-count deltas. '
+            if risks_required else '')
         instruction_source = 'pinned' if self.state.get('instruction_identity') else 'original installed'
         prompt = (f'Invoke the {instruction_source} {STAGES[skill_stage]} skill at {self.state["skills"][skill_stage]["path"]}. '
                   f'Read it and its references. Work item {self.work}, workspace {self.workspace}. '
@@ -2380,7 +2418,7 @@ assert results['scratch'] == 'ok'
                   'Use fresh independent observations, do not trust previous judgments. '
                   f'Exact input_identity_json must encode this object: {json.dumps(inputs)}. '
                   f'Every requirement must occur exactly once: {self.state["requirements"]}. '
-                  f'{report_format}{learning_format}{coverage_prompt}Status uses normal skill vocabulary. '
+                  f'{report_format}{learning_format}{coverage_prompt}{risk_prompt}Status uses normal skill vocabulary. '
                   f'{"The controller renders review text from structured fields. Do not add free-text details or other top-level fields." if name == "review" else "details contains the full human report."} '
                   'Keep generated fixtures and verbose debug output in scratch. Return the relevant command, '
                   'assertion, result, and environment in the report; do not dump entire logs or workspaces. '
@@ -2423,7 +2461,7 @@ assert results['scratch'] == 'ok'
                        'edit or repeat an unchanged passing check without a concrete reason. ')
         attempt, host = self.dispatch(name, inputs, prompt,
                                       self.workspace if name in ('implementation', 'repair') else None,
-                                      report_schema(name, coverage_required))
+                                      report_schema(name, coverage_required, risks_required))
         self.timed_source_stable()
         if name in ('review', 'proof'):
             self.current()
@@ -2497,13 +2535,15 @@ assert results['scratch'] == 'ok'
                     self.workspace, self.work, fs.snapshot_key(manifest),
                     self.state['contract']['sha256'])
                 fs.validate_coverage_trace(report['coverage_trace'], self.state['requirements'],
-                                           report, name, manifest, changed, records)
+                                           report, name, manifest, changed, records,
+                                           risks=risks_required)
                 if name == 'review':
                     scope = fs.review_scope(self.state['candidate'], manifest,
                                             self.state['local_git_generations'][-1]['commit'],
                                             report['coverage_trace']['inspected_paths'],
                                             self.state.get('agreement_paths', ()),
-                                            report.get('limitations', ()), report['coverage_trace'])
+                                            report.get('limitations', ()), report['coverage_trace'],
+                                            report.get('checks', ()))
             if name == 'proof' and report['status'] == 'PROVEN':
                 if not host['executions'] or any(row['verdict'] != 'proven' or not row['evidence'] for row in rows):
                     raise ValueError('proof lacks full independently exercised evidence')
@@ -2766,7 +2806,7 @@ assert results['scratch'] == 'ok'
         self.current(check_source=check_source)
         already_complete = (self.state.get('status') == 'REVIEWED_AND_PROVEN' and
                             self.state.get('completed_at'))
-        if self.state.get('coverage_format_version') == 1:
+        if self.state.get('coverage_format_version') in (1, 2):
             for name in ('review', 'proof', 'implementation'):
                 record = self.state.get('reports', {}).get(name)
                 if record and 'coverage_trace_sha256' not in record:
@@ -3779,7 +3819,7 @@ def create(root, args, invocation_started_epoch=None, *, live_evaluation=False):
     state = {'schema': 'promise-to-proof/delivery/v1', 'policy': POLICY, 'invocation_id': str(uuid.uuid4()),
              'status': 'RUNNING', 'blocker': None, 'work_item': args.work, 'comparison_base': base,
              'contract': agreement, 'requirements': requirements, 'binding_inputs': inputs,
-             'coverage_format_version': 1,
+             'coverage_format_version': 2,
              'agreement_paths': agreement_paths,
              'source_tree_key': fs.snapshot_key(current), 'source_head': head,
              'source_index_sha256': fs.digest(fs.git(root, 'ls-files', '--stage', '-z')),
