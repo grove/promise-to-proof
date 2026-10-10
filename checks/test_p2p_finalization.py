@@ -392,7 +392,27 @@ class IntegrationTests(unittest.TestCase):
                 receipt_ref="refs/heads/p2p/receipts/tiny", execute=True)
         self.assertEqual(result["status"], "FINALIZED")
         self.assertIsNone(result["record"]["landing"]["pull_request"])
+        self.assertEqual(result["human_progress"]["phase"], "FULLY_FINALIZED")
+        self.assertIn("no PR", result["human_progress"]["why_it_matters"])
         publish.assert_called_once()
+
+    def test_portable_checkpoint_requires_actual_remote_candidate_git_objects(self):
+        completed, _ = self.bundle.landed("direct")
+        self.bundle.git("add", "p2p-state/tiny.json")
+        self.bundle.git("commit", "-qm", "Publish checkpoint bytes")
+        subprocess.run(["git", "init", "--bare", "-q", self.remote], check=True)
+        self.bundle.git("push", "--quiet", self.remote,
+                        "HEAD:refs/heads/checkpoint")
+        with self.assertRaisesRegex(ValueError, "not recoverable"):
+            final.portable(self.root, self.checkpoint, self.remote)
+        self.bundle.git("branch", "portable-candidate",
+                        self.bundle.index["candidate_commit"])
+        self.bundle.git("push", "--quiet", self.remote,
+                        "portable-candidate:refs/heads/portable-candidate")
+        observed = final.portable(self.root, self.checkpoint, self.remote)
+        self.assertEqual(observed["checkpoint_sha256"],
+                         fs.digest(self.checkpoint))
+        self.assertTrue(observed["url"].endswith("p2p-state/tiny.json"))
 
     def test_missing_receipt_branch_is_created_only_with_all_exact_grants(self):
         completed, _ = self.bundle.landed("direct")
