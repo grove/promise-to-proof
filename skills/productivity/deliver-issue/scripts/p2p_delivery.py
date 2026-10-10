@@ -4419,6 +4419,7 @@ def main(argv=None):
                 output.update(status='BLOCKED', blocker=message,
                               reuse={'status': 'STALE', 'reason': message,
                                      'new_model_calls': 0, 'new_canonical_writes': 0})
+                output['human_progress'] = progress_view.explain(output)
                 print(json.dumps(output, indent=2))
                 return 1
             if args.action == 'upgrade-instructions':
