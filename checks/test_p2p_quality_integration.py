@@ -42,10 +42,8 @@ class IntegratedQualityTests(unittest.TestCase):
         self.assertIn("green-but-incomplete", self.selected["cases"])
         self.assertIn("unrelated-scope-expansion", self.selected["cases"])
         self.assertIn("review-meaningful-tests", self.selected["cases"])
-        self.assertEqual(self.cases["green-but-incomplete"]["contract"],
-                         self.cases["review-meaningful-tests"]["contract"]
-                         if "contract" in self.cases["review-meaningful-tests"]
-                         else self.fixtures["contract"])
+        self.assertEqual(self.cases["green-but-incomplete"].get("contract", self.fixtures["contract"]),
+                         self.cases["review-meaningful-tests"].get("contract", self.fixtures["contract"]))
         self.assertEqual(len(self.selected["cases"]), len(set(self.selected["cases"])))
         self.assertTrue(self.selected["optional_advice"].startswith("\nOptional"))
         _, ids = d.parse_contract(self.fixtures["contract"].encode())
