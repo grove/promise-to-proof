@@ -251,6 +251,17 @@ class DeliveryRecordTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "checkpoint"):
             record_protocol.validate(self.root, changed, checkpoint=self.checkpoint)
 
+    def test_retained_approval_route_and_excluded_scope_cannot_be_rewritten(self):
+        completed, _ = self.landed("squash")
+        for change in (
+            {"agreement_paths": completed["agreement_paths"] + ["unrelated.txt"]},
+            {"routing": completed["routing"] | {"target_ref": "refs/heads/forged"}},
+            {"completed_at": "2026-10-12T14:00:00Z"},
+        ):
+            with self.subTest(change=change):
+                with self.assertRaisesRegex(ValueError, "scope, routing, or invocation"):
+                    record_protocol.validate(self.root, completed | change, checkpoint=self.checkpoint)
+
     def test_report_identity_and_requirement_coverage_must_be_independent(self):
         completed, _ = self.landed("squash")
         bad_cp = copy.deepcopy(self.index)
