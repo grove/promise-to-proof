@@ -1298,6 +1298,13 @@ def checkpoint_documents(root, work):
         if not file.is_file():
             raise ValueError("missing checkpoint input: " + relative)
         selected.add(relative)
+        if relative.endswith("/continuity.json") and relative.startswith(".p2p/work/"):
+            pointer = json.loads(file.read_bytes())
+            if (set(pointer) != {"origin", "unit", "topology_identity", "record_sha256"} or
+                    not WORK.fullmatch(pointer["origin"])):
+                raise ValueError("invalid continuation pointer in checkpoint")
+            origin_plan = f".p2p/work/{work_slug(pointer['origin'])}/slicing.md"
+            pending.extend([pointer["origin"], origin_plan])
         if file.suffix == ".md":
             referenced_hashes.update(re.findall(r"[a-f0-9]{64}", file.read_text()))
         if WORK.fullmatch(relative):
