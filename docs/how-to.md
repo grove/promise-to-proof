@@ -62,6 +62,24 @@ previously proven work but requires new host preflight, and a failed host
 initialization needs the host restriction resolved rather than another
 blind retry. The raw evidence remains available if you need details.
 
+## Validate which code actually landed
+
+A local `REVIEWED + PROVEN` result is not a merge. When the user has an
+actual delivered commit, P2P can now validate a landed-code mapping in the
+existing Delivery Record v1 without inventing another acceptance system.
+That read-only operation compares the exact reviewed candidate and its #82
+checkpoint with the delivered Git tree and history, including squash and
+rebase. It rejects unreviewed overlapping changes and requires the whole
+assembled parent's own proof even when all child PRs have merged.
+
+The new optional `landing` section preserves the historical local record's
+meaning, and the same confirmed delivery keeps one stable event/receipt
+identity across retries. See [Delivery Record v1](delivery-record-v1.md) for
+the exact validation and preview commands. **This is not yet receipt
+publication or authorized merge automation**: #47 completes those effects,
+checks remote readback, and confirms the durable final delivery receipt.
+Do not treat a local matching Git branch as a remotely confirmed delivery.
+
 ## Re-size from delivery evidence
 
 A delivery may expose a useful boundary that was not visible during planning.

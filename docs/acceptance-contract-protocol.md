@@ -1377,6 +1377,41 @@ The bundle is a derived inspection artifact, not another canonical contract or
 report. A valid bundle does not establish evidence authenticity, evidence
 adequacy, or merge readiness and does not create a new acceptance verdict.
 
+## Delivery Record v1: local acceptance and landed-code mapping
+
+The existing `promise-to-proof/delivery-record/v1` is the **one normative
+machine-readable completion record**. Its old
+`status: REVIEWED_AND_PROVEN` means the exact local candidate passed
+independent full review and proof, not that code was committed, published,
+merged, deployed or finalized. Existing records retain that exact meaning
+without migration or a new required field.
+
+Issue #50 adds a validated, optional `landing` section to that same record.
+The controller-bundled read-only `p2p_delivery_record.py` can preview and
+validate an actual landed commit/tree against the frozen comparison base,
+approved destination, full candidate scope, full independent review/proof
+receipts and the existing #82 checkpoint. Preserve unrelated newer destination
+changes while rejecting a changed or unreviewed overlapping path. Validate
+merge-parent relationships for ordinary merges, squash and rebase; direct work
+may have no issue/PR; independently landed child issues never substitute for
+full assembled-parent acceptance. Normalized evidence references from #51
+are optional, never independent proof verdicts, and must remain retrievable
+when cited.
+
+Use canonical JSON with sorted keys, compact separators, UTF-8, no ASCII
+escaping and no trailing newline for stable SHA-256 receipt/event identity.
+Exclude timestamps and transport location from that identity; preserve
+original timestamps and bytes rather than rewriting them on a retry. A
+conflicting delivery event is not a retry and must block.
+
+A validated Git mapping is **not** a remotely published completed-delivery
+receipt. #47 owns effect authorization, actual merge/readback, publishing a
+single durable receipt and cleanup. A local record or unverified checkpoint
+never grants remote authority or proves portability. Do not add a competing
+record, archive, derived approval, model stage or receipt publication path.
+See [Delivery Record v1](delivery-record-v1.md) for the exact extension,
+reconstruction, compatibility and validator usage.
+
 ## Pull-request publication handoff
 
 `publish-pr` may prepare and, under exact publication authority, publish one

@@ -302,6 +302,11 @@ class RecoveryReceiptTests(unittest.TestCase):
                 return message
             report = json.loads(message)
             report['requirements'].append(dict(report['requirements'][0], id='R2'))
+            # Keep the offline R2 trace consistent with the added requirement.
+            # Production trace coverage remains strict and unchanged.
+            if 'coverage_trace' in report:
+                trace = report['coverage_trace']['requirements']
+                trace.append(dict(trace[0], id='R2'))
             if stage == 'implementation':
                 report['gaps'] = ['R1: output not ready.', 'R2: exit status not ready.']
             elif stage == 'repair' and self.fake.calls.count('repair') == 1:

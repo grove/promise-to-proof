@@ -552,6 +552,28 @@ is running or its exit is uncertain.
     only superseded generated reports after final-record readback. Do not infer
     a completed stage from a chat summary.
 
+## Validate a completed delivery without confusing local and landed work
+
+The existing compact `delivery.json` is Delivery Record v1. Its
+`REVIEWED_AND_PROVEN` status refers only to the accepted **local**
+candidate, even after cleanup. For an explicitly confirmed later landing,
+use the bundled `p2p_delivery_record.py` helper and exact #82 checkpoint to
+preview/validate an optional landed-code mapping in that **same** record.
+It checks immutable candidate/contract/requirement scope, separate review
+and proof receipts, the delivered Git tree, approved branch and actual
+merge/squash/rebase relationships. A parent with independently landed
+children requires a full assembled-parent proof; a spec/local issue needs
+no GitHub source issue or invented parent PR.
+
+This helper is read-only and produces a draft mapping, **not** a completed
+remote receipt. Never treat the source checkout, agent text, a PR comment,
+or an unconfirmed local Git ref as proof of a remote merge or deployment.
+When a completion receipt is requested, hand the exact validated mapping
+to the outer #47 finalization workflow, which must confirm authorization,
+remote effects, durable readback and portability separately. Reuse existing
+records and checkpoints; do not create a second status store or rerun
+implementation/review/proof to render a receipt.
+
 ## Result and authority
 
 The controller saves compact portable checkpoints at completed stage boundaries.

@@ -319,6 +319,14 @@ quality of every future agent judgment. See the
 [delivery-model documentation](./checks/delivery-model/README.md) for the exact
 scope of those checks.
 
+The existing [Delivery Record v1](./docs/delivery-record-v1.md) now also has
+a read-only way to validate **which actual commit/tree contains the accepted
+change**, accounting for merges, squash, rebase and accepted parent work
+without requiring a GitHub issue. It preserves older locally verified
+records. A validated local Git mapping still does **not** confirm remote
+receipt publication or deployment; finalization remains a separately
+authorized workflow.
+
 ## Project status
 
 P2P currently has an executable local delivery controller, durable acceptance
