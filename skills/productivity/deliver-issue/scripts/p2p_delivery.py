@@ -22,6 +22,7 @@ import uuid
 import p2p_filesystem as fs
 import p2p_autonomy as autonomy
 import p2p_applicability as applicability
+import p2p_continuity as continuity
 import p2p_admission as admission_decision
 import p2p_slices as slices
 import p2p_instructions as instructions
@@ -2870,6 +2871,8 @@ assert results['scratch'] == 'ok'
             'review_sha256': fs.digest(review_bytes),
             'proof_sha256': fs.digest(proof_bytes),
             'completed_at': self.state['completed_at'],
+            **({'promise_continuity': continuity.load(self.root, self.work)}
+               if continuity.load(self.root, self.work) is not None else {}),
             'autonomy': self.state.get('autonomy'),
             'limits': self.state['limits'],
             'recovery_count': len(self.state.get('recovery_history', [])),
@@ -4219,6 +4222,7 @@ def result(delivery):
         'checkpoint_restored_from': state.get('checkpoint_restored_from'),
         'fresh_host_preflight_complete': bool(state.get('preflight_complete')),
         'admission': state.get('admission_decision'),
+        'promise_continuity': continuity.load(delivery.root, delivery.work),
         'implementation_complete': state.get('implementation_complete', False),
         'resume_count': state.get('resume_count', 0),
         'parent_has_children': any(line.strip() == '## Children' for line in
@@ -4318,6 +4322,7 @@ def completed_result(root, work, directory):
         'candidate': identity(candidate), 'routing': record.get('routing'),
         'contract': record['contract'], 'agreement_paths': record.get('agreement_paths', [work]),
         'implementation_complete': True,
+        'promise_continuity': continuity.load(root, work),
         'parent_has_children': any(line.strip() == '## Children' for line in
                                    fs.document_lines(agreement['content'])),
         'destination_observation': record.get('destination_observation'),

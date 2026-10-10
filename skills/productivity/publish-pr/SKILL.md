@@ -160,6 +160,19 @@ focused re-verification protocol. A small localized change can use targeted
 review observations; it does not imply automatically re-running every check.
 This comparison never replaces current-target compatibility or authorization.
 
+## Keep original issue closure separate from partial publication
+
+Before preparing a PR for a unit with a #71 continuity pointer, validate its
+source-bound topology and record the original promise, exact contribution,
+outstanding obligations, the next issue and final full-acceptance owner in the
+PR description. Run the deterministic `p2p_continuity.publication_guard` on
+the actual draft body: reject `Closes`, `Fixes` or `Resolves` references
+against an unfulfilled originating issue. Preserve existing PR/head/review
+identities on late reconciliation; only independently authorized issue effects
+may supersede the origin as **not planned**, never as delivered. If the source
+is truly unrelated, preserve the recorded justification rather than inventing
+parentage.
+
 ## Prepare an exact preview
 
 Before presenting a preview for approval, check actual write access from this

@@ -109,6 +109,15 @@ All-independent delivery needs combined parent verification, not an empty PR.
 A destination-only change does not change product promises or establish proof
 of a different candidate.
 
+### Original-promise continuity
+
+For an existing #71 identity-bound continuity handoff, distinguish this unit's
+independent proof from the original full promise. Retain the originating
+requirements, actual remaining units, final combined-acceptance owner and one
+next action; do not reinterpret historical proof on the old candidate as a
+verdict on a later combined result. Source/continuity drift blocks full-claim
+promotion while preserving independently completed work.
+
 ### 2. Identify the candidate
 
 Record the full commit SHA or exact snapshot, contract source and revision,

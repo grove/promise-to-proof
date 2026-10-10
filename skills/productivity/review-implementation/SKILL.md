@@ -79,6 +79,17 @@ where a contract obligation depends on it. An empty diff proves nothing either
 way: inspect already-sufficient behavior when that is the target, or report
 missing implementation when the promised behavior does not exist.
 
+## Verify contribution without losing the source promise
+
+If an identity-checked #71 continuity record exists, inspect the actual
+current unit, originating promise and remaining obligations. Review this
+unit against its accepted contract and inherited constraints, retaining the
+exact candidate and previous report identities. State the contribution and
+which original requirements remain for the next unit or assembled parent;
+never interpret a partially reviewed prerequisite, merged PR or checked issue
+as whole-promise acceptance. A stale/broken continuity link is a focused
+reconciliation blocker, not permission to silently sever the origin.
+
 ## Examine three axes
 
 Keep each axis visible in the report. Put overlapping findings under their
