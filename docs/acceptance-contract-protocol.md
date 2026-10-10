@@ -1618,6 +1618,45 @@ unknown policy/host support, incomplete parent acceptance, unavailable
 checkpoint or uncertain GitHub effects, preserve the strongest verified
 partial state and give one actionable next step.
 
+### Publishing the existing saved review with an authorized PR (#70)
+
+When a requested `publish-pr` has confirmed its exact draft PR, it also
+prepares a readable top-level GitHub review **from the existing independently
+saved review**. The optional expert entry point is `/publish-pr-review`; the
+normal publication workflow invokes it directly instead of asking the user to
+select another stage. No additional reviewer, verdict, checkpoint, contract
+format or mandatory model call is introduced.
+
+Before preview and again immediately before a remote review effect, validate
+the unchanged contract and binding sources, original review receipt and
+full reviewed scope, current PR repository/head and retained candidate-to-commit
+equivalence mapping. Product changes, mismatched scope, stale report, unknown
+identity or unavailable current Git objects prevent publication as a current
+review. In particular, a GitHub PR marker or matching branch alone cannot
+establish review applicability.
+
+Use the original material findings and check observations with the established
+plain-language working style. A clean `REVIEWED` report becomes a GitHub
+`COMMENT`, **never** GitHub `APPROVE`. A material `CHANGES NEEDED` report
+can become a GitHub `REQUEST_CHANGES` only with separate exact effect
+authority. A `BLOCKED` review is not a current publishing conclusion.
+Inline comments require an exact applicable changed line; do not invent
+locations. Keep the full original report and exact identities inspectable
+inside collapsed technical details. Explicitly distinguish independent
+review, separate acceptance proof, repository review approval, merge
+readiness and actual merge.
+
+Each review submission needs an exact saved preview, an action-specific
+standing `pr-review-comment` or `pr-review-request-changes` mandate
+(or explicit human approval of the entire preview), and a current PR-head
+readback. `pr-create` authority alone does not grant review submission.
+Read the complete remote reviews before and after writing, match the exact
+review identity, body and GitHub state, and reuse an unchanged review on
+retries. A lost response requires reconciliation before another write;
+ambiguous, edited or duplicate results block success. Preserve old candidate
+reviews, human PR edits and discussions. Publication remains distinct from
+merge permission and finalization under #47.
+
 ## Pull-request publication handoff
 
 `publish-pr` may prepare and, under exact publication authority, publish one
