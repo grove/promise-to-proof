@@ -91,6 +91,11 @@ when a supported live macOS/Codex host is explicitly authorized, run
 `checks/check_p2p_judgments_host.py --output-dir NEW_DIRECTORY`. The live suite
 retains independent expected/observed judgments and fails mismatches. Its
 fixtures and mocked transport tests are never live host evidence.
+The [combined quality-integration check](checks/quality-integration.md) uses the
+same fixed fixtures plus a source/contract audit. Its offline tests run as
+`python3 -m unittest discover -s checks -p 'test_p2p_quality_integration.py'`;
+the actual macOS/Codex integration requires a new evidence directory and explicit
+live-host authorization. Do not report fixture judgments as model outcomes.
 
 If a required check cannot run in the current environment, say exactly which
 check was not run and why. Never treat an unavailable check as a pass.
