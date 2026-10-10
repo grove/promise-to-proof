@@ -286,14 +286,14 @@ class FakeTransport:
             if self.mode == 'omit' and stage == 'proof': report['requirements'] = []
             if self.mode == 'stale' and stage == 'proof':
                 report['input_identity_json'] = json.dumps(dict(inputs, work_item_sha256='0'*64))
-            if stage in ('implementation', 'repair', 'review', 'proof'):
+            admission = (json.loads((event_path.parents[2] / 'admission.json').read_text())
+                         if stage in ('implementation', 'repair', 'review', 'proof') else {})
+            # A pinned historical pilot controller predates coverage traces and
+            # agreement_paths. Preserve that test's exact old report format;
+            # current controller fixtures use its actual admitted exclusions.
+            if stage in ('implementation', 'repair', 'review', 'proof') and 'agreement_paths' in admission:
                 # Explicitly OFFLINE fixture trace; not a real reviewer judgment.
                 product = Path(prompt.split('workspace ', 1)[1].split('. ', 1)[0])
-                # The controller's exact admitted agreement paths include not
-                # only this contract/spec, but parent sources and transferred
-                # routing inputs. Reuse its identity boundary in the *fixture*
-                # instead of inventing a second coverage scope.
-                admission = json.loads((event_path.parents[2] / 'admission.json').read_text())
                 excluded = admission['agreement_paths']
                 manifest = d.fs.snapshot(product, exclude=excluded)
                 changed = d.fs.tree_changes(d.fs.snapshot(product, inputs['comparison_base'], exclude=excluded), manifest)
