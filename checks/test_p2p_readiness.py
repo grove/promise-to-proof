@@ -48,6 +48,37 @@ class ReadinessTests(unittest.TestCase):
                            'command': command, 'aggregated_output': observation, 'exit_code': 1}})
         return edit
 
+    def test_admission_binds_actual_receipts_and_reuses_on_unchanged_resume(self):
+        code, value = self.fixture.cli('run', '--max-dispatches', '2')
+        self.assertEqual(code, 1, value)
+        state = self.fixture.state()
+        decision = state['admission_decision']
+        self.assertEqual(decision['status'], 'ADMITTED')
+        self.assertEqual(set(row['name'] for row in decision['conditions']),
+                         {'agreement', 'routing', 'workspace', 'recovery', 'verifier', 'prerequisites'})
+        self.assertTrue((self.fixture.runtime() / 'decision.json').is_file())
+        before = self.fixture.fake.calls.count('preflight')
+        self.assertEqual(self.fixture.cli('extend', '--authorize-extension',
+                                           '--max-dispatches', '6')[0], 0)
+        self.assertEqual(self.fixture.cli('resume')[0], 0)
+        self.assertEqual(self.fixture.fake.calls.count('preflight'), before)
+        self.assertTrue(all(row['applicability'] == 'REUSED'
+                            for row in self.fixture.state()['admission_decision']['conditions']))
+
+    def test_changed_host_executable_blocks_before_implementation_or_reuse(self):
+        code, value = self.fixture.cli('run', '--max-dispatches', '2')
+        self.assertEqual(code, 1, value)
+        executable = fixture.Path(__file__).resolve().parent / 'fixtures/codex'
+        original = executable.read_bytes()
+        try:
+            executable.write_bytes(b'#!/bin/sh\\necho modified\\n')
+            code, value = self.fixture.cli('resume')
+            self.assertEqual(code, 1, value)
+            self.assertIn('capability configuration changed', value['blocker'])
+            self.assertNotIn('implementation', self.fixture.fake.calls)
+        finally:
+            executable.write_bytes(original)
+
     def test_ready_uses_existing_second_context_and_does_not_require_unimplemented_product(self):
         self.assertFalse((self.fixture.root / 'greet.py').exists())
         code, result = self.fixture.cli()
