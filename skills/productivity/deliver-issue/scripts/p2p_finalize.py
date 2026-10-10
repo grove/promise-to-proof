@@ -6,6 +6,7 @@ idempotent receipts; no second acceptance or delivery-state protocol.
 """
 import argparse
 import datetime
+import fcntl
 import json
 import os
 from pathlib import Path
@@ -214,19 +215,28 @@ def reserve_merge(root, work, readiness_path, pr_url, head, base, method):
          "merge-readiness must be the original retained work-item report")
     marker = ("<!-- p2p-merge-intent:sha256:" +
               fs.digest(fs.canonical([pr_url, head, base, method])) + " -->")
-    original = expected.read_bytes()
-    matches = re.findall(rb"<!-- p2p-merge-intent:sha256:[a-f0-9]{64} -->",
-                         original)
-    if matches:
-        need(len(matches) == 1 and matches[0].decode() == marker,
-             "conflicting or duplicate saved merge-effect intent")
-        return False
-    fs.atomic_write(expected, original.rstrip(b"\n") + b"\n\n" +
-                    marker.encode() + b"\n", ignored_root=root)
-    need(expected.read_bytes() == original.rstrip(b"\n") + b"\n\n" +
-         marker.encode() + b"\n",
-         "merge intent write/readback failed; no remote effect was sent")
-    return True
+    # Use the controller's already-established work-item lock. A second
+    # coordinator must never race the read/append boundary and issue a second
+    # merge from a stale absence observation.
+    lock_path = expected.parent.parent / (expected.parent.name + ".lock")
+    fs.require_ignored(root, str(lock_path.relative_to(root)))
+    with lock_path.open("a") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise ValueError("another controller/finalizer owns the delivery lock")
+        original = expected.read_bytes()
+        matches = re.findall(rb"<!-- p2p-merge-intent:sha256:[a-f0-9]{64} -->",
+                             original)
+        if matches:
+            need(len(matches) == 1 and matches[0].decode() == marker,
+                 "conflicting or duplicate saved merge-effect intent")
+            return False
+        updated = original.rstrip(b"\n") + b"\n\n" + marker.encode() + b"\n"
+        fs.atomic_write(expected, updated, ignored_root=root)
+        need(expected.read_bytes() == updated,
+             "merge intent write/readback failed; no remote effect was sent")
+        return True
 
 
 def receipt_body(record):
