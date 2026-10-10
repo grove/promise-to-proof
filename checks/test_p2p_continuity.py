@@ -95,6 +95,28 @@ class ContinuityTests(unittest.TestCase):
         self.assertEqual(c.publication_guard(status,"Implements prerequisite.\n"),
                          "Implements prerequisite.\n")
 
+    def test_persist_retains_slicing_and_pointers_without_tracker_effects(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            subprocess.run(["git","init","-q",str(root)],check=True)
+            (root/".gitignore").write_text("/.p2p/\\n")
+            for slug in ("react","react-prereq","react-final"):
+                folder=root/".p2p/work"/slug
+                folder.mkdir(parents=True)
+                (folder/"contract.md").write_text("# Accepted contract\\n")
+            parent=root/".p2p/work/react/slicing.md"
+            original=b"## Approved delivery plan\\nPlan revision: v1\\n"
+            parent.write_bytes(original)
+            saved=c.persist(root,".p2p/work/react/contract.md",self.decision,self.refs)
+            self.assertEqual(saved["status"],"PRESERVED")
+            self.assertEqual(saved["tracker_effects"],0)
+            self.assertTrue(parent.read_bytes().startswith(original))
+            again=c.persist(root,".p2p/work/react/contract.md",self.decision,self.refs)
+            self.assertEqual(saved,again)
+            self.assertEqual(c.load(root,self.refs["S2"]["work_item"])["final_acceptance_owner"],"S2")
+            self.assertEqual(len(list((root/".p2p/work/react/history").glob("*/slicing.md"))),1)
+
     def test_changed_topology_refuses_stale_continuity(self):
         altered=dict(self.decision,identity="x"*64)
         with self.assertRaisesRegex(ValueError,"stale"):
