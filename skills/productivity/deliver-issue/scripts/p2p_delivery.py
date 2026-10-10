@@ -3541,6 +3541,10 @@ assert results['scratch'] == 'ok'
         completed = [entry for entry in history if entry['status'] in ('complete', 'worker-replaced')]
         cycle = any(entry['candidate_before'] == current_key for entry in completed)
         stall = stalls.detect(findings, current_key, completed, self.state['requirements'])
+        # One fresh perspective per materially identical stall, not one for every
+        # later retry. Existing short diagnosis can still consider newer evidence.
+        reset = stall if stall and not any(row.get('perspective_reset') and
+                                           row.get('stall') == stall for row in completed) else None
         previous = [entry for entry in completed if
                     (entry['fingerprint'] == fingerprint or
                      (obligations and entry.get('obligations', self.recovery_obligations(entry['findings'])) == obligations) or
@@ -3550,7 +3554,7 @@ assert results['scratch'] == 'ok'
             force_diagnosis = False
         plan = {'action': 'implementation', 'approach': 'Correct the named implementation and evidence gaps.'}
         if force_diagnosis or previous or stall:
-            plan = self.diagnose(findings, history, stall=stall)
+            plan = self.diagnose(findings, history, stall=reset)
             if (previous or stall) and not plan['strategy_changed']:
                 raise ValueError('recovery diagnosis found no new executable strategy: ' + plan['reason'])
             repeated = stalls.strategy_repetition(plan, completed)
@@ -3574,6 +3578,7 @@ assert results['scratch'] == 'ok'
                  'status': 'reserved', 'started_at': now(), 'dispatch_offset': len(self.state['attempts'])}
         if stall:
             entry['stall'] = stall
+            entry['perspective_reset'] = bool(reset)
         for key in ('strategy_key', 'difference_from_prior', 'expected_result'):
             if plan.get(key):
                 entry[key] = plan[key]
