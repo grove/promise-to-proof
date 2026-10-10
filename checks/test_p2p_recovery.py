@@ -362,7 +362,7 @@ class RecoveryReceiptTests(unittest.TestCase):
                 report['requirements'][0]['verdict'] = 'not proven'
                 report['gaps'] = ['R1: the output remains wrong' if original.calls.count('proof') == 1
                                   else 'R1 still has no passing observation for stdout']
-            if stage == 'diagnosis' and original.calls.count('diagnosis') == 2:
+            if stage == 'diagnosis' and original.calls.count('diagnosis') == 1:
                 report.update(strategy_changed=True, strategy_key='replace-cli-entrypoint',
                               approach='Replace the previous patch with a direct native CLI implementation.',
                               difference_from_prior='Stop patching the old function; change the CLI entry point.',
@@ -375,14 +375,15 @@ class RecoveryReceiptTests(unittest.TestCase):
             code, value = self.cli()
         self.assertEqual(code, 0, value)
         self.assertEqual(self.fake.calls.count('repair'), 2)
-        self.assertEqual(self.fake.calls.count('diagnosis'), 2)
+        # The initial repair costs no diagnosis. The first genuine stall does.
+        self.assertEqual(self.fake.calls.count('diagnosis'), 1)
         self.assertEqual(self.fake.calls.count('review'), 3)
         self.assertEqual(self.fake.calls.count('proof'), 3)
         state = self.state()
         self.assertEqual(state['recovery_history'][1]['strategy_key'], 'replace-cli-entrypoint')
         self.assertEqual(state['recovery_history'][1]['stall']['kind'], 'unresolved_proof_behavior')
         self.assertIn('Stall perspective reset', [prompt for name, prompt in self.fake.prompts
-                                                 if name == 'diagnosis'][1])
+                                                 if name == 'diagnosis'][0])
         self.assertEqual(state['recovery_history'][1]['status'], 'complete')
         self.assertNotEqual(state['recovery_history'][0]['candidate_after'],
                             state['recovery_history'][1]['candidate_after'])
