@@ -161,7 +161,20 @@ approval-bound history and binding inputs. Report its path, bytes and
 Never call local files disposable without verified shared readback.
 
 For a direct user invocation on an issue, publish and verify the shared planning
-handoff under the protocol's standalone planning rules. A local-only or draft-only
+handoff under the protocol's standalone planning rules. After writing/readback
+of the exact saved contract, run `python3 <skill-dir>/scripts/render_issue_proposal.py
+--repo <root> --contract .p2p/work/<slug>/contract.md --output <preview>`.
+Review the displayed requirements, boundaries, checks, exclusions and action
+for semantic completeness against the contract and original source. The renderer
+blocks malformed rows and missing binding source bytes; genuine evidence gaps
+and open questions must show "not ready for approval". Never independently
+rewrite or approve a separate visible paraphrase. Keep exact contract and
+binding data recoverable under collapsed technical details. Before posting,
+read the existing issue comments and reuse an identical previously verified
+handoff. After publication or uncertain write, read the comment back and run
+the script with `--verify-comment <readback-file>`; report success only if
+its full visible presentation and exact source recovery match. Preserve
+historical proposals and approval binding across revisions and retries. A local-only or draft-only
 request suppresses that write. An invocation inside delivery stays local under
 the enclosing workflow's authority. Return the comment URL and exact proposal
 needing approval; publication does not approve it. If publication or readback
