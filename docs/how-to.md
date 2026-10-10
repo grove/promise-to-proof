@@ -56,8 +56,9 @@ PR and matching product-tree identity must be verified.
 
 **Read these distinctions literally.** `REVIEWED + PROVEN` refers to the
 isolated local candidate, not the operator checkout or the destination branch.
-An open PR has not merged. A confirmed merge still lacks a validated durable
-final receipt until #50/#47 deliver that step. An imported checkpoint keeps
+An open PR has not merged. A confirmed merge is still only partial until
+the [finalization workflow](finalization.md) validates the delivered code
+against #50 and reads back the complete receipt. An imported checkpoint keeps
 previously proven work but requires new host preflight, and a failed host
 initialization needs the host restriction resolved rather than another
 blind retry. The raw evidence remains available if you need details.
