@@ -2,6 +2,7 @@
 import contextlib
 import io
 import json
+import shutil
 from pathlib import Path
 import tempfile
 import unittest
@@ -163,6 +164,54 @@ class DeliverySliceTests(unittest.TestCase):
         self.assertEqual(self.base.fake.calls.count("diagnosis"), 0)
         self.assertEqual([x["slice"]["id"] for x in self.base.state()["implementation_slices"]],
                          ["I1", "I2"])
+
+    def test_portable_checkpoint_restarts_only_unfinished_implementation_slice(self):
+        import test_p2p_checkpoints as portable
+        run = portable.CheckpointTests(
+            "test_completed_stage_resumes_on_another_computer_without_old_execution")
+        run.setUp()
+        try:
+            run.fixture.fake.mode = "sliced"
+            original = d.Delivery.stage
+            def interrupt(delivery, name, *args, **kwargs):
+                if name == "implementation" and delivery.state.get("implementation_slices"):
+                    raise ValueError("fixture portable boundary between implementation slices")
+                return original(delivery, name, *args, **kwargs)
+            with patch.object(d.Delivery, "stage", autospec=True, side_effect=interrupt):
+                code, partial = run.fixture.cli()
+            self.assertEqual(code, 1, partial)
+            checkpoint_path = run.root / "p2p-state/tiny.json"
+            raw = checkpoint_path.read_bytes()
+            checkpoint = json.loads(raw)
+            self.assertEqual([r["slice"]["id"] for r in
+                              checkpoint["execution"]["implementation_slices"]], ["I1"])
+            self.assertLess(len(raw), d.fs.CHECKPOINT_LIMIT)
+            remote, clone = run.publish_fixture(checkpoint)
+            self.assertEqual(d.fs.checkpoint_status(run.root, run.work,
+                                                    str(remote))["status"], "PORTABLE")
+            shutil.rmtree(run.root / ".p2p")
+            shutil.rmtree(Path(run.fixture.temp.name) / "home/.p2p")
+            restored = d.fs.restore_checkpoint(clone, raw)
+            self.assertEqual(restored["status"], "RESTORED")
+            calls_before = run.fixture.fake.calls.count("implementation")
+            code, resumed = run.fixture.run_root(clone, run.work, run.fixture.base, "resume")
+            self.assertEqual(code, 0, resumed.get("blocker"))
+            state = json.loads((clone / ".p2p/work/tiny/delivery.json").read_bytes())
+            self.assertEqual([r["slice"]["id"] for r in state["implementation_slices"]],
+                             ["I1", "I2"])
+            self.assertEqual(state["implementation_slices"][0]["attempt_id"],
+                             checkpoint["execution"]["implementation_slices"][0]["attempt_id"])
+            stages = [a["stage"] for a in state["attempts"]]
+            self.assertEqual(stages.count("prior-preflight-1"), 1)
+            self.assertEqual(stages.count("preflight-1"), 1)
+            self.assertEqual(stages.count("preflight-2"), 1)
+            self.assertEqual(stages.count("implementation"), 2)
+            self.assertEqual(stages.count("review"), 1)
+            self.assertEqual(stages.count("proof"), 1)
+            self.assertEqual(run.fixture.fake.calls.count("implementation") - calls_before, 1)
+            self.assertEqual(resumed["status"], "REVIEWED_AND_PROVEN")
+        finally:
+            run.tearDown()
 
     def test_tampered_saved_slice_never_counts_as_verified(self):
         self.base.fake.mode = "sliced"
