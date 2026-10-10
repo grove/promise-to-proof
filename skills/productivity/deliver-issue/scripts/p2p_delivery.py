@@ -22,6 +22,7 @@ import uuid
 import p2p_filesystem as fs
 import p2p_autonomy as autonomy
 import p2p_applicability as applicability
+import p2p_slices as slices
 import p2p_instructions as instructions
 import p2p_progress as progress_view
 from p2p_delivery_measurements import build as delivery_measurement
@@ -1078,7 +1079,7 @@ def host_events(path):
             'message': messages[-1] if messages else '', 'executions': executions}
 
 
-def report_schema(stage, coverage=False, risks=False):
+def report_schema(stage, coverage=False, risks=False, implementation_slices=False):
     string = {'type': 'string'}
     def obj(properties):
         return {'type': 'object', 'properties': properties, 'required': list(properties), 'additionalProperties': False}
@@ -1133,6 +1134,8 @@ def report_schema(stage, coverage=False, risks=False):
             trace['properties']['risks'] = {'type': 'array', 'items': risk}
             trace['required'].append('risks')
         properties['coverage_trace'] = trace
+    if stage == 'implementation' and implementation_slices:
+        properties['implementation_slice'] = slices.schema()
     return obj(properties)
 
 
@@ -1574,6 +1577,8 @@ def restore_checkpoint(root, checkpoint, contents, checkpoint_data, *,
             'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host')
     if state.get('instruction_identity'):
         keys += ('instruction_identity',)
+    if state.get('implementation_slice_version'):
+        keys += ('implementation_slice_version',)
     local_save(root, work, 'runtime/admission.json', encoded({key: state[key] for key in keys}))
     delivery.save()
     delivery.read_only = True
@@ -1773,7 +1778,23 @@ class Delivery:
                                exclude=agreement_paths,
                                prepared=(candidate_entries, base_candidate_entries))
         self.state['candidate'] = candidate
-        record_generation(self, candidate, stage, manifest=candidate_entries)
+        generation = record_generation(self, candidate, stage, manifest=candidate_entries)
+        if stage == 'implementation' and self.state.get('implementation_slice_version') == 1:
+            source = generation.get('source_attempt') or {}
+            attempt = next((item for item in self.state['attempts']
+                            if item['id'] == source.get('attempt_id')), None)
+            if not attempt or not attempt.get('report'):
+                raise ValueError('slice capture has no saved confirmed implementation report')
+            data = fs.safe(self.runtime, attempt['report']).read_bytes()
+            if fs.digest(data) != attempt['report_sha256']:
+                raise ValueError('slice capture report differs from authenticated attempt')
+            if attempt.get('report_validation') != 'rejected':
+                report = json.loads(data)
+                sealed = slices.attach(self.state, attempt, report, generation)
+                if sealed and report['status'] == 'PARTIAL':
+                    # This is a genuine verified intra-stage boundary. Persist
+                    # its sealed generation now, before preparing portability.
+                    self.save()
         self._generation_chain_verified = False
         return candidate
 
@@ -2370,6 +2391,11 @@ assert results['scratch'] == 'ok'
             self.verify_generation_chain()
         else:
             self.current()
+        slices_enabled = name == 'implementation' and self.state.get('implementation_slice_version') == 1
+        if slices_enabled:
+            slices.verify_retained(self.state, self.runtime, self.receipt)
+            if len(self.state.get('implementation_slices', [])) >= slices.MAX_SLICES:
+                raise ValueError('implementation exhausted meaningful slice budget; reconcile the delivery boundary')
         inputs = self.stage_inputs(self.state['candidate'])
         prior = self.state.get('reports', {})
         skill_stage = self.state.get('repair_skill', 'repair') if name == 'repair' else name
@@ -2488,9 +2514,36 @@ assert results['scratch'] == 'ok'
                        'Use focused checks while making a correction. Once the candidate is ready, finish '
                        'the required repository checks; do not restart a full suite after each intermediate '
                        'edit or repeat an unchanged passing check without a concrete reason. ')
+            if slices_enabled:
+                progress = self.state.get('implementation_slices', [])
+                prompt += (
+                    'Plan the next useful implementation slice INSIDE THIS invocation, not via another '
+                    'planner stage. Default to ONE whole-outcome slice and status IMPLEMENTED when this '
+                    'change and all meaningful required checks fit coherently. Only if a concrete '
+                    'dependency, separately observable outcome or recoverability boundary justifies '
+                    'more work, finish and CHECK one slice, return status PARTIAL, and name the exact '
+                    'next useful action and reason. WIP=1: never start more than one slice here, '
+                    'do not invent micro-tasks, duplicate checks or seek extra approval. '
+                    'Return implementation_slice as structured controller-owned slice facts: '
+                    'I1/I2... in order, accepted requirement IDs, expected observable result, '
+                    'changed/relevant paths, actual exercised checks (test, inspection or manual '
+                    'with exact host command/result/output observation), VERIFIED or BLOCKED outcome, '
+                    'justified boundary_reason, next_action, and any obsolete earlier slice IDs '
+                    'with substantive retirement reasons. Never mark VERIFIED without real host '
+                    'command/output evidence; non-test inspection is acceptable if observed. '
+                    'IMPLEMENTED requires all accepted requirements covered by active verified '
+                    'slices, no gaps and no next action. A partial VERIFIED result must name '
+                    'remaining gaps. A blocked slice is not a passing checkpoint. '
+                    'For a true structural split of the agreed outcome, retain progress and '
+                    'use the existing /slice-contract handoff, not internal micro-slicing. '
+                    'Resume from previously verified slices when their original dependencies '
+                    'and current candidate bytes still apply, rechecking any changed assumptions. '
+                    'Previous controller-verified implementation slices (history is not new proof): '
+                    + json.dumps(progress) + '. ')
         attempt, host = self.dispatch(name, inputs, prompt,
                                       self.workspace if name in ('implementation', 'repair') else None,
-                                      report_schema(name, coverage_required, risks_required))
+                                      report_schema(name, coverage_required, risks_required,
+                                                    slices_enabled))
         self.timed_source_stable()
         if name in ('review', 'proof'):
             # Source stability was just verified at this same receipt boundary.
@@ -2504,6 +2557,8 @@ assert results['scratch'] == 'ok'
             expected_fields = {'status', 'input_identity_json', 'requirements', 'gaps', 'learning_candidates'}
             if coverage_required:
                 expected_fields.add('coverage_trace')
+            if slices_enabled:
+                expected_fields.add('implementation_slice')
             if name == 'review':
                 expected_fields.update({'findings', 'coverage', 'checks', 'limitations', 'missing_input', 'expected_result'})
             else:
@@ -2558,6 +2613,14 @@ assert results['scratch'] == 'ok'
                         raise ValueError('BLOCKED review report must name the missing input and expected result')
                 elif report['missing_input'] or report['expected_result']:
                     raise ValueError('non-blocked review report contains blocked-only details')
+            if slices_enabled:
+                repository = self.runtime / 'repository.git'
+                before = fs.snapshot(repository,
+                                     self.state['local_git_generations'][-1]['commit'])
+                current = fs.snapshot(self.workspace, exclude=self.state.get('agreement_paths', ()))
+                slices.validate(report, self.state['requirements'],
+                                self.state.get('implementation_slices', []),
+                                host['executions'], current, before)
             if coverage_required:
                 manifest = fs.snapshot(self.workspace, exclude=self.state.get('agreement_paths', ()))
                 base = fs.snapshot(self.workspace, self.state['comparison_base'],
@@ -2698,6 +2761,8 @@ assert results['scratch'] == 'ok'
             sessions.append(attempt.get('session_id'))
         if not all(sessions) or len(set(sessions)) != 2:
             raise ValueError('independent completed verifier sessions could not be established')
+        if self.state.get('implementation_slice_version') == 1:
+            slices.verify_retained(self.state, self.runtime, self.receipt)
         checkpoint = self.state.get('checkpoint')
         if checkpoint and checkpoint.get('status') == 'LOCAL_ONLY':
             path = fs.safe(self.root, checkpoint['path'])
@@ -3504,7 +3569,18 @@ assert results['scratch'] == 'ok'
             self.check_report_rejection(last)
         if last and last['stage'] in ('implementation', 'repair') and last['status'] != 'retired':
             name = last['stage']
-            if last['status'] in ('reserved', 'failed'):
+            if (name == 'implementation' and last['status'] == 'complete'
+                    and name not in self.state.get('reports', {})
+                    and self.state.get('implementation_slice_version') == 1
+                    and any(item['attempt_id'] == last['id']
+                            for item in self.state.get('implementation_slices', []))):
+                # The previous VERIFIED/PARTIAL slice was checkpointed and its
+                # current report slot deliberately freed. Reuse its exact
+                # generation, not a stale report or another implementation call.
+                self.timed_source_stable()
+                slices.verify_retained(self.state, self.runtime, self.receipt)
+                report = {'status': 'PARTIAL'}
+            elif last['status'] in ('reserved', 'failed'):
                 report = self.stage(name, reconcile=True)
             else:
                 self.timed_source_stable()
@@ -3538,12 +3614,26 @@ assert results['scratch'] == 'ok'
                 else:
                     report = self.stage('implementation')
                     self.capture('implementation')
+                if (report['status'] == 'PARTIAL' and self.state.get('implementation_slice_version') == 1
+                        and self.state.get('implementation_slices')
+                        and self.state['implementation_slices'][-1]['slice']['outcome'] == 'VERIFIED'):
+                    # Checkpoint already verified slice; dispatch the next
+                    # meaningful slice rather than diagnosing a failed worker.
+                    # Export the completed report/generation first; a crash
+                    # between checkpoint and next-slice dispatch retains
+                    # portable evidence, not an uncheckpointed in-memory step.
+                    self.checkpoint()
+                    self.state['reports'].pop('implementation', None)
+                    self.save()
+                    continue
                 if report['status'] not in ('IMPLEMENTED', 'REPAIRED'):
                     report = self.recover({'implementation': report['gaps']}, force_diagnosis=True)
                 if report['status'] in ('IMPLEMENTED', 'REPAIRED'):
                     self.state['implementation_complete'] = True
                 self.save()
                 self.checkpoint()
+            if self.state.get('implementation_slice_version') == 1:
+                slices.verify_retained(self.state, self.runtime, self.receipt)
             if 'review' not in self.state.get('reports', {}):
                 self.stage('review')
             review = self.read_report('review')
@@ -3752,6 +3842,10 @@ assert results['scratch'] == 'ok'
         local_save(self.root, self.work, 'runtime/admission.json', encoded(transition['new_admission']))
         self.state['reports'] = {}
         self.state['implementation_complete'] = False
+        # The approved agreement has changed. Earlier implementation checks
+        # remain in exact attempt/Git history but cannot count as verified
+        # slices for this new set of accepted promises.
+        self.state['implementation_slices'] = []
         self.state.pop('continuation', None)
         history = self.state.setdefault('agreement_history', [])
         adoption = {
@@ -3911,7 +4005,8 @@ def create(root, args, invocation_started_epoch=None, *, live_evaluation=False):
     state = {'schema': 'promise-to-proof/delivery/v1', 'policy': POLICY, 'invocation_id': str(uuid.uuid4()),
              'status': 'RUNNING', 'blocker': None, 'work_item': args.work, 'comparison_base': base,
              'contract': agreement, 'requirements': requirements, 'binding_inputs': inputs,
-             'coverage_format_version': 2,
+             'coverage_format_version': 2, 'implementation_slice_version': 1,
+             'implementation_slices': [],
              'agreement_paths': agreement_paths,
              'source_tree_key': fs.snapshot_key(current), 'source_head': head,
              'source_index_sha256': fs.digest(fs.git(root, 'ls-files', '--stage', '-z')),
@@ -3946,6 +4041,7 @@ def create(root, args, invocation_started_epoch=None, *, live_evaluation=False):
         state['live_evaluation'] = True
     delivery = Delivery(root, args.work, state)
     local_save(root, args.work, 'runtime/admission.json', encoded({k: state[k] for k in ('policy', 'invocation_id', 'work_item', 'comparison_base', 'contract', 'binding_inputs', 'source_tree_key', 'source_head', 'source_index_sha256', 'source_product_index_sha256', 'excluded_dirty', 'agreement_paths', 'skills', 'instruction_identity', 'routing', 'routing_records', 'starting_commit', 'base_tree_key', 'local_git_base', 'previous_records', 'authority', 'autonomy', 'limits', 'deadline', 'started_at', 'started_epoch', 'deadline_started_epoch', 'host', 'coverage_format_version',
+                     'implementation_slice_version',
                      *(['live_evaluation'] if live_evaluation else []))}))
     delivery.save()
     delivery.capture('admission')
@@ -4033,6 +4129,8 @@ def result(delivery):
         'attempts': [] if state.get('cleanup_verified_at') else state['attempts'],
         'measurement': delivery_measurement(state, delivery.runtime),
         'work_selection': applicability.next_work(state),
+        **({'implementation_progress': slices.progress_view(state)}
+           if state.get('implementation_slice_version') == 1 else {}),
         'records': str(delivery.directory),
         'local_runtime': str(delivery.runtime) if delivery.runtime.exists() else None,
         'resume': f'python3 {Path(__file__).resolve()} --repo {delivery.root} resume {delivery.work}',
@@ -4302,6 +4400,8 @@ def main(argv=None):
                 delivery.current()
             for name in delivery.state.get('reports', {}):
                 delivery.read_report(name)
+            if delivery.state.get('implementation_slice_version') == 1 and not pending:
+                slices.verify_retained(delivery.state, delivery.runtime, delivery.receipt)
             output = result(delivery)
             if pending:
                 output.update(status='RUNNING', blocker=None)

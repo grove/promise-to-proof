@@ -1254,6 +1254,34 @@ acceptance. `gap` means the path, seam, or oracle is missing or inadequate.
 Unresolved product decisions go in open questions, evidence limits in unresolved
 gaps, and deliberate exclusions in out of scope. Planning does not run proof.
 
+### Verified implementation slices (WIP=1, issue #55)
+
+A normal implementation should be one complete step. If a specific dependency
+or separate observable outcome justifies an interruption-safe boundary, the
+existing implementation worker may finish one bounded slice and report
+`PARTIAL`. That slice has accepted requirement IDs, expected result, changed
+or dependent product paths, real command/output observations (test or sensible
+non-test evidence), a justified boundary, and the next action. No new model
+planner, human approval, micro-task list, per-file commit or separate progress
+store is required. Only one implementation slice is active at once.
+
+The controller accepts a `VERIFIED` slice only after a completed real host
+report, matching actual command evidence, and the exact captured local Git
+generation. It checkpoints a meaningful partial completion using the existing
+portable checkpoint mechanism. A new session can then continue with the next
+unfinished slice without repeating verified work, provided its dependencies
+still apply. A missing receipt, tampered product or changed earlier seam
+requires rechecking; changes to an earlier verified slice must be explicitly
+replaced and revalidated with the original accepted obligations preserved.
+Obsolete implementation strategy may be retired with a substantive reason,
+but the agreement may not be silently amended.
+
+The final whole-outcome `IMPLEMENTED` handoff still needs all requirement IDs,
+necessary repository tests and an exact current candidate; it is **not**
+REVIEWED, PROVEN, published or merged. Ordinary #82 receiving-host isolation,
+#73 evidence applicability, recovery journals and #77 genuine re-sizing
+boundaries stay in force.
+
 ## Implementation and review handoffs
 
 Implement the minimum complete solution inside the spec envelope. For every

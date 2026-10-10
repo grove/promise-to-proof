@@ -226,6 +226,14 @@ class FakeTransport:
         else:
             if stage in ('implementation','repair'):
                 (workspace / self.output_path).write_text("print('hello')\n" + ("# repaired fixture\n" if stage == 'repair' else ''))
+                if self.mode == 'sliced' and stage == 'implementation' and self.calls.count('implementation') == 2:
+                    test_file = workspace / 'tests/test_greet.py'
+                    test_file.parent.mkdir(exist_ok=True)
+                    test_file.write_text(
+                        "import subprocess, sys\n"
+                        "def test_greeting():\n"
+                        "    result = subprocess.run([sys.executable, 'greet.py'], capture_output=True, text=True)\n"
+                        "    assert result.returncode == 0 and result.stdout == 'hello\\n'\n")
             status = {'implementation':'IMPLEMENTED','repair':'REPAIRED','review':'REVIEWED','proof':'PROVEN'}[stage]
             gap = self.mode in ('repair','exhausted') and stage == 'proof' and (self.mode == 'exhausted' or self.calls.count('proof') == 1)
             gap |= self.mode in ('multi-repair', 'evidence') and stage == 'proof' and self.calls.count('proof') <= 2
@@ -248,6 +256,9 @@ class FakeTransport:
                     'evidence':'The implementation stage exercised greet.py and observed exact hello newline output.',
                     'uncertainty':'This is candidate advice until retrospect checks it against final review and proof.'
                 }]
+            if (self.mode == 'sliced' and stage == 'implementation' and
+                    self.calls.count('implementation') == 1):
+                report.update(status='PARTIAL', gaps=['regression check remains'])
             if self.mode in ('partial-repair','partial-implementation') and stage == 'implementation':
                 report.update(status='PARTIAL', gaps=['original implementation gap'])
             if self.mode == 'partial-repair' and stage == 'repair' and self.calls.count('repair') == 1:
@@ -313,7 +324,35 @@ class FakeTransport:
                 }
                 if 'coverage_trace.risks' in prompt:
                     report['coverage_trace']['risks'] = []  # No extra material risks in the low-risk offline fixture.
+            if stage == 'implementation' and 'implementation_slice' in prompt:
+                staged = self.mode == 'sliced'
+                number = self.calls.count('implementation')
+                partial = report['status'] == 'PARTIAL'
+                report['implementation_slice'] = {
+                    'id': f'I{number}' if staged else 'I1', 'requirement_ids': ['R1'],
+                    'expected_result': 'hello newline and zero exit',
+                    'checks': [{'kind': 'test',
+                                'command': ('FIXTURE python3 tests/test_greet.py'
+                                            if staged and number == 2 else 'FIXTURE python3 greet.py'),
+                                'result': 'passed',
+                                'observation': ('greet test passed' if staged and number == 2
+                                                else 'hello')}],
+                    'paths': [item['path'] for item in d.fs.tree_changes(
+                        d.fs.snapshot(product, inputs.get('local_git_generation', {}).get('commit',
+                                                      ) or inputs['comparison_base'], exclude=excluded),
+                        manifest)],
+                    'outcome': 'BLOCKED' if partial and not staged else 'VERIFIED',
+                    'boundary_reason': 'Regression check is a separate observable outcome.' if staged and partial else '',
+                    'next_action': ('Create and verify regression check.' if staged and partial else
+                                    'Recover named implementation gap.' if partial else ''),
+                    'retires': []}
             output = 'hello\n'
+            if self.mode == 'sliced' and stage == 'implementation' and self.calls.count('implementation') == 2:
+                events.append({'type': 'item.completed', 'item': {
+                    'type': 'command_execution',
+                    'command': 'FIXTURE python3 tests/test_greet.py',
+                    'aggregated_output': 'greet test passed',
+                    'exit_code': 0}})
             report = json.dumps(report)
         self.messages.append((stage, report))
         events += [{'type':'item.completed','item':{'type':'command_execution','command':'FIXTURE python3 greet.py',
@@ -2172,6 +2211,15 @@ Pending actions: none.
         self.assertEqual(self.fake.calls.count('planning-audit'),1)
         self.assertEqual(self.state()['contract']['revision'],'v2')
         self.assertEqual(len(self.state()['agreement_history']),1)
+        # A revision invalidates all old-agreement step assertions. The
+        # completed new implementation is recorded as a new I1 rather than
+        # opportunistically inheriting the previous contract's I1 result.
+        current = self.state()
+        old, new = [a for a in current['attempts'] if a['stage'] == 'implementation']
+        self.assertNotEqual(old['inputs']['work_item_sha256'],
+                            new['inputs']['work_item_sha256'])
+        self.assertEqual([row['slice']['id'] for row in current['implementation_slices']], ['I1'])
+        self.assertEqual(current['implementation_slices'][0]['attempt_id'], new['id'])
         self.assertTrue(list((self.root / '.p2p/work/tiny/history').glob('*/contract.md')))
 
     def test_planning_rejects_weakened_ids_and_independent_audit_refusal(self):

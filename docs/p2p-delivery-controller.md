@@ -271,6 +271,30 @@ enforce a monetary ceiling. Recorded token usage is an observation; cost is unkn
 An elapsed-time deadline can terminate the local process, but provider work or
 billing may continue after that deadline.
 
+## Verified progress inside an implementation
+
+New deliveries can save bounded, independently evidenced implementation slices
+inside the ordinary `implementation` stage. Small changes still use one
+implementation call. A genuine dependency or observable boundary can return a
+verified `PARTIAL` slice with its requirement IDs, expected result, real checks,
+affected paths and next action. The controller validates host command/output
+evidence and the exact Git generation, then uses the **existing** portable
+checkpoint before dispatching the next slice. It does not launch a separate
+planner or demand user approval for routine progress.
+
+Status and run/resume responses include `implementation_progress` with the
+verified slice count, active IDs, retired internal strategies, working candidate
+identity and next action. WIP=1 means only one active implementation step.
+If a later step changes an earlier verified path, that previous step must be
+explicitly replaced and checked again. A simulated green test, missing report
+or partial unverified worker never becomes successful progress.
+
+The existing #82 checkpoint carries the slice facts and Git objects to another
+computer; a newly restored host must still pass its own preflight. A final
+`IMPLEMENTED` handoff covers every accepted requirement and still requires
+fresh independent review and proof. See
+[the implementation-slice validation](../checks/implementation-slices.md).
+
 ## Reuse retained facts without replaying delivery
 
 The controller derives a small read-only `work_selection` from the existing
