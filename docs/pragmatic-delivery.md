@@ -141,3 +141,7 @@ for required safeguards and contradictory mandatory wording. It is a structural
 regression check, not an experiment showing that models follow the rules or that
 delivery is faster. The [behavioral scenarios](../checks/pragmatic-verification-scenarios.md)
 exercise both false blocking and false acceptance on a supported live host.
+The small [integrated delivery-quality gate](../checks/quality-integration.md)
+also checks source ambiguity *before* fixed-candidate review/proof, confirms
+identity and evidence links, and preserves one compact report. The offline
+integration regressions validate the harness, not live agent judgment.
