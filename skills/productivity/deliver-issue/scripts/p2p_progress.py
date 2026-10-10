@@ -374,6 +374,16 @@ def explain(status, *, publication=None, finalization=None):
         why += " Child completion does not establish acceptance for an assembled parent."
         if "Assembled-parent review and proof" not in not_established:
             not_established.append("Assembled-parent review and proof")
+    stage_work = status.get("work_selection")
+    if isinstance(stage_work, dict) and isinstance(stage_work.get("stages"), dict):
+        labels = {"REUSED": "retained and current", "STALE": "needs refreshed evidence",
+                  "MISSING": "not yet established"}
+        statements = [name.replace("-", " ") + ": " + labels.get(stage_work["stages"].get(name),
+                      "not established")
+                      for name in ("implementation", "review", "proof")]
+        next_stage = stage_work.get("next")
+        if statements and isinstance(next_stage, str):
+            why += " Saved work: " + "; ".join(statements) + ". Next existing work: " + next_stage + "."
     message = " ".join((what, why, "Next: " + next_action))
     return {
         "phase": phase, "message": message, "what_happened": what,
