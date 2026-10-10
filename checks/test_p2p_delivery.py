@@ -207,9 +207,12 @@ class FakeTransport:
                     'Inspect the actual local seam and replace the failed approach.'),
                 'reason': 'Fixture independent diagnosis.',
                 'strategy_changed': not blocked and (self.calls.count('diagnosis') == 1 or self.mode == 'partial-repair'),
+                'strategy_key': '' if blocked else ('inspect-seam-' + str(self.calls.count('diagnosis'))),
+                'difference_from_prior': '' if blocked else 'Use a different local code path and reproduce the issue.',
                 'capability_check': '' if blocked else 'P2P_RECOVERY_CAPABILITY=fixture local CLI available',
                 'missing_input': 'configured command `python3 greet.py`' if blocked else '',
-                'expected_result': 'exit zero and print `hello\\n`' if blocked else ''})
+                'expected_result': ('exit zero and print `hello\\n`' if blocked else
+                                    'Run python3 greet.py and observe hello newline with exit status zero.')})
             output = 'P2P_RECOVERY_CAPABILITY=fixture local CLI available'
         elif stage == 'planning':
             proposed = CONTRACT.replace('Contract revision: v1', 'Contract revision: v2')
