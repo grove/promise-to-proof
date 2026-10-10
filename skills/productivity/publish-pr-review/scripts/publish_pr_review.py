@@ -198,7 +198,7 @@ def render_review(saved, repository, number, head):
                   f"Review SHA-256: \`{saved['review_sha256']}\`  ",
                   f"PR head: \`{head}\`", ""])
     report = saved["body"]
-    fence = "\`" * max(3, max((len(x) for x in re.findall(r"\`+", report)), default=0) + 1)
+    fence = "`" * max(3, max((len(x) for x in re.findall(r"`+", report)), default=0) + 1)
     lines += [fence + "markdown", report.rstrip("\n"), fence, "", "</details>", ""]
     body = "\n".join(lines)
     if len(body.encode()) > 60000:
