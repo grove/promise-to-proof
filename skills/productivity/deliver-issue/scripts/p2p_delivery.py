@@ -3383,9 +3383,13 @@ assert results['scratch'] == 'ok'
                         report = json.loads(host['message'])
                     except (ValueError, TypeError) as error:
                         raise ReportFormatError('invalid recovery diagnosis JSON: ' + str(error)) from error
-                    if (not isinstance(report, dict) or set(report) != set(properties) or
+                    modern = attempt['inputs'].get('recovery_plan_version') == 2
+                    legacy = set(properties) - {'strategy_key', 'difference_from_prior'}
+                    allowed_fields = ({frozenset(properties)} if modern else
+                                      {frozenset(properties), frozenset(legacy)})
+                    if (not isinstance(report, dict) or frozenset(report) not in allowed_fields or
                             any(not isinstance(report[key], bool if field['type'] == 'boolean' else str)
-                                for key, field in properties.items()) or
+                                for key, field in properties.items() if key in report) or
                             report['status'] not in properties['status']['enum'] or
                             report['action'] not in properties['action']['enum'] or not report['reason'].strip()):
                         raise ReportFormatError('invalid recovery diagnosis fields')
@@ -3402,8 +3406,13 @@ assert results['scratch'] == 'ok'
                             raise ReportFormatError('blocked diagnosis must name the unavailable input and expected result')
                     else:
                         if (report['action'] == 'none' or not report['approach'].strip() or
-                                report['missing_input'] or report['expected_result']):
+                                report['missing_input']):
                             raise ReportFormatError('recovery diagnosis has no executable approach')
+                        if modern and (not re.fullmatch(r'[a-z][a-z0-9._-]{2,60}', report['strategy_key']) or
+                                       (history and not report['difference_from_prior'].strip()) or
+                                       not stalls.falsifiable(report['expected_result'])):
+                            raise ReportFormatError('recovery diagnosis needs a distinct strategy, '
+                                                    'why it differs, and a falsifiable expected result')
                         check = report['capability_check']
                         observed = [event for event in host['executions']
                                     if check in event.get('aggregated_output', '').splitlines() and
@@ -3529,7 +3538,8 @@ assert results['scratch'] == 'ok'
         current_key = candidate_key(self.state['candidate'])
         completed = [entry for entry in history if entry['status'] in ('complete', 'worker-replaced')]
         cycle = any(entry['candidate_before'] == current_key for entry in completed)
-        previous = [entry for entry in history if entry['status'] in ('complete', 'worker-replaced') and
+        stall = stalls.detect(findings, current_key, completed, self.state['requirements'])
+        previous = [entry for entry in completed if
                     (entry['fingerprint'] == fingerprint or
                      (obligations and entry.get('obligations', self.recovery_obligations(entry['findings'])) == obligations) or
                      entry.get('candidate_after') == entry['candidate_before'] == current_key or cycle)]
@@ -3537,16 +3547,13 @@ assert results['scratch'] == 'ok'
                 self.state.get('recovery_decision', {}).get('status') not in ('pending', 'diagnosed', 'rejected')):
             force_diagnosis = False
         plan = {'action': 'implementation', 'approach': 'Correct the named implementation and evidence gaps.'}
-        if force_diagnosis or previous:
-            plan = self.diagnose(findings, history)
-            if previous and not plan['strategy_changed']:
+        if force_diagnosis or previous or stall:
+            plan = self.diagnose(findings, history, stall=stall)
+            if (previous or stall) and not plan['strategy_changed']:
                 raise ValueError('recovery diagnosis found no new executable strategy: ' + plan['reason'])
-            method = lambda value: ' '.join(re.findall(r'\w+', value.casefold()))
-            if previous and any(entry['action'] == plan['action'] and
-                                method(entry['approach']) == method(plan['approach']) and
-                                entry.get('capability_check') == plan.get('capability_check') for entry in completed):
-                raise ValueError('recovery diagnosis repeated an exhausted strategy without new capabilities: ' +
-                                 plan['approach'])
+            repeated = stalls.strategy_repetition(plan, completed)
+            if (previous or stall) and repeated:
+                raise ValueError('recovery diagnosis ' + repeated + ': ' + plan['approach'])
             if plan['action'] == 'plan-acceptance':
                 self.handoff('plan-acceptance', plan['reason'])
                 self.state['recovery_decision']['status'] = 'consumed'
@@ -3563,6 +3570,11 @@ assert results['scratch'] == 'ok'
         entry = {'fingerprint': fingerprint, 'findings': findings, 'obligations': obligations, 'action': plan['action'],
                  'approach': plan['approach'], 'candidate_before': current_key,
                  'status': 'reserved', 'started_at': now(), 'dispatch_offset': len(self.state['attempts'])}
+        if stall:
+            entry['stall'] = stall
+        for key in ('strategy_key', 'difference_from_prior', 'expected_result'):
+            if plan.get(key):
+                entry[key] = plan[key]
         if 'capability_check' in plan:
             entry['capability_check'] = plan['capability_check']
             decision = self.state['recovery_decision']
@@ -3693,7 +3705,8 @@ assert results['scratch'] == 'ok'
                 return
             self.recover({'review': review.get('findings', []), 'review_gaps': review['gaps'],
                           'proof_gaps': proof['gaps'], 'unproven': [row['id'] for row in proof['requirements']
-                                                               if row['verdict'] != 'proven']}, proof)
+                                                               if row['verdict'] != 'proven'],
+                          'failed_checks': stalls.failed_checks(review)}, proof)
 
     def reconcile_worker(self):
         """Only a confirmed terminated worker can be replaced; uncertain launches stay blocked."""
