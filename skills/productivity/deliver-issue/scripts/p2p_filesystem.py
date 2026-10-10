@@ -725,6 +725,63 @@ def review_scope_status(root, work, current_repo=None, current_ref=None):
     except (ValueError, OSError) as error:
         return {'status': 'UNKNOWN', 'reason': 'cannot inspect exact candidate: ' + str(error)}
 
+def target_risk_status(root, work, destination_ref, head_ref, destination_repo=None):
+    """Read-only pre-merge risk intersection against the *frozen* review base.
+
+    Caller must independently check target policy/CI and the current head-target
+    integration. This is an input to merge-readiness, not a compatibility verdict.
+    """
+    if any(not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", value)
+           for value in (destination_ref, head_ref)):
+        raise ValueError("target-risk-status requires exact full PR-head and destination commit SHAs")
+    root = Path(root).resolve()
+    target_root = Path(destination_repo).resolve() if destination_repo else root
+    relation = review_scope_status(root, work, target_root, head_ref)
+    if relation["status"] != "COVERED":
+        return {"status": "UNKNOWN", "reason": (
+            "PR head is not the exact reviewed candidate; refresh independent current-head review and proof"
+            if relation["status"] == "UNCOVERED_DELTA" else relation.get("reason", "review coverage unavailable")),
+                "review_head_delta": relation.get("uncovered_changes", [])}
+    slug = work_slug(work)
+    local = safe(root, f".p2p/work/{slug}")
+    common = Path(git(root, "rev-parse", "--path-format=absolute", "--git-common-dir").decode().strip()).resolve()
+    legacy = Path.home() / ".p2p/work" / (root.name + "-" + digest(str(common).encode())[:16]) / slug
+    if ((legacy / "delivery.json").is_file() or (legacy / "artifacts/delivery.json").is_file()):
+        if ((local / "delivery.json").is_file() or (local / "artifacts/delivery.json").is_file()):
+            return {"status": "UNKNOWN", "reason": "conflicting local and legacy review records"}
+        local = legacy
+    active = local / "delivery.json"
+    terminal = local / "artifacts/delivery.json"
+    record = json.loads((active if active.is_file() else terminal).read_bytes())
+    scope = (record.get("reports", {}).get("review", {}).get("review_scope")
+             if active.is_file() else record.get("review_scope"))
+    if not isinstance(scope, dict):
+        return {"status": "UNKNOWN", "reason": "no risk-aware saved review scope"}
+    base_ref = scope["comparison_base"]
+    try:
+        base = full_commit(target_root, base_ref)
+        target = full_commit(target_root, destination_ref)
+        head = full_commit(target_root, head_ref)
+        if target != destination_ref or head != head_ref:
+            raise ValueError("resolved refs differ from exact supplied SHAs")
+        ff = subprocess.run(["git", "-C", str(target_root), "merge-base",
+                             "--is-ancestor", base, target], capture_output=True)
+        if ff.returncode != 0:
+            return {"status": "UNKNOWN", "reason": (
+                "destination is non-fast-forward or its relationship to the frozen base is unavailable")}
+        exclude = record.get("agreement_paths", (work,))
+        base_manifest = snapshot(target_root, base, exclude=exclude)
+        destination_manifest = snapshot(target_root, target, exclude=exclude)
+        classification = assess_target_risks(scope, base_manifest, destination_manifest)
+        return classification | {
+            "pr_head": head, "destination": target, "frozen_base": base,
+            "reviewed_candidate": scope["candidate_key"],
+            "compatibility_status": "NOT ASSESSED",
+        }
+    except (ValueError, OSError) as error:
+        return {"status": "UNKNOWN", "reason": "cannot inspect exact head/target/base: " + str(error)}
+
+
 def document_lines(text):
     """Read document metadata, excluding fenced examples."""
     fence = None
@@ -1713,6 +1770,11 @@ def main(argv=None):
     scope_command.add_argument('work')
     scope_command.add_argument('--current-repo', help='PR head checkout; defaults to the source repository')
     scope_command.add_argument('--current-ref', help='exact current commit SHA or ref; defaults to the checked-out product tree')
+    target_risks = commands.add_parser("target-risk-status", help="read-only frozen-base to target seam intersection")
+    target_risks.add_argument("work")
+    target_risks.add_argument("--destination-ref", required=True, help="exact full destination SHA")
+    target_risks.add_argument("--head-ref", required=True, help="exact full current PR head SHA")
+    target_risks.add_argument("--destination-repo", help="checkout with exact base/head/destination objects")
     entry_command = commands.add_parser("resolve-entry", help="read-only lookup for a single delivery request")
     entry_command.add_argument("source", help="quoted text, configured #issue, repository spec, or saved contract path")
     entry_command.add_argument("--issue-repository", help="configured GitHub OWNER/REPO for an issue number")
@@ -1799,6 +1861,9 @@ def main(argv=None):
             result = publication_access(root, args.work, args.workspace)
         elif args.command == 'review-scope-status':
             result = review_scope_status(root, args.work, args.current_repo, args.current_ref)
+        elif args.command == 'target-risk-status':
+            result = target_risk_status(root, args.work, args.destination_ref,
+                                        args.head_ref, args.destination_repo)
         elif args.command == "resolve-entry":
             result = entry_source(root, args.source, args.issue_repository)
         elif args.command == "reconcile":
@@ -1826,6 +1891,8 @@ def main(argv=None):
             result = resolve(root, args.work)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         if args.command == 'review-scope-status' and result['status'] != 'COVERED':
+            return 1
+        if args.command == 'target-risk-status' and result['status'] != 'NO_ADDITIONAL_RISK_CHECKS':
             return 1
         return 0
     except (ValueError, OSError, KeyError, TypeError, UnicodeError) as error:
