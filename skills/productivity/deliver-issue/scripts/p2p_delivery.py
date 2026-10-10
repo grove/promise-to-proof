@@ -2483,7 +2483,10 @@ assert results['scratch'] == 'ok'
                                       report_schema(name, coverage_required, risks_required))
         self.timed_source_stable()
         if name in ('review', 'proof'):
-            self.current()
+            # Source stability was just verified at this same receipt boundary.
+            # Validate the exact candidate here without repeating that complete
+            # source scan, pinned instruction and base preflight a second time.
+            self.current(check_source=False)
         scope = None
         with self.report_validation(attempt, host):
             raw_report = host['message'].encode('utf-8')
