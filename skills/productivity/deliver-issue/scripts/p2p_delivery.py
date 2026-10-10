@@ -3096,6 +3096,10 @@ assert results['scratch'] == 'ok'
     def cleanup(self):
         if self.state.get('status') != 'REVIEWED_AND_PROVEN':
             raise ValueError('only a REVIEWED_AND_PROVEN delivery can be cleaned')
+        # Recheck selected evidence before even replacing/pruning final records.
+        # The existing removal guard also runs at the actual deletion boundary.
+        import p2p_learning
+        p2p_learning.cleanup_guard(self.root, self.work)
         if self.state.get('cleanup_verified_at') and self.state.get('final_records_written'):
             self.verify_final_readback('source checkout changed after cleanup identity verification')
             self.remove_superseded_artifacts()
