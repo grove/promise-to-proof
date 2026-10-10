@@ -59,6 +59,23 @@ class EvidenceSemanticsTests(unittest.TestCase):
             with self.subTest(change=change), self.assertRaises(ValueError):
                 self.check(implementation_slice=change)
 
+    def test_echo_self_attestation_and_unrelated_inspection_are_not_checks(self):
+        for check in (
+            {"kind": "test", "command": "echo hello", "result": "passed",
+             "observation": "hello"},
+            {"kind": "inspection", "command": "cat unrelated.txt", "result": "observed",
+             "observation": "hello"},
+            {"kind": "test", "command": "python3 make_claim.py", "result": "passed",
+             "observation": "hello"},
+        ):
+            with self.subTest(check=check), self.assertRaisesRegex(ValueError, "does not exercise"):
+                slices.validate(
+                    self.report | {"implementation_slice": witness(checks=[check])},
+                    ["R1"], [],
+                    [{"command": check["command"], "exit_code": 0,
+                      "aggregated_output": "hello\n"}],
+                    self.after, self.before)
+
     def test_manual_inspection_evidence_is_allowed_when_observed(self):
         manual = witness(checks=[{"kind": "inspection", "command": "cat greet.py",
                                   "result": "observed", "observation": "print("}])
@@ -87,16 +104,20 @@ class EvidenceSemanticsTests(unittest.TestCase):
                     "attempt_id": "first"}
         after = self.after + [{"path": "tests/test_greet.py", "type": "file",
                                "mode": "100644", "content_base64": "YXNzZXJ0IFRydWUK"}]
+        evidence = {"command": "python3 tests/test_greet.py", "exit_code": 0,
+                    "aggregated_output": "greet regression passed"}
         second = witness(id="I2", paths=["tests/test_greet.py"],
+                         checks=[{"kind": "test", "command": "python3 tests/test_greet.py",
+                                  "result": "passed", "observation": "greet regression passed"}],
                          retires=[{"id": "I1", "reason": "Old plan replaced by direct API check."}])
         report = {"status": "IMPLEMENTED", "gaps": [], "implementation_slice": second}
         result = slices.validate(report, ["R1"], [original],
-                                 self.events, after, self.after)
+                                 self.events + [evidence], after, self.after)
         self.assertEqual(result["retires"][0]["id"], "I1")
         with self.assertRaisesRegex(ValueError, "replacement"):
             slices.validate(report | {"implementation_slice": second |
                                       {"retires": [{"id": "I1", "reason": ""}]}},
-                            ["R1"], [original], self.events, after, self.after)
+                            ["R1"], [original], self.events + [evidence], after, self.after)
 
 
     def test_changed_verified_slice_file_needs_explicit_replacement_and_recheck(self):
