@@ -106,6 +106,15 @@ class ExplanationTests(unittest.TestCase):
         self.assertTrue(shown["requires_user_action"])
         self.assertIn("approve", shown["next_action"].lower())
 
+    def test_missing_invocation_is_not_resumable(self):
+        shown = progress.explain(report(
+            status="BLOCKED", blocker="no delivery invocation exists",
+            candidate_workspace=None))
+        self.assertEqual(shown["phase"], "NOT_ADMITTED")
+        self.assertIn("no controller stages to resume", shown["why_it_matters"])
+        self.assertIn("/deliver-issue", shown["next_action"])
+        self.assertNotIn("then resume this invocation", shown["next_action"])
+
     def test_restore_requires_new_host_preflight_even_with_prior_implementation(self):
         shown = progress.explain(report(
             checkpoint_restored_from="9" * 64,
@@ -291,11 +300,24 @@ class ExistingControllerIntegration(unittest.TestCase):
         self.assertEqual(len(current["attempts"]), before_attempts)
         self.assertIn("where_is_the_code", current["human_progress"])
 
+    def test_status_pr_readback_only_renders_verified_remote_facts(self):
+        code, _ = self.fixture.cli()
+        self.assertEqual(code, 0)
+        from test_p2p_delivery import d
+        before = list(self.fixture.fake.calls)
+        observed = publication("OPEN")
+        with patch.object(d.progress_view, "inspect_github_pr", return_value=observed) as readback:
+            code, output = self.fixture.cli("status", "--pr", PR)
+        self.assertEqual(code, 0, output)
+        self.assertEqual(output["human_progress"]["phase"], "PR_PUBLISHED_NOT_MERGED")
+        self.assertEqual(output["publication_observation"], observed)
+        self.assertEqual(self.fixture.fake.calls, before)
+        readback.assert_called_once()
+
     def test_plain_cli_is_readable_and_does_not_dispatch(self):
         code, _ = self.fixture.cli()
         self.assertEqual(code, 0)
         calls = list(self.fixture.fake.calls)
-        saved = self.fixture.d if hasattr(self.fixture, "d") else None
         from test_p2p_delivery import d
         output = io.StringIO()
         args = ["--repo", str(self.fixture.root), "status",
