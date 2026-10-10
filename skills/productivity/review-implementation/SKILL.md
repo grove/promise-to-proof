@@ -186,6 +186,17 @@ material seam as a finding or necessary unknown; do not silently call it
 addressed. Use `coverage_trace.risks` on the current stage when requested,
 without repeating facts in another review rubric.
 
+### Retained same-stage observations
+
+If the controller provides an `applicability` check plan from a previous
+exact same-stage candidate, treat it as a **suggestion of potentially reusable
+observations, not an accepted review judgment**. Inspect the complete delta,
+original saved command/observation, risk reach, callers and any changed
+test/configuration assumptions. Independently explain which evidence remains
+applicable, check affected paths and material interactions afresh, and issue
+a *new* full current-candidate review. `FULL_RECHECK` or missing evidence
+requires broad fresh checking; no optional polish may create a repair loop.
+
 ## Investigate without repairing
 
 Start from the source, contract, candidate, and constraints. The author's report
