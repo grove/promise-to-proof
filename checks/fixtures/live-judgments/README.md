@@ -105,6 +105,29 @@ these scenarios claims universal review reliability until it has been run on
 the real supported host; offline fixture checks are explicitly not live
 evidence.
 
+## Risk-driven seams: issue #42
+
+The #72 live runner also exercises a durable booking CLI on two fixed
+candidates. One uses SQLite with a unique seat constraint and proper on-disk
+state; the other retains only in-process state. For the latter, supplied
+same-process tests are green, while independently authored public-interface
+sequences after a process restart expose missing persistence and overlapping
+callers both succeeding. The correct control includes deterministic restart
+and competing-process tests.
+
+Both stages must independently recognize the relevant R2 persistence and
+R3 one-winner risks, connect them to actual implementation paths and evidence,
+and distinguish addressed from unresolved risks. The negative candidate must
+not receive REVIEWED/PROVEN; the correct candidate must pass without invented
+extra test quotas. The oracle and expected status remain outside model inputs,
+and the runner fails both false acceptance and unnecessary blocking.
+
+The additional risk facts also support a conservative read-only compatibility
+classification when a target moves. A path intersection or uncertain risk
+reach requests relevant pair-specific checking; an unrelated target change
+does not require a duplicate deep suite. This never grants merge permission
+or automatically reuses #73 evidence.
+
 This is a **small specified-error detector**, not universal model reliability,
 a numerical quality score, or the larger #52 benchmark. It does not establish
 a speedup without matched measurements. #73 can later extend the same follow-up
