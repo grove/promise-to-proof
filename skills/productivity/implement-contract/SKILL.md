@@ -122,6 +122,36 @@ facts in the existing `coverage_trace.risks` when the controller requests them;
 a material unresolved risk is unfinished work, not an optional polish suggestion.
 Do not manufacture a dependency graph or another planning stage.
 
+### Make verified implementation steps resumable, not ceremonial
+
+In a controller-managed delivery that requests `implementation_slice`, plan
+the next meaningful step **inside the existing implementation invocation**.
+Default to one coherent slice for a tiny fix or a normal complete change.
+WIP=1 means one active slice, not one change per file or a mandatory task tree.
+Split only for a real dependency, independently observable result or valuable
+interruption boundary. Never insert a new planning model call, approval, commit,
+tracker issue, or auxiliary `PROGRESS.md` solely to make slices.
+
+Report the exact accepted requirement IDs, expected observable outcome,
+affected production/test paths, and actual checks. `VERIFIED` requires matching
+host-observed command/result/output evidence; an exercised manual or inspection
+check can be sufficient when appropriate. A passing command without a relevant
+assertion or observation is not enough. Use `PARTIAL` only after finishing one
+actually useful verified slice, naming a concrete boundary, remaining gaps and
+one next action. Do not mark a blocked step verified. The controller records
+its exact Git generation, stage report, and verified slice inside the existing
+checkpoint when a real boundary is reached.
+
+On restart, read the retained verified slices and continue at the first
+unfinished slice. Recheck dependencies modified since a saved slice. When a
+previous internal strategy is obsolete, list its slice ID in `retires`, give
+a substantive reason and recheck changed seams. Never replace a promised
+requirement or treat an internal change as an approved scope revision; a real
+delivery boundary belongs to the existing sizing/slicing process. The final
+`IMPLEMENTED` report must account for **all accepted requirements**, leave no
+implementation gaps and bind the current exact candidate. Independent review,
+proof, publication and merge remain separate decisions.
+
 ## Develop and validate evidence
 
 Prefer test-first work for new behavior and fixes when a suitable seam exists.
