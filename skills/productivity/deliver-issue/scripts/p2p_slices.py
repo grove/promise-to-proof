@@ -250,6 +250,12 @@ def verify_retained(state, runtime, receipts):
         generation = next((row for row in generations
                            if row.get("commit") == record["generation_commit"]), None)
         if (not attempt or attempt.get("stage") != "implementation" or
+                attempt.get("inputs", {}).get("work_item_sha256") !=
+                    state.get("contract", {}).get("sha256") or
+                attempt.get("inputs", {}).get("comparison_base") !=
+                    state.get("comparison_base") or
+                attempt.get("inputs", {}).get("binding_inputs") !=
+                    state.get("binding_inputs") or
                 attempt.get("status") != "complete" or
                 attempt.get("report_validation") == "rejected" or
                 attempt.get("report_sha256") != record["report_sha256"] or
