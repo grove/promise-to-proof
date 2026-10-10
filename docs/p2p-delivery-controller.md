@@ -490,7 +490,23 @@ include a low-risk control and durable booking scenarios with an independent
 public-CLI restart and competing-process oracle. Offline fixture checks
 establish only runner/trace behavior, not live model quality.
 
-## Host boundary and checks
+## Measured first-pass controller overhead
+
+The [#57 performance validation](../checks/first-pass-latency.md) compares
+the exact pre-optimization controller methods with current ones under an
+identical offline delivery. It confirms the same preflight, implementation,
+independent review/proof and portable checkpoint boundaries while removing
+unnecessary product-tree scans, duplicated source checks and Git subprocesses
+for non-Git checkpoint receipts. A balanced four-pair sample showed 18.1%
+less **controller-fixture elapsed time**; it is not a live macOS/Codex speed
+claim or a substitute for model-token measurements.
+
+Run `python3 checks/benchmark_p2p_first_pass.py --repeats 4` from a
+checkout containing the pinned original commit to reproduce the measurement.
+The ordinary focused CI gate uses a single baseline/optimized pair so
+performance validation does not itself add substantial ceremony.
+
+
 
 Each invocation first launches two fresh real Codex contexts. They attempt writes
 to protected candidate, agreement, binding inputs, comparison-base and controller
