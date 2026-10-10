@@ -56,7 +56,7 @@ class PublishReviewTests(unittest.TestCase):
     def test_missing_or_wrong_grant_blocks_submission(self):
         p = preview()
         digest = r.sha(r.canonical(p))
-        with self.assertRaisesRegex(ValueError, "authorization"):
+        with self.assertRaisesRegex(ValueError, "matching controller effect grant"):
             r.authorize(p, digest)
         with self.assertRaisesRegex(ValueError, "does not match"):
             r.authorize(p, digest, approved_sha="0" * 64, approval_source="human approval")
