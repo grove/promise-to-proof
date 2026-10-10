@@ -25,3 +25,5 @@ jobs:
           -k 'test_successful_repair_rereviews_and_reproves'
       - name: Check retained verification history
         run: python3 -m unittest discover -s checks -p 'test_p2p_verification_history.py'
+      - name: Check review's pragmatic test-quality instructions
+        run: python3 -m unittest discover -s checks -p 'test_pragmatic_verification.py'
