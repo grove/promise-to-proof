@@ -194,3 +194,163 @@ def check_ready(root, record, remote, repository, pr, method, readiness,
              "current GitHub PR approvals are insufficient or conflicting")
     return {"head": head, "base": base, "integration": integration,
             "target": branch}
+
+
+def receipt_body(record):
+    """Stable exact comment serialization of the one canonical #50 record."""
+    identifier = record.get("landing", {}).get("receipt_id")
+    need(isinstance(identifier, str) and
+         re.fullmatch(r"sha256:[a-f0-9]{64}", identifier),
+         "record lacks a stable, verified #50 receipt identity")
+    return ("<!-- p2p-final:" + identifier + " -->\n" +
+            "\x60\x60\x60json\n" + fs.canonical(record).decode("utf-8") +
+            "\n\x60\x60\x60\n")
+
+
+def comments(repository, issue, *, runner=subprocess.run):
+    value = run(["gh", "api", "--paginate", "--jq", ".[]",
+                 f"repos/{repository}/issues/{issue}/comments"], runner=runner)
+    return [json.loads(line) for line in value.stdout.splitlines() if line.strip()]
+
+
+def matching_receipt(rows, record):
+    body = receipt_body(record)
+    identifier = record["landing"]["receipt_id"]
+    matches = []
+    for item in rows:
+        actual = item.get("body")
+        if not isinstance(actual, str) or "<!-- p2p-final:" not in actual:
+            continue
+        captured = RECEIPT.fullmatch(actual)
+        need(captured is not None, "malformed existing completion receipt")
+        previous = json.loads(captured[2])
+        need(isinstance(previous, dict) and
+             previous.get("landing", {}).get("receipt_id") == "sha256:" + captured[1] and
+             actual == receipt_body(previous),
+             "existing receipt marker and record content disagree")
+        same_event = previous["landing"]["receipt_id"] == identifier
+        if same_event:
+            need(actual == body, "completed receipt identity has conflicting bytes")
+            matches.append(item)
+        elif previous.get("invocation_id") == record.get("invocation_id"):
+            raise ValueError("this delivery invocation already has a conflicting receipt")
+    need(len(matches) <= 1, "multiple matching completed delivery receipts")
+    return matches[0] if matches else None
+
+
+def receipt_target(root, record, pr_url=None, receipt_issue=None, receipt_ref=None):
+    """Select the original issue, matching PR, or an exact existing Git ref."""
+    source = fs.safe(root, record["work_item"])
+    text = source.read_text(encoding="utf-8") if source.is_file() else ""
+    issue_urls = set(re.findall(
+        r"^Source attribution:\s*(https://github\.com/[^\s;]+/issues/\d+)",
+        text, re.M))
+    need(len(issue_urls) <= 1, "ambiguous source issue provenance")
+    if receipt_issue:
+        need(ISSUE.fullmatch(receipt_issue) is not None and
+             receipt_issue in issue_urls,
+             "explicit receipt issue must be the agreed original source issue")
+        issue_url = receipt_issue
+    else:
+        issue_url = next(iter(issue_urls)) if issue_urls else None
+    if issue_url:
+        match = ISSUE.fullmatch(issue_url)
+        need(match is not None and match[1] == record["landing"]["repository"],
+             "source issue belongs to a different delivery repository")
+        return {"kind": "comment", "repository": match[1], "number": int(match[2]),
+                "destination": issue_url}
+    if pr_url:
+        match = PR.fullmatch(pr_url)
+        need(match and match[1] == record["landing"]["repository"],
+             "receipt PR belongs to a different delivery repository")
+        return {"kind": "comment", "repository": match[1], "number": int(match[2]),
+                "destination": pr_url}
+    need(isinstance(receipt_ref, str) and
+         re.fullmatch(r"refs/heads/p2p/receipts/[a-z0-9-]+", receipt_ref),
+         "issue-less/no-PR delivery needs an exact authorized p2p/receipts Git ref")
+    return {"kind": "git", "ref": receipt_ref}
+
+
+def comment_receipt(record, target, mandate, *, runner=subprocess.run):
+    """Read before writing; on lost reply read again without a second write."""
+    body = receipt_body(record)
+    need(len(body.encode()) <= 60000, "completed receipt exceeds GitHub comment limit")
+    repository, number = target["repository"], target["number"]
+    first = matching_receipt(comments(repository, number, runner=runner), record)
+    if first is None:
+        autonomy.authorize(mandate, "issue-comment", repository,
+                           target["destination"])
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8") as file:
+            file.write(body)
+            file.flush()
+            result = run(["gh", "issue", "comment", str(number), "--repo", repository,
+                          "--body-file", file.name], check=False, runner=runner)
+        # A failed response may still have applied the effect. Never blindly retry.
+    confirmed = matching_receipt(comments(repository, number, runner=runner), record)
+    if confirmed is None:
+        return {"status": "PARTIAL",
+                "reason": "GitHub receipt write was not confirmed; reread before retrying"}
+    url = confirmed.get("html_url")
+    need(isinstance(url, str) and url.startswith("https://github.com/" + repository + "/"),
+         "confirmed receipt lacks its durable GitHub URL")
+    return {"status": "RECORDED", "url": url,
+            "body_sha256": fs.digest(body.encode())}
+
+
+def git_receipt(root, remote, target, record, checkpoint, mandate,
+                *, runner=subprocess.run):
+    """Write one deterministic receipt commit with a separate temporary Git index.
+
+    This changes Git objects/remotes under exact grants, not the operator's
+    checked-out branch, files or staging index. Never force-update a receipt ref.
+    """
+    ref = target["ref"]
+    path = f"p2p-state/{fs.work_slug(record['work_item'])}-delivery.json"
+    value = fs.canonical(record) + b"\n"
+    branches = remote_branches(root, remote, runner=runner)
+    tip = branches.get(ref)
+    need(tip, "receipt branch is not published; establish its checkpoint under branch-create authority")
+    checkpoint_path = f"p2p-state/{fs.work_slug(record['work_item'])}.json"
+    saved = run(["git", "-C", str(root), "show", tip + ":" + checkpoint_path],
+                check=False, runner=runner)
+    need(saved.returncode == 0 and saved.stdout.encode() == checkpoint,
+         "receipt branch does not preserve the exact #82 checkpoint")
+    prior = run(["git", "-C", str(root), "show", tip + ":" + path],
+                check=False, runner=runner)
+    if prior.returncode == 0:
+        need(prior.stdout.encode() == value,
+             "remote receipt branch contains a conflicting completed record")
+        return {"status": "RECORDED", "url": remote + ":" + ref + ":" + path,
+                "remote_commit": tip}
+    autonomy.authorize(mandate, "commit", record["landing"]["repository"], ref)
+    autonomy.authorize(mandate, "push", record["landing"]["repository"], ref)
+    timestamp = datetime.datetime.fromisoformat(
+        record["landing"]["confirmed_at"].replace("Z", "+00:00")).timestamp()
+    date = str(int(timestamp)) + " +0000"
+    with tempfile.TemporaryDirectory() as folder:
+        env = dict(os.environ, GIT_INDEX_FILE=str(Path(folder) / "index"),
+                   GIT_AUTHOR_NAME="P2P Delivery", GIT_AUTHOR_EMAIL="p2p@localhost",
+                   GIT_COMMITTER_NAME="P2P Delivery", GIT_COMMITTER_EMAIL="p2p@localhost",
+                   GIT_AUTHOR_DATE=date, GIT_COMMITTER_DATE=date)
+        run(["git", "-C", str(root), "read-tree", tip], env=env, runner=runner)
+        blob = run(["git", "-C", str(root), "hash-object", "-w", "--stdin"],
+                   input=value.decode(), env=env, runner=runner).stdout.strip()
+        run(["git", "-C", str(root), "update-index", "--add", "--cacheinfo",
+             f"100644,{blob},{path}"], env=env, runner=runner)
+        tree = run(["git", "-C", str(root), "write-tree"], env=env,
+                   runner=runner).stdout.strip()
+        commit = run(["git", "-C", str(root), "commit-tree", tree, "-p", tip,
+                      "-m", "P2P complete " + record["landing"]["receipt_id"]],
+                     env=env, runner=runner).stdout.strip()
+    run(["git", "-C", str(root), "push", remote, commit + ":" + ref],
+        check=False, runner=runner)
+    # Confirm after any response (including a lost/nonzero one).
+    current = remote_branches(root, remote, runner=runner).get(ref)
+    if current != commit:
+        return {"status": "PARTIAL",
+                "reason": "remote receipt push was not confirmed; never blindly retry"}
+    actual = run(["git", "-C", str(root), "show", commit + ":" + path],
+                 runner=runner).stdout.encode()
+    need(actual == value, "remote receipt object bytes differ from the approved record")
+    return {"status": "RECORDED", "url": remote + ":" + ref + ":" + path,
+            "remote_commit": commit}
