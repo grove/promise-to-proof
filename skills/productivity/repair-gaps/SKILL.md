@@ -14,6 +14,14 @@ For a read-only diagnosis dispatch, inspect mechanisms and return the controller
 requested diagnosis schema; make no edits and do not claim REPAIRED. Choose a
 concrete different method after repeated gaps, including evidence or local
 prerequisite work. Name an exact unavailable input only when recovery cannot act.
+When the controller supplies a stall perspective reset, reopen the original
+promise and accepted requirements rather than anchoring on the previous fix.
+Use only the bounded recent strategies first, reading existing deeper receipts
+when the difference matters. Give the executable method a stable strategy_key,
+explain difference_from_prior, and name in expected_result the concrete
+falsifiable check and observed behavior that will change. Do not rename the old
+repair and claim novelty, or treat a single transient error as a structural
+sizing issue. A real unavailable prerequisite or authority stays a blocker.
 Evidence-only recovery must leave product bytes unchanged. Planning decisions
 return to the delegated planner/auditor; repair cannot weaken the agreement.
 

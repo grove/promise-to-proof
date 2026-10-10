@@ -40,6 +40,11 @@ jobs:
           -k 'test_upgrade_preserves_work_refreshes_only_verifiers_and_is_idempotent'
       - name: Validate one-slice, WIP-one and interrupted intra-stage recovery
         run: python3 -m unittest discover -s checks -p 'test_p2p_slices.py' -v
+      - name: Detect repair stalls and preserve recovery identities
+        run: |
+          python3 -m unittest discover -s checks -p 'test_p2p_stalls.py' -v
+          python3 -m unittest discover -s checks -p 'test_p2p_recovery.py' -v
+          python3 -m unittest discover -s checks -p 'test_p2p_portable_recovery.py' -v
       - name: Check existing generation and repair behavior
         run: >-
           python3 -m unittest discover -s checks -p 'test_p2p_delivery.py'
