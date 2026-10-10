@@ -239,10 +239,10 @@ def explain(status, *, publication=None, finalization=None):
             location = "verified delivered destination branch"
         elif verified_pub and pub["status"] == "MERGED":
             phase = "MERGED_RECEIPT_PENDING"
-            what = "GitHub confirms that the matching pull request was merged into " + pub["target"] + "."
-            why = "The accepted local candidate and published PR head are verified, but a completed-delivery mapping and durable final receipt have not been confirmed."
+            what = "GitHub confirms that the matching pull request was merged with target " + pub["target"] + "."
+            why = "The accepted local candidate and published PR head are verified. The actual delivered-code mapping, current destination tip and durable final receipt are not yet verified."
             next_action = "Inspect the actual merged commit and retain finalization as pending. #50/#47 must supply a supported validated receipt before P2P can claim delivery fully finalized."
-            location = "merged pull request " + pub["url"] + " (destination branch reported by GitHub)"
+            location = "merged pull request " + pub["url"] + " (current destination branch contents not independently verified)"
             not_established = ["Delivered-code mapping", "Durable final receipt"]
         elif verified_pub and pub["status"] == "OPEN":
             phase = "PR_PUBLISHED_NOT_MERGED"
