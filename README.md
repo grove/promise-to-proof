@@ -369,7 +369,11 @@ python3 -m unittest discover -s checks -p 'test_*.py'
 ```
 
 The model/conformance checks and live host checks have additional pinned
-requirements documented in their own guides.
+requirements documented in their own guides. The small
+[live judgment regression suite](./checks/fixtures/live-judgments/README.md)
+independently checks positive, incomplete, out-of-scope, optional-polish, and
+follow-up candidate outcomes using the real supported review/proof stages. Its
+offline fixture tests are not live evidence.
 
 ## Contributing
 
