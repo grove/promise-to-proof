@@ -62,8 +62,17 @@ through the established #82 procedure before using `status` or `resume`.
 checkpoint file alone is neither approval nor a current verdict.
 
 On `PLAN`, there is no matching local contract or Git checkpoint. For an
-issue input, first inspect the configured tracker for a previously approved
-standalone planning handoff and amendments; import its exact approved agreement
+issue input, inspect the configured tracker first for a previously approved
+standalone planning handoff, material amendments, and an applicable published
+#82 **issue checkpoint**. A GitHub checkpoint comment has a
+`<!-- p2p-checkpoint:<slug>:<sha256> -->` marker; read its actual contents
+rather than trusting the marker alone. Resolve the single exact matching
+checkpoint SHA and invoke the existing `checkpoint-github-restore --repository
+OWNER/REPO --issue N --sha256 HASH` path. Validate every checkpoint input,
+selected issue identity, source amendment and approval after restoration.
+Ambiguous checkpoints or missing objects block reuse; never adopt a competing
+contract or reissue a worker because a comment claims completion. For an
+approved standalone planning handoff, import its exact approved agreement
 and source snapshots under the existing rules *without repeating planning*.
 Where no approved matching agreement exists, run `plan-acceptance` **within
 this invocation**, including its source inspection, independent audit and
