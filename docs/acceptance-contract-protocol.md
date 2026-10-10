@@ -210,6 +210,22 @@ runtime behavior. Preserve meaningful regression guards. Required integration
 checks still exercise the assembled outcome; historical child success alone is
 not evidence that the combined workflow works.
 
+Review important changed or relied-on tests as engineering code, in proportion
+to the actual risk and repository standards. A green test command alone does not
+establish regression protection. Inspect whether its assertions observe the
+relevant production interface and compare against independent expectations.
+A tautology, an oracle calculated from the implementation under test, a mock
+that bypasses the decision being protected, a fixture-only path, or a test that
+unpredictably skips a material assertion may fail to detect a broken promise.
+Assess the concrete missed defect, false confidence, or maintenance risk, not
+the use of mocks or helpers in the abstract. Prefer a reliable deterministic
+seam when uncontrolled timing or scheduling materially weakens the guard.
+A material test-quality finding names the affected behavior, actual weakness,
+consequence and smallest useful correction/check. Accept already meaningful
+tests without reauthoring them. Do not demand a universal mutation experiment,
+new tests solely for independent authorship, numeric coverage target, style
+rewrite or second exhaustive proof. Harmless preferences remain optional.
+
 Use focused checks while implementation or repair is changing the candidate.
 Run an expensive repository-wide check when the candidate is ready for that
 gate, rather than after each intermediate edit. A binding final-candidate check
