@@ -162,14 +162,25 @@ def main():
     args = parser.parse_args()
     if not 1 <= args.repeats <= 10:
         parser.error("repeats must be between 1 and 10")
-    before = [episode(True) for _ in range(args.repeats)]
+    # Alternate order within the same runner to reduce cold-cache and
+    # scheduling bias. Each episode is still a newly admitted repository.
+    before, after, order = [], [], []
+    for index in range(args.repeats):
+        stages = ["baseline"] if args.baseline_only else (
+            ["baseline", "optimized"] if index % 2 == 0 else ["optimized", "baseline"])
+        for stage in stages:
+            order.append(stage)
+            if stage == "baseline":
+                before.append(episode(True))
+            else:
+                after.append(episode(False))
     result = {"schema": "promise-to-proof/first-pass-comparison/v1",
               "baseline_commit": BASE, "repeats": args.repeats,
+              "order": order, "fresh_repository_per_episode": True,
               "host": "offline Linux/fixture transport; not live Codex",
               "baseline_samples": before,
               "model_time": None, "model_tokens": None, "model_cost": None}
     if not args.baseline_only:
-        after = [episode(False) for _ in range(args.repeats)]
         result["optimized_samples"] = after
         result["comparison"] = compare(before, after)
     print(json.dumps(result, indent=2, sort_keys=True, default=str))
