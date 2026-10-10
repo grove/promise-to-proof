@@ -453,10 +453,10 @@ def entry_source(root, request, issue_repository=None):
     request = request.strip()
     # A project-owned work/*.md is NOT automatically a legacy P2P contract.
     # Only an explicitly recognizable acceptance contract uses the legacy route.
-    legacy_file = safe(root, request) if re.fullmatch(rf"work/{SLUG}\\.md", request) else None
+    legacy_file = safe(root, request) if re.fullmatch(rf"work/{SLUG}\.md", request) else None
     legacy_contract = bool(legacy_file and legacy_file.is_file() and
                            re.search(r"^# Acceptance contract:", legacy_file.read_text(encoding="utf-8"), re.M) and
-                           re.search(r"^Contract revision: v[1-9][0-9]*\\s*$",
+                           re.search(r"^Contract revision: v[1-9][0-9]*\s*$",
                                      legacy_file.read_text(encoding="utf-8"), re.M))
     if (request.startswith(".p2p/") and WORK.fullmatch(request)) or legacy_contract:
         selected = safe(root, request)
