@@ -4382,7 +4382,7 @@ def main(argv=None):
             print(json.dumps({'status': 'EXTENDED', 'limits': delivery.state['limits'],
                               'deadline': delivery.state['deadline'], 'resume': result(delivery)['resume']}, indent=2))
             return 0
-        if args.action == 'resume' and delivery.state.get('status') == 'REVIEWED_AND_PROVEN' and (
+        if args.action in ('run', 'resume') and delivery.state.get('status') == 'REVIEWED_AND_PROVEN' and (
                 delivery.state.get('preflight_complete') and
                 not delivery.state.get('task_readiness_invalidated')):
             # Verify rather than render/rewrite the same authoritative stage
