@@ -160,6 +160,17 @@ property check, or isolated fault experiment with independently known expected
 results. No universal mutation run, percentage or exhaustive new suite applies.
 An unresolved material seam remains NOT PROVEN for the affected obligation.
 
+### Retained observations are not inherited proof
+
+The controller's same-stage `applicability` plan identifies saved observations
+that could survive a product edit, not reusable `PROVEN` verdicts. Read the
+original checked command evidence and exact prior candidate, independently
+validate unchanged assumptions, rerun affected edges/tests/oracles and binding
+final-candidate checks, and return fresh proof for **all** contract IDs tied to
+the current exact candidate. Unknown reach or unavailable retained command
+outputs means fresh broad checks. Do not read reviewer findings as proof or
+copy prior proof verdicts to a new Git generation.
+
 ### 4. Check material counterexamples
 
 Select realistic failure cases for the actual change and its important seams.
