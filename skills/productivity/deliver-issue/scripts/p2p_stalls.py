@@ -95,7 +95,7 @@ def falsifiable(expected):
     """Concrete check/result language, not merely 'improve quality' or 'try again'."""
     value = ' '.join((expected or '').split())
     return (len(value) >= 20 and len(value.split()) >= 4 and bool(re.search(
-        r'\b(?:test|tests|check|checks|assert|exit|status|stdout|stderr|error|'
+        r'\b(?:assert|exit|status|stdout|stderr|error|'
         r'output|input|return|response|record|report|proof|review|command|'
         r'observe|observed|print|reject|accept|pass|fail|reproduc\w*|R\d+)\b',
         value, re.I)))
