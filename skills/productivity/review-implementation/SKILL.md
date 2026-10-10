@@ -144,6 +144,11 @@ questions are answered; do not require polish or a second exhaustive proof.
 The reviewer, not the implementer or controller, owns reconciliation of a prior
 finding that is disproven or no longer applicable. Retain the old observation
 and explain the changed conclusion instead of silently rewriting its verdict.
+On a changed candidate with checked earlier review observations, explicitly name
+the earlier material finding, the new evidence showing that it has been fixed or
+was mistaken, and why the current conclusion differs. Record that reasoning in
+the affected requirement observation or checks; never replace a previous report
+or treat a small diff as automatic applicability.
 
 ## Investigate without repairing
 
