@@ -156,7 +156,8 @@ class DeliveryCoverageTests(unittest.TestCase):
         self.assertEqual(current["status"], "REVIEWED_AND_PROVEN")
         local = d.local_directory(self.root, self.work)
         state = json.loads((local / "delivery.json").read_text())
-        self.assertEqual(state["coverage_format_version"], 1)
+        self.assertEqual(state["coverage_format_version"], 2)
+        self.assertEqual(state["reports"]["review"]["review_scope"]["seam_dependencies"]["risks"], [])
         self.assertEqual(state["reports"]["review"]["review_scope"]["candidate_key"],
                          state["candidate"]["key"])
         for name in ("implementation", "review", "proof"):

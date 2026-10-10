@@ -147,6 +147,19 @@ agreed public seam. If a seam or oracle needs a consequential change, report the
 decision as a gap rather than silently replacing it. A passing suite or checked
 GitHub criterion does not cover a promise whose result is never asserted.
 
+### Record risk-to-observation links
+
+Use the canonical material-seam policy and the existing
+`coverage_trace.risks` when requested. Map material affected obligations to
+the actual shared-state, API, lifecycle or failure seam and to retained direct
+checks/observations. For a simple isolated change, one meaningful existing
+public-interface check can be sufficient. Where sequential examples cannot
+rule out a credible race, persisted-state loss or dangerous failure, choose
+one justified deterministic interleaving, restart/state-machine sequence,
+property check, or isolated fault experiment with independently known expected
+results. No universal mutation run, percentage or exhaustive new suite applies.
+An unresolved material seam remains NOT PROVEN for the affected obligation.
+
 ### 4. Check material counterexamples
 
 Select realistic failure cases for the actual change and its important seams.

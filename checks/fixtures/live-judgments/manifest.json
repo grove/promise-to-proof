@@ -57,6 +57,16 @@
       "username.py": "\"\"\"Username acceptance behavior.\"\"\"\nimport subprocess\n\n\ndef normalize(value):\n    return value.strip()\n\n\ndef accept(value):\n    if not normalize(value):\n        raise ValueError(\"username required\")\n    subprocess.run(\"echo \" + value + \" >/dev/null\", shell=True, check=True)\n    return value\n",
       "username_cli.py": "\"\"\"Public interface for username validation.\"\"\"\nimport sys\nfrom username import accept\n\n\ndef main(argv):\n    try:\n        if len(argv) != 1:\n            raise ValueError(\"exactly one username is required\")\n        print(accept(argv[0]))\n    except ValueError:\n        print(\"invalid username\", file=sys.stderr)\n        return 2\n    return 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main(sys.argv[1:]))\n",
       "tests/test_username.py": "\"\"\"Public-interface regression checks with independent outcomes.\"\"\"\nimport subprocess\nimport sys\nimport unittest\n\n\ndef invoke(value):\n    return subprocess.run([sys.executable, \"-B\", \"username_cli.py\", value],\n                          capture_output=True, text=True, timeout=5)\n\n\nclass UsernameRegressionTests(unittest.TestCase):\n    def test_empty(self):\n        result = invoke(\"\")\n        self.assertEqual(result.returncode, 2)\n        self.assertEqual(result.stdout, \"\")\n        self.assertEqual(result.stderr, \"invalid username\\n\")\n\n    def test_spaces_and_tabs(self):\n        for value in (\"   \", \"\\t\", \" \\t \"):\n            with self.subTest(value=repr(value)):\n                result = invoke(value)\n                self.assertEqual(result.returncode, 2)\n                self.assertEqual(result.stdout, \"\")\n                self.assertEqual(result.stderr, \"invalid username\\n\")\n\n    def test_visible_names(self):\n        for value in (\"Ada\", \"Maya\"):\n            with self.subTest(value=value):\n                result = invoke(value)\n                self.assertEqual(result.returncode, 0)\n                self.assertEqual(result.stdout, value + \"\\n\")\n                self.assertEqual(result.stderr, \"\")\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+    },
+    "reservation-atomic": {
+      "booking.py": "\"\"\"Atomic, durable seat reservations.\"\"\"\nimport sqlite3\n\n\ndef connection(path):\n    db = sqlite3.connect(path, timeout=15)\n    db.execute(\"CREATE TABLE IF NOT EXISTS bookings (seat TEXT PRIMARY KEY, username TEXT NOT NULL)\")\n    db.commit()\n    return db\n\n\ndef reserve(path, seat, user):\n    with connection(path) as db:\n        try:\n            db.execute(\"INSERT INTO bookings(seat, username) VALUES (?, ?)\", (seat, user))\n        except sqlite3.IntegrityError:\n            return False\n        return True\n\n\ndef occupant(path, seat):\n    with connection(path) as db:\n        row = db.execute(\"SELECT username FROM bookings WHERE seat = ?\", (seat,)).fetchone()\n        return row[0] if row else None\n",
+      "booking_cli.py": "\"\"\"Reservation command-line interface.\"\"\"\nimport sys\nfrom booking import reserve, occupant\n\n\ndef main(argv):\n    if len(argv) == 4 and argv[0] == \"reserve\":\n        _, database, seat, user = argv\n        if reserve(database, seat, user):\n            print(\"reserved\")\n            return 0\n        print(\"taken\", file=sys.stderr)\n        return 2\n    if len(argv) == 3 and argv[0] == \"show\":\n        _, database, seat = argv\n        print(occupant(database, seat) or \"none\")\n        return 0\n    print(\"usage: booking_cli.py [reserve|show] DB seat [user]\", file=sys.stderr)\n    return 2\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main(sys.argv[1:]))\n",
+      "tests/test_booking.py": "\"\"\"Real CLI restarts and concurrent writes are tested.\"\"\"\nfrom concurrent.futures import ThreadPoolExecutor\nfrom pathlib import Path\nimport subprocess\nimport sys\nimport tempfile\nimport unittest\n\n\ndef cli(*args):\n    return subprocess.run([sys.executable, \"-B\", \"booking_cli.py\", *map(str, args)],\n                          capture_output=True, text=True, timeout=15)\n\n\nclass ReservationTests(unittest.TestCase):\n    def test_persists_across_processes(self):\n        with tempfile.TemporaryDirectory() as folder:\n            database = Path(folder) / \"bookings.db\"\n            initial = cli(\"reserve\", database, \"seat\", \"Ada\")\n            self.assertEqual((initial.returncode, initial.stdout), (0, \"reserved\\n\"))\n            saved = cli(\"show\", database, \"seat\")\n            self.assertEqual((saved.returncode, saved.stdout), (0, \"Ada\\n\"))\n            duplicate = cli(\"reserve\", database, \"seat\", \"Maya\")\n            self.assertEqual((duplicate.returncode, duplicate.stderr), (2, \"taken\\n\"))\n\n    def test_competing_processes(self):\n        with tempfile.TemporaryDirectory() as folder:\n            database = Path(folder) / \"bookings.db\"\n            self.assertEqual(cli(\"show\", database, \"other\").stdout, \"none\\n\")\n            def attempt(who):\n                return cli(\"reserve\", database, \"other\", who).returncode\n            with ThreadPoolExecutor(max_workers=2) as pool:\n                outcomes = list(pool.map(attempt, (\"Ada\", \"Maya\")))\n            self.assertEqual(sorted(outcomes), [0, 2])\n            self.assertIn(cli(\"show\", database, \"other\").stdout, (\"Ada\\n\", \"Maya\\n\"))\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+    },
+    "reservation-volatile": {
+      "booking.py": "\"\"\"In-process seat state; no durable consistency guarantee.\"\"\"\nplaces = {}\n\n\ndef reserve(path, seat, user):\n    key = (path, seat)\n    if key in places:\n        return False\n    places[key] = user\n    return True\n\n\ndef occupant(path, seat):\n    return places.get((path, seat))\n",
+      "booking_cli.py": "\"\"\"Reservation command-line interface.\"\"\"\nimport sys\nfrom booking import reserve, occupant\n\n\ndef main(argv):\n    if len(argv) == 4 and argv[0] == \"reserve\":\n        _, database, seat, user = argv\n        if reserve(database, seat, user):\n            print(\"reserved\")\n            return 0\n        print(\"taken\", file=sys.stderr)\n        return 2\n    if len(argv) == 3 and argv[0] == \"show\":\n        _, database, seat = argv\n        print(occupant(database, seat) or \"none\")\n        return 0\n    print(\"usage: booking_cli.py [reserve|show] DB seat [user]\", file=sys.stderr)\n    return 2\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main(sys.argv[1:]))\n",
+      "tests/test_booking.py": "\"\"\"Only local, in-process behavior is tested.\"\"\"\nimport tempfile\nimport unittest\nfrom booking import reserve, occupant\n\n\nclass ReservationTests(unittest.TestCase):\n    def test_single_process(self):\n        with tempfile.TemporaryDirectory() as folder:\n            database = folder + \"/bookings.db\"\n            self.assertTrue(reserve(database, \"seat\", \"Ada\"))\n            self.assertEqual(occupant(database, \"seat\"), \"Ada\")\n            self.assertFalse(reserve(database, \"seat\", \"Maya\"))\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
     }
   },
   "cases": [
@@ -1064,6 +1074,127 @@
             }
           ],
           "requires_previous_observations": true
+        }
+      ]
+    },
+    {
+      "id": "verification-durable-control",
+      "rationale": "A correct SQLite-backed booking CLI survives process boundaries and enforces one-winner capacity under overlapping clients. Meaningful existing tests are enough; no unnecessary test-writing quota.",
+      "contract": "# Acceptance contract: durable reservation\n\nContract revision: v1\nSource: [Specification](../../../spec.md)\n\nIntended outcome: Reservations survive process restarts, and concurrent callers cannot both take one slot.\n\n## Acceptance matrix\n\n| ID | Source | Requirement | Boundaries / counterexamples | Seam | Oracle | Planned evidence | Plan state |\n|---|---|---|---|---|---|---|---|\n| R1 | spec.md | Reserve an unoccupied slot and report success. | The first valid booking succeeds. | python3 booking_cli.py reserve DB seat Ada | Exit zero, prints reserved. | Execute the real CLI on a fresh database and inspect the result. | planned |\n| R2 | spec.md | Persist the reservation across independent CLI processes. | Process restart must not lose reservation. | python3 booking_cli.py show DB seat | Exit zero, prints Ada. | Restart the CLI, observe the recorded occupant. | planned |\n| R3 | spec.md | Enforce at most one successful reservation per slot across competing processes. | A second or concurrent reservation must fail. | python3 booking_cli.py reserve DB seat Maya | Exit two and prints taken. | Exercise repeated and overlapping callers with the actual persistence mechanism. | planned |\n\n## Unresolved gaps\n\nNone.\n",
+      "base_changes": {
+        "spec.md": "A durable CLI must reserve the first user for a slot, keep it across process restarts, and prevent two processes from both reserving the same slot. Successful reserve prints reserved; a duplicate prints taken and exits two. The storage must be on disk rather than in-process state.\\n"
+      },
+      "candidates": [
+        {
+          "name": "atomic-reservations",
+          "implementation": "reservation-atomic",
+          "expected": {
+            "review": "REVIEWED",
+            "proof": "PROVEN",
+            "required_risks": {
+              "review": [
+                {
+                  "requirement": "R2",
+                  "path": "booking.py",
+                  "status": "addressed"
+                },
+                {
+                  "requirement": "R3",
+                  "path": "booking.py",
+                  "status": "addressed"
+                }
+              ],
+              "proof": [
+                {
+                  "requirement": "R2",
+                  "path": "booking.py",
+                  "status": "addressed"
+                },
+                {
+                  "requirement": "R3",
+                  "path": "booking.py",
+                  "status": "addressed"
+                }
+              ]
+            }
+          },
+          "oracle": [
+            {
+              "id": "restart-and-interleaving",
+              "args": [
+                "-c",
+                "from concurrent.futures import ThreadPoolExecutor\nimport subprocess\nimport sys\nimport tempfile\nfrom pathlib import Path\nwith tempfile.TemporaryDirectory() as folder:\n    first_db, race_db = Path(folder) / \"first.db\", Path(folder) / \"race.db\"\n    def call(*args):\n        return subprocess.run([sys.executable, \"-B\", \"booking_cli.py\", *map(str, args)], capture_output=True, text=True, timeout=15)\n    initial = call(\"reserve\", first_db, \"seat\", \"Ada\")\n    saved = call(\"show\", first_db, \"seat\")\n    duplicate = call(\"reserve\", first_db, \"seat\", \"Maya\")\n    call(\"show\", race_db, \"other\")\n    def contender(name):\n        return call(\"reserve\", race_db, \"other\", name).returncode\n    with ThreadPoolExecutor(max_workers=2) as pool:\n        outcomes = list(pool.map(contender, (\"Ada\", \"Maya\")))\n    print(\"initial:\", initial.returncode, sep=\"\")\n    print(\"persisted:\", saved.stdout.strip(), sep=\"\")\n    print(\"rejected:\", duplicate.returncode, sep=\"\")\n    print(\"concurrent-winners:\", sum(code == 0 for code in outcomes), sep=\"\")\n"
+              ],
+              "exit": 0,
+              "stdout": "initial:0\npersisted:Ada\nrejected:2\nconcurrent-winners:1\n",
+              "stderr": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "verification-concurrency-and-persistence-gap",
+      "rationale": "Supplied in-process tests are green, but separate processes lose the booking and competing callers can both succeed. The state-machine sequence and overlap have independently known failing observations.",
+      "contract": "# Acceptance contract: durable reservation\n\nContract revision: v1\nSource: [Specification](../../../spec.md)\n\nIntended outcome: Reservations survive process restarts, and concurrent callers cannot both take one slot.\n\n## Acceptance matrix\n\n| ID | Source | Requirement | Boundaries / counterexamples | Seam | Oracle | Planned evidence | Plan state |\n|---|---|---|---|---|---|---|---|\n| R1 | spec.md | Reserve an unoccupied slot and report success. | The first valid booking succeeds. | python3 booking_cli.py reserve DB seat Ada | Exit zero, prints reserved. | Execute the real CLI on a fresh database and inspect the result. | planned |\n| R2 | spec.md | Persist the reservation across independent CLI processes. | Process restart must not lose reservation. | python3 booking_cli.py show DB seat | Exit zero, prints Ada. | Restart the CLI, observe the recorded occupant. | planned |\n| R3 | spec.md | Enforce at most one successful reservation per slot across competing processes. | A second or concurrent reservation must fail. | python3 booking_cli.py reserve DB seat Maya | Exit two and prints taken. | Exercise repeated and overlapping callers with the actual persistence mechanism. | planned |\n\n## Unresolved gaps\n\nNone.\n",
+      "base_changes": {
+        "spec.md": "A durable CLI must reserve the first user for a slot, keep it across process restarts, and prevent two processes from both reserving the same slot. Successful reserve prints reserved; a duplicate prints taken and exits two. The storage must be on disk rather than in-process state.\\n"
+      },
+      "candidates": [
+        {
+          "name": "volatile-reservations",
+          "implementation": "reservation-volatile",
+          "expected": {
+            "review": "CHANGES NEEDED",
+            "proof": "NOT PROVEN",
+            "required_risks": {
+              "review": [
+                {
+                  "requirement": "R2",
+                  "path": "booking.py",
+                  "status": "unresolved"
+                },
+                {
+                  "requirement": "R3",
+                  "path": "booking.py",
+                  "status": "unresolved"
+                }
+              ],
+              "proof": [
+                {
+                  "requirement": "R2",
+                  "path": "booking.py",
+                  "status": "unresolved"
+                },
+                {
+                  "requirement": "R3",
+                  "path": "booking.py",
+                  "status": "unresolved"
+                }
+              ]
+            },
+            "missing_proof": [
+              "R2",
+              "R3"
+            ],
+            "review_finding": {
+              "axis": "Contract fidelity",
+              "source": "R2",
+              "path": "booking.py"
+            }
+          },
+          "oracle": [
+            {
+              "id": "restart-and-interleaving",
+              "args": [
+                "-c",
+                "from concurrent.futures import ThreadPoolExecutor\nimport subprocess\nimport sys\nimport tempfile\nfrom pathlib import Path\nwith tempfile.TemporaryDirectory() as folder:\n    first_db, race_db = Path(folder) / \"first.db\", Path(folder) / \"race.db\"\n    def call(*args):\n        return subprocess.run([sys.executable, \"-B\", \"booking_cli.py\", *map(str, args)], capture_output=True, text=True, timeout=15)\n    initial = call(\"reserve\", first_db, \"seat\", \"Ada\")\n    saved = call(\"show\", first_db, \"seat\")\n    duplicate = call(\"reserve\", first_db, \"seat\", \"Maya\")\n    call(\"show\", race_db, \"other\")\n    def contender(name):\n        return call(\"reserve\", race_db, \"other\", name).returncode\n    with ThreadPoolExecutor(max_workers=2) as pool:\n        outcomes = list(pool.map(contender, (\"Ada\", \"Maya\")))\n    print(\"initial:\", initial.returncode, sep=\"\")\n    print(\"persisted:\", saved.stdout.strip(), sep=\"\")\n    print(\"rejected:\", duplicate.returncode, sep=\"\")\n    print(\"concurrent-winners:\", sum(code == 0 for code in outcomes), sep=\"\")\n"
+              ],
+              "exit": 0,
+              "stdout": "initial:0\npersisted:none\nrejected:0\nconcurrent-winners:2\n",
+              "stderr": ""
+            }
+          ]
         }
       ]
     }

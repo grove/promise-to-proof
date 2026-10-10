@@ -169,6 +169,23 @@ fresh independent full-scope judgment, though earlier observations can remain
 applicable under the canonical focused re-verification rules. A trace is
 not a substitute for checking scope, quality, or material risks.
 
+### Check important affected seams proportionately
+
+Follow the canonical material-seam rules, reusing the existing requirement
+and review-scope trace. If a candidate touches a realistic security boundary,
+shared state, persistence or concurrency invariant, name the affected path,
+applicable failure trigger, concrete consequence and independent check or
+inspection. It may be material without a live exploit. A small isolated
+change needs no separate exhaustive edge-case search or extra test method.
+Do not duplicate proof: select enough independent engineering observations
+to judge the important implementation and scope risks.
+
+For a changed candidate, inspect the complete delta, its callers/configuration,
+and assumptions behind any retained prior observations. Record an unresolved
+material seam as a finding or necessary unknown; do not silently call it
+addressed. Use `coverage_trace.risks` on the current stage when requested,
+without repeating facts in another review rubric.
+
 ## Investigate without repairing
 
 Start from the source, contract, candidate, and constraints. The author's report

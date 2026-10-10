@@ -75,6 +75,8 @@ class OfflineJudgmentTransport:
             **({'inspected_paths': sorted({item['path'] for item in manifest} & set(paths))}
                if stage == 'review' else {}),
         }
+        if 'coverage_trace.risks' in prompt:
+            report['coverage_trace']['risks'] = []  # No extra material risks in the low-risk offline fixture.
         session = "offline-" + uuid.uuid4().hex
         events = [
             {"type": "thread.started", "thread_id": session},
@@ -118,15 +120,23 @@ class LiveJudgmentRunnerTests(unittest.TestCase):
             "review-unreliable-regression-test", "review-sample-only-implementation",
             "review-conditional-security-risk", "review-reconcile-corrected-finding",
         }
-        self.assertEqual(set(cases), original | review_quality)
+        material_risks = {
+            "verification-durable-control", "verification-concurrency-and-persistence-gap",
+        }
+        self.assertEqual(set(cases), original | review_quality | material_risks)
         for case in cases.values():
             for candidate in case["candidates"]:
                 self.assertIn(candidate["expected"]["review"], ("REVIEWED", "CHANGES NEEDED"))
                 self.assertIn(candidate["expected"]["proof"], ("PROVEN", "NOT PROVEN"))
-                self.assertTrue(
-                    {"empty-username", "visible-username", "whitespace-only-username", "unrelated-fee"}
-                    <= {p["id"] for p in candidate["oracle"]}
-                )
+                if case["id"].startswith("verification-"):
+                    self.assertEqual({p["id"] for p in candidate["oracle"]},
+                                     {"restart-and-interleaving"})
+                    self.assertIn("required_risks", candidate["expected"])
+                else:
+                    self.assertTrue(
+                        {"empty-username", "visible-username", "whitespace-only-username", "unrelated-fee"}
+                        <= {p["id"] for p in candidate["oracle"]}
+                    )
                 for probe in candidate.get("guard_probes", []):
                     self.assertEqual(probe["replace"], ["username.py"])
                     self.assertIn(probe["expected_exit"], (0, 1))
@@ -209,6 +219,26 @@ class LiveJudgmentRunnerTests(unittest.TestCase):
                              ["review", "proof", "review", "proof"])
             self.assertEqual(len({a["session_id"] for a in delivery.state["attempts"]}), 4)
             self.assertEqual(delivery.state["local_git_generations"][-1]["candidate_key"], second["key"])
+
+    def test_material_risk_outcomes_use_independent_contract_and_public_oracle(self):
+        cases = {case["id"]: case for case in self.data["cases"]}
+        correct = cases["verification-durable-control"]
+        broken = cases["verification-concurrency-and-persistence-gap"]
+        self.assertIn("Persist the reservation across independent CLI processes",
+                      correct["contract"])
+        self.assertEqual(correct["contract"], broken["contract"])
+        self.assertIn("storage", correct["base_changes"]["spec.md"].lower())
+        for case, outcome, risk_status in ((correct, "PROVEN", "addressed"),
+                                            (broken, "NOT PROVEN", "unresolved")):
+            entry = case["candidates"][0]
+            self.assertEqual(entry["expected"]["proof"], outcome)
+            for stage in ("review", "proof"):
+                self.assertEqual(
+                    {(r["requirement"], r["path"], r["status"])
+                     for r in entry["expected"]["required_risks"][stage]},
+                    {("R2", "booking.py", risk_status), ("R3", "booking.py", risk_status)})
+        self.assertIn("concurrent-winners:1", correct["candidates"][0]["oracle"][0]["stdout"])
+        self.assertIn("concurrent-winners:2", broken["candidates"][0]["oracle"][0]["stdout"])
 
     def test_test_quality_controls_distinguish_genuine_from_hollow_regression_guards(self):
         cases = {case["id"]: case for case in self.data["cases"]}

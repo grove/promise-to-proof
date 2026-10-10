@@ -453,6 +453,43 @@ a known narrow delta still needs targeted independent inspection and fresh
 current-candidate verification, while an unchanged candidate still needs a
 current-target compatibility check.
 
+## Risk-driven checks for changed seams and moving targets
+
+The existing stage reports now retain an optional compact material-risk
+mapping alongside #41 requirement coverage. Each applicable item identifies
+requirements, touched code/dependency paths, a realistic trigger, why it
+matters, an observation/check and its resolved or unresolved status. Low-risk
+changes can legitimately have no additional risk items. A risk that remains
+materially unresolved cannot appear as successfully addressed by a current
+stage. These facts are checked for real references and retained in the existing
+review/delivery records; there is no extra actor or assessment stage.
+
+When a PR target advances, use the frozen review base and exact PR-head/target
+commits to identify only relevant *additional* compatibility checks:
+
+```sh
+python3 skills/productivity/deliver-issue/scripts/p2p_filesystem.py \
+  --repo /path/to/source \
+  target-risk-status .p2p/work/example/contract.md \
+  --destination-repo /path/to/checkout-with-required-git-objects \
+  --head-ref FULL_PR_HEAD_SHA --destination-ref FULL_TARGET_SHA
+```
+
+`TARGETED_CHECKS_REQUIRED` names changed paths intersecting saved seams;
+`NO_ADDITIONAL_RISK_CHECKS` means there is no extra check from the recorded
+dependencies, not that merge readiness has passed. `UNKNOWN` reports
+missing history, non-fast-forward target movement, or a different PR head.
+A known direct intersection merits focused current-head/target verification;
+uncertain reach merits broader checking. Ordinary exact-pair CI, current
+target compatibility, review/proof identities and merge authority remain
+separate mandatory decisions. The CLI is read-only and returns nonzero when
+more checks or a resolution are needed.
+
+The [live judgment fixtures](../checks/fixtures/live-judgments/README.md)
+include a low-risk control and durable booking scenarios with an independent
+public-CLI restart and competing-process oracle. Offline fixture checks
+establish only runner/trace behavior, not live model quality.
+
 ## Host boundary and checks
 
 Each invocation first launches two fresh real Codex contexts. They attempt writes
