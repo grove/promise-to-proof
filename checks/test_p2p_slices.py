@@ -45,6 +45,15 @@ class EvidenceSemanticsTests(unittest.TestCase):
         self.assertEqual(len(self.check()["checks"]), 1)
         self.assertLessEqual(len(json.dumps(self.check())), 2048)
 
+    def test_check_schema_exposes_enforced_evidence_limits(self):
+        fields = slices.schema()['properties']['checks']['items']['properties']
+        for field in ('command', 'observation'):
+            with self.subTest(field=field):
+                self.assertEqual((fields[field]['minLength'], fields[field]['maxLength']), (1, 400))
+                check = witness()['checks'][0] | {field: 'x' * 401}
+                with self.assertRaisesRegex(ValueError, 'meaningful observable'):
+                    self.check(implementation_slice=witness(checks=[check]))
+
     def test_false_green_or_missing_check_does_not_verify_slice(self):
         for change in (
                 witness(checks=[]),
@@ -84,6 +93,22 @@ class EvidenceSemanticsTests(unittest.TestCase):
             report, ["R1"], [],
             [{"command": "cat greet.py", "exit_code": 0,
               "aggregated_output": "print('hello')\n"}], self.after, self.before)["id"], "I1")
+
+    def test_git_inspection_with_controller_metadata_options_is_grounded(self):
+        command = ('GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_OPTIONAL_LOCKS=0 '
+                   'git --git-dir=../repository.git --work-tree=. diff comparison-base')
+        check = {"kind": "inspection", "command": command, "result": "observed",
+                 "observation": "+print('hello')"}
+        self.assertEqual(slices.validate(
+            self.report | {"implementation_slice": witness(checks=[check])}, ["R1"], [],
+            [{"command": command, "exit_code": 0, "aggregated_output": "+print('hello')\n"}],
+            self.after, self.before)["id"], "I1")
+        for invalid in (command.replace('diff comparison-base', 'log --format=diff'),
+                        command.replace('git --git-dir=', 'printf --git-dir=')):
+            with self.subTest(command=invalid):
+                self.assertFalse(slices._nontrivial_check(check | {"command": invalid}, ["greet.py"]))
+        with self.assertRaisesRegex(ValueError, "matching host"):
+            self.check(implementation_slice=witness(checks=[check]))
 
     def test_partial_slice_requires_real_boundary_and_next_action(self):
         partial = witness(boundary_reason="A separately observable database step.",

@@ -25,6 +25,14 @@ sizing issue. A real unavailable prerequisite or authority stays a blocker.
 Evidence-only recovery must leave product bytes unchanged. Planning decisions
 return to the delegated planner/auditor; repair cannot weaken the agreement.
 
+A controller's read-only diagnosis can follow implementation, review or proof;
+it does not require a `NOT PROVEN` proof for an implementation or agreement gap.
+Use its supplied exact input identity. The controller owns authority validation,
+candidate capture, Git generation mapping and durable records; do not reconstruct
+those checks or audit its instruction archive. Read every applicable protocol
+section using its headings, skipping unrelated workflow sections. The standalone
+repair workflow below requires the matching proof and storage steps.
+
 
 `/repair-gaps` is the repair step after `/prove`. It consumes the source
 contract, the proof result, the matching candidate, and specific unresolved

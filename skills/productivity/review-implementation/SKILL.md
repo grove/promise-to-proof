@@ -14,6 +14,15 @@ Apply its [pragmatic assurance](references/acceptance-contract-protocol.md#pragm
 and [focused re-verification](references/acceptance-contract-protocol.md#focused-re-verification-after-a-repair)
 rules. The goal is a trustworthy delivery, not an exhaustive search for improvements.
 
+For a controller-managed isolated stage, use its exact supplied identities and
+enforced fixed candidate. The controller establishes and rechecks authority,
+routing, candidate/binding-input identity, Git generation mapping and stability.
+Do not audit its mandate, instruction archive or generation chain or reconstruct
+candidate capture solely for handoff. Independently inspect the complete sources,
+actual candidate, diff, scope and material engineering evidence. An actual
+contradiction or missing identity guarantee remains `BLOCKED`. The standalone
+identity-establishment and storage steps below apply outside that boundary.
+
 Invocation authorizes inspection, safe isolated diagnostics, and saving the
 review report and evidence under `.p2p/work/<slug>/`. Do not
 repair code, tests, configuration, or the contract, even when the surrounding

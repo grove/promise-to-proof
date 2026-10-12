@@ -864,6 +864,17 @@ attribution before capture; an external URL alone cannot establish its currency.
 Historical copies in `.p2p/` identify previous agreements but are not live inputs.
 The work item, binding inputs, and reports must all agree on these identities.
 
+In a controller-managed host-isolated delivery, the controller establishes and
+rechecks authority/routing, full candidate and binding-input identities and Git
+generation mapping at stage boundaries. It checks protected binding-input and
+fixed verifier-candidate stability before and after verification. Workers bind
+their reports to its supplied exact identities and independently inspect the
+actual sources, product, scope and material evidence. Do not repeat controller
+mandate validation, generation mapping, instruction-archive audits or candidate
+capture solely for handoff. An actual contradiction or unavailable identity
+guarantee still blocks a positive verdict. Standalone stages establish these
+identities themselves; controller metadata never supplies a product judgment.
+
 Exclude `.p2p/` and `p2p-state/` from product candidate trees and snapshots. Capture
 all relevant tracked, staged, unstaged, deleted, and untracked product content,
 including executable modes and symlink targets. A compact record keeps the full

@@ -247,6 +247,18 @@ register from this skill.
 
 ## Reconcile and hand off
 
+In a controller-managed delivery, the controller performs the authority/routing
+validation, final candidate capture, Git generation mapping, and durable report
+storage. Return the requested structured report with the supplied exact
+`input_identity_json`; the controller captures the resulting candidate before
+independent verification. Do not reconstruct its snapshot algorithm, audit its
+instruction archive or generation chain, rerun its mandate validator, or write
+`candidate.json`. Those checks belong to the controller. Your checks establish
+the product's source obligations and material development risks. Report any
+actual input contradiction without duplicating controller internals for handoff.
+The candidate-record and report-storage instructions below apply to standalone
+delivery; controller-managed delivery supplies those artifacts itself.
+
 Inspect the complete resulting diff for missing substance and unjustified scope.
 Account for each selected requirement with implementation locations, its direct
 acceptance test/check or contract-approved non-test evidence path, observed

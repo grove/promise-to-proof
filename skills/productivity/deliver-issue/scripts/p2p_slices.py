@@ -27,18 +27,20 @@ def schema():
     return obj({
         "id": string,
         "requirement_ids": {"type": "array", "items": string},
-        "expected_result": string,
+        "expected_result": string | {"minLength": 1, "maxLength": 450},
         "checks": {"type": "array", "maxItems": MAX_CHECKS, "items": obj({
             "kind": {"type": "string", "enum": ["test", "inspection", "manual"]},
-            "command": string,
+            "command": string | {"minLength": 1, "maxLength": 400},
             "result": {"type": "string", "enum": ["passed", "observed"]},
-            "observation": string,
+            "observation": string | {"minLength": 1, "maxLength": 400},
         })},
-        "paths": {"type": "array", "items": string},
+        "paths": {"type": "array", "maxItems": MAX_PATHS,
+                  "items": string | {"maxLength": 350}},
         "outcome": {"type": "string", "enum": ["VERIFIED", "BLOCKED"]},
-        "boundary_reason": string,
-        "next_action": string,
-        "retires": {"type": "array", "items": obj({"id": string, "reason": string})},
+        "boundary_reason": string | {"maxLength": 450},
+        "next_action": string | {"maxLength": 450},
+        "retires": {"type": "array", "items": obj({"id": string,
+                    "reason": string | {"minLength": 1, "maxLength": 240}})},
     })
 
 
@@ -75,6 +77,18 @@ def _nontrivial_check(check, paths):
                       "sleep", "touch", "mkdir"}:
         return False
     command = check["command"]
+    git_args = parts[:]
+    while git_args and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", git_args[0]):
+        git_args.pop(0)
+    git_inspection = False
+    if git_args and git_args.pop(0).rsplit("/", 1)[-1] == "git":
+        while git_args and git_args[0].startswith("-"):
+            option = git_args.pop(0)
+            if option in ("-C", "-c", "--git-dir", "--work-tree", "--namespace", "--config-env"):
+                if not git_args:
+                    return False
+                git_args.pop(0)
+        git_inspection = bool(git_args and git_args[0] in ("diff", "show", "grep"))
     if check["kind"] == "test":
         runners = ("pytest", "unittest", "cargo test", "go test",
                    "npm test", "npm run test", "pnpm test", "yarn test",
@@ -87,6 +101,7 @@ def _nontrivial_check(check, paths):
             return False
     if check["kind"] == "inspection" and not (
             any(path in command for path in paths) or
+            git_inspection or
             "git diff" in command or "git show" in command or
             "git grep" in command):
         return False

@@ -19,6 +19,16 @@ and [focused re-verification](references/acceptance-contract-protocol.md#focused
 rules: complete coverage and fresh current-candidate judgments do not require
 exhaustive or duplicate checking.
 
+For a controller-managed isolated stage, use its exact supplied identities and
+enforced fixed candidate. The controller establishes and rechecks authority,
+routing, candidate/binding-input identity, Git generation mapping and stability.
+Do not audit its mandate, instruction archive or generation chain or reconstruct
+candidate capture solely for handoff. Independently reconcile the complete
+original sources and prove the actual product outcomes with material evidence.
+An actual contradiction or missing identity guarantee remains `NOT PROVEN`.
+The standalone identity-establishment and storage steps below remain applicable
+outside that controller-managed boundary.
+
 Optional [evidence-record v1](../../../docs/evidence-record-v1.md) records may be cited
 by evidence ID and computed SHA-256 digest, and their deterministic Markdown
 rendering may be embedded in `proof.md`. Validate records against the exact proof

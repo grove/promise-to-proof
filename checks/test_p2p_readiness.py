@@ -96,6 +96,19 @@ class ReadinessTests(unittest.TestCase):
         self.assertIn('NEVER a missing prerequisite', prompt)
         self.assertIn('actual required access', prompt)
         self.assertIn('Do not install dependencies', prompt)
+        schema = json.loads((self.fixture.runtime() / 'attempts' / attempt['id'] / 'schema.json').read_bytes())
+        self.assertEqual(schema['properties']['checks']['items']['properties']['requirement_id']['enum'],
+                         state['requirements'])
+        self.assertIn('ONE exact declared ID', prompt)
+
+    def test_readiness_still_rejects_undeclared_ids(self):
+        def invalid(report, events):
+            report['checks'][0]['requirement_id'] = 'PREFLIGHT'
+        with patch.object(d, 'launch', self.transport(invalid)):
+            code, result = self.fixture.cli()
+        self.assertEqual(code, 1, result)
+        self.assertEqual(self.fixture.state()['attempts'][-1]['report_validation'], 'rejected')
+        self.assertNotIn('implementation', self.fixture.fake.calls)
 
     def test_missing_evidence_blocks_before_implementation_and_resumes_same_delivery(self):
         edit = self.missing('input', 'required historical SQL evidence',
